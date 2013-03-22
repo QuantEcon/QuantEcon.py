@@ -4,12 +4,12 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm
 import numpy as np
 from odu_vfi import *
-from compute_vf import compute_value_function
+from compute_fp import compute_fixed_point
 
 
 sp = searchProblem(w_grid_size=100, pi_grid_size=100)
 v_init = np.zeros(len(sp.grid_points)) + sp.c / (1 - sp.beta)
-v = compute_value_function(bellman, sp, v_init)
+v = compute_fixed_point(bellman, sp, v_init)
 policy = get_greedy(sp, v)
 # Make functions from these arrays by interpolation
 vf = LinearNDInterpolator(sp.grid_points, v)
