@@ -3,15 +3,16 @@ Computational Economics
 
 John Stachurski with Thomas J. Sargent
 
-This repository holds python code for the **Computational Economics** project.  
+This repository holds Python code for the **Computational Economics** project.  
 
-### To Download
+### To download
 
 Either
 
-* Click the 'Zip' icon 
-* Use git to clone 
+* Download the zip file [here](https://github.com/jstac/comp-econ/archive/master.zip)
+* Click the 'Zip' icon at the top of the page
+* Use git to clone --- see above
 
-### To Download
+### Project page
 
-The main project page is [here](https://jstac.github.com/comp-econ).
+The main project page is [here](http://jstac.github.com/comp-econ).
