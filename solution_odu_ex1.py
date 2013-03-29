@@ -1,8 +1,4 @@
 """
-Author: John Stachurski, with Thomas J. Sargent
-Date:   3/2013
-File:   odu_rwf.py
-
 Solves the "Offer Distribution Unknown" Model by iterating on a guess of the
 reservation wage function.
 """
