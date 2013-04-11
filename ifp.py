@@ -1,7 +1,7 @@
 """
-Filename: ifp.py
-Authors: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date: 3/2013
+File: ifp.py
 
 Functions for solving the income fluctuation problem. Iteration with either
 the Coleman or Bellman operators from appropriate initial conditions leads to
@@ -9,13 +9,14 @@ convergence to the optimal consumption policy.  The income process is a finite
 state Markov chain.  Note that the Coleman operator is the preferred method,
 as it is almost always faster and more accurate.  The Bellman operator is
 only provided for comparison.
+
 """
 
 import numpy as np
 from scipy.optimize import fminbound, brentq
 from scipy import interp
 
-class consumerProblem:
+class consumerProblem(object):
     """
     This class is just a "struct" to hold the collection of parameters
     defining the consumer problem.  

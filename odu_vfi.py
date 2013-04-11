@@ -1,17 +1,18 @@
 """
-Author: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date:   3/2013
 File:   odu_vfi.py
 
 Solves the "Offer Distribution Unknown" Model by value function iteration.
-Note that a better implementation is given in odu_rwf.
+
+Note that a much better technique is given in solution_odu_ex1.py
 """
 from scipy.interpolate import LinearNDInterpolator
 from scipy.integrate import fixed_quad
 from scipy.stats import beta as beta_distribution
 import numpy as np
 
-class searchProblem:
+class searchProblem(object):
     """
     A class to store a given parameterization of the "offer distribution
     unknown" model.
@@ -25,9 +26,9 @@ class searchProblem:
         problem. Each row represents a single (w, pi) pair.
         """
         self.beta, self.c, self.w_max = beta, c, w_max
-        F = beta_distribution(F_a, F_b, scale=w_max)
-        G = beta_distribution(G_a, G_b, scale=w_max)
-        self.f, self.g = F.pdf, G.pdf              # Density functions
+        self.F = beta_distribution(F_a, F_b, scale=w_max)
+        self.G = beta_distribution(G_a, G_b, scale=w_max)
+        self.f, self.g = self.F.pdf, self.G.pdf    # Density functions
         self.pi_min, self.pi_max = 1e-3, 1 - 1e-3  # Avoids instability
         self.w_grid = np.linspace(0, w_max, w_grid_size)
         self.pi_grid = np.linspace(self.pi_min, self.pi_max, pi_grid_size)

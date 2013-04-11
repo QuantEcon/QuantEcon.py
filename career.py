@@ -1,11 +1,11 @@
 """
-Author: John Stachurski, with Thomas J. Sargent
-Date:   2/2013
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Date:   4/2013
 File:   kalman.py
 
 A collection of functions to solve the career / job choice model of Neal.
-
 """
+
 import numpy as np
 from scipy.special import binom, beta
 

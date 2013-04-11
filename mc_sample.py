@@ -1,7 +1,7 @@
 """
-File:   mc_sample.py
-Author: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date:   2/2013
+File:   mc_sample.py
 """
 
 import numpy as np

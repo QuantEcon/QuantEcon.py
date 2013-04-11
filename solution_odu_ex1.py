@@ -1,39 +1,43 @@
 """
-Solves the "Offer Distribution Unknown" Model by iterating on a guess of the
+Solves the "Offer Distribution Unknown" model by iterating on a guess of the
 reservation wage function.
 """
 from scipy import interp
 import numpy as np
+from numpy import maximum as npmax
 import matplotlib.pyplot as plt
 from odu_vfi import searchProblem
 from scipy.integrate import fixed_quad
 from compute_fp import compute_fixed_point
 
-def res_wage_operator(sp, w_bar):
+
+def res_wage_operator(sp, phi):
     """
-    Updates the reservation wage function guess via the operator Q.  Returns
-    the updated function Q w_bar, represented as an array.
+    Updates the reservation wage function guess phi via the operator Q.
+    Returns the updated function Q phi, represented as the array new_phi.
     
         * sp is an instance of searchProblem, defined in odu_vfi
-        * w_bar is a NumPy array with len(w_bar) = len(sp.pi_grid)
+        * phi is a NumPy array with len(phi) = len(sp.pi_grid)
 
     """
     beta, c, f, g, q = sp.beta, sp.c, sp.f, sp.g, sp.q    # Simplify names
-    w_bar_f = lambda p: interp(p, sp.pi_grid, w_bar)   # Turn into function
-    M = len(w_bar)
-    new_w = np.empty(M)
-    for i in range(M):
-        pi = sp.pi_grid[i]
-        integrand = lambda wp: np.maximum(wp, w_bar_f(q(wp, pi))) * \
-                    (pi * f(wp) + (1 - pi) * g(wp))
+    phi_f = lambda p: interp(p, sp.pi_grid, phi)  # Turn phi into a function
+    new_phi = np.empty(len(phi))
+    for i, pi in enumerate(sp.pi_grid):
+        def integrand(x):
+            "Integral expression on right-hand side of operator"
+            return npmax(x, phi_f(q(x, pi))) * (pi * f(x) + (1 - pi) * g(x))
         integral, error = fixed_quad(integrand, 0, sp.w_max)
-        new_w[i] = (1 - beta) * c + beta * integral
-    return new_w
+        new_phi[i] = (1 - beta) * c + beta * integral
+    return new_phi
+
 
 if __name__ == '__main__':  # If module is run rather than imported
+
     sp = searchProblem(pi_grid_size=50)
-    w_bar_init = np.ones(len(sp.pi_grid)) 
-    w_bar = compute_fixed_point(res_wage_operator, sp, w_bar_init)
+    phi_init = np.ones(len(sp.pi_grid)) 
+    w_bar = compute_fixed_point(res_wage_operator, sp, phi_init)
+
     fig, ax = plt.subplots()
     ax.plot(sp.pi_grid, w_bar, linewidth=2, color='black')
     ax.set_ylim(0, 2)

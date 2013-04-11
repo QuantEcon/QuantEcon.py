@@ -1,5 +1,5 @@
 """
-Author: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date:   2/2013
 File:   kalman.py
 

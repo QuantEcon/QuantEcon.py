@@ -1,9 +1,10 @@
 """
-Filename: tauchen.py
-Authors: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date: 3/2013
+File: tauchen.py
 
-Discretize linear Gaussian AR(1) processes via Tauchen's method
+Discretizes Gaussian linear AR(1) processes via Tauchen's method
+
 """
 
 import numpy as np

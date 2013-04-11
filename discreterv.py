@@ -1,13 +1,14 @@
 """
-File:   discreterv.py
-Author: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date:   2/2013
+File:   discreterv.py
+
 """
 
 from numpy import cumsum
 from numpy.random import uniform
 
-class discreteRV:
+class discreteRV(object):
     """
     Generates an array of draws from a discrete random variable with vector of
     probabilities given by q.  In particular, the draw() method returns i with

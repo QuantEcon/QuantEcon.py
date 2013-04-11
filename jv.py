@@ -1,5 +1,5 @@
 """
-Author: John Stachurski, with Thomas J. Sargent
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Date:   3/2013
 File:   jv.py
 
@@ -31,7 +31,7 @@ from scipy import interp
 
 epsilon = 1e-4  #  A small number, used in the optimization routine
 
-class workerProblem:
+class workerProblem(object):
 
     def __init__(self, A=1.4, alpha=0.6, beta=0.96, grid_size=50):
         """
