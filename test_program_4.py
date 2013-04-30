@@ -11,7 +11,6 @@ def generate_data(n, generator_type):
         epsilon_values.append(e)
     return epsilon_values
 
-ts_length = 100
-data = generate_data(ts_length, 'U')
+data = generate_data(100, 'U')
 pylab.plot(data, 'b-')
 pylab.show()

@@ -8,7 +8,6 @@ def generate_data(n):
         epsilon_values.append(e)
     return epsilon_values
 
-ts_length = 100
-data = generate_data(ts_length)
+data = generate_data(100)
 pylab.plot(data, 'b-')
 pylab.show()
