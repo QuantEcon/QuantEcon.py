@@ -16,7 +16,7 @@ import numpy as np
 from scipy.optimize import fminbound, brentq
 from scipy import interp
 
-class consumerProblem(object):
+class consumerProblem:
     """
     This class is just a "struct" to hold the collection of parameters
     defining the consumer problem.  

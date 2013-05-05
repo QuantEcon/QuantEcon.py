@@ -8,7 +8,7 @@ File:   discreterv.py
 from numpy import cumsum
 from numpy.random import uniform
 
-class discreteRV(object):
+class discreteRV:
     """
     Generates an array of draws from a discrete random variable with vector of
     probabilities given by q.  In particular, the draw() method returns i with

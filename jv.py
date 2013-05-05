@@ -31,7 +31,7 @@ from scipy import interp
 
 epsilon = 1e-4  #  A small number, used in the optimization routine
 
-class workerProblem(object):
+class workerProblem:
 
     def __init__(self, A=1.4, alpha=0.6, beta=0.96, grid_size=50):
         """

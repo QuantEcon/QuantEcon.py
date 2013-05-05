@@ -1,7 +1,7 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   4/2013
-File:   kalman.py
+Date:   5/2013
+File:   career.py
 
 A collection of functions to solve the career / job choice model of Neal.
 """
@@ -21,7 +21,7 @@ def gen_probs(n, a, b):
     return probs
 
 
-class workerProblem(object):
+class workerProblem:
 
     def __init__(self, B=5.0, beta=0.95, N=50, F_a=1, F_b=1, G_a=1, G_b=1):
         self.beta, self.N, self.B = beta, N, B

@@ -17,7 +17,7 @@ import numpy as np
 from numpy import dot
 from numpy.linalg import inv
 
-class Kalman(object):
+class Kalman:
 
     def __init__(self, A, G, Q, R):
         """

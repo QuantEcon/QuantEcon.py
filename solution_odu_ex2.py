@@ -13,7 +13,7 @@ w_bar_vals = compute_fixed_point(res_wage_operator, sp, phi_init)
 w_bar = lambda x: interp(x, pi_grid, w_bar_vals)
 
 
-class Agent(object):
+class Agent:
     """
     Holds the employment state and beliefs of an individual agent.
     """

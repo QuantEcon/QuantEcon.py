@@ -12,7 +12,7 @@ from scipy.integrate import fixed_quad
 from scipy.stats import beta as beta_distribution
 import numpy as np
 
-class searchProblem(object):
+class searchProblem:
     """
     A class to store a given parameterization of the "offer distribution
     unknown" model.
