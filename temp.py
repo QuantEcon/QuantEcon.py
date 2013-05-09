@@ -1,27 +1,19 @@
 
-
+from ifp import *
 import numpy as np
+import matplotlib.pyplot as plt
 
-alpha = 0.7
-phi_ext = 2 * 3.14 * 0.5
+num_iter = 25
 
-def f(a, b):
-    return 2 + alpha - 2 * np.cos(b)*np.cos(a) - alpha * np.cos(phi_ext - 2*b)
-    #return a + np.sqrt(b)
+fig, ax = plt.subplots()
 
-x_max = 3
-y_max = 2.5
-
-# A grid for plotting
-Nx1, Ny1 = 10, 5
-x1 = np.linspace(0, x_max, Nx1)
-y1 = np.linspace(0, y_max, Ny1)
-X1, Y1 = np.meshgrid(x1, y1)
-
-Zm = f(X1, Y1)
-ZA = np.empty((Ny1, Nx1))
-for i in range(Ny1):
-    for j in range(Nx1):
-        ZA[i, j] = f(x1[j], y1[i])
-
-
+rs = np.linspace(0, 0.04, 4)
+for r in rs:
+    cp = consumerProblem(r=r)
+    v, c = initialize(cp)
+    print r
+    for i in range(num_iter):
+        c = coleman_operator(cp, c)
+    ax.plot(cp.asset_grid, c[:,0], label=str(r))
+ax.legend(loc='upper left')
+fig.show()

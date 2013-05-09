@@ -10,7 +10,7 @@ for r_val in r_vals:
     m = consumerProblem(r=r_val)
     v_init, c_init = initialize(m)
     c = compute_fixed_point(coleman_operator, m, c_init)
-    ax.plot(m.asset_grid, c[:, 0], label=r'$r = %.2f$' % r_val)
+    ax.plot(m.asset_grid, c[:, 0], label=r'$r = %.3f$' % r_val)
 
 ax.set_xlabel('asset level')
 ax.set_ylabel('consumption (low income)')
