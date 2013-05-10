@@ -113,15 +113,15 @@ def coleman_operator(cp, c):
             vals[i] = interp(a, cp.asset_grid, c[:, i])
         return vals
 
-    new_c = np.empty(c.shape)
+    Kc = np.empty(c.shape)
     for i_a, a in enumerate(asset_grid):
         for i_z, z in enumerate(z_vals):
             def h(t):
                 expectation = np.dot(du(cf(R * a + z - t)), Pi[i_z, :])
                 return du(t) - max(gamma * expectation, du(R * a + z + b))
-            new_c[i_a, i_z] = brentq(h, np.min(z_vals), R * a + z + b)
+            Kc[i_a, i_z] = brentq(h, np.min(z_vals), R * a + z + b)
 
-    return new_c
+    return Kc
 
 def initialize(cp):
     """

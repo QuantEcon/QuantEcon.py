@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from compute_fp import compute_fixed_point
 from ifp import coleman_operator, consumerProblem, initialize
-from ifp_stationary_dist import compute_asset_series
+from solution_ifp_ex3 import compute_asset_series
 
 M = 25
 r_vals = np.linspace(0, 0.04, M)  
@@ -11,8 +11,8 @@ fig, ax = plt.subplots()
 for b in (1, 3):
     asset_mean = []
     for r_val in r_vals:
-        m = consumerProblem(r=r_val, b=b)
-        mean = np.mean(compute_asset_series(m, T=250000))
+        cp = consumerProblem(r=r_val, b=b)
+        mean = np.mean(compute_asset_series(cp, T=250000))
         asset_mean.append(mean)
     ax.plot(asset_mean, r_vals, label=r'$b = %d$' % b)
 
