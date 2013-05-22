@@ -1,18 +1,14 @@
-Computational Economics
-===========================
+Quantitative Economics with Python
+========================================
 
-John Stachurski with Thomas J. Sargent
+This repository holds Python code for the [Quantitative Economics with Python](http://quant-econ.net) project.  
 
-This repository holds Python code for the **Computational Economics** project.  
+Authors: John Stachurski and Thomas J. Sargent
 
 ### To download
 
 Either
 
-* Download the zip file [here](https://github.com/jstac/comp-econ/archive/master.zip)
-* Click the 'Zip' icon at the top of the page
-* Use git to clone --- see above
+* Click the 'Zip' button at the top of this page, or
+* Use [git](https://help.github.com/articles/set-up-git) to clone the repository
 
-### Project page
-
-The main project page is [here](http://jstac.github.com/comp-econ).
