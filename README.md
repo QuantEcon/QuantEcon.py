@@ -5,10 +5,20 @@ This repository holds Python code for the [Quantitative Economics with Python](h
 
 Authors: John Stachurski and Thomas J. Sargent
 
-### To download
+### About
+
+This code repository is written in conjuction with the lecture series---see
+the Quantitative Economics with Python [top page](http://quant-econ.net).  All
+code contained in this repository is explained in detail in the lectures.
+The lectures also provide information on getting started with Python and
+working with the code repository.
+
+
+### Downloading the Repository
 
 Either
 
 * Click the 'Zip' button at the top of this page, or
-* Use [git](https://help.github.com/articles/set-up-git) to clone the repository
+* Use [Git](https://help.github.com) to clone the repository
+
 
