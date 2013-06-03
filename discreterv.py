@@ -21,8 +21,8 @@ class discreteRV:
     def set_q(self, q):
         self.Q = cumsum(q)  # Cumulative sum
 
-    def draw(self, n=1):
-        "Returns n draws from q."
-        return self.Q.searchsorted(uniform(0, 1, size=n)) 
+    def draw(self, k=1):
+        "Returns k draws from q."
+        return self.Q.searchsorted(uniform(0, 1, size=k)) 
 
 

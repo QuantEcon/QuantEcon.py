@@ -1,8 +1,5 @@
-"""
-Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   2/2013
-File:   mc_sample.py
-"""
+## Filename: mc_sample.py
+## Author: John Stachurski
 
 import numpy as np
 from discreterv import discreteRV
@@ -28,3 +25,4 @@ def sample_path(p, init=0, sample_size=1000):
     for t in range(sample_size - 1):
         X[t+1] = P[X[t]].draw()
     return X
+
