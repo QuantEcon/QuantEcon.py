@@ -75,11 +75,3 @@ def get_greedy(w, v):
                 action = 3
             policy[i, j] = action
     return policy
-
-        
-    print "Computing the value function with %d iterations" % K
-    for i in range(K):
-        new_v = bellman(w, v)
-        v = new_v
-    return v
-

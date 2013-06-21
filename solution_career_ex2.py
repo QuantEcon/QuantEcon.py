@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from discreterv import discreteRV
+from discrete_rv import discreteRV
 from career import *
 from compute_fp import compute_fixed_point
 

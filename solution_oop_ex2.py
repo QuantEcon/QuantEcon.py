@@ -7,7 +7,7 @@ class Polynomial:
         """
         self.coefficients = coefficients
 
-    def evaluate(self, x):
+    def __call__(self, x):
         y = 0
         for i, a in enumerate(self.coefficients):
             y += a * x**i  
