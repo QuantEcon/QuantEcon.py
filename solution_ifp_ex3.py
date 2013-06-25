@@ -3,7 +3,7 @@ import numpy as np
 from ifp import consumerProblem, coleman_operator, initialize
 from compute_fp import compute_fixed_point
 from scipy import interp
-import mc_sample 
+import mc_tools 
 
 def compute_asset_series(cp, T=500000):
     """
@@ -16,7 +16,7 @@ def compute_asset_series(cp, T=500000):
     c = compute_fixed_point(coleman_operator, cp, c_init)
     cf = lambda a, i_z: interp(a, cp.asset_grid, c[:, i_z])
     a = np.zeros(T+1)
-    z_seq = mc_sample.sample_path(Pi, sample_size=T)
+    z_seq = mc_tools.sample_path(Pi, sample_size=T)
     for t in range(T):
         i_z = z_seq[t]
         a[t+1] = R * a[t] + z_vals[i_z] - cf(a[t], i_z)
