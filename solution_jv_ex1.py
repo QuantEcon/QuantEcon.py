@@ -33,7 +33,7 @@ ax.set_ylabel(r'$x_{t+1}$', fontsize=16, rotation='horizontal')
 ax.plot(plot_grid, plot_grid, 'k--')  # 45 degree line
 for x in plot_grid:
     for i in range(50):
-        b = 1 if random.uniform(0, 1) < s(x) else 0
+        b = 1 if random.uniform(0, 1) < pi(s(x)) else 0
         U = wp.F.rvs(1)
         y = h(x, b, U)
         ax.plot(x, y, 'go', alpha=0.25)

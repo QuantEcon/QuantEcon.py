@@ -4,10 +4,12 @@ from matplotlib import cm
 from career import *
 from compute_fp import compute_fixed_point
 
+# === solve for the value function === #
 wp = workerProblem()
 v_init = np.ones((wp.N, wp.N))*100
 v = compute_fixed_point(bellman, wp, v_init)
 
+# === plot value function === #
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(111, projection='3d')
 tg, eg = np.meshgrid(wp.theta, wp.epsilon)

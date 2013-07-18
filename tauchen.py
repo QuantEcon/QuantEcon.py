@@ -1,6 +1,6 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date: 3/2013
+Date: 6/2013
 File: tauchen.py
 
 Discretizes Gaussian linear AR(1) processes via Tauchen's method
@@ -10,7 +10,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 import numpy as np
 from scipy.stats import norm
 
-def approx_markov(rho, sigma, m=3, N=7):
+def approx_markov(rho, sigma_u, m=3, n=7):
     """
     Computes the Markov matrix associated with a discretized version of
     the linear Gaussian AR(1) process 
@@ -20,28 +20,34 @@ def approx_markov(rho, sigma, m=3, N=7):
     according to Tauchen's method.  Here {u_t} is an iid Gaussian process with
     zero mean.
 
-    Parameters
+    Parameters:
 
         * rho is the correlation coefficient
-        * sigma is the standard deviation of u
+        * sigma_u is the standard deviation of u
         * m parameterizes the width of the state space
-        * N is the number of states
+        * n is the number of states
+    
+    Returns:
+
+        * x, the state space, as a NumPy array
+        * a matrix P, where P[i,j] is the probability of transitioning from
+            x[i] to x[j]
 
     """
-    F = norm(loc=0, scale=sigma).cdf
-    std_y = np.sqrt(sigma**2 / (1-rho**2))  # standard deviation of y_t
-    ymax = m * std_y                        # top of discrete state space
-    ymin = - ymax                           # bottom of discrete state space
-    S = np.linspace(ymin, ymax, N)          # discretized state space
-    step = (ymax - ymin) / (N - 1)
+    F = norm(loc=0, scale=sigma_u).cdf
+    std_y = np.sqrt(sigma_u**2 / (1-rho**2))  # standard deviation of y_t
+    x_max = m * std_y                         # top of discrete state space
+    x_min = - x_max                           # bottom of discrete state space
+    x = np.linspace(x_min, x_max, n)          # discretized state space
+    step = (x_max - x_min) / (n - 1)
     half_step = 0.5 * step
-    P = np.empty((N, N))
+    P = np.empty((n, n))
 
-    for j in range(N):
-        P[j, 0] = F(S[0]-rho * S[j] + half_step)
-        P[j, N-1] = 1 - F(S[N-1] - rho * S[j] - half_step)
-        for k in range(1, N-1):
-            z = S[k] - rho * S[j]
-            P[j, k] = F(z + half_step) - F(z - half_step)
+    for i in range(n):
+        P[i, 0] = F(x[0]-rho * x[i] + half_step)
+        P[i, n-1] = 1 - F(x[n-1] - rho * x[i] - half_step)
+        for j in range(1, n-1):
+            z = x[j] - rho * x[i]
+            P[i, j] = F(z + half_step) - F(z - half_step)
 
-    return S, P
+    return x, P

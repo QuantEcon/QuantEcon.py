@@ -1,3 +1,4 @@
+from __future__ import division  # Omit if using Python 3.x
 from random import uniform
 from math import sqrt
 
@@ -10,7 +11,7 @@ for i in range(n):
     if d < 0.5:
         count += 1
 
-area_estimate = count / float(n)
+area_estimate = count / n
 
 print area_estimate * 4  # dividing by radius**2
 

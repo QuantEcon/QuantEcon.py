@@ -13,13 +13,15 @@ def f(a, b):
 
 x_max = 3
 y_max = 2.5
-# The approximation grid
+
+# === the approximation grid === #
 Nx0, Ny0 = 25, 25
 x0 = np.linspace(0, x_max, Nx0)
 y0 = np.linspace(0, y_max, Ny0)
 X0, Y0 = np.meshgrid(x0, y0)
 points = np.column_stack((X0.ravel(1), Y0.ravel(1)))
-# Generate the function values on the grid
+
+# === generate the function values on the grid === #
 Z0 = np.empty(Nx0 * Ny0)
 for i in range(len(Z0)):
     a, b = points[i,:]
@@ -27,13 +29,13 @@ for i in range(len(Z0)):
 
 g = LinearNDInterpolator(points, Z0)
 
-# A grid for plotting
+# === a grid for plotting === #
 Nx1, Ny1 = 100, 100
 x1 = np.linspace(0, x_max, Nx1)
 y1 = np.linspace(0, y_max, Ny1)
 X1, Y1 = np.meshgrid(x1, y1)
 
-# The approximating function, as a matrix, for plotting
+# === the approximating function, as a matrix, for plotting === #
 #ZA = np.empty((Ny1, Nx1))
 #for i in range(Ny1):
 #    for j in range(Nx1):
@@ -41,6 +43,7 @@ X1, Y1 = np.meshgrid(x1, y1)
 ZA = g(X1, Y1)
 ZF = f(X1, Y1)
 
+# === plot === #
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(1, 1, 1, projection='3d')
 p = ax.plot_wireframe(X1, Y1, ZF, rstride=4, cstride=4)

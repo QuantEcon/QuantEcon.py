@@ -10,16 +10,16 @@ function is given by
 
   for w(x, phi, s) := x(1 - phi - s) 
                         + beta (1 - pi(s)) V(G(x, phi)) 
-                            + beta pi(s) E V[ max(G(x, phi), U)]
+                        + beta pi(s) E V[ max(G(x, phi), U)]
 Here
 
-    x = human capital
-    s = search effort
-    phi = investment in human capital 
-    pi(s) = probability of new offer given search level s
-    x(1 - phi - s) = wage
-    G(x, phi) = updated human capital when current job retained
-    U = a random variable with distrib. F -- new draw of human capital
+    * x = human capital
+    * s = search effort
+    * phi = investment in human capital 
+    * pi(s) = probability of new offer given search level s
+    * x(1 - phi - s) = wage
+    * G(x, phi) = updated human capital when current job retained
+    * U = a random variable with distribution F -- new draw of human capital
 
 """
 
@@ -38,12 +38,13 @@ class workerProblem:
         This class is just a "struct" to hold the attributes of a given model.
         """
         self.A, self.alpha, self.beta = A, alpha, beta
-        # Set defaults for G, pi and F
+        # === set defaults for G, pi and F === #
         self.G = lambda x, phi: A * (x * phi)**alpha 
         self.pi = np.sqrt 
         self.F = stats.beta(2, 2)  
-        # Set up grid over the state space for DP.  Max of grid is the max of 
-        # a large quantile value for F and the fixed point y = G(y, 1).
+        # === Set up grid over the state space for DP === #
+        # Max of grid is the max of a large quantile value for F and the 
+        # fixed point y = G(y, 1).
         grid_max = max(A**(1 / (1 - alpha)), self.F.ppf(1 - epsilon))
         self.x_grid = np.linspace(epsilon, grid_max, grid_size)
 
@@ -62,7 +63,8 @@ def bellman_operator(wp, V, brute_force=False, return_policies=False):
     the updated values TV(x) over x in x_grid.
 
     """
-    G, pi, F, beta = wp.G, wp.pi, wp.F, wp.beta  # Simplify names
+    # === simplify names, set up arrays, etc. == #
+    G, pi, F, beta = wp.G, wp.pi, wp.F, wp.beta  
     Vf = lambda x: interp(x, wp.x_grid, V) 
     N = len(wp.x_grid)
     new_V, s_policy, phi_policy = np.empty(N), np.empty(N), np.empty(N)
@@ -72,24 +74,24 @@ def bellman_operator(wp, V, brute_force=False, return_policies=False):
     c3 = lambda z: z[1] - epsilon      # used to enforce phi >= epsilon
     guess, constraints = (0.2, 0.2), [c1, c2, c3]
 
+    # === solve r.h.s. of Bellman equation === #
     for i, x in enumerate(wp.x_grid):
 
-        def w(z):  # z = (s, phi)
-            """
-            Objective function, corresponding to the right-hand side of the
-            Bellman equation. Negated because we will minimize.
-            """
+        # === set up objective function === #
+        def w(z):  
             s, phi = z
             integrand = lambda u: Vf(np.maximum(G(x, phi), u)) * F.pdf(u)
             integral, err = integrate(integrand, a, b)
             q = pi(s) * integral + (1 - pi(s)) * Vf(G(x, phi))
-            return - x * (1 - phi - s) - beta * q
+            return - x * (1 - phi - s) - beta * q  # minus because we minimize
 
-        if not brute_force:  # Use SciPy solver
+        # === either use SciPy solver === #
+        if not brute_force:  
             max_s, max_phi = minimize(w, guess, ieqcons=constraints, disp=0)
             max_val = -w((max_s, max_phi))
 
-        else:  # Search on a grid
+        # === or search on a grid === #
+        else:  
             search_grid = np.linspace(epsilon, 1, 15)
             max_val = -1
             for s in search_grid:
@@ -98,6 +100,7 @@ def bellman_operator(wp, V, brute_force=False, return_policies=False):
                     if current_val > max_val:
                         max_val, max_s, max_phi = current_val, s, phi
 
+        # === store results === #
         new_V[i] = max_val
         s_policy[i], phi_policy[i] = max_s, max_phi
 

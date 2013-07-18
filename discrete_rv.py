@@ -34,7 +34,7 @@ class discreteRV(object):
     def draw(self, k=1):
         """
         Returns k draws from q. For each such draw, the value i is returned
-        with probability q[i].
+        with probability q[i].  
         """
         return self.Q.searchsorted(uniform(0, 1, size=k)) 
 

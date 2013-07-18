@@ -6,23 +6,25 @@ from numpy.random import multivariate_normal
 import matplotlib.pyplot as plt
 from kalman import Kalman
 
-# The prior density
+# === define prior density === #
 Sigma = [[0.4, 0.3], [0.3, 0.45]]
 Sigma = np.array(Sigma)
 x_hat = np.array([0.2, -0.2])
-# Define A, Q, G, R
+
+# === define A, Q, G, R === #
 G = np.eye(2)
 R = 0.5 * Sigma
 A = np.eye(2)
 Q = np.zeros(2)
 
-## Initialize Kalman filter
+# === initialize Kalman filter === #
 kn = Kalman(A, G, Q, R)
 kn.set_state(x_hat, Sigma)
 
-# The true value of the state
+# === the true value of the state === #
 theta = np.zeros(2) + 4.0
 
+# === generate plot === #
 T = 1000
 z = np.empty(T)
 for t in range(T):

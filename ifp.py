@@ -61,17 +61,20 @@ def bellman_operator(cp, V, return_policy=False):
         * V is a NumPy array of dimension len(cp.asset_grid) x len(cp.z_vals)
 
     """
-    R, Pi, beta, u, b = cp.R, cp.Pi, cp.beta, cp.u, cp.b  # Simplify names
-    asset_grid, z_vals = cp.asset_grid, cp.z_vals         # Simplify names
+    # === simplify names, set up arrays === #
+    R, Pi, beta, u, b = cp.R, cp.Pi, cp.beta, cp.u, cp.b  
+    asset_grid, z_vals = cp.asset_grid, cp.z_vals        
     new_V = np.empty(V.shape)
     new_c = np.empty(V.shape)
-    # Turn V into a function based on linear interpolation along the asset grid
-    vf = lambda a, i_z: interp(a, asset_grid, V[:, i_z]) 
     z_index = range(len(z_vals))  
 
+    # === linear interpolation of V along the asset grid === #
+    vf = lambda a, i_z: interp(a, asset_grid, V[:, i_z]) 
+
+    # === solve r.h.s. of Bellman equation === #
     for i_a, a in enumerate(asset_grid):
         for i_z, z in enumerate(z_vals):
-            def obj(c):  # Define objective function to be *minimized*
+            def obj(c):  # objective function to be *minimized*
                 y = sum(vf(R * a + z - c, j) * Pi[i_z, j] for j in z_index)
                 return - u(c) - beta * y
             c_star = fminbound(obj, np.min(z_vals), R * a + z + b)
@@ -97,11 +100,14 @@ def coleman_operator(cp, c):
     The array c is replaced with a function cf that implements univariate
     linear interpolation over the asset grid for each possible value of z.
     """
-    R, Pi, beta, du, b = cp.R, cp.Pi, cp.beta, cp.du, cp.b  # Simplify names
-    asset_grid, z_vals = cp.asset_grid, cp.z_vals           # Simplify names
+    # === simplify names, set up arrays === #
+    R, Pi, beta, du, b = cp.R, cp.Pi, cp.beta, cp.du, cp.b  
+    asset_grid, z_vals = cp.asset_grid, cp.z_vals          
     z_size = len(z_vals)
     gamma = R * beta
-    vals = np.empty(z_size)  # Empty array used below
+    vals = np.empty(z_size)  
+
+    # === linear interpolation to get consumption function === #
     def cf(a):
         """
         The call cf(a) returns an array containing the values c(a, z) for each
@@ -113,6 +119,7 @@ def coleman_operator(cp, c):
             vals[i] = interp(a, cp.asset_grid, c[:, i])
         return vals
 
+    # === solve for root to get Kc === #
     Kc = np.empty(c.shape)
     for i_a, a in enumerate(asset_grid):
         for i_z, z in enumerate(z_vals):
@@ -131,10 +138,13 @@ def initialize(cp):
         * cp is an instance of class consumerProblem.
 
     """
-    R, beta, u, b = cp.R, cp.beta, cp.u, cp.b             # Simplify names
-    asset_grid, z_vals = cp.asset_grid, cp.z_vals         # Simplify names
+    # === simplify names, set up arrays === #
+    R, beta, u, b = cp.R, cp.beta, cp.u, cp.b             
+    asset_grid, z_vals = cp.asset_grid, cp.z_vals        
     shape = len(asset_grid), len(z_vals)         
     V, c = np.empty(shape), np.empty(shape)
+
+    # === populate V and c === #
     for i_a, a in enumerate(asset_grid):
         for i_z, z in enumerate(z_vals):
             c_max = R * a + z + b

@@ -45,15 +45,20 @@ def sample_path(P, init=0, sample_size=1000):
 
     Returns: A NumPy array containing the sample path
     """
+    # === set up array to store output === #
     X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
         X[0] = init
     else:
         X[0] = discreteRV(init).draw()
+
+    # === turn each row into a distribution === #
+    # In particular, let P_dist[i] be the distribution corresponding to the
+    # i-th row P[i,:]
     n = len(P)
-    # Let P_dist[i] be the distribution corresponding to the i-th row P[i,:]
     P_dist = [discreteRV(P[i,:]) for i in range(n)]
-    # Generate the sample path
+
+    # === generate the sample path === #
     for t in range(sample_size - 1):
         X[t+1] = P_dist[X[t]].draw()
     return X

@@ -58,10 +58,11 @@ class Kalman:
             Sigma^F = Sigma - Sigma G' (G Sigma G' + R)^{-1} G Sigma
 
         """
-        # Simplify notation
+        # === simplify notation === #
         G, R = self.G, self.R
         x_hat, Sigma = self.current_x_hat, self.current_Sigma
-        # And then update
+
+        # === and then update === #
         A = dot(Sigma, G.T)
         B = dot(dot(G, Sigma), G.T) + R
         if B.shape:  # If B has a shape, then it is multidimensional
@@ -77,10 +78,11 @@ class Kalman:
         moments of the predictive distribution -- which becomes the time t+1
         prior
         """
-        # Make local copies of names to simplify notation
+        # === simplify notation === #
         A, Q = self.A, self.Q
         x_hat, Sigma = self.current_x_hat, self.current_Sigma
-        # And then update
+
+        # === and then update === #
         self.current_x_hat = dot(A, x_hat)
         self.current_Sigma = dot(A, dot(Sigma, A.T)) + Q
 
@@ -91,8 +93,4 @@ class Kalman:
         """
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
-
-        
-
-
 

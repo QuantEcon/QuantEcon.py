@@ -19,11 +19,14 @@ class ecdf:
         return np.mean(self.observations <= x)
 
     def plot(self, a=None, b=None): 
-        # Choose a reasonable interval if [a, b] is not specified
+
+        # === choose reasonable interval if [a, b] not specified === #
         if not a:
             a = self.observations.min() - self.observations.std()
         if not b:
             b = self.observations.max() + self.observations.std()
+
+        # === generate plot === #
         x_vals = np.linspace(a, b, num=100)
         f = np.vectorize(self.__call__)
         plt.plot(x_vals, f(x_vals))
