@@ -1,0 +1,9 @@
+new york: 8244910
+los angeles: 3819702
+chicago: 2707120 
+houston: 2145146
+philadelphia: 1536471
+phoenix: 1469471
+san antonio: 1359758
+san diego: 1326179
+dallas: 1223229
