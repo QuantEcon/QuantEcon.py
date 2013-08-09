@@ -63,7 +63,7 @@ def bellman_operator(wp, V, brute_force=False, return_policies=False):
     the updated values TV(x) over x in x_grid.
 
     """
-    # === simplify names, set up arrays, etc. == #
+    # === simplify names, set up arrays, etc. === #
     G, pi, F, beta = wp.G, wp.pi, wp.F, wp.beta  
     Vf = lambda x: interp(x, wp.x_grid, V) 
     N = len(wp.x_grid)
