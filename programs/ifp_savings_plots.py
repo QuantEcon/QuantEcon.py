@@ -1,3 +1,10 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: ifp_savings_plots.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+
+"""
 from compute_fp import compute_fixed_point
 from matplotlib import pyplot as plt
 from ifp import *

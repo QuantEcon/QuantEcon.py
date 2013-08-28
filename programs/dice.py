@@ -1,3 +1,10 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: dice.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+
+"""
 import random
 
 class Dice:

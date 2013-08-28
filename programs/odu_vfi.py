@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   3/2013
-File:   odu_vfi.py
+Filename: odu_vfi.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 Solves the "Offer Distribution Unknown" Model by value function iteration.
 

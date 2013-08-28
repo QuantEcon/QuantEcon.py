@@ -1,3 +1,11 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: career_vf_plot.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
+
+"""
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm

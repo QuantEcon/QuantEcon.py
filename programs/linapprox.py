@@ -1,19 +1,32 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: linapprox.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+
+"""
+
 from __future__ import division  # Omit if using Python 3.x
 
 def linapprox(f, a, b, n, x):
     """
-    Evaluates the piecewise linear interpolant of f at x on the interval [a,
-    b], with n evenly spaced grid points.
+    Evaluates the piecewise linear interpolant of f at x on the interval 
+    [a, b], with n evenly spaced grid points.
 
-    Parameters: 
+    Parameters 
+    ===========
+        f : function
+            The function to approximate
 
-        f is a function
-        x, a and b are numbers with a <= x <= b
-        n is an integer.
+        x, a, b : scalars (floats or integers) 
+            Evaluation point and endpoints, with a <= x <= b
 
-    Returns: 
+        n : integer
+            Number of grid points
 
-        A number (the interpolant evaluated at x)
+    Returns
+    =========
+        A float. The interpolant evaluated at x
 
     """
     length_of_interval = b - a

@@ -1,3 +1,9 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: lin_inter_3d_plot.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 21/08/2013
+"""
 
 from scipy.interpolate import interp2d, LinearNDInterpolator
 import matplotlib.pyplot as plt

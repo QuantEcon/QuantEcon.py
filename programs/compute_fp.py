@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date: 7/2013
-File: compute_fp.py
+Filename: compute_fp.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 Compute the fixed point of a given operator T, starting from 
 specified initial condition v.

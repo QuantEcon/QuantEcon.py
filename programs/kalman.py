@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   2/2013
-File:   kalman.py
+Filename: kalman.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 Implements the Kalman filter for the state space model
 

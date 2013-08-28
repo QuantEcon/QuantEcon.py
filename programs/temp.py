@@ -1,3 +1,12 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: temp.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
+
+"""
+
+
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt

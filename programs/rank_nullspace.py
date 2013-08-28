@@ -1,3 +1,13 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: rank_nullspace.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+
+"""
+
+
+
 import numpy as np
 from numpy.linalg import svd
 

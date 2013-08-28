@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   5/2013
-File:   career.py
+Filename: career.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 A collection of functions to solve the career / job choice model of Neal.
 """

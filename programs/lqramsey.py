@@ -1,7 +1,8 @@
 """
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Filename: lqramsey.py
 Authors: Thomas Sargent, Doc-Jin Jang, Jeong-hun Choi, John Stachurski
-LastModified: 7/8/2013
+LastModified: 11/08/2013
 
 This module provides code to compute Ramsey equilibria in a LQ economy with
 distortionary taxation.  The program computes allocations (consumption,
@@ -10,8 +11,9 @@ related quantities.
 
 Functions for plotting the results are also provided below.
 
-See the corresponding lecture at http://quant-econ.net for a description of the
-model.
+See the lecture at http://quant-econ.net/lqramsey.html for a description of
+the model.
+
 """
 
 import sys
@@ -111,22 +113,22 @@ def compute_paths(T, econ):
     Returns
     ========
     path: a namedtuple of type 'Path', containing
-        'g',            - Govt spending
-        'd',            - Endowment
-        'b',            - Utility shift parameter
-        's',            - Coupon payment on existing debt
-        'c',            - Consumption
-        'l',            - Labor
-        'p',            - Price
-        'tau',          - Tax rate
-        'rvn',          - Revenue
-        'B',            - Govt debt
-        'R',            - Risk free gross return
-        'pi',           - One-period risk-free interest rate
-        'Pi',           - Cumulative rate of return, adjusted
-        'xi'            - Adjustment factor for Pi
+         g            - Govt spending
+         d            - Endowment
+         b            - Utility shift parameter
+         s            - Coupon payment on existing debt
+         c            - Consumption
+         l            - Labor
+         p            - Price
+         tau          - Tax rate
+         rvn          - Revenue
+         B            - Govt debt
+         R            - Risk free gross return
+         pi           - One-period risk-free interest rate
+         Pi           - Cumulative rate of return, adjusted
+         xi           - Adjustment factor for Pi
 
-        The corresponding values are flat ndarrays.
+        The corresponding values are flat numpy ndarrays.
 
     """
 
@@ -165,8 +167,9 @@ def compute_paths(T, econ):
     ## solution to a quadratic equation a(nu**2 - nu) + b = 0 where
     ## a and b are expected discounted sums of quadratic forms of the state.
     Sm = Sb - Sd - Ss    
+    # == Compute a and b == #
     if econ.discrete:
-        ns = P.shape[0]         # Number of possible states of the world
+        ns = P.shape[0]
         F = scipy.linalg.inv(np.identity(ns) - beta * P)
         a0 = 0.5 * dot(F, dot(Sm, x_vals).T**2)[0]
         H = dot(Sb - Sd + Sg, x_vals) * dot(Sg - Ss, x_vals)
@@ -202,7 +205,7 @@ def compute_paths(T, econ):
     Sl = 0.5 * (Sb - Sd + Sg - nu * Sm)   
     c = dot(Sc, x).flatten()
     l = dot(Sl, x).flatten()
-    p = dot(Sb - Sc, x).flatten()
+    p = dot(Sb - Sc, x).flatten()  # Price without normalization
     tau = 1 - l / (b - c)
     rvn = l * tau  
 

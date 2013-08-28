@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date: 3/2013
-File: ifp.py
+Filename: ifp.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 Functions for solving the income fluctuation problem. Iteration with either
 the Coleman or Bellman operators from appropriate initial conditions leads to

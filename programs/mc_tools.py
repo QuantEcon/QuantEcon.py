@@ -1,8 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   6/2013
-File:   mc_tools.py
-
+Filename: mc_tools.py
+Authors: JOhn Stachurski and Thomas J. Sargent
+LastModified: 11/08/2013
 """
 
 import numpy as np

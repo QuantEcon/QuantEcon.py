@@ -1,4 +1,10 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: odu_plot_densities.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
 
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from odu_vfi import searchProblem

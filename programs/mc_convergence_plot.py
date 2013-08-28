@@ -1,3 +1,10 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: mc_convergence_plot.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+
+"""
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt

@@ -1,3 +1,10 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: yahoo_fin.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+"""
+
 from urllib import urlopen, urlencode
 from datetime import date, timedelta
 from operator import itemgetter

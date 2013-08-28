@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   3/2013
-File:   jv.py
+Filename: jv.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 A Jovanovic-type model of employment with on-the-job search. The value
 function is given by

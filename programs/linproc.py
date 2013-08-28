@@ -1,7 +1,8 @@
 """
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Filename: linproc.py
-Authors: Thomas Sargent, Doc-Jin Jang, Jeoung-hun Choi, John Stachurski
-Date: May 2013
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 """
 import numpy as np
 from numpy import conj, pi, real

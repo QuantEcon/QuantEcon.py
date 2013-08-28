@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   2/2013
-File:   gaussian_contours.py
+Filename: gaussian_contours.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 Plots of bivariate Gaussians to illustrate the Kalman filter.  
 """

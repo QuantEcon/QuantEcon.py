@@ -1,6 +1,8 @@
 """
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Filename: lqramsey_ar1.py
 Authors: Thomas Sargent, Doc-Jin Jang, Jeong-hun Choi, John Stachurski
+LastModified: 11/08/2013
 
 Example 1: Govt spending is AR(1) and state is (g, 1).
 

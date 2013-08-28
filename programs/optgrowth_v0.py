@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date: 7/2013
-File: optgrowth_v0.py
+Filename: optgrowth_v0.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 A first pass at solving the optimal growth problem via value function
 iteration, provided as an introduction to the techniques.  A more general

@@ -1,7 +1,8 @@
 """
+Origin: QEwP by John Stachurski and Thomas J. Sargent
 Filename: estspec.py
-Authors: Thomas Sargent, Doc-Jin Jang, Jeoung-hun Choi, John Stachurski
-Date: July 2013
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 """
 
 from __future__ import division, print_function  # Omit for Python 3.x

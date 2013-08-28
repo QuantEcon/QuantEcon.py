@@ -1,7 +1,8 @@
 """
 Source: QEwP by John Stachurski and Thomas J. Sargent
-Date: April 2013
-File: solution_shortpath.py
+Filename: solution_shortpath.py
+Authors: John Stachurksi and Thomas J. Sargent
+LastModified: 11/08/2013
 """
 
 def read_graph():

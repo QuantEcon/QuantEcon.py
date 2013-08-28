@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date:   6/2013
-File:   discrete_rv0.py
+Filename: discrete_rv0.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 """
 

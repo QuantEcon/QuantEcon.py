@@ -1,7 +1,8 @@
 """
 Origin: QEwP by John Stachurski and Thomas J. Sargent
-Date: 6/2013
-File: tauchen.py
+Filename: tauchen.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
 
 Discretizes Gaussian linear AR(1) processes via Tauchen's method
 

@@ -1,3 +1,12 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: nx_demo.py
+Authors: JOhn Stachurski and Thomas J. Sargent
+LastModified: 11/08/2013
+"""
+
+
+
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib import cm

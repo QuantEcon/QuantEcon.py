@@ -1,4 +1,10 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: descriptor_eg.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
 
+"""
 class Car(object):
 
     def __init__(self, miles_till_service=1000):

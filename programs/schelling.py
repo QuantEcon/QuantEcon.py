@@ -1,14 +1,18 @@
-## Filename: seg.py
-## Author: John Stachurski
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: schelling.py
+Authors: JOhn Stachurski and Thomas J. Sargent
+LastModified: 11/08/2013
+"""
 
 from random import uniform
 from math import sqrt
 import matplotlib.pyplot as plt
 
-num_of_type_0 = 200
-num_of_type_1 = 200
+num_of_type_0 = 250
+num_of_type_1 = 250
 num_neighbors = 10      # Number of agents regarded as neighbors
-require_same_type = 5   # Want at least this many neighbors to be same type
+require_same_type = 4   # Want at least this many neighbors to be same type
 
 
 class Agent:
@@ -35,11 +39,11 @@ class Agent:
             if self != agent:
                 distance = self.get_distance(agent)
                 distances.append((distance, agent))
-        # Sort from smallest to largest, according to distance
+        # == sort from smallest to largest, according to distance == #
         distances.sort()
         # And extract the neighboring agents
         neighbors = [agent for d, agent in distances[:num_neighbors]]
-        # Count how many neighbors have the same type as self
+        # == count how many neighbors have the same type as self == #
         num_same_type = sum(self.type == agent.type for agent in neighbors)
         return num_same_type >= require_same_type
 
@@ -48,10 +52,11 @@ class Agent:
         while not self.happy(agents):
             self.draw_location()
 
-def plot_distribution(agents, figname):
-    "Plot the distribution of agents in file figname.png."
+def plot_distribution(agents, cycle_num):
+    "Plot the distribution of agents after cycle_num rounds of the loop."
     x_values_0, y_values_0 = [], []
     x_values_1, y_values_1 = [], []
+    # == Obtain locations of each type == #
     for agent in agents:
         x, y = agent.location
         if agent.type == 0:
@@ -60,31 +65,34 @@ def plot_distribution(agents, figname):
         else:
             x_values_1.append(x)
             y_values_1.append(y)
-    plt.plot(x_values_0, y_values_0, 'o', markerfacecolor='orange', markersize=6)
-    plt.plot(x_values_1, y_values_1, 'o', markerfacecolor='green', markersize=6)
-    plt.savefig(figname)
-    plt.clf()
+    fig, ax = plt.subplots()
+    plot_args = {'markersize' : 8, 'alpha' : 0.6}
+    ax.set_axis_bgcolor('azure')
+    ax.plot(x_values_0, y_values_0, 'o', markerfacecolor='orange',  **plot_args)
+    ax.plot(x_values_1, y_values_1, 'o', markerfacecolor='green', **plot_args)
+    ax.set_title('Cycle {}'.format(cycle_num - 1))
+    fig.savefig('schelling_fig{}.png'.format(cycle_num))
 
 
-def main():
-    """
-    Create a list of agents.  Loop until none wishes to move given the 
-    current distribution of locations.
-    """
-    agents = [Agent(0) for i in range(num_of_type_0)]
-    agents.extend(Agent(1) for i in range(num_of_type_1))
+# == Main == #
 
-    count = 1
-    while 1:
-        print 'Entering loop ', count
-        plot_distribution(agents, 'fig%s.png' % count)
-        count += 1
-        no_one_moved = True
-        for agent in agents:
-            old_location = agent.location
-            agent.update(agents)
-            if agent.location != old_location:
-                no_one_moved = False
-        if no_one_moved:
-            break
+# == Create a list of agents == #
+agents = [Agent(0) for i in range(num_of_type_0)]
+agents.extend(Agent(1) for i in range(num_of_type_1))
+
+
+count = 1
+# ==  Loop until none wishes to move == #
+while 1:
+    print 'Entering loop ', count
+    plot_distribution(agents, count)
+    count += 1
+    no_one_moved = True
+    for agent in agents:
+        old_location = agent.location
+        agent.update(agents)
+        if agent.location != old_location:
+            no_one_moved = False
+    if no_one_moved:
+        break
 

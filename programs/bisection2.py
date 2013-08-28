@@ -1,3 +1,11 @@
+"""
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: bisection2.py
+Authors: John Stachurski, Thomas J. Sargent
+LastModified: 11/08/2013
+
+"""
+
 def bisect(f, a, b, tol=10e-5):
     """
     Implements the bisection root finding algorithm, assuming that f is a

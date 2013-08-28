@@ -1,4 +1,9 @@
 """
+Origin: QEwP by John Stachurski and Thomas J. Sargent
+Filename: kalman_test.py
+Authors: John Stachurski and Thomas Sargent
+LastModified: 11/08/2013
+
 A test with multivariate parameters.
 """
 import numpy as np
