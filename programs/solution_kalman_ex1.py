@@ -26,5 +26,5 @@ for i in range(N):
 
 ax.set_title(r'First %d densities when $\theta = %.1f$' % (N, theta)) 
 ax.legend(loc='upper left')
-fig.show()
+plt.show()
 

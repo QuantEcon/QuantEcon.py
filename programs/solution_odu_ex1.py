@@ -47,4 +47,4 @@ if __name__ == '__main__':  # If module is run rather than imported
     ax.fill_between(sp.pi_grid, w_bar, 2, color='green', alpha=0.15)
     ax.text(0.42, 1.2, 'reject')
     ax.text(0.7, 1.8, 'accept')
-    fig.show()
+    plt.show()

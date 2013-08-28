@@ -111,4 +111,4 @@ if __name__ == '__main__':  # If run directly, not imported
     ax.set_xlabel('capital')
     title = r'Density of $k_1$ (lighter) to $k_T$ (darker) for $T={}$'
     ax.set_title(title.format(T))
-    fig.show()
+    plt.show()

@@ -56,7 +56,7 @@ for ax in axes:
     ax.vlines(range(n), m, data, lw=0.2)
     ax.legend(**legend_args)
 
-fig.show()
+plt.show()
 
 
 

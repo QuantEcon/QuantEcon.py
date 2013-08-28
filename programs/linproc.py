@@ -148,7 +148,7 @@ class linearProcess(object):
         ax.set_xlabel('time')
         ax.set_ylabel('response')
         if show:
-            fig.show()
+            plt.show()
 
     def plot_spectral_density(self, ax=None, show=True):
         if show:
@@ -161,7 +161,7 @@ class linearProcess(object):
         ax.set_xlabel('frequency')
         ax.set_ylabel('spectrum')
         if show:
-            fig.show()
+            plt.show()
 
     def plot_autocovariance(self, ax=None, show=True):
         if show:
@@ -173,7 +173,7 @@ class linearProcess(object):
         ax.set_xlabel('time')
         ax.set_ylabel('autocovariance')     
         if show:
-            fig.show()
+            plt.show()
 
     def plot_simulation(self, ax=None, show=True):
         if show:
@@ -184,7 +184,7 @@ class linearProcess(object):
         ax.set_xlabel('time')
         ax.set_ylabel('state space')
         if show:
-            fig.show()
+            plt.show()
 
     def quad_plot(self) :
         """
@@ -198,6 +198,6 @@ class linearProcess(object):
         self.plot_spectral_density(axes[0, 1], show=False)
         self.plot_autocovariance(axes[1, 0], show=False)
         self.plot_simulation(axes[1, 1], show=False)
-        fig.show()
+        plt.show()
 
 

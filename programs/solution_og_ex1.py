@@ -23,4 +23,4 @@ for i, n in enumerate((2, 4, 6)):
     ax[i].legend(loc='upper left')
     ax[i].set_title('{} value function iterations'.format(n))
 
-fig.show()
+plt.show()

@@ -27,5 +27,5 @@ for i, wl in enumerate((15, 55, 175)):  # window lengths
     ax[i].legend()
     ax[i].set_title('window length = {}'.format(wl))
 
-fig.show()
+plt.show()
 

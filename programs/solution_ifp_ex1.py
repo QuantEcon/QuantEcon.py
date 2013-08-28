@@ -25,5 +25,5 @@ ax.plot(m.asset_grid, c2[:, 0], label='policy function iteration')
 ax.set_xlabel('asset level')
 ax.set_ylabel('consumption (low income)')
 ax.legend(loc='upper left')
-fig.show()
+plt.show()
 

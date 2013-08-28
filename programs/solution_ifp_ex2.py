@@ -15,5 +15,5 @@ for r_val in r_vals:
 ax.set_xlabel('asset level')
 ax.set_ylabel('consumption (low income)')
 ax.legend(loc='upper left')
-fig.show()
+plt.show()
 

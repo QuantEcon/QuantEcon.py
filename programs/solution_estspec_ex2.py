@@ -23,5 +23,5 @@ for i in range(3):
     ax[i].semilogy(x, y_ar, 'b-', lw=2, alpha=0.75, label='AR smoothed periodogram')
 
     ax[i].legend(loc='upper left')
-fig.show()
+plt.show()
 

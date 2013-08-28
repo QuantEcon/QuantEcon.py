@@ -66,5 +66,5 @@ if __name__ == '__main__':
     ax.plot(grid, v_star(grid), 'k-', lw=2, alpha=0.8, label='true value function')
     ax.legend(loc='upper left')
 
-    fig.show()
+    plt.show()
 

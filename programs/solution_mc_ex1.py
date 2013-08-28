@@ -30,4 +30,4 @@ for x0, col in ((0, 'blue'), (1, 'green')):
     ax.plot(X_bar - p, 'k-', alpha=0.6)  # Overlay in black--make lines clearer
 
 ax.legend(loc='upper right')
-fig.show()
+plt.show()

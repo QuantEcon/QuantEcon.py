@@ -35,5 +35,5 @@ pc = pd.Series(price_change)
 pc.sort()
 fig, ax = plt.subplots()
 pc.plot(kind='bar', ax=ax)
-fig.show()
+plt.show()
 

@@ -41,7 +41,7 @@ xgrid = np.linspace(xmin, xmax, 200)
 ax.plot(xgrid, norm.pdf(xgrid, scale=s), 'k-', lw=2, label=r'$N(0, \sigma^2)$')
 ax.legend()
 
-fig.show()
+plt.show()
 
 
 

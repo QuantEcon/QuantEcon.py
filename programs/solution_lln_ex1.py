@@ -36,7 +36,7 @@ lb = r"$N(0, g'(\mu)^2  \sigma^2)$"
 ax.plot(xgrid, norm.pdf(xgrid, scale=asymptotic_sd), 'k-', lw=2, label=lb)
 ax.legend()
 
-fig.show()
+plt.show()
 
 
 

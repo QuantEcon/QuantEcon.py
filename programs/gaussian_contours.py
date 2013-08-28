@@ -48,7 +48,7 @@ def plot1():
     ax.contourf(X, Y, Z, 6, alpha=0.6, cmap=cm.jet)
     cs = ax.contour(X, Y, Z, 6, colors="black")
     ax.clabel(cs, inline=1, fontsize=10)
-    fig.show()
+    plt.show()
 
 def plot2():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
@@ -56,7 +56,7 @@ def plot2():
     cs = ax.contour(X, Y, Z, 6, colors="black")
     ax.clabel(cs, inline=1, fontsize=10)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
-    fig.show()
+    plt.show()
 
 def plot3():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
@@ -70,7 +70,7 @@ def plot3():
     ax.clabel(cs2, inline=1, fontsize=10)
     ax.contourf(X, Y, new_Z, 6, alpha=0.6, cmap=cm.jet)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
-    fig.show()
+    plt.show()
 
 def plot4():
     # Density 1
@@ -92,7 +92,7 @@ def plot4():
     ax.clabel(cs3, inline=1, fontsize=10)
     ax.contourf(X, Y, new_Z, 6, alpha=0.6, cmap=cm.jet)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
-    fig.show()
+    plt.show()
 
 # Choose a plot to generate
 plot4()

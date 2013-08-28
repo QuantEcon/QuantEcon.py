@@ -47,5 +47,5 @@ for i in range(4):
     #title = r'Density of $k_1$ (lighter) to $k_T$ (darker) for $T={}$'
     #ax.set_title(title.format(T))
 
-fig.show()
+plt.show()
 

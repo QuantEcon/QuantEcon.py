@@ -30,4 +30,4 @@ if __name__ == '__main__':
     ax.hist(a, bins=20, alpha=0.5, normed=True)
     ax.set_xlabel('assets')
     ax.set_xlim(-0.05, 0.75)
-    fig.show()
+    plt.show()

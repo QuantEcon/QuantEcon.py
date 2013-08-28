@@ -22,5 +22,5 @@ ax.set_xlabel('capital')
 ax.set_ylabel('interest rate')
 ax.grid(True)
 ax.legend(loc='upper left')
-fig.show()
+plt.show()
 

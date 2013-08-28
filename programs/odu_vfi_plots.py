@@ -39,7 +39,7 @@ if plot_choice == 'value_function':
     ax.clabel(cs, inline=1, fontsize=10)
     ax.set_xlabel('pi', fontsize=14)
     ax.set_ylabel('wage', fontsize=14)
-    fig.show()
+    plt.show()
 else:
     Z = np.empty((w_plot_grid_size, pi_plot_grid_size))
     for i in range(w_plot_grid_size):
@@ -52,4 +52,4 @@ else:
     ax.set_ylabel('wage', fontsize=14)
     ax.text(0.4, 1.0, 'reject')
     ax.text(0.7, 1.8, 'accept')
-    fig.show()
+    plt.show()

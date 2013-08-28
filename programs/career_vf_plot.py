@@ -26,4 +26,4 @@ ax.plot_surface(tg, eg, v.T, rstride=2, cstride=2, cmap=cm.jet, alpha=0.5,
 ax.set_zlim(150, 200)
 ax.set_xlabel('theta', fontsize=14)
 ax.set_ylabel('epsilon', fontsize=14)
-fig.show()
+plt.show()

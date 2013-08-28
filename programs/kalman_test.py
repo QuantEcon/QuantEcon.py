@@ -41,6 +41,6 @@ for t in range(T):
 fig, ax = plt.subplots()
 ax.plot(range(T), z) 
 ax.fill_between(range(T), np.zeros(T), z, color="blue", alpha=0.2) 
-fig.show()
+plt.show()
 
 

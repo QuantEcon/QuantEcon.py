@@ -10,4 +10,4 @@ for i in range(3):
     current_label = r'$\mu = {0:.2f}$'.format(m)
     ax.plot(x, y, lw=2, alpha=0.6, label=current_label)
 ax.legend()
-fig.show()
+plt.show()
