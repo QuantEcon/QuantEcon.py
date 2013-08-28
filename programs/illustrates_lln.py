@@ -1,5 +1,5 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
+Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: illustrates_lln.py
 Authors: JOhn Stachurski and Thomas J. Sargent
 LastModified: 11/08/2013

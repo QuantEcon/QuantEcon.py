@@ -1,5 +1,5 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
+Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: clt3d.py
 
 Visual illustration of the central limit theorem.  Produces a 3D figure

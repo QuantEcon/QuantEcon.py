@@ -1,5 +1,5 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
+Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lqramsey_discrete.py
 Authors: Thomas Sargent, Doc-Jin Jang, Jeong-hun Choi, John Stachurski
 LastModified: 11/08/2013

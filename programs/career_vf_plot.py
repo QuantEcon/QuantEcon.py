@@ -1,5 +1,5 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
+Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: career_vf_plot.py
 Authors: John Stachurski and Thomas Sargent
 LastModified: 11/08/2013

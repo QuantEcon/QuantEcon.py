@@ -1,5 +1,5 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
+Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lae.py
 Authors: John Stachurski, Thomas J. Sargent
 LastModified: 21/08/2013

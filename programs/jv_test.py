@@ -1,5 +1,5 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
+Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: jv_test.py
 Authors: John Stachurski and Thomas Sargent
 LastModified: 11/08/2013

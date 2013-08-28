@@ -1,5 +1,5 @@
 """
-Source: QEwP by John Stachurski and Thomas J. Sargent
+Source: QE by John Stachurski and Thomas J. Sargent
 Filename: solution_shortpath.py
 Authors: John Stachurksi and Thomas J. Sargent
 LastModified: 11/08/2013
