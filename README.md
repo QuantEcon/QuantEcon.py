@@ -1,17 +1,9 @@
 
 ## Quantitative Economics 
 
-This repository holds Python code for [Quantitative Economics](http://quant-econ.net),  an on-line course on quantitative economic modeling authored by [John Stachurski](http://johnstachurski.net) and [Thomas J. Sargent](https://files.nyu.edu/ts43/public/).
-
-The course content consists of
-
-1. A [series of lectures](http://quant-econ.net)
-1. This code repository, containing Python programs described in the lectures
-
-### Getting Started
+This repository collects all of the code for [Quantitative Economics](http://quant-econ.net),  an on-line course on quantitative economic modeling authored by [John Stachurski](http://johnstachurski.net) and [Thomas J. Sargent](https://files.nyu.edu/ts43/public/).
 
 We recommend you start by visiting the [lecture series main page](http://quant-econ.net), which provides detailed information on working with this code repository.
-
 
 ### Downloading the Repository
 
