@@ -39,7 +39,7 @@ temp = np.dot(Q, error_obs)
 chisq_obs = np.sum(temp**2, axis=0)
 
 # == Plot == #
-plt, ax = plt.subplots()
+fig, ax = plt.subplots()
 xmax = 8
 ax.set_xlim(0, 8)
 xgrid = np.linspace(0, 8, 200)
