@@ -3,6 +3,9 @@ Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: yahoo_fin.py
 Authors: John Stachurski, Thomas J. Sargent
 LastModified: 11/08/2013
+
+Compute returns on a certain portfolio since the start of the year, and plot
+them from best to worst.
 """
 
 from urllib import urlopen, urlencode
@@ -13,22 +16,46 @@ today = date.today()
 base_url = 'http://ichart.finance.yahoo.com/table.csv'
 
 def get_stock_price(request_date, ticker):
+    """
+    Get stock price corresponding to the date and ticker.  
 
-    dd = str(request_date.day)
-    mm = str(request_date.month - 1)  
-    yr = str(today.year)  
+    Parameters
+    ===========
 
-    request_data = {'a': mm,            # Start month, base zero
-                    'b': dd,            # Start day
-                    'c': yr,            # Start year
-                    'd': mm,            # End month, base zero
-                    'e': dd,            # End day
-                    'f': yr,            # End year
-                    'g': 'd',           # Daily data
-                    's': ticker,        # Ticker name
-                    'ignore': '.csv'}   # Data type
+    request_date : datetime.date instance
+        The desired day
 
-    response = urlopen(base_url + '?' + urlencode(request_data))
+    ticker : string
+        The stock, such as 'AAPL'
+
+    Returns
+    ========
+
+    The opening price as a float
+    """
+    
+    previous_date = request_date - timedelta(days=1)
+
+    dd1 = str(previous_date.day)
+    mm1 = str(previous_date.month - 1)  
+    yr1 = str(previous_date.year)  
+
+    dd2 = str(request_date.day)
+    mm2 = str(request_date.month - 1)  
+    yr2 = str(request_date.year)  
+
+    request_data = {'a': mm1,            # Start month, base zero
+                    'b': dd1,            # Start day
+                    'c': yr1,            # Start year
+                    'd': mm2,            # End month, base zero
+                    'e': dd2,            # End day
+                    'f': yr2,            # End year
+                    'g': 'd',            # Daily data
+                    's': ticker,         # Ticker name
+                    'ignore': '.csv'}    # Data type
+
+    url = base_url + '?' + urlencode(request_data)
+    response = urlopen(url)
     response.next()                 # Skip the first line
     prices = response.next()        
     price = prices.split(',')[1]    # Opening price
