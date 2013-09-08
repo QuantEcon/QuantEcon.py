@@ -25,8 +25,7 @@ If you wand to learn a bit more about Git and GitHub, you'll find it's an excell
 
 ### License
 
-Copyright © 2013 John Stachurski and Thomas J. Sargent
-LGPLv3:
+Copyright © 2013 John Stachurski and Thomas J. Sargent GPLv3:
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
