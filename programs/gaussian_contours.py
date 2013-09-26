@@ -2,7 +2,7 @@
 Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: gaussian_contours.py
 Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+LastModified: 10/09/2013
 
 Plots of bivariate Gaussians to illustrate the Kalman filter.  
 """
@@ -13,21 +13,22 @@ import matplotlib.cm as cm
 from matplotlib.mlab import bivariate_normal
 import matplotlib.pyplot as plt
 
-# The prior density
+# == Set up the Gaussian prior density p == #
 Sigma = [[0.4, 0.3], [0.3, 0.45]]
 Sigma = np.matrix(Sigma)
 x_hat = np.matrix([0.2, -0.2]).T
-# The matrices in y = G x + N(0, R)
+# == Define the matrices G and R from the equation y = G x + N(0, R) == #
 G = [[1, 0], [0, 1]]
 G = np.matrix(G)
 R = 0.5 * Sigma
-# The matrices A and Q
+# == The matrices A and Q == #
 A = [[1.2, 0], [0, -0.2]]
 A = np.matrix(A)
 Q = 0.3 * Sigma
-# The observed value of y
+# == The observed value of y == #
 y = np.matrix([2.3, -1.9]).T
 
+# == Set up grid for plotting == #
 x_grid = np.linspace(-1.5, 2.9, 100)
 y_grid = np.linspace(-3.1, 1.7, 100)
 X, Y = np.meshgrid(x_grid, y_grid)
@@ -43,12 +44,13 @@ fig, ax = plt.subplots()
 ax.xaxis.grid(True, zorder=0)
 ax.yaxis.grid(True, zorder=0)
 
+# == Code for the 4 plots, choose one below == #
+
 def plot1():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
     ax.contourf(X, Y, Z, 6, alpha=0.6, cmap=cm.jet)
     cs = ax.contour(X, Y, Z, 6, colors="black")
     ax.clabel(cs, inline=1, fontsize=10)
-    plt.show()
 
 def plot2():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
@@ -56,7 +58,6 @@ def plot2():
     cs = ax.contour(X, Y, Z, 6, colors="black")
     ax.clabel(cs, inline=1, fontsize=10)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
-    plt.show()
 
 def plot3():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
@@ -70,7 +71,6 @@ def plot3():
     ax.clabel(cs2, inline=1, fontsize=10)
     ax.contourf(X, Y, new_Z, 6, alpha=0.6, cmap=cm.jet)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
-    plt.show()
 
 def plot4():
     # Density 1
@@ -92,7 +92,7 @@ def plot4():
     ax.clabel(cs3, inline=1, fontsize=10)
     ax.contourf(X, Y, new_Z, 6, alpha=0.6, cmap=cm.jet)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
-    plt.show()
 
-# Choose a plot to generate
-plot4()
+# == Choose a plot to generate == #
+plot1()
+plt.show()

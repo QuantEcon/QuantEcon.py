@@ -16,19 +16,29 @@ respectively.
 
 import numpy as np
 from numpy import dot
-from numpy.linalg import inv
+from scipy.linalg import inv
+import riccati
 
 class Kalman:
 
     def __init__(self, A, G, Q, R):
         """
-        Provide initial parameters describing the model.  All arguments should
-        be Python scalars or NumPy ndarrays.
+        Provides initial parameters describing the state space model
+
+            x_{t+1} = A x_t + w_{t+1}       (w_t ~ N(0, Q))
+
+            y_t = G x_t + v_t               (v_t ~ N(0, R))
+        
+        Parameters
+        ============
+        
+        All arguments should be Python scalars or NumPy ndarrays.
 
             * A is n x n
-            * Q is n x n and positive definite
+            * Q is n x n, symmetric and nonnegative definite
             * G is k x n
-            * R is k x k and positive definite
+            * R is k x k, symmetric and nonnegative definite
+
         """
         self.A = np.array(A, dtype='float32')
         self.G = np.array(G, dtype='float32')
@@ -95,3 +105,18 @@ class Kalman:
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
 
+    def stationary_values(self):
+        """
+        Computes the limit of Sigma_t as t goes to infinity by solving the
+        associated Riccati equation.  Computation is via the doubling
+        algorithm (see the documentation in riccati.dare).  Returns the limit
+        and the stationary Kalman gain.
+        """
+        # === simplify notation === #
+        A, Q, G, R = self.A, self.Q, self.G, self.R
+        # === solve Riccati equation, obtain Kalman gain === #
+        Sigma_infinity = riccati.dare(A.T, G.T, R, Q)
+        temp1 = dot(dot(A, Sigma_infinity), G.T)
+        temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
+        K_infinity = dot(temp1, temp2)
+        return Sigma_infinity, K_infinity
