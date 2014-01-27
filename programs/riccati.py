@@ -11,7 +11,7 @@ import numpy as np
 from numpy import dot
 from numpy.linalg import solve
 
-def dare(A, B, R, Q, tolerance=1e-10, max_iter=50):
+def dare(A, B, R, Q, tolerance=1e-10, max_iter=150):
     """
     Solves the discrete-time algebraic Riccati equation 
     
@@ -37,10 +37,11 @@ def dare(A, B, R, Q, tolerance=1e-10, max_iter=50):
     """
     # == Set up == #
     error = tolerance + 1
-    I = np.eye(max(A.shape))
     fail_msg = "Convergence failed after {} iterations."
-    if R.size == 1:
-        R.shape = 1, 1
+    # == Make sure that all arrays are two-dimensional == #
+    A, B, Q, R = map(np.atleast_2d, (A, B, Q, R))
+    k = Q.shape[0]
+    I = np.identity(k)
 
     # == Initial conditions == #
     a0 = A

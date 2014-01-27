@@ -1,4 +1,6 @@
 """
+Origin: QE by John Stachurski and Thomas J. Sargent
+Filename: solution_lqc_ex3.py
 An infinite horizon profit maximization problem for a monopolist with
 adjustment costs.
 """
@@ -13,7 +15,7 @@ a0      = 5
 a1      = 0.5
 sigma   = 0.15
 rho     = 0.9
-gamma   = 50
+gamma   = 1
 beta    = 0.95
 c       = 2
 T       = 120

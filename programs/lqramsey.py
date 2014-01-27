@@ -25,43 +25,8 @@ import matplotlib.pyplot as plt
 from collections import namedtuple
 from rank_nullspace import nullspace
 import mc_tools
+from quadsums import var_quadratic_sum
 
-def var_quadratic_sum(A, C, H, beta, x_0):
-    """
-    Computes the expected discounted quadratic sum
-    
-        q(x_0) := E \sum_{t=0}^{\infty} \beta^t x_t' H x_t
-
-    Here {x_t} is the VAR process x_{t+1} = A x_t + C w_t with {w_t} standard
-    normal and x_0 the initial condition.
-
-    Parameters
-    ===========
-    A, C, and H: numpy.ndarray
-        All are n x n matrices represented as NumPy arrays
-
-    beta: float
-        A scalar in (0, 1) 
-    
-    x_0: numpy.ndarray
-        The initial condtion. A conformable array (of length n, or with n rows) 
-
-    Returns
-    ========
-    q0: numpy.ndarray
-        Represents the value q(x_0)
-
-    Remarks: The formula for computing q(x_0) is q(x_0) = x_0' Q x_0 + v where 
-
-        Q is the solution to Q = H + beta A' Q A and 
-        v = \trace(C' Q C) \beta / (1 - \beta)
-
-    """
-    Q = scipy.linalg.solve_discrete_lyapunov(sqrt(beta) * A.T, H)
-    cq = dot(dot(C.T, Q), C)
-    v = np.trace(cq) * beta / (1 - beta)
-    q0 = dot(dot(x_0.T, Q), x_0) + v
-    return q0
 
 
 # == Set up a namedtuple to store data on the model economy == #

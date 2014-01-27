@@ -17,7 +17,7 @@ class LQ:
     This class is for analyzing linear quadratic optimal control problems of
     either the infinite horizon form 
 
-        min E sum_{t=1}^{infty} beta^t r(x_t, u_t)
+        min E sum_{t=0}^{infty} beta^t r(x_t, u_t)
         
     with 
     
@@ -25,7 +25,7 @@ class LQ:
 
     or the finite horizon form 
 
-    min E sum_{t=1}^{T-1} beta^t r(x_t, u_t) + x_T' R_f x_T
+    min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + x_T' R_f x_T
 
     Both are minimized subject to the law of motion
 
@@ -72,23 +72,21 @@ class LQ:
         We also initialize the pair (P, d) that represents the value function
         via V(x) = x' P x + d, and the policy function matrix F.
         """
-        self.A = np.asarray(A, dtype='float32')
-        self.B = np.asarray(B, dtype='float32')
-        self.Q = np.asarray(Q, dtype='float32')
-        self.R = np.asarray(R, dtype='float32')
+        # == Make sure all matrices can be treated as 2D arrays == #
+        converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
+        self.A, self.B, self.Q, self.R = map(converter, (A, B, Q, R))
+        # == Record dimensions == #
+        self.k, self.n = self.Q.shape[0], self.R.shape[0]
+
         self.beta = beta
 
-        # == Record dimensions == #
-        self.k = 1 if self.Q.size == 1 else self.Q.shape[0]
-        self.n = 1 if self.R.size == 1 else self.R.shape[0]
-
-        if not C:
-            # == If C not given, then model is deterministic. Set C = 0 == #
+        if C == None:
+            # == If C not given, then model is deterministic. Set C=0. == #
             self.j = 1
             self.C = np.zeros((self.n, self.j))
         else:
-            self.C = np.asarray(C, dtype='float32')
-            self.j = 1 if self.C.size == 1 else self.C.shape[1]
+            self.C = converter(C)
+            self.j = self.C.shape[1]
 
         if T:
             # == Model is finite horizon == #
