@@ -1,3 +1,11 @@
+"""
+Origin: QE by John Stachurski and Thomas J. Sargent
+Filename: robustlq.py
+Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski 
+LastModified: 28/01/2014
+
+Solves robust LQ control problems.
+"""
 
 from __future__ import division  # Remove for Python 3.sx
 import numpy as np
@@ -8,31 +16,32 @@ from scipy.linalg import solve, inv, det, solve_discrete_lyapunov
 
 class RBLQ:
     """
-    Provides methods for analysing robust LQ control problems
-    of the form
+    Provides methods for analysing infinite horizon robust LQ control 
+    problems of the form
 
         min_{u_t}  sum_t beta^t {x_t' R x_t + u'_t Q u_t }
 
-    with 
+    subject to
         
-        x_{t+1} = A x_t + B u_t + C w_{t+1}.
+        x_{t+1} = A x_t + B u_t + C w_{t+1}
 
+    and with model misspecification parameter theta.
     """
 
-    def __init__(self, A, B, C, Q, R, beta, theta):
+    def __init__(self, Q, R, A, B, C, beta, theta):
         """
         Sets up the robust control problem.
 
         Parameters
         ==========
 
+        Q, R : array_like, dtype = float
+            The matrices R and Q from the objective function
+
         A, B, C : array_like, dtype = float
             The matrices A, B, and C from the state space system
 
-        R, Q : array_like, dtype = float
-            The matrices R and Q from the robust control problem
-
-        beta, theta : float
+        beta, theta : scalar, float
             The discount and robustness factors in the robust control problem
 
         We assume that

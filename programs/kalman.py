@@ -32,7 +32,7 @@ class Kalman:
         Parameters
         ============
         
-        All arguments should be Python scalars or NumPy ndarrays.
+        All arguments should be scalars or array_like
 
             * A is n x n
             * Q is n x n, symmetric and nonnegative definite
@@ -40,10 +40,15 @@ class Kalman:
             * R is k x k, symmetric and nonnegative definite
 
         """
-        self.A = np.array(A, dtype='float32')
-        self.G = np.array(G, dtype='float32')
-        self.Q = np.array(Q, dtype='float32')
-        self.R = np.array(R, dtype='float32')
+        self.A, self.G, self.Q, self.R = map(self.convert, (A, G, Q, R))
+        self.k, self.n = self.G.shape
+
+    def convert(self, x): 
+        """
+        Convert array_like objects (lists of lists, floats, etc.) into well
+        formed 2D NumPy arrays
+        """
+        return np.atleast_2d(np.asarray(x, dtype='float32'))
 
     def set_state(self, x_hat, Sigma):
         """
@@ -55,8 +60,9 @@ class Kalman:
 
         Must be Python scalars or NumPy arrays.
         """
-        self.current_Sigma = np.array(Sigma, dtype='float32')
-        self.current_x_hat = np.array(x_hat, dtype='float32')
+        self.current_Sigma = self.convert(Sigma)
+        self.current_x_hat = self.convert(x_hat)
+        self.current_x_hat.shape = self.n, 1
 
     def prior_to_filtered(self, y):
         """
@@ -74,12 +80,11 @@ class Kalman:
         x_hat, Sigma = self.current_x_hat, self.current_Sigma
 
         # === and then update === #
+        y = self.convert(y)
+        y.shape = self.k, 1
         A = dot(Sigma, G.T)
         B = dot(dot(G, Sigma), G.T) + R
-        if B.shape:  # If B has a shape, then it is multidimensional
-            M = dot(A, inv(B))
-        else:  # Otherwise it's just scalar
-            M = A / B
+        M = dot(A, inv(B))
         self.current_x_hat = x_hat + dot(M, (y - dot(G, x_hat)))
         self.current_Sigma = Sigma  - dot(M, dot(G,  Sigma))
 
