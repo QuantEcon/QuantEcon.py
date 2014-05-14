@@ -13,7 +13,7 @@ def subplots():
         ax.spines[spine].set_color('none')
     
     ax.grid()
-    return (fig, ax)
+    return fig, ax
 
 
 fig, ax = subplots()  # Call the local version, not plt.subplots()

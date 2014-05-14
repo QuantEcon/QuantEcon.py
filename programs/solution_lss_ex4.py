@@ -11,7 +11,10 @@ A = [[phi_1, phi_2, phi_3, phi_4],
      [1,     0,     0,     0],
      [0,     1,     0,     0],
      [0,     0,     1,     0]]
-C = [sigma, 0, 0, 0]
+C = [[sigma], 
+     [0], 
+     [0], 
+     [0]]
 G = [1, 0, 0, 0]
 
 T0 = 10
@@ -20,7 +23,7 @@ T2 = 75
 T4 = 100
 
 ar = LSS(A, C, G, mu_0=np.ones(4))
-ymin, ymax = -0.8, 1.0
+ymin, ymax = -0.6, 0.6
 
 fig, ax = plt.subplots(figsize=(8, 5))
 

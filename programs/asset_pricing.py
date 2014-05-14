@@ -5,7 +5,7 @@ LastModified: 12/02/2014
 
 Computes asset prices in an endowment economy when the endowment obeys
 geometric growth driven by a finite state Markov chain.  The transition matrix
-of the Markov chain is P, and the set of states is lambda.  The discount
+of the Markov chain is P, and the set of states is s.  The discount
 factor is beta, and gamma is the coefficient of relative risk aversion in the
 household's utility function.
 """
@@ -15,7 +15,7 @@ from numpy.linalg import solve
 
 class AssetPrices:
 
-    def __init__(self, beta, P, lamb, gamma):
+    def __init__(self, beta, P, s, gamma):
         '''
         Initializes an instance of AssetPrices
 
@@ -27,16 +27,16 @@ class AssetPrices:
         P : array_like
             transition matrix 
             
-        lamb : array_like
+        s : array_like
             growth rate of consumption 
 
         gamma : float
             coefficient of risk aversion 
         '''
         self.beta, self.gamma = beta, gamma
-        self.P, self.lamb = [np.atleast_2d(x) for x in P, lamb]
+        self.P, self.s = [np.atleast_2d(x) for x in P, s]
         self.n = self.P.shape[0]
-        self.lamb.shape = self.n, 1
+        self.s.shape = self.n, 1
 
     def tree_price(self):
         '''
@@ -44,9 +44,9 @@ class AssetPrices:
         v(lambda)C_t
         '''
         # == Simplify names == #
-        P, lamb, gamma, beta = self.P, self.lamb, self.gamma, self.beta
+        P, s, gamma, beta = self.P, self.s, self.gamma, self.beta
         # == Compute v == #
-        P_tilde = P * lamb**(1-gamma) #using broadcasting
+        P_tilde = P * s**(1-gamma) #using broadcasting
         I = np.identity(self.n)
         O = np.ones(self.n)
         v = beta * solve(I - beta * P_tilde, P_tilde.dot(O))
@@ -63,9 +63,9 @@ class AssetPrices:
 
         '''
         # == Simplify names == #
-        P, lamb, gamma, beta = self.P, self.lamb, self.gamma, self.beta
+        P, s, gamma, beta = self.P, self.s, self.gamma, self.beta
         # == Compute price == #
-        P_check = P * lamb**(-gamma)
+        P_check = P * s**(-gamma)
         I = np.identity(self.n)
         O = np.ones(self.n)
         p_bar = beta * solve(I - beta * P_check, P_check.dot(zeta * O))
@@ -90,8 +90,8 @@ class AssetPrices:
             tolerance for infinite horizon problem
         '''
         # == Simplify names, initialize variables == #
-        P, lamb, gamma, beta = self.P, self.lamb, self.gamma, self.beta
-        P_check = P * lamb**(-gamma)
+        P, s, gamma, beta = self.P, self.s, self.gamma, self.beta
+        P_check = P * s**(-gamma)
         # == Compute consol price == #
         v_bar = self.consol_price(zeta)
         # == Compute option price == #

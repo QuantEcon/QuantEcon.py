@@ -195,9 +195,9 @@ class LSS:
         """
         Forecast the geometric sums
 
-            S_x := E_t [sum_{j=0}^{\infty} beta^j x_{t+j} | x_t ]
+            S_x := E [sum_{j=0}^{\infty} beta^j x_{t+j} | x_t ]
 
-            S_y := E_t [sum_{j=0}^{\infty} beta^j y_{t+j} | x_t ]
+            S_y := E [sum_{j=0}^{\infty} beta^j y_{t+j} | x_t ]
 
         Parameters
         ===========

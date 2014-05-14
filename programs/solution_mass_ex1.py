@@ -11,12 +11,12 @@ import asset_pricing
 n = 5
 P = 0.0125 * np.ones((n, n))
 P += np.diag(0.95 - 0.0125 * np.ones(5))
-lamb = np.array([1.05, 1.025, 1.0, 0.975, 0.95])
+s = np.array([1.05, 1.025, 1.0, 0.975, 0.95])
 gamma = 2.0
 beta = 0.94
 zeta = 1.0
 
-ap = asset_pricing.AssetPrices(beta, P, lamb, gamma)
+ap = asset_pricing.AssetPrices(beta, P, s, gamma)
 
 v = ap.tree_price()
 print "Lucas Tree Prices: ", v
@@ -24,7 +24,7 @@ print "Lucas Tree Prices: ", v
 v_consol = ap.consol_price(zeta)
 print "Consol Bond Prices: ", v_consol
 
-P_tilde = P*lamb**(1-gamma)
+P_tilde = P * s**(1-gamma)
 temp = beta * P_tilde.dot(v) - beta * P_tilde.dot(np.ones(n))
 print "Should be 0: ",  v - temp 
 

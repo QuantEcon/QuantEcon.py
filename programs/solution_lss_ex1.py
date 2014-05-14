@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lss import LSS
 
-phi_0, phi_1, phi_2 = 1, 0.8, -0.8
+phi_0, phi_1, phi_2 = 1.1, 0.8, -0.8
 
-A = [[phi_0, 0,     0],
-     [0,     phi_1, phi_2],
+A = [[1,     0,     0],
+     [phi_0, phi_1, phi_2],
      [0,     1,     0]]
 C = np.zeros((3, 1))
 G = [0, 1, 0]

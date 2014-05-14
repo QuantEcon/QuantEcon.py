@@ -41,8 +41,8 @@ chisq_obs = np.sum(temp**2, axis=0)
 # == Plot == #
 fig, ax = plt.subplots()
 xmax = 8
-ax.set_xlim(0, 8)
-xgrid = np.linspace(0, 8, 200)
+ax.set_xlim(0, xmax)
+xgrid = np.linspace(0, xmax, 200)
 lb = "Chi-squared with 2 degrees of freedom"
 ax.plot(xgrid, chi2.pdf(xgrid, 2), 'k-', lw=2, label=lb)
 ax.legend()
