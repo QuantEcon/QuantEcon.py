@@ -1,0 +1,26 @@
+node0
+node8
+node11
+node18
+node23
+node33
+node41
+node53
+node56
+node57
+node60
+node67
+node70
+node73
+node76
+node85
+node87
+node88
+node93
+node94
+node96
+node97
+node98
+node99
+
+Cost:  160.55
