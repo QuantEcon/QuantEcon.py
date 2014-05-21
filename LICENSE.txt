@@ -1,30 +1,4 @@
 
-## Quantitative Economics 
-
-This repository collects code for [Quantitative Economics](http://quant-econ.net),  an on-line course on quantitative economic modeling authored by [Thomas J. Sargent](https://files.nyu.edu/ts43/public/) and [John Stachurski](http://johnstachurski.net).
-
-We recommend you start by visiting the [lecture series main page](http://quant-econ.net), which provides detailed information on working with this code repository.
-
-### Downloading the Repository
-
-Either
-
-* Click the 'Download ZIP' button on the right, or
-* Use [Git](https://help.github.com) to clone the repository
-
-### Browsing Program Files On-Line
-
-You can browse all the files in the repository directly (without downloading) by clicking on the "programs" folder above.
-
-
-### About Git / GitHub
-
-This code repository is hosted by [GitHub](http://github.com).  The primary function of GitHub is to host open source code repositories in a manner that facilitates sharing and collaboration.  
-
-If you wand to learn a bit more about Git and GitHub, you'll find it's an excellent investment. A good place to start is the [GitHub help page](https://help.github.com/).
-
-### License
-
 Copyright © 2013, 2014 Thomas J. Sargent and John Stachurski: BSD-3
 All rights reserved.
 
