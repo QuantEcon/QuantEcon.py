@@ -1,9 +1,9 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: discrete_rv.py
-Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+Authors: Thomas Sargent, John Stachurski 
 
+Generates an array of draws from a discrete random variable with a specified
+vector of probabilities.
 """
 
 from numpy import cumsum

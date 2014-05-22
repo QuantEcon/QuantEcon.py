@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: career.py
-Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+Authors: Thomas Sargent, John Stachurski 
 
 A collection of functions to solve the career / job choice model of Neal.
 """

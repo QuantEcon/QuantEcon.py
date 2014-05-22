@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: compute_fp.py
-Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+Authors: Thomas Sargent, John Stachurski 
 
 Compute the fixed point of a given operator T, starting from 
 specified initial condition v.

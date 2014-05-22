@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: kalman.py
-Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+Authors: Thomas Sargent, John Stachurski 
 
 Implements the Kalman filter for the state space model
 

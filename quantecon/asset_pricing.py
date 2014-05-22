@@ -1,7 +1,6 @@
 """
 Filename: asset_pricing.py
 Authors: David Evans, John Stachurski and Thomas J. Sargent
-LastModified: 12/02/2014
 
 Computes asset prices in an endowment economy when the endowment obeys
 geometric growth driven by a finite state Markov chain.  The transition matrix

@@ -1,11 +1,9 @@
 """
-Origin: QEwP by John Stachurski and Thomas J. Sargent
 Filename: ecdf.py
-Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+Authors: Thomas Sargent, John Stachurski 
 
-Implements the empirical distribution function.
-
+Implements the empirical cumulative distribution function given an array of
+observations.
 """
 
 import numpy as np
