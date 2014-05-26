@@ -1,2 +1,6 @@
 *.pyc
 *ipynb_checkpoints*
+
+/build/
+/dist/
+/*.egg_info
