@@ -1,9 +1,6 @@
 """
 Origin: QE by John Stachurski and Thomas J. Sargent
-Filename: bisection.py
 Authors: John Stachurski, Thomas J. Sargent
-LastModified: 11/08/2013
-
 """
 
 

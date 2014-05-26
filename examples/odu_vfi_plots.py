@@ -1,22 +1,23 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: odu_vfi_plots.py
 Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
 """
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm
+from scipy.interpolate import LinearNDInterpolator
 import numpy as np
-from odu_vfi import *
-from compute_fp import compute_fixed_point
+
+from quantecon import odu_vfi 
+from quantecon.compute_fp import compute_fixed_point
 
 
-sp = searchProblem(w_grid_size=100, pi_grid_size=100)
+sp = odu_vfi.searchProblem(w_grid_size=100, pi_grid_size=100)
 v_init = np.zeros(len(sp.grid_points)) + sp.c / (1 - sp.beta)
-v = compute_fixed_point(bellman, sp, v_init)
-policy = get_greedy(sp, v)
+v = compute_fixed_point(odu_vfi.bellman, sp, v_init)
+policy = odu_vfi.get_greedy(sp, v)
+
 # Make functions from these arrays by interpolation
 vf = LinearNDInterpolator(sp.grid_points, v)
 pf = LinearNDInterpolator(sp.grid_points, policy)
@@ -39,7 +40,6 @@ if plot_choice == 'value_function':
     ax.clabel(cs, inline=1, fontsize=10)
     ax.set_xlabel('pi', fontsize=14)
     ax.set_ylabel('wage', fontsize=14)
-    plt.show()
 else:
     Z = np.empty((w_plot_grid_size, pi_plot_grid_size))
     for i in range(w_plot_grid_size):
@@ -52,4 +52,5 @@ else:
     ax.set_ylabel('wage', fontsize=14)
     ax.text(0.4, 1.0, 'reject')
     ax.text(0.7, 1.8, 'accept')
-    plt.show()
+
+plt.show()

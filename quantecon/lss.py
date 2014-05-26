@@ -78,7 +78,7 @@ class LSS:
 
         """
         x = np.empty((self.n, ts_length))
-        x[:,0] = multivariate_normal(self.mu_0, self.Sigma_0)
+        x[:,0] = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
         w = np.random.randn(self.m, ts_length-1)
         for t in range(ts_length-1):
             x[:, t+1] = self.A.dot(x[:, t]) + self.C.dot(w[:, t])

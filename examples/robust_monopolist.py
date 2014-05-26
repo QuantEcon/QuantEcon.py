@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: robust_monopolist.py
 Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski 
-LastModified: 28/01/2014
 
 The robust control problem for a monopolist with adjustment costs.  The
 inverse demand curve is:
@@ -23,14 +21,13 @@ For the linear regulator, we take the state and control to be
 """
 
 from __future__ import division
-from robustlq import RBLQ
-from lqcontrol import LQ
 import pandas as pd
 import numpy as np
 from scipy.linalg import eig
 from scipy import interp
 import matplotlib.pyplot as plt
 
+import quantecon as qe
 
 # == model parameters == #
 
@@ -75,7 +72,7 @@ def evaluate_policy(theta, F):
     value associated with that policy under the worst case path for {w_t}, as
     well as the entropy level.
     """
-    rlq = RBLQ(Q, R, A, B, C, beta, theta)
+    rlq = qe.robustlq.RBLQ(Q, R, A, B, C, beta, theta)
     K_F, P_F, d_F, O_F, o_F = rlq.evaluate_F(F)
     x0 = np.array([[1.], [0.], [0.]])
     value = - x0.T.dot(P_F.dot(x0)) - d_F
@@ -131,11 +128,11 @@ def value_and_entropy(emax, F, bw, grid_size=1000):
 
 
 # == Compute the optimal rule == #
-optimal_lq = LQ(Q, R, A, B, C, beta)
+optimal_lq = qe.lqcontrol.LQ(Q, R, A, B, C, beta)
 Po, Fo, do = optimal_lq.stationary_values()
 
 # == Compute a robust rule given theta == #
-baseline_robust = RBLQ(Q, R, A, B, C, beta, theta)
+baseline_robust = qe.robustlq.RBLQ(Q, R, A, B, C, beta, theta)
 Fb, Kb, Pb = baseline_robust.robust_rule()
 
 # == Check the positive definiteness of worst-case covariance matrix to == #

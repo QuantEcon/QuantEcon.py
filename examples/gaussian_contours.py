@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: gaussian_contours.py
 Authors: John Stachurski and Thomas Sargent
-LastModified: 10/09/2013
 
 Plots of bivariate Gaussians to illustrate the Kalman filter.  
 """

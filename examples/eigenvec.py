@@ -1,7 +1,10 @@
 """
-QE by Tom Sargent and John Stachurski.
+Filename: eigenvec.py
+Authors: Tom Sargent and John Stachurski.
+
 Illustrates eigenvectors.
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import eig

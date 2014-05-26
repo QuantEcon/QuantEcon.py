@@ -11,6 +11,7 @@ omegas = np.linspace(0, np.pi, 180)
 num_rows, num_cols = 2, 1
 fig, axes = plt.subplots(num_rows, num_cols, figsize=(10, 8))
 plt.subplots_adjust(hspace=0.4)
+
 # Autocovariance when phi = 0.8
 temp = r'spectral density, $\phi = {0:.2}$'
 for i, phi in enumerate((0.8, -0.8)):

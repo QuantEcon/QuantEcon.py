@@ -6,12 +6,12 @@ Visual illustration of the central limit theorem.  Produces a 3D figure
 showing the density of the scaled sample mean  \sqrt{n} \bar X_n plotted
 against n.
 """
+
 import numpy as np
 from scipy.stats import beta, bernoulli, gaussian_kde
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.collections import PolyCollection
 import matplotlib.pyplot as plt
-
 
 beta_dist = beta(2, 2)  
 

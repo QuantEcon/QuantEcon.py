@@ -1,14 +1,12 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: mc_convergence_plot.py
 Authors: John Stachurski, Thomas J. Sargent
-LastModified: 11/08/2013
 
 """
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-import mc_tools
+from quantecon import mc_tools
 
 P = ((0.971, 0.029, 0.000),  
      (0.145, 0.778, 0.077), 
