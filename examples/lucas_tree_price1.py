@@ -1,7 +1,8 @@
+
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
-from lucastree import lucas_tree, compute_price
+from quantecon.lucastree import lucas_tree, compute_price
 
 fig, ax = plt.subplots()
 #grid = np.linspace(1e-10, 4, 100)

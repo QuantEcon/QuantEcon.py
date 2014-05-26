@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lqramsey_ar1.py
 Authors: Thomas Sargent, Doc-Jin Jang, Jeong-hun Choi, John Stachurski
-LastModified: 11/08/2013
 
 Example 1: Govt spending is AR(1) and state is (g, 1).
 
@@ -10,7 +8,7 @@ Example 1: Govt spending is AR(1) and state is (g, 1).
 
 import numpy as np
 from numpy import array
-from lqramsey import *
+import quantecon as qe
 
 # == Parameters == #
 beta = 1 / 1.05   
@@ -24,7 +22,7 @@ Sd = array((0, 0)).reshape(1, 2)
 Sb = array((0, 2.135)).reshape(1, 2)
 Ss = array((0, 0)).reshape(1, 2)
 
-economy = Economy(beta=beta, 
+economy = qe.lqramsey.Economy(beta=beta, 
         Sg=Sg, 
         Sd=Sd, 
         Sb=Sb, 
@@ -33,7 +31,7 @@ economy = Economy(beta=beta,
         proc=(A, C))
 
 T = 50
-path = compute_paths(T, economy)
-gen_fig_1(path)
+path = qe.lqramsey.compute_paths(T, economy)
+qe.lqramsey.gen_fig_1(path)
 
 

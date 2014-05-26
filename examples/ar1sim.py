@@ -1,8 +1,6 @@
 """
 Origin: QE by Thomas J. Sargent and John Stachurski
 Filename: ar1sim.py
-LastModified: Thu May 15 09:26:01 EST 2014
-
 """
 
 import numpy as np

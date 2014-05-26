@@ -13,8 +13,8 @@ This is a density in y.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from lae import LAE
 from scipy.stats import lognorm, beta
+from quantecon.lae import LAE
 
 # == Define parameters == #
 s = 0.2

@@ -7,12 +7,13 @@ LastModified: 11/08/2013
 """
 from compute_fp import compute_fixed_point
 from matplotlib import pyplot as plt
-from ifp import *
+from quantecon.compute_fp import compute_fixed_point
+import quantecon as qe
 
 # === solve for optimal consumption === #
-m = consumerProblem(r=0.03, grid_max=4)
-v_init, c_init = initialize(m)
-c = compute_fixed_point(coleman_operator, m, c_init)
+m = qe.ifp.consumerProblem(r=0.03, grid_max=4)
+v_init, c_init = qe.ifp.initialize(m)
+c = compute_fixed_point(qe.ifp.coleman_operator, m, c_init)
 a = m.asset_grid
 R, z_vals = m.R, m.z_vals
 

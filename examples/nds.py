@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
 from random import uniform
+
 fig, ax = plt.subplots()
 x = np.linspace(-4, 4, 150)
 for i in range(3):

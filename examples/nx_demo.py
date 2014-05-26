@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: nx_demo.py
 Authors: John Stachurski and Thomas J. Sargent
-LastModified: 11/08/2013
 """
 
 import networkx as nx

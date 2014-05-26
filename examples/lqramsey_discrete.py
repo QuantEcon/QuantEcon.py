@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lqramsey_discrete.py
 Authors: Thomas Sargent, Doc-Jin Jang, Jeong-hun Choi, John Stachurski
-LastModified: 11/08/2013
 
 LQ Ramsey model with discrete exogenous process.  
 
@@ -10,7 +8,7 @@ LQ Ramsey model with discrete exogenous process.
 
 import numpy as np
 from numpy import array
-from lqramsey import *
+import quantecon as qe
 
 # == Parameters == #
 beta = 1 / 1.05              
@@ -29,7 +27,7 @@ Sd = array((0, 1, 0, 0, 0)).reshape(1, 5)
 Sb = array((0, 0, 1, 0, 0)).reshape(1, 5)
 Ss = array((0, 0, 0, 1, 0)).reshape(1, 5)
 
-economy = Economy(beta=beta, 
+economy = qe.lqramsey.Economy(beta=beta, 
         Sg=Sg, 
         Sd=Sd, 
         Sb=Sb, 
@@ -38,5 +36,5 @@ economy = Economy(beta=beta,
         proc=(P, x_vals))
 
 T = 15
-path = compute_paths(T, economy)
-gen_fig_1(path)
+path = qe.lqramsey.compute_paths(T, economy)
+qe.lqramsey.gen_fig_1(path)

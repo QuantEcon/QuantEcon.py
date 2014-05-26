@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-from lss import LSS
+from quantecon.lss import LSS
 import random
 
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
@@ -25,7 +25,7 @@ fig, ax = plt.subplots(figsize=(8,4))
 ax.set_xlim(ymin, ymax)
 ax.set_xlabel(r'$y_t$', fontsize=16)
 
-x, y = ar.replicate(T=T, num_reps=500000, mu_0=np.ones(4))
+x, y = ar.replicate(T=T, num_reps=500000)
 mu_x, mu_y, Sigma_x, Sigma_y = ar.moments(T=T, mu_0=np.ones(4))
 f_y = norm(loc=float(mu_y), scale=float(np.sqrt(Sigma_y)))
 

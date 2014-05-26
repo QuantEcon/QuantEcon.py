@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: illustrates_clt.py
 Authors: John Stachurski and Thomas J. Sargent
-LastModified: 11/08/2013
 
 Visual illustration of the central limit theorem.  Histograms draws of 
 

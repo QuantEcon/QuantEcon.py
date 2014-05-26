@@ -9,7 +9,7 @@ A permanent income / life-cycle model with iid income
 
 import numpy as np
 import matplotlib.pyplot as plt
-from lqcontrol import *
+from quantecon.lqcontrol import LQ
 
 # == Model parameters == #
 r       = 0.05
