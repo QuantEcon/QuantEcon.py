@@ -9,7 +9,6 @@ setup(
   author_email = 'john.stachurski@gmail.com',
   url = 'https://github.com/jstac/quant-econ', # use the URL to the github repo
   download_url = 'https://github.com/jstac/quant-econ/tarball/0.1.2', 
-  keywords = ['quantitative', 'economics'], 
-  classifiers = [],
+  keywords = ['quantitative', 'economics'] 
 )
 
