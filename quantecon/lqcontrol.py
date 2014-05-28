@@ -133,7 +133,8 @@ class LQ:
 
             V(x) = x' P x + d
 
-        Also computes the control matrix F from u = - Fx
+        in the infinite horizon case.  Also computes the control matrix F from
+        u = - Fx
 
         """
         # === simplify notation === #
