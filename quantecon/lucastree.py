@@ -44,9 +44,9 @@ lucas_tree = namedtuple('lucas_tree',
 
 # == A function to compute the price == #
 
-def compute_price(lt, grid=None):
+def compute_lt_price(lt, grid=None):
     """
-    Compute the equilibrium price function associated Lucas tree lt
+    Compute the equilibrium price function associated with Lucas tree lt
 
     Parameters
     ==========

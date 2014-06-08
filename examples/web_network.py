@@ -1,7 +1,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import mc_tools
 import re
 
 alphabet = 'abcdefghijklmnopqrstuvwxyz'

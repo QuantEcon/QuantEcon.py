@@ -20,7 +20,7 @@ def gen_probs(n, a, b):
     return probs
 
 
-class workerProblem:
+class WorkerProblem:
 
     def __init__(self, B=5.0, beta=0.95, N=50, F_a=1, F_b=1, G_a=1, G_b=1):
         self.beta, self.N, self.B = beta, N, B
@@ -31,9 +31,9 @@ class workerProblem:
         self.F_mean = np.sum(self.theta * self.F_probs)
         self.G_mean = np.sum(self.epsilon * self.G_probs)
 
-def bellman(w, v):
+def wp_bellman(w, v):
     """
-    The Bellman operator.  
+    The Bellman operator for the career / job choice model of Neal.  
     
         * w is an instance of workerProblem
         * v is a 2D NumPy array representing the value function
@@ -51,7 +51,7 @@ def bellman(w, v):
             new_v[i, j] = max(v1, v2, v3)
     return new_v
 
-def get_greedy(w, v):
+def wp_get_greedy(w, v):
     """
     Compute optimal actions taking v as the value function.  Parameters are
     the same as for bellman().  Returns a 2D NumPy array "policy", where

@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: optgrowth.py
 Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
 
 Solving the optimal growth problem via value function iteration.
 
@@ -13,7 +11,7 @@ import numpy as np
 from scipy.optimize import fminbound
 from scipy import interp
 
-class growthModel:
+class GrowthModel:
     """
     This class is just a "struct" to hold the collection of primitives
     defining the growth model.  The default values are 
@@ -37,14 +35,14 @@ class growthModel:
         self.grid = np.linspace(1e-6, grid_max, grid_size)
 
 
-def bellman_operator(gm, w):
+def gm_bellman_operator(gm, w):
     """
     The approximate Bellman operator, which computes and returns the updated
     value function Tw on the grid poitns.
 
     Parameters:
 
-        * gm is an instance of the growthModel class
+        * gm is an instance of the GrowthModel class
         * w is a flat NumPy array with len(w) = len(grid)
 
     The vector w represents the value of the input function on the grid
@@ -64,11 +62,11 @@ def bellman_operator(gm, w):
     return Tw
 
 
-def compute_greedy(gm, w):
+def gm_compute_greedy(gm, w):
     """
     Compute the w-greedy policy on the grid points.  Parameters:
 
-        * gm is an instance of the growthModel class
+        * gm is an instance of the GrowthModel class
         * w is a flat NumPy array with len(w) = len(grid)
 
     """

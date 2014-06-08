@@ -1,8 +1,3 @@
-"""
-Origin: QE by John Stachurski and Thomas J. Sargent
-Authors: John Stachurski, Thomas J. Sargent
-"""
-
 
 def bisect(f, a, b, tol=10e-5):
     """

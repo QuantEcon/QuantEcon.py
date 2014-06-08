@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 
 
-class linearProcess(object):
+class LinearProcess(object):
     """
     This class provides functions for working with scalar ARMA processes.  In
     particular, it defines methods for computing and plotting the
