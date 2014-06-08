@@ -28,6 +28,7 @@ source:
 requirements:
   build:
     - python
+    - setuptools
       #    - numpy
       #    - scipy
       #    - pandas
@@ -35,10 +36,10 @@ requirements:
 
   run:
     - python
-      #    - numpy
-      #    - scipy
-      #    - pandas
-      #    - matplotlib
+    - numpy
+    - scipy
+    - pandas
+    - matplotlib
 
 test:
   # Python imports
