@@ -49,7 +49,7 @@ class consumerProblem:
         self.asset_grid = np.linspace(-b, grid_max, grid_size)
 
 
-def bellman_operator(cp, V, return_policy=False):
+def cp_bellman_operator(cp, V, return_policy=False):
     """
     The approximate Bellman operator, which computes and returns the updated
     value function TV (or the V-greedy policy c if return_policy == True).
@@ -129,7 +129,7 @@ def coleman_operator(cp, c):
 
     return Kc
 
-def initialize(cp):
+def cp_initialize(cp):
     """
     Creates a suitable initial conditions V and c for value function and
     policy function iteration respectively.

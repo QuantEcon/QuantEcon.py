@@ -8,7 +8,7 @@ LastModified: 11/08/2013
 import numpy as np
 from discrete_rv import discreteRV
 
-def compute_stationary(P):
+def mc_compute_stationary(P):
     """
     Computes the stationary distribution of Markov matrix P.
 
@@ -27,7 +27,7 @@ def compute_stationary(P):
 
 
 
-def sample_path(P, init=0, sample_size=1000): 
+def mc_sample_path(P, init=0, sample_size=1000): 
     """
     Generates one sample path from a finite Markov chain with (n x n) Markov
     matrix P on state space S = {0,...,n-1}. 

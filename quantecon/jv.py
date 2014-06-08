@@ -30,7 +30,7 @@ from scipy import interp
 
 epsilon = 1e-4  #  A small number, used in the optimization routine
 
-class workerProblem:
+class jv_workerProblem:
 
     def __init__(self, A=1.4, alpha=0.6, beta=0.96, grid_size=50):
         """
@@ -48,7 +48,7 @@ class workerProblem:
         self.x_grid = np.linspace(epsilon, grid_max, grid_size)
 
 
-def bellman_operator(wp, V, brute_force=False, return_policies=False):
+def jv_bellman_operator(wp, V, brute_force=False, return_policies=False):
     """
     Parameter wp is an instance of workerProblem.  Thus function returns the
     approximate value function TV by applying the Bellman operator associated

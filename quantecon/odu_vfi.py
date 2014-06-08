@@ -13,7 +13,7 @@ from scipy.integrate import fixed_quad
 from scipy.stats import beta as beta_distribution
 import numpy as np
 
-class searchProblem:
+class SearchProblem:
     """
     A class to store a given parameterization of the "offer distribution
     unknown" model.
@@ -45,7 +45,7 @@ class searchProblem:
         return np.maximum(np.minimum(new_pi, self.pi_max), self.pi_min)
 
 
-def bellman(sp, v):
+def sp_bellman(sp, v):
     """
     The Bellman operator.
 
@@ -66,7 +66,7 @@ def bellman(sp, v):
         new_v[i] = max(v1, v2)
     return new_v
 
-def get_greedy(sp, v):
+def sp_get_greedy(sp, v):
     """
     Compute optimal actions taking v as the value function.  Parameters are
     the same as for bellman().  Returns a NumPy array called "policy", where

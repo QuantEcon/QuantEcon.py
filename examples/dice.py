@@ -1,6 +1,5 @@
 """
 Filename: dice.py
-Authors: John Stachurski, Thomas J. Sargent
 """
 
 import random

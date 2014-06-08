@@ -6,7 +6,7 @@ Authors: John Stachurski, Thomas J. Sargent
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-from quantecon import mc_tools
+from quantecon import mc_compute_stationary
 
 P = ((0.971, 0.029, 0.000),  
      (0.145, 0.778, 0.077), 
@@ -34,7 +34,7 @@ for t in range(20):
 
 ax.scatter(x_vals, y_vals, z_vals, c='r', s=60)
 
-psi_star = mc_tools.compute_stationary(P)
+psi_star = mc_compute_stationary(P)
 ax.scatter(psi_star[0], psi_star[1], psi_star[2], c='k', s=60)
 
 plt.show()
