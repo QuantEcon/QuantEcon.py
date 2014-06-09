@@ -35,49 +35,49 @@ class GrowthModel:
         self.grid = np.linspace(1e-6, grid_max, grid_size)
 
 
-def gm_bellman_operator(gm, w):
-    """
-    The approximate Bellman operator, which computes and returns the updated
-    value function Tw on the grid poitns.
+    def bellman_operator(self, w):
+        """
+        The approximate Bellman operator, which computes and returns the updated
+        value function Tw on the grid poitns.
 
-    Parameters:
+        Parameters
+        ==========
+            w : a flat NumPy array with len(w) = len(grid)
 
-        * gm is an instance of the GrowthModel class
-        * w is a flat NumPy array with len(w) = len(grid)
+        The vector w represents the value of the input function on the grid
+        points.
 
-    The vector w represents the value of the input function on the grid
-    points.
+        """
+        # === Apply linear interpolation to w === #
+        Aw = lambda x: interp(x, self.grid, w)  
 
-    """
-    # === Apply linear interpolation to w === #
-    Aw = lambda x: interp(x, gm.grid, w)  
+        # === set Tw[i] equal to max_c { u(c) + beta w(f(k_i) - c)} === #
+        Tw = np.empty(len(w))
+        for i, k in enumerate(self.grid):
+            objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
+            c_star = fminbound(objective, 1e-6, self.f(k))
+            Tw[i] = - objective(c_star)
 
-    # === set Tw[i] equal to max_c { u(c) + beta w(f(k_i) - c)} === #
-    Tw = np.empty(len(w))
-    for i, k in enumerate(gm.grid):
-        objective = lambda c:  - gm.u(c) - gm.beta * Aw(gm.f(k) - c)
-        c_star = fminbound(objective, 1e-6, gm.f(k))
-        Tw[i] = - objective(c_star)
-
-    return Tw
+        return Tw
 
 
-def gm_compute_greedy(gm, w):
-    """
-    Compute the w-greedy policy on the grid points.  Parameters:
+    def compute_greedy(self, w):
+        """
+        Compute the w-greedy policy on the grid points.  Parameters:
 
-        * gm is an instance of the GrowthModel class
-        * w is a flat NumPy array with len(w) = len(grid)
+        Parameters
+        ==========
+            w : a flat NumPy array with len(w) = len(grid)
 
-    """
-    # === Apply linear interpolation to w === #
-    Aw = lambda x: interp(x, gm.grid, w)  
+        """
+        # === Apply linear interpolation to w === #
+        Aw = lambda x: interp(x, self.grid, w)  
 
-    # === set sigma[i] equal to argmax_c { u(c) + beta w(f(k_i) - c)} === #
-    sigma = np.empty(len(w))
-    for i, k in enumerate(gm.grid):
-        objective = lambda c:  - gm.u(c) - gm.beta * Aw(gm.f(k) - c)
-        sigma[i] = fminbound(objective, 1e-6, gm.f(k))
+        # === set sigma[i] equal to argmax_c { u(c) + beta w(f(k_i) - c)} === #
+        sigma = np.empty(len(w))
+        for i, k in enumerate(self.grid):
+            objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
+            sigma[i] = fminbound(objective, 1e-6, self.f(k))
 
-    return sigma
+        return sigma
 

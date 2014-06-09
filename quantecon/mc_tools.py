@@ -6,7 +6,7 @@ LastModified: 11/08/2013
 """
 
 import numpy as np
-from discrete_rv import discreteRV
+from discrete_rv import DiscreteRV
 
 def mc_compute_stationary(P):
     """
@@ -50,13 +50,13 @@ def mc_sample_path(P, init=0, sample_size=1000):
     if isinstance(init, int):
         X[0] = init
     else:
-        X[0] = discreteRV(init).draw()
+        X[0] = DiscreteRV(init).draw()
 
     # === turn each row into a distribution === #
     # In particular, let P_dist[i] be the distribution corresponding to the
     # i-th row P[i,:]
     n = len(P)
-    P_dist = [discreteRV(P[i,:]) for i in range(n)]
+    P_dist = [DiscreteRV(P[i,:]) for i in range(n)]
 
     # === generate the sample path === #
     for t in range(sample_size - 1):
