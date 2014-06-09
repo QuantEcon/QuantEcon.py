@@ -1,5 +1,6 @@
 ''' 
-    Import names to top level.
+Import the main names to top level.
+
 '''
 
 from asset_pricing import AssetPrices
