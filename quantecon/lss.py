@@ -1,11 +1,11 @@
 """
-Origin: QE by Thomas J. Sargent and John Stachurski
+Authors: Thomas J. Sargent, John Stachurski
 Filename: lss.py
-LastModified: 30/01/2014
 
-Computes quantities related to the linear state space model
+Computes quantities related to the Gaussian linear state space model
 
     x_{t+1} = A x_t + C w_{t+1}
+
         y_t = G x_t
 
 The shocks {w_t} are iid and N(0, I)
