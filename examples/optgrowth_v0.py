@@ -1,12 +1,9 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: optgrowth_v0.py
 Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
 
 A first pass at solving the optimal growth problem via value function
-iteration, provided as an introduction to the techniques.  A more general
-version is provided in optgrowth.py.
+iteration.  A more general version is provided in optgrowth.py.
 
 """
 from __future__ import division  # Omit for Python 3.x
@@ -59,11 +56,13 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
     ax.set_ylim(-40, -20)
     ax.set_xlim(np.min(grid), np.max(grid))
-    ax.plot(grid, w, color=plt.cm.jet(0), lw=2, alpha=0.6, label='initial condition')
+    lb = 'initial condition'
+    ax.plot(grid, w, color=plt.cm.jet(0), lw=2, alpha=0.6, label=lb)
     for i in range(n):
         w = bellman_operator(w)
         ax.plot(grid, w, color=plt.cm.jet(i / n), lw=2, alpha=0.6)
-    ax.plot(grid, v_star(grid), 'k-', lw=2, alpha=0.8, label='true value function')
+    lb = 'true value function'
+    ax.plot(grid, v_star(grid), 'k-', lw=2, alpha=0.8, label=lb)
     ax.legend(loc='upper left')
 
     plt.show()

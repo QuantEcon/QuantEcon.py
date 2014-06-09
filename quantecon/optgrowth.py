@@ -13,10 +13,10 @@ from scipy import interp
 
 class GrowthModel:
     """
-    This class is just a "struct" to hold the collection of primitives
-    defining the growth model.  The default values are 
+    This class defines the primitives representing the growth model.  The
+    default values are 
 
-        f(k) = k**alpha, i.e, Cobb-douglas production function
+        f(k) = k**alpha, i.e, Cobb-Douglas production function
         u(c) = ln(c), i.e, log utility
 
     See the __init__ function for details
@@ -35,10 +35,10 @@ class GrowthModel:
         self.grid = np.linspace(1e-6, grid_max, grid_size)
 
 
-    def bellman_operator(self, w):
+    def bellman_operator(self, w, compute_policy=False):
         """
-        The approximate Bellman operator, which computes and returns the updated
-        value function Tw on the grid poitns.
+        The approximate Bellman operator, which computes and returns the 
+        updated value function Tw on the grid points.
 
         Parameters
         ==========
@@ -51,14 +51,23 @@ class GrowthModel:
         # === Apply linear interpolation to w === #
         Aw = lambda x: interp(x, self.grid, w)  
 
+        if compute_policy:
+            sigma = np.empty(len(w))
+
         # === set Tw[i] equal to max_c { u(c) + beta w(f(k_i) - c)} === #
         Tw = np.empty(len(w))
         for i, k in enumerate(self.grid):
             objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
             c_star = fminbound(objective, 1e-6, self.f(k))
+            if compute_policy:
+                # sigma[i] = argmax_c { u(c) + beta w(f(k_i) - c)} 
+                sigma[i] = c_star
             Tw[i] = - objective(c_star)
 
-        return Tw
+        if compute_policy:
+            return Tw, sigma
+        else:
+            return Tw
 
 
     def compute_greedy(self, w):
@@ -70,14 +79,6 @@ class GrowthModel:
             w : a flat NumPy array with len(w) = len(grid)
 
         """
-        # === Apply linear interpolation to w === #
-        Aw = lambda x: interp(x, self.grid, w)  
-
-        # === set sigma[i] equal to argmax_c { u(c) + beta w(f(k_i) - c)} === #
-        sigma = np.empty(len(w))
-        for i, k in enumerate(self.grid):
-            objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
-            sigma[i] = fminbound(objective, 1e-6, self.f(k))
-
+        Tw, sigma = self.bellman_operator(w, compute_policy=True)
         return sigma
 
