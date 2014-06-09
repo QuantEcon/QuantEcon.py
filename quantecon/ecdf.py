@@ -9,7 +9,7 @@ observations.
 import numpy as np
 import matplotlib.pyplot as plt
 
-class ecdf:
+class ECDF:
 
     def __init__(self, observations):
         self.observations = np.asarray(observations)
