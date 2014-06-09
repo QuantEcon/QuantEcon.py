@@ -9,14 +9,13 @@ from matplotlib import cm
 from scipy.interpolate import LinearNDInterpolator
 import numpy as np
 
-from quantecon import odu_vfi 
-from quantecon.compute_fp import compute_fixed_point
+from quantecon import SearchProblem, compute_fixed_point
 
 
-sp = odu_vfi.searchProblem(w_grid_size=100, pi_grid_size=100)
+sp = SearchProblem(w_grid_size=100, pi_grid_size=100)
 v_init = np.zeros(len(sp.grid_points)) + sp.c / (1 - sp.beta)
-v = compute_fixed_point(odu_vfi.bellman, sp, v_init)
-policy = odu_vfi.get_greedy(sp, v)
+v = compute_fixed_point(sp.bellman_operator, v_init)
+policy = sp.get_greedy(v)
 
 # Make functions from these arrays by interpolation
 vf = LinearNDInterpolator(sp.grid_points, v)

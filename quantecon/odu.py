@@ -50,8 +50,11 @@ class SearchProblem:
         iteration is not recommended for this problem.  See the reservation
         wage operator below.
 
-            * v is an approximate value function represented as a one-dimensional
-                array.
+        Parameters
+        ==============
+            v : An approximate value function represented as a
+                one-dimensional array.
+
         """
         # == Simplify names == #
         f, g, beta, c, q = self.f, self.g, self.beta, self.c, self.q 
@@ -62,7 +65,8 @@ class SearchProblem:
         for i in range(N):
             w, pi = self.grid_points[i,:]
             v1 = w / (1 - beta)
-            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) + (1 - pi) * g(m))
+            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) \
+                    + (1 - pi) * g(m))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             v2 = c + beta * integral
             new_v[i] = max(v1, v2)
@@ -70,11 +74,11 @@ class SearchProblem:
 
     def get_greedy(self, v):
         """
-        Compute optimal actions taking v as the value function.  Parameters are
-        the same as for bellman().  Returns a NumPy array called "policy", where
-        policy[i] is the optimal action at self.grid_points[i,:].  The optimal
-        action is represented in binary, where 0 indicates reject and 1 indicates
-        accept.
+        Compute optimal actions taking v as the value function.  Parameters
+        are the same as for bellman().  Returns a NumPy array called "policy",
+        where policy[i] is the optimal action at self.grid_points[i,:].  The
+        optimal action is represented in binary, where 0 indicates reject and
+        1 indicates accept.
         """
         # == Simplify names == #
         f, g, beta, c, q = self.f, self.g, self.beta, self.c, self.q  
@@ -85,7 +89,8 @@ class SearchProblem:
         for i in range(N):
             w, pi = self.grid_points[i,:]
             v1 = w / (1 - beta)
-            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) + (1 - pi) * g(m))
+            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) + \
+                    (1 - pi) * g(m))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             v2 = c + beta * integral
             policy[i] = v1 > v2  # Evaluates to 1 or 0
@@ -109,7 +114,7 @@ class SearchProblem:
         for i, pi in enumerate(self.pi_grid):
             def integrand(x):
                 "Integral expression on right-hand side of operator"
-                return npmax(x, phi_f(q(x, pi))) * (pi * f(x) + (1 - pi) * g(x))
+                return npmax(x, phi_f(q(x,pi))) * (pi * f(x) + (1 - pi) * g(x))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             new_phi[i] = (1 - beta) * c + beta * integral
         return new_phi
