@@ -15,9 +15,13 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
     contraction mapping or similar, T^k v will be an approximation to the
     fixed point.
 
-    The convention for using this function is that T can be called as 
+    Parameters
+    =============
+        T : callable
+        A function that acts on v
     
-        new_v = T(v).
+        v : an object
+
 
     """
     iterate = 0 
