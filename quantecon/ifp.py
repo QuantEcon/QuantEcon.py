@@ -11,11 +11,11 @@ from scipy import interp
 class ConsumerProblem:
     """
     A class for solving the income fluctuation problem. Iteration with either
-    the Coleman or Bellman operators from appropriate initial conditions leads
-    to convergence to the optimal consumption policy.  The income process is a
-    finite state Markov chain.  Note that the Coleman operator is the
-    preferred method, as it is almost always faster and more accurate.  The
-    Bellman operator is only provided for comparison.
+    the Coleman or Bellman operators from appropriate initial conditions
+    leads to convergence to the optimal consumption policy.  The income
+    process is a finite state Markov chain.  Note that the Coleman operator
+    is the preferred method, as it is almost always faster and more accurate.
+    The Bellman operator is only provided for comparison.
 
     """
 
@@ -49,13 +49,13 @@ class ConsumerProblem:
 
     def bellman_operator(self, V, return_policy=False):
         """
-        The approximate Bellman operator, which computes and returns the updated
-        value function TV (or the V-greedy policy c if return_policy == True).
+        The approximate Bellman operator, which computes and returns the
+        updated value function TV (or the V-greedy policy c if return_policy
+        == True).
 
         Parameters
         ===========
-
-            * V is a NumPy array of dimension len(cp.asset_grid) x len(cp.z_vals)
+            V : a NumPy array of dim len(cp.asset_grid) x len(cp.z_vals)
 
         """
         # === simplify names, set up arrays === #
@@ -63,7 +63,7 @@ class ConsumerProblem:
         asset_grid, z_vals = self.asset_grid, self.z_vals        
         new_V = np.empty(V.shape)
         new_c = np.empty(V.shape)
-        z_index = range(len(z_vals))  
+        z_idx = range(len(z_vals))  
 
         # === linear interpolation of V along the asset grid === #
         vf = lambda a, i_z: interp(a, asset_grid, V[:, i_z]) 
@@ -72,7 +72,7 @@ class ConsumerProblem:
         for i_a, a in enumerate(asset_grid):
             for i_z, z in enumerate(z_vals):
                 def obj(c):  # objective function to be *minimized*
-                    y = sum(vf(R * a + z - c, j) * Pi[i_z, j] for j in z_index)
+                    y = sum(vf(R * a + z - c, j) * Pi[i_z, j] for j in z_idx)
                     return - u(c) - beta * y
                 c_star = fminbound(obj, np.min(z_vals), R * a + z + b)
                 new_c[i_a, i_z], new_V[i_a, i_z] = c_star, -obj(c_star)
@@ -94,7 +94,8 @@ class ConsumerProblem:
             * c is a NumPy array of dimension len(asset_grid) x len(z_vals)
 
         The array c is replaced with a function cf that implements univariate
-        linear interpolation over the asset grid for each possible value of z.
+        linear interpolation over the asset grid for each possible value of
+        z.
         """
         # === simplify names, set up arrays === #
         R, Pi, beta, du, b = self.R, self.Pi, self.beta, self.du, self.b  
@@ -106,10 +107,10 @@ class ConsumerProblem:
         # === linear interpolation to get consumption function === #
         def cf(a):
             """
-            The call cf(a) returns an array containing the values c(a, z) for each
-            z in z_vals.  For each such z, the value c(a, z) is constructed by
-            univariate linear approximation over asset space, based on the values
-            in the array c
+            The call cf(a) returns an array containing the values c(a, z) for
+            each z in z_vals.  For each such z, the value c(a, z) is
+            constructed by univariate linear approximation over asset space,
+            based on the values in the array c
             """
             for i in range(z_size):
                 vals[i] = interp(a, asset_grid, c[:, i])

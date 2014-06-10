@@ -30,7 +30,7 @@ def smooth(x, window_len=7, window='hanning'):
 
     """
     if len(x) < window_len:
-        raise ValueError, "Input vector length must be at least window length."
+        raise ValueError, "Input vector length must be >= window length."
 
     if window_len < 3:
         raise ValueError, "Window length must be at least 3."
@@ -108,7 +108,7 @@ def ar_periodogram(x, window='hanning', window_len=7):
     arguments.
     """              
     # === run regression === #
-    x_current, x_lagged = x[1:], x[:-1]                       # x_t and x_{t-1}
+    x_current, x_lagged = x[1:], x[:-1]  # x_t and x_{t-1}
     x_current, x_lagged = Series(x_current), Series(x_lagged) # pandas series
     results = ols(y=x_current, x=x_lagged, intercept=True, nw_lags=1)
     e_hat = results.resid.values

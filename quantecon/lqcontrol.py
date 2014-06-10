@@ -1,10 +1,8 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lqcontrol.py
 Authors: John Stachurski and Thomas J. Sargent
-LastModified: 12/09/2013
 
-Solves LQ control problems.
+Provides a class called LQ for solving linear quadratic control problems.
 """
 
 import numpy as np
