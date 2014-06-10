@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lqramsey.py
 Authors: Thomas Sargent, Doc-Jin Jang, Jeong-hun Choi, John Stachurski
-LastModified: 11/08/2013
 
 This module provides code to compute Ramsey equilibria in a LQ economy with
 distortionary taxation.  The program computes allocations (consumption,
@@ -23,10 +21,7 @@ from numpy.random import randn
 import scipy.linalg 
 import matplotlib.pyplot as plt
 from collections import namedtuple
-from rank_nullspace import nullspace
-import mc_tools
-from quadsums import var_quadratic_sum
-
+from quantecon import nullspace, mc_sample_path, var_quadratic_sum
 
 
 # == Set up a namedtuple to store data on the model economy == #
@@ -107,7 +102,7 @@ def compute_paths(T, econ):
 
     # == Simulate the exogenous process x == #
     if econ.discrete:
-        state = mc_tools.sample_path(P, init=0, sample_size=T)
+        state = mc_sample_path(P, init=0, sample_size=T)
         x = x_vals[:,state]
     else:
         # == Generate an initial condition x0 satisfying x0 = A x0 == #

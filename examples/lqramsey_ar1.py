@@ -8,7 +8,7 @@ Example 1: Govt spending is AR(1) and state is (g, 1).
 
 import numpy as np
 from numpy import array
-import quantecon as qe
+import lqramsey
 
 # == Parameters == #
 beta = 1 / 1.05   
@@ -22,7 +22,7 @@ Sd = array((0, 0)).reshape(1, 2)
 Sb = array((0, 2.135)).reshape(1, 2)
 Ss = array((0, 0)).reshape(1, 2)
 
-economy = qe.lqramsey.Economy(beta=beta, 
+economy = lqramsey.Economy(beta=beta, 
         Sg=Sg, 
         Sd=Sd, 
         Sb=Sb, 
@@ -31,7 +31,7 @@ economy = qe.lqramsey.Economy(beta=beta,
         proc=(A, C))
 
 T = 50
-path = qe.lqramsey.compute_paths(T, economy)
-qe.lqramsey.gen_fig_1(path)
+path = lqramsey.compute_paths(T, economy)
+lqramsey.gen_fig_1(path)
 
 

@@ -53,10 +53,10 @@ class JvWorker:
         V-greedy policies s_policy and phi_policy when return_policies=True.
 
         In the function, the array V is replaced below with a function Vf that
-        implements linear interpolation over the points (V(x), x) for x in x_grid.
-        If the brute_force flag is true, then grid search is performed at each
-        maximization step.  In either case, T returns a NumPy array representing
-        the updated values TV(x) over x in x_grid.
+        implements linear interpolation over the points (V(x), x) for x in 
+        x_grid.  If the brute_force flag is true, then grid search is 
+        performed at each maximization step.  In either case, T returns a 
+        NumPy array representing the updated values TV(x) over x in x_grid.
 
         """
         # === simplify names, set up arrays, etc. === #
@@ -76,10 +76,11 @@ class JvWorker:
             # === set up objective function === #
             def w(z):  
                 s, phi = z
-                integrand = lambda u: Vf(np.maximum(G(x, phi), u)) * F.pdf(u)
-                integral, err = integrate(integrand, a, b)
+                h = lambda u: Vf(np.maximum(G(x, phi), u)) * F.pdf(u)
+                integral, err = integrate(h, a, b)
                 q = pi(s) * integral + (1 - pi(s)) * Vf(G(x, phi))
-                return - x * (1 - phi - s) - beta * q  # minus because we minimize
+                # == minus because we minimize == #
+                return - x * (1 - phi - s) - beta * q  
 
             # === either use SciPy solver === #
             if not brute_force:  

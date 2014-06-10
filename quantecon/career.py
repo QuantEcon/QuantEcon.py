@@ -37,8 +37,11 @@ class CareerWorkerProblem:
         
             * v is a 2D NumPy array representing the value function
             
-        The array v should be interpreted as v[i, j] = v(theta_i, epsilon_j).  
-        Returns the updated value function Tv as an array of shape v.shape
+        The array v should be interpreted as 
+        
+            v[i, j] = v(theta_i, epsilon_j).  
+
+        Returns updated value function Tv as an array of shape v.shape
         """
         new_v = np.empty(v.shape)
         for i in range(self.N):
@@ -53,11 +56,12 @@ class CareerWorkerProblem:
 
     def get_greedy(self, v):
         """
-        Compute optimal actions taking v as the value function.  Parameters are
-        the same as for bellman().  Returns a 2D NumPy array "policy", where
-        policy[i, j] is the optimal action at state (theta_i, epsilon_j).  The
-        optimal action is represented as an integer in the set 1, 2, 3, where 1 =
-        'stay put', 2 = 'new job' and 3 = 'new life'
+        Compute optimal actions taking v as the value function.  Parameters 
+        are the same as for bellman().  Returns a 2D NumPy array "policy", 
+        where policy[i, j] is the optimal action at (theta_i, epsilon_j).  
+
+        The optimal action is represented as an integer in the set 1, 2, 3, 
+        where 1 = 'stay put', 2 = 'new job' and 3 = 'new life'
         """
         policy = np.empty(v.shape, dtype=int)
         for i in range(self.N):

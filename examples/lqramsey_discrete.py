@@ -8,7 +8,7 @@ LQ Ramsey model with discrete exogenous process.
 
 import numpy as np
 from numpy import array
-import quantecon as qe
+import lqramsey
 
 # == Parameters == #
 beta = 1 / 1.05              
@@ -27,7 +27,7 @@ Sd = array((0, 1, 0, 0, 0)).reshape(1, 5)
 Sb = array((0, 0, 1, 0, 0)).reshape(1, 5)
 Ss = array((0, 0, 0, 1, 0)).reshape(1, 5)
 
-economy = qe.lqramsey.Economy(beta=beta, 
+economy = lqramsey.Economy(beta=beta, 
         Sg=Sg, 
         Sd=Sd, 
         Sb=Sb, 
@@ -36,5 +36,5 @@ economy = qe.lqramsey.Economy(beta=beta,
         proc=(P, x_vals))
 
 T = 15
-path = qe.lqramsey.compute_paths(T, economy)
-qe.lqramsey.gen_fig_1(path)
+path = lqramsey.compute_paths(T, economy)
+lqramsey.gen_fig_1(path)
