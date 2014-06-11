@@ -25,6 +25,7 @@ def time_path():
     return w, b, c
 
 
+# == Figure showing a typical realization == #
 
 if 1:
     fig, ax = plt.subplots()
@@ -43,6 +44,7 @@ if 1:
 
     plt.show()
 
+# == Figure showing multiple consumption paths == #
 
 if 0:
     fig, ax = plt.subplots()

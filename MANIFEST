@@ -14,11 +14,10 @@ quantecon/kalman.py
 quantecon/lae.py
 quantecon/linproc.py
 quantecon/lqcontrol.py
-quantecon/lqramsey.py
 quantecon/lss.py
 quantecon/lucastree.py
 quantecon/mc_tools.py
-quantecon/odu_vfi.py
+quantecon/odu.py
 quantecon/optgrowth.py
 quantecon/quadsums.py
 quantecon/rank_nullspace.py
