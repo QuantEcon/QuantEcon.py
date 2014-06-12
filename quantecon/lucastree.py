@@ -1,8 +1,6 @@
 """
-Origin: QE by Thomas J. Sargent and John Stachurski 
 Filename: lucastree.py
 Authors: Thomas Sargent, John Stachurski
-LastModified: Tue May 6 08:37:18 EST 2014
 
 Solves the price function for the Lucas tree in a continuous state setting,
 using piecewise linear approximation for the sequence of candidate price

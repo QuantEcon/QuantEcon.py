@@ -8,15 +8,13 @@ Tests jv.py with a particular parameterization.
 
 """
 import matplotlib.pyplot as plt
-from jv import workerProblem, bellman_operator
-from quantecon.compute_fp import compute_fixed_point
-import quantecon.jv as jv
+from quantecon import compute_fixed_point, JvWorker
 
 # === solve for optimal policy === #
-wp = jv.workerProblem(grid_size=25)
+wp = JvWorker(grid_size=25)
 v_init = wp.x_grid * 0.5
-V = compute_fixed_point(jv.bellman_operator, wp, v_init, max_iter=40)
-s_policy, phi_policy = jv.bellman_operator(wp, V, return_policies=True)
+V = compute_fixed_point(wp.bellman_operator, v_init, max_iter=40)
+s_policy, phi_policy = wp.bellman_operator(V, return_policies=True)
 
 # === plot policies === #
 fig, ax = plt.subplots()

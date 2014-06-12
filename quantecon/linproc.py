@@ -1,8 +1,9 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: linproc.py
 Authors: John Stachurski and Thomas Sargent
-LastModified: 11/08/2013
+
+Provides functions for visualizing scalar ARMA processes.
+
 """
 import numpy as np
 from numpy import conj, pi, real
@@ -35,7 +36,7 @@ class LinearProcess(object):
         interpretation is the ARMA(p, q) model 
 
             X_t = phi_1 X_{t-1} + ... + phi_p X_{t-p} + 
-                epsilon_t + theta_1 epsilon_{t-1} + ... + theta_q epsilon_{t-q}
+            epsilon_t + theta_1 epsilon_{t-1} + ...  + theta_q epsilon_{t-q}
 
         where
 
@@ -105,7 +106,7 @@ class LinearProcess(object):
         psi = psi[0].flatten()  # Simplify return value into flat array
         return psi
 
-    def spectral_density(self, two_pi=True, resolution=1200) :
+    def spectral_density(self, two_pi=True, res=1200): 
         """
         Compute the spectral density function over [0, pi] if two_pi is False
         and [0, 2 pi] otherwise.  The spectral density is the discrete time
@@ -116,7 +117,7 @@ class LinearProcess(object):
         where gamma is the autocovariance function and the sum is over the set
         of all integers.
         """       
-        w, h = freqz(self.ma_poly, self.ar_poly, worN=resolution, whole=two_pi)
+        w, h = freqz(self.ma_poly, self.ar_poly, worN=res, whole=two_pi)
         spect = h * conj(h) * self.sigma**2 
         return w, spect
 

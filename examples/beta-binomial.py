@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: beta-binomial.py
 Authors: John Stachurski, Thomas J. Sargent
-LastModified: 11/08/2013
 
 """
 from scipy.special import binom, beta
