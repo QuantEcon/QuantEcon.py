@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from career import *
+from quantecon.career import *
 from compute_fp import compute_fixed_point
 
 wp = workerProblem()

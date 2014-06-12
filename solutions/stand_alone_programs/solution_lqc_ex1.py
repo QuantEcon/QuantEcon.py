@@ -11,7 +11,7 @@ and p(T) = 0.
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-from lqcontrol import *
+from quantecon.lqcontrol import *
 
 # == Model parameters == #
 r       = 0.05

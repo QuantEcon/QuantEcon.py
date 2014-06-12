@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import random
-from jv import workerProblem, bellman_operator
-from compute_fp import compute_fixed_point
+from quantecon.jv import workerProblem, bellman_operator
+from quantecon.compute_fp import compute_fixed_point
 import numpy as np
 
 # Set up

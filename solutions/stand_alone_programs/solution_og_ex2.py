@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interp
-from optgrowth import growthModel, bellman_operator, compute_greedy
-from compute_fp import compute_fixed_point
+from quantecon.optgrowth import growthModel, bellman_operator, compute_greedy
+from quantecon.compute_fp import compute_fixed_point
 
 gm = growthModel() 
 w = 5 * gm.u(gm.grid) - 25  # To be used as an initial condition

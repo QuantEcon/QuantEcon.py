@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import lognorm, beta
 import matplotlib.pyplot as plt
-from lae import lae
+from quantecon.lae import lae
 
 # == Define parameters == #
 s = 0.2

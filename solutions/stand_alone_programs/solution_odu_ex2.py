@@ -1,9 +1,10 @@
 from scipy import interp
 import numpy as np
 import matplotlib.pyplot as plt
-from odu_vfi import searchProblem
+from quantecon.odu_vfi import searchProblem
+from quantecon.compute_fp import compute_fixed_point
 from solution_odu_ex1 import res_wage_operator
-from compute_fp import compute_fixed_point
+
 
 # Set up model and compute the function w_bar
 sp = searchProblem(pi_grid_size=50, F_a=1, F_b=1)

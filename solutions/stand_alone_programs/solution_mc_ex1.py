@@ -4,7 +4,7 @@ and compare it to the stationary probability.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import mc_tools
+from quantecon import mc_tools
 
 alpha = beta = 0.1
 N = 10000

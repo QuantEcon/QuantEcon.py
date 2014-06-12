@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from jv import workerProblem 
+from quantecon.jv import workerProblem 
 import numpy as np
 
 # Set up

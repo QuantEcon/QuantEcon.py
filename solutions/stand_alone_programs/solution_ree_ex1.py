@@ -6,7 +6,7 @@ Solves an exercise from the rational expectations module
 """
 from __future__ import print_function
 import numpy as np
-from lqcontrol import LQ
+from quantecon.lqcontrol import LQ
 
 
 # == Model parameters == #

@@ -9,7 +9,7 @@ idea of the speed of convergence.
 import numpy as np
 from scipy.stats import norm, gaussian_kde
 import matplotlib.pyplot as plt
-from lae import lae
+from quantecon.lae import lae
 
 phi = norm()
 n = 500
