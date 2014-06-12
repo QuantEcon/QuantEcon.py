@@ -1,9 +1,9 @@
 from matplotlib import pyplot as plt
-from quantecon.jv import workerProblem 
+from quantecon import JvWorker 
 import numpy as np
 
 # Set up
-wp = workerProblem(grid_size=25)
+wp = JvWorker(grid_size=25)
 
 def xbar(phi):
     return (wp.A * phi**wp.alpha)**(1 / (1 - wp.alpha))

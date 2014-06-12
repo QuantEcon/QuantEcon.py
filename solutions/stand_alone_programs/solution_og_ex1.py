@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-from quantecon.optgrowth import growthModel, bellman_operator, compute_greedy
+from quantecon.optgrowth import GrowthModel, bellman_operator, compute_greedy
 from quantecon.compute_fp import compute_fixed_point
 
 alpha, beta = 0.65, 0.95
-gm = growthModel() 
+gm = GrowthModel() 
 true_sigma = (1 - alpha * beta) * gm.grid**alpha
 w = 5 * gm.u(gm.grid) - 25  # Initial condition
 

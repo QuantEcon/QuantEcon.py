@@ -28,7 +28,7 @@ P = np.empty((n, n))
 for i in range(n):
     P[i,:] = Q[i,:] / Q[i,:].sum()
 # == Compute the stationary distribution r == #
-r = mc_tools.compute_stationary(P)
+r = mc_tools.mc_compute_stationary(P)
 ranked_pages = {alphabet[i] : r[i] for i in range(n)}
 # == Print solution, sorted from highest to lowest rank == #
 print('Rankings\n ***')

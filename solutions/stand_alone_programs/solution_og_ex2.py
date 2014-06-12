@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interp
-from quantecon.optgrowth import growthModel, bellman_operator, compute_greedy
-from quantecon.compute_fp import compute_fixed_point
+from quantecon import GrowthModel
+from quantecon import compute_fixed_point
 
-gm = growthModel() 
+gm = GrowthModel() 
 w = 5 * gm.u(gm.grid) - 25  # To be used as an initial condition
 discount_factors = (0.9, 0.94, 0.98)
 series_length = 25
@@ -17,8 +17,8 @@ for beta in discount_factors:
 
     # Compute the optimal policy given the discount factor
     gm.beta = beta
-    v_star = compute_fixed_point(bellman_operator, gm, w, max_iter=20)
-    sigma = compute_greedy(gm, v_star)
+    v_star = compute_fixed_point(gm.bellman_operator, w, max_iter=20)
+    sigma = gm.compute_greedy(v_star)
 
     # Compute the corresponding time series for capital
     k = np.empty(series_length)

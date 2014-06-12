@@ -1,23 +1,23 @@
 from matplotlib import pyplot as plt
-from quantecon.ifp import *
+from quantecon import ConsumerProblem
 
-m = consumerProblem()
+m = ConsumerProblem()
 K = 80
 
 # Bellman iteration 
-V, c = initialize(m)
+V, c = m.initialize()
 print "Starting value function iteration"
 for i in range(K):
     print "Current iterate = " + str(i)
-    V = bellman_operator(m, V)  
-c1 = bellman_operator(m, V, return_policy=True)  
+    V = m.bellman_operator(V)  
+c1 = m.bellman_operator(V, return_policy=True)  
 
 # Policy iteration 
 print "Starting policy function iteration"
-V, c2 = initialize(m)
+V, c2 = m.initialize()
 for i in range(K):
     print "Current iterate = " + str(i)
-    c2 = coleman_operator(m, c2)
+    c2 = m.coleman_operator(c2)
 
 fig, ax = plt.subplots()
 ax.plot(m.asset_grid, c1[:, 0], label='value function iteration')

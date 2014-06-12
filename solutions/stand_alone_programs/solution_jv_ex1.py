@@ -1,16 +1,15 @@
 import matplotlib.pyplot as plt
 import random
-from quantecon.jv import workerProblem, bellman_operator
-from quantecon.compute_fp import compute_fixed_point
+from quantecon import JvWorker, compute_fixed_point
 import numpy as np
 
 # Set up
-wp = workerProblem(grid_size=25)
+wp = JvWorker(grid_size=25)
 G, pi, F = wp.G, wp.pi, wp.F       # Simplify names
 
 v_init = wp.x_grid * 0.5
-V = compute_fixed_point(bellman_operator, wp, v_init, max_iter=40)
-s_policy, phi_policy = bellman_operator(wp, V, return_policies=True)
+V = compute_fixed_point(wp.bellman_operator, v_init, max_iter=40)
+s_policy, phi_policy = wp.bellman_operator(V, return_policies=True)
 
 # Turn the policy function arrays into actual functions
 s = lambda y: np.interp(y, wp.x_grid, s_policy)

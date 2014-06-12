@@ -21,7 +21,7 @@ ax.hlines(0, 0, N, lw=2, alpha=0.6)  # Horizonal line at zero
 
 for x0, col in ((0, 'blue'), (1, 'green')):
     # == Generate time series for worker that starts at x0 == #
-    X = mc_tools.sample_path(P, x0, N)
+    X = mc_tools.mc_sample_path(P, x0, N)
     # == Compute fraction of time spent unemployed, for each n == #
     X_bar = (X == 0).cumsum() / (1 + np.arange(N, dtype=float)) 
     # == Plot == #

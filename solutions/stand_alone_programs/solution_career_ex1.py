@@ -6,16 +6,14 @@ career.  In reading the code, recall that optimal_policy[i, j] = policy at
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from quantecon.discrete_rv import discreteRV
-from career import *
-from quantecon.compute_fp import compute_fixed_point
+from quantecon import DiscreteRV, compute_fixed_point, CareerWorkerProblem
 
-wp = workerProblem()
+wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
-v = compute_fixed_point(bellman, wp, v_init)
-optimal_policy = get_greedy(wp, v)
-F = discreteRV(wp.F_probs)
-G = discreteRV(wp.G_probs)
+v = compute_fixed_point(wp.bellman,v_init)
+optimal_policy = wp.get_greedy(v)
+F = DiscreteRV(wp.F_probs)
+G = DiscreteRV(wp.G_probs)
 
 def gen_path(T=20):
     i = j = 0  
