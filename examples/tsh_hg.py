@@ -26,7 +26,7 @@ ax.set_xlim(ymin, ymax)
 ax.set_xlabel(r'$y_t$', fontsize=16)
 
 x, y = ar.replicate(T=T, num_reps=500000)
-mu_x, mu_y, Sigma_x, Sigma_y = ar.moments(T=T, mu_0=np.ones(4))
+mu_x, mu_y, Sigma_x, Sigma_y = ar.moment_sequence()
 f_y = norm(loc=float(mu_y), scale=float(np.sqrt(Sigma_y)))
 
 y = y.flatten()

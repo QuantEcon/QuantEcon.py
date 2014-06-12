@@ -5,15 +5,15 @@ Authors: John Stachurski, Thomas J. Sargent
 LastModified: 11/08/2013
 
 """
-from compute_fp import compute_fixed_point
+
 from matplotlib import pyplot as plt
 from quantecon.compute_fp import compute_fixed_point
 import quantecon as qe
 
 # === solve for optimal consumption === #
-m = qe.ifp.consumerProblem(r=0.03, grid_max=4)
-v_init, c_init = qe.ifp.initialize(m)
-c = compute_fixed_point(qe.ifp.coleman_operator, m, c_init)
+m = qe.ConsumerProblem(r=0.03, grid_max=4)
+v_init, c_init = m.initialize()
+c = compute_fixed_point(m.coleman_operator, c_init) #Coleman Operator takes in (c)?
 a = m.asset_grid
 R, z_vals = m.R, m.z_vals
 
