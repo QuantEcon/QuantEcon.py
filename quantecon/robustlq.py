@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: robustlq.py
 Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski 
-LastModified: 28/01/2014
 
 Solves robust LQ control problems.
 """
@@ -108,8 +106,8 @@ class RBLQ:
     def robust_rule(self):
         """
         This method solves the robust control problem by tricking it into a
-        stacked LQ problem, as described in chapter 2 of Hansen-Sargent's text
-        "Robustness."  The optimal control with observed state is
+        stacked LQ problem, as described in chapter 2 of Hansen-Sargent's
+        text "Robustness."  The optimal control with observed state is
 
             u_t = - F x_t
 
@@ -147,9 +145,9 @@ class RBLQ:
     def robust_rule_simple(self, P_init=None, max_iter=80, tol=1e-8):
         """
         A simple algorithm for computing the robust policy F and the
-        corresponding value function P, based around straightforward iteration
-        with the robust Bellman operator.  This function is easier to
-        understand but one or two orders of magnitude slower than
+        corresponding value function P, based around straightforward
+        iteration with the robust Bellman operator.  This function is easier
+        to understand but one or two orders of magnitude slower than
         self.robust_rule().  For more information see the docstring of that
         method.
         """
@@ -218,7 +216,7 @@ class RBLQ:
 
     def compute_deterministic_entropy(self, F, K, x0):
         """
-        Given K and F, compute the value of deterministic entropy, which is 
+        Given K and F, compute the value of deterministic entropy, which is
         sum_t beta^t x_t' K'K x_t with x_{t+1} = (A - BF + CK) x_t.
         """
         H0 = dot(K.T, K)

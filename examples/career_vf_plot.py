@@ -10,13 +10,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 from matplotlib import cm
-from quantecon.compute_fp import compute_fixed_point
 import quantecon as qe
 
 # === solve for the value function === #
-wp = qe.career.workerProblem()
+wp = qe.CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
-v = compute_fixed_point(qe.career.bellman, wp, v_init)
+v = qe.compute_fixed_point(wp.bellman, v_init)
 
 # === plot value function === #
 fig = plt.figure(figsize=(8,6))

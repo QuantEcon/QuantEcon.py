@@ -1,15 +1,13 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: lq_permanent_1.py
 Authors: John Stachurski and Thomas J. Sargent
-LastModified: 19/09/2013
 
 A permanent income / life-cycle model with iid income
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
-from quantecon.lqcontrol import LQ
+from quantecon import LQ
 
 # == Model parameters == #
 r       = 0.05

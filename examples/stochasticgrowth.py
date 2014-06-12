@@ -14,7 +14,7 @@ This is a density in y.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import lognorm, beta
-from quantecon.lae import LAE
+from quantecon import LAE
 
 # == Define parameters == #
 s = 0.2
