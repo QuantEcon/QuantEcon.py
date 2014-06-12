@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from optgrowth import growthModel, bellman_operator, compute_greedy
-from compute_fp import compute_fixed_point
+from quantecon.optgrowth import growthModel, bellman_operator, compute_greedy
+from quantecon.compute_fp import compute_fixed_point
 
 alpha, beta = 0.65, 0.95
 gm = growthModel() 

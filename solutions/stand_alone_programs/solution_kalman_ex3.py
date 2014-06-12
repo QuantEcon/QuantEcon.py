@@ -3,7 +3,7 @@ import numpy as np
 from numpy.random import multivariate_normal
 import matplotlib.pyplot as plt
 from scipy.linalg import eigvals
-from kalman import Kalman
+from quantecon.kalman import Kalman
 
 # === Define A, Q, G, R === #
 G = np.eye(2)

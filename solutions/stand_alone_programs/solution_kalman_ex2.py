@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from kalman import Kalman
+from quantecon.kalman import Kalman
 from scipy.stats import norm
 from scipy.integrate import quad
 

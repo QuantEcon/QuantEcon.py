@@ -9,7 +9,7 @@ a subset of countries.
 """
 import pandas as pd
 import matplotlib.pyplot as plt
-from pandas.io.parsers import ExcelFile
+from pandas.io.excel import ExcelFile
 import urllib
 
 # == Get data and read into file gd.xls == #

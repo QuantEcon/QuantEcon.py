@@ -5,7 +5,7 @@ LastModified: 12/02/2014
 """
 
 import numpy as np
-import asset_pricing 
+from quantecon import asset_pricing 
 
 # == Define primitives == #
 n = 5

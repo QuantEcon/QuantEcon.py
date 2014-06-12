@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from ifp import consumerProblem, coleman_operator, initialize
-from compute_fp import compute_fixed_point
+from quantecon.ifp import consumerProblem, coleman_operator, initialize
+from quantecon.compute_fp import compute_fixed_point
 from scipy import interp
 import mc_tools 
 

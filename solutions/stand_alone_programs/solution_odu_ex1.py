@@ -6,9 +6,9 @@ from scipy import interp
 import numpy as np
 from numpy import maximum as npmax
 import matplotlib.pyplot as plt
-from odu_vfi import searchProblem
+from quantecon.odu_vfi import searchProblem
 from scipy.integrate import fixed_quad
-from compute_fp import compute_fixed_point
+from quantecon.compute_fp import compute_fixed_point
 
 
 def res_wage_operator(sp, phi):
