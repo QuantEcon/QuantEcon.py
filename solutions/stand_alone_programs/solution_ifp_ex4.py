@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from compute_fp import compute_fixed_point
-from ifp import coleman_operator, consumerProblem, initialize
+from quantecon.compute_fp import compute_fixed_point
+from quantecon.ifp import coleman_operator, consumerProblem, initialize
 from solution_ifp_ex3 import compute_asset_series
 
 M = 25

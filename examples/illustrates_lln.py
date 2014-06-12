@@ -42,7 +42,7 @@ for ax in axes:
 
     # == Compute sample mean at each n == #
     sample_mean = np.empty(n)
-    for i in range(n):
+    for i in range(1,n):
         sample_mean[i] = np.mean(data[:i])
 
     # == Plot == #

@@ -3,7 +3,7 @@ Return list of pages, ordered by rank
 """
 from __future__ import print_function, division  # Omit if using Python 3.x
 import numpy as np
-import mc_tools
+from quantecon import mc_tools
 from operator import itemgetter
 import re
 

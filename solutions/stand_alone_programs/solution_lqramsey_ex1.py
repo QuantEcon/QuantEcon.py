@@ -1,7 +1,7 @@
 
 import numpy as np
 from numpy import array
-from lqramsey import *
+from quantecon.lqramsey import *
 
 # == Parameters == #
 beta = 1 / 1.05   
