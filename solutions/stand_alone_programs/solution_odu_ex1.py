@@ -6,9 +6,9 @@ from scipy import interp
 import numpy as np
 from numpy import maximum as npmax
 import matplotlib.pyplot as plt
-from quantecon.odu_vfi import searchProblem
+from quantecon import SearchProblem
 from scipy.integrate import fixed_quad
-from quantecon.compute_fp import compute_fixed_point
+from quantecon import compute_fixed_point
 
 
 def res_wage_operator(sp, phi):
@@ -34,7 +34,7 @@ def res_wage_operator(sp, phi):
 
 if __name__ == '__main__':  # If module is run rather than imported
 
-    sp = searchProblem(pi_grid_size=50)
+    sp = SearchProblem(pi_grid_size=50)
     phi_init = np.ones(len(sp.pi_grid)) 
     w_bar = compute_fixed_point(res_wage_operator, sp, phi_init)
 

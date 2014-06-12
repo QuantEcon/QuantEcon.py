@@ -6,8 +6,8 @@ Solves an exercise from the rational expectations module
 """
 from __future__ import print_function
 import numpy as np
-from quantecon.lqcontrol import LQ
-from quantecon.solution_ree_ex1 import beta, R, Q, B
+from quantecon import LQ
+from solution_ree_ex1 import beta, R, Q, B
 
 candidates = (
           (94.0886298678, 0.923409232937),

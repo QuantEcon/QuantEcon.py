@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import quantecon as qe
 
-lp = qe.linearProcess(-0.9)
+lp = qe.LinearProcess(-0.9)
 wl = 65
 
 

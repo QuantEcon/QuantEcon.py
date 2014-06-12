@@ -1,9 +1,9 @@
 from matplotlib import pyplot as plt
 import numpy as np
-from quantecon.ifp import consumerProblem, coleman_operator, initialize
-from quantecon.compute_fp import compute_fixed_point
+from quantecon import ConsumerProblem
+from quantecon import compute_fixed_point
 from scipy import interp
-import mc_tools 
+from quantecon import mc_tools 
 
 def compute_asset_series(cp, T=500000):
     """
@@ -12,11 +12,11 @@ def compute_asset_series(cp, T=500000):
     """
 
     Pi, z_vals, R = cp.Pi, cp.z_vals, cp.R  # Simplify names
-    v_init, c_init = initialize(cp)
-    c = compute_fixed_point(coleman_operator, cp, c_init)
+    v_init, c_init = cp.initialize()
+    c = compute_fixed_point(cp.coleman_operator, c_init)
     cf = lambda a, i_z: interp(a, cp.asset_grid, c[:, i_z])
     a = np.zeros(T+1)
-    z_seq = mc_tools.sample_path(Pi, sample_size=T)
+    z_seq = mc_tools.mc_sample_path(Pi, sample_size=T)
     for t in range(T):
         i_z = z_seq[t]
         a[t+1] = R * a[t] + z_vals[i_z] - cf(a[t], i_z)
@@ -24,7 +24,7 @@ def compute_asset_series(cp, T=500000):
 
 if __name__ == '__main__':
 
-    cp = consumerProblem(r=0.03, grid_max=4)
+    cp = ConsumerProblem(r=0.03, grid_max=4)
     a = compute_asset_series(cp)
     fig, ax = plt.subplots()
     ax.hist(a, bins=20, alpha=0.5, normed=True)

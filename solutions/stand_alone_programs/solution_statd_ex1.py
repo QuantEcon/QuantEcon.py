@@ -9,7 +9,7 @@ idea of the speed of convergence.
 import numpy as np
 from scipy.stats import norm, gaussian_kde
 import matplotlib.pyplot as plt
-from quantecon.lae import lae
+from quantecon import LAE
 
 phi = norm()
 n = 500
@@ -30,7 +30,7 @@ Z = phi.rvs(n)
 X = np.empty(n)
 for t in range(n-1):
     X[t+1] = theta * np.abs(X[t]) + d * Z[t]
-psi_est = lae(p, X)
+psi_est = LAE(p, X)
 k_est = gaussian_kde(X)
 
 fig, ax = plt.subplots()

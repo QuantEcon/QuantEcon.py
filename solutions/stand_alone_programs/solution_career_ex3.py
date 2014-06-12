@@ -1,12 +1,12 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from quantecon.career import *
-from compute_fp import compute_fixed_point
+from quantecon import CareerWorkerProblem, compute_fixed_point
 
-wp = workerProblem()
+wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
-v = compute_fixed_point(bellman, wp, v_init)
-optimal_policy = get_greedy(wp, v)
+v = compute_fixed_point(wp.bellman, v_init)
+optimal_policy = wp.get_greedy(v)
 
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_subplot(111)

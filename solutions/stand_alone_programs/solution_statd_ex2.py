@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import lognorm, beta
 import matplotlib.pyplot as plt
-from quantecon.lae import lae
+from quantecon import LAE
 
 # == Define parameters == #
 s = 0.2
@@ -36,7 +36,7 @@ for i in range(4):
         k[:, t+1] = s * A[:,t] * k[:, t]**alpha + (1 - delta) * k[:, t]
 
     # == Generate T instances of lae using this data, one for each t == #
-    laes = [lae(p, k[:, t]) for t in range(T)]
+    laes = [LAE(p, k[:, t]) for t in range(T)]
 
     ygrid = np.linspace(0.01, xmax, 150)
     greys = [str(g) for g in np.linspace(0.0, 0.8, T)]
