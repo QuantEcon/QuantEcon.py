@@ -7,11 +7,10 @@ LastModified: 11/08/2013
 """
 
 from matplotlib import pyplot as plt
-from quantecon.compute_fp import compute_fixed_point
-import quantecon as qe
+from quantecon import ConsumerProblem, compute_fixed_point
 
 # === solve for optimal consumption === #
-m = qe.ConsumerProblem(r=0.03, grid_max=4)
+m = ConsumerProblem(r=0.03, grid_max=4)
 v_init, c_init = m.initialize()
 c = compute_fixed_point(m.coleman_operator, c_init) #Coleman Operator takes in (c)?
 a = m.asset_grid
