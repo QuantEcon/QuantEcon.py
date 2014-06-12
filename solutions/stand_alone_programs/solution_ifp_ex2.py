@@ -1,7 +1,7 @@
 from compute_fp import compute_fixed_point
 from matplotlib import pyplot as plt
 import numpy as np
-from ifp import coleman_operator, consumerProblem, initialize
+from quantecon.ifp import coleman_operator, consumerProblem, initialize
 
 r_vals = np.linspace(0, 0.04, 4)  
 

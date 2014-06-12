@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from lss import LSS
+from quantecon.lss import LSS
 
 phi_0, phi_1, phi_2 = 1.1, 0.8, -0.8
 

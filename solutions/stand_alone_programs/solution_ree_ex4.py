@@ -7,7 +7,7 @@ Solves an exercise from the rational expectations module
 
 from __future__ import print_function
 import numpy as np
-from lqcontrol import LQ
+from quantecon.lqcontrol import LQ
 from solution_ree_ex1 import a0, a1, beta, gamma
 
 A = np.array([[1, 0], [0, 1]])

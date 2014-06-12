@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from lss import LSS
+from quantecon.lss import LSS
 
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
 sigma = 0.2

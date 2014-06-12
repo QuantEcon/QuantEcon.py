@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from ifp import *
+from quantecon.ifp import *
 
 m = consumerProblem()
 K = 80

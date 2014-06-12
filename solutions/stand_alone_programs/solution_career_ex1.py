@@ -6,9 +6,9 @@ career.  In reading the code, recall that optimal_policy[i, j] = policy at
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from discrete_rv import discreteRV
+from quantecon.discrete_rv import discreteRV
 from career import *
-from compute_fp import compute_fixed_point
+from quantecon.compute_fp import compute_fixed_point
 
 wp = workerProblem()
 v_init = np.ones((wp.N, wp.N))*100
