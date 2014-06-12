@@ -8,7 +8,7 @@ Example 1: Govt spending is AR(1) and state is (g, 1).
 
 import numpy as np
 from numpy import array
-import lqramsey
+from quantecon import lqramsey
 
 # == Parameters == #
 beta = 1 / 1.05   

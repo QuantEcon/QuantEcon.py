@@ -2,7 +2,7 @@
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
-from quantecon.lucastree import lucas_tree, compute_lt_price
+from quantecon import lucas_tree, compute_lt_price
 
 fig, ax = plt.subplots()
 #grid = np.linspace(1e-10, 4, 100)
