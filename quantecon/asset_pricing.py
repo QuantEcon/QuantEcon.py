@@ -21,21 +21,20 @@ class AssetPrices:
         Parameters
         ==========
         beta : float
-            discount factor 
+            discount factor
 
         P : array_like
-            transition matrix 
-            
+            transition matrix
+
         s : array_like
-            growth rate of consumption 
+            growth rate of consumption
 
         gamma : float
-            coefficient of risk aversion 
+            coefficient of risk aversion
         '''
         self.beta, self.gamma = beta, gamma
-        self.P, self.s = [np.atleast_2d(x) for x in P, s]
+        self.P, self.s = P, s
         self.n = self.P.shape[0]
-        self.s.shape = self.n, 1
 
     def tree_price(self):
         '''
@@ -50,7 +49,7 @@ class AssetPrices:
         O = np.ones(self.n)
         v = beta * solve(I - beta * P_tilde, P_tilde.dot(O))
         return v
-        
+
     def consol_price(self, zeta):
         '''
         Computes price of a consol bond with payoff zeta
@@ -69,7 +68,7 @@ class AssetPrices:
         O = np.ones(self.n)
         p_bar = beta * solve(I - beta * P_check, P_check.dot(zeta * O))
         return p_bar
-        
+
     def call_option(self, zeta, p_s, T=[], epsilon=1e-8):
         '''
         Computes price of a call option on a consol bond with payoff zeta
@@ -80,10 +79,10 @@ class AssetPrices:
             coupon of the console
 
         p_s : float
-            strike price 
+            strike price
 
-        T : list of integers 
-            length of option 
+        T : list of integers
+            length of option
 
         epsilon : float
             tolerance for infinite horizon problem
@@ -103,11 +102,11 @@ class AssetPrices:
                 w_bars[t] = w_bar
             # == Maximize across columns == #
             to_stack = (beta*P_check.dot(w_bar), v_bar-p_s)
-            w_bar_new = np.amax(np.vstack(to_stack), axis = 0 ) 
+            w_bar_new = np.amax(np.vstack(to_stack), axis = 0 )
             # == Find maximal difference of each component == #
-            error = np.amax(np.abs(w_bar-w_bar_new)) 
+            error = np.amax(np.abs(w_bar-w_bar_new))
             # == Update == #
             w_bar = w_bar_new
             t += 1
-        
+
         return w_bar, w_bars
