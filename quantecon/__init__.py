@@ -1,4 +1,4 @@
-''' 
+'''
 Import the main names to top level.
 
 '''
@@ -25,4 +25,5 @@ from rank_nullspace import rank_est, nullspace
 from riccati import dare
 from robustlq import RBLQ
 from tauchen import approx_markov
+import quad as quad
 
