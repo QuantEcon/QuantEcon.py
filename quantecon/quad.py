@@ -824,9 +824,9 @@ def _qnwbeta1(n, a=1, b=1):
         weights[i] = temp/(pp*p2)
 
     nodes = (1-nodes)/2
-    weights = weights * exp(gammaln(a+n) + gammaln(b+n)
-                            - gammaln(n+1) - gammaln(n+ab+1))
-    weights = weights / (2*exp(gammaln(a+1) + gammaln(b+1)
+    weights = weights * math.exp(gammaln(a+n) + gammaln(b+n)
+                                 - gammaln(n+1) - gammaln(n+ab+1))
+    weights = weights / (2*math.exp(gammaln(a+1) + gammaln(b+1)
                          - gammaln(ab+2)))
 
     return nodes, weights
