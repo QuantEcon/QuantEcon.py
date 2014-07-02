@@ -37,12 +37,15 @@ def _make_multidim_func(one_d_func, n, *args):
 
     Parameters
     ----------
-    n, a, b :
-        see individual functions' docstrings for a description of the
-        first three parameters
-
     one_d_func : function
         The 1d function to be called along each dimension
+
+    n : int or array-like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    args :
+        These are the arguments to various qnw____ functions.  For the
+        majority of the functions this is just a and b, but some differ.
 
     """
     args = list(args)
@@ -720,10 +723,8 @@ def qnwbeta(n, a=1, b=1):
 
 def _qnwbeta1(n, a=1, b=1):
     """
-    Insert docs.  Default is a=b=1 which is just a uniform distribution
-
-    NOTE: Add multidimensional support with wrapper function around
-    this one.
+    Computes nodes and weights for quadrature on the beta distribution.
+    Default is a=b=1 which is just a uniform distribution
 
     NOTE: For now I am just following compecon; would be much better to
     find a different way since I don't know what they are doing.
