@@ -1,0 +1,42 @@
+language: python
+# Choose versions of Python to test on
+python:
+
+  - "2.7"
+  - "3.3"
+
+# Stop the annoying emails
+notifications:
+  email: false
+
+# Only test the master branch
+branches:
+  only:
+    - master
+
+# Set up anaconda so we can get good support for scipy and numpy
+# (Found this on https://gist.github.com/dan-blanchard/7045057)
+# Should speed up testing
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/anaconda/bin:$PATH
+  - conda update --yes conda
+  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+  - sudo rm -rf /dev/shm
+  - sudo ln -s /run/shm /dev/shm
+# Install packages
+install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy==1.8 scipy matplotlib nose pandas pip
+  # Coverage packages are on my binstar channel
+  - conda install --yes -c dan_blanchard python-coveralls nose-cov
+  - python setup.py install
+
+# Run test
+# script:
+#   - nosetests --with-cov --cov quantecon --cov-config .coveragerc --logging-level=INFO
+
+# Calculate coverage
+# after_success:
+#   - coveralls --config_file .coveragerc

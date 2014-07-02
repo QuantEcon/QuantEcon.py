@@ -1,5 +1,8 @@
 
-## Quantitative Economics 
+## Quantitative Economics
+
+[![Build Status](https://travis-ci.org/spencerlyon2/quant-econ.svg?branch=master)](https://travis-ci.org/spencerlyon2/quant-econ)
+[![Coverage Status](https://coveralls.io/repos/spencerlyon2/quant-econ/badge.png)](https://coveralls.io/r/spencerlyon2/quant-econ)
 
 This repository collects code for quantitative economic modeling
 
@@ -17,6 +20,7 @@ At present, the lead developers of this repository (in alphabetical order) are
 * [Thomas J. Sargent](https://files.nyu.edu/ts43/public/)
 * [John Stachurski](http://johnstachurski.net)
 * [Pablo Winant](http://www.mosphere.fr/)
+
 
 
 ### Downloading the Repository
@@ -39,7 +43,7 @@ at a terminal prompt
 
 ### About Git / GitHub
 
-This code repository is hosted by [GitHub](http://github.com).  The primary function of GitHub is to host open source code repositories in a manner that facilitates sharing and collaboration.  
+This code repository is hosted by [GitHub](http://github.com).  The primary function of GitHub is to host open source code repositories in a manner that facilitates sharing and collaboration.
 
 If you wand to learn a bit more about Git and GitHub, you'll find it's an excellent investment. A good place to start is the [GitHub help page](https://help.github.com/).
 
