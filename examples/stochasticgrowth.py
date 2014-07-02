@@ -2,7 +2,7 @@
 Neoclassical growth model with constant savings rate, where the dynamics are
 given by
 
-    k_{t+1} = s A_t f(k_t) + (1 - delta) k_t
+    k_{t+1} = s A_{t+1} f(k_t) + (1 - delta) k_t
 
 Marginal densities are computed using the look-ahead estimator.  Thus, the
 estimate of the density psi_t of k_t is
