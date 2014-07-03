@@ -137,7 +137,7 @@ def _qnwcheb1(n, a, b):
     t1 = np.arange(1, n+1) - 0.5
     t2 = np.arange(0.0, n, 2)
     t3 = np.concatenate([np.array([1.0]),
-                      -2.0/(np.arange(1.0, n-1, 2) * np.arange(3.0, n+1, 2))])
+                         -2.0/(np.arange(1.0, n-1, 2)*np.arange(3.0, n+1, 2))])
 
     # compute weights and return
     weights = ((b-a)/n)*np.cos(np.pi/n*np.outer(t1, t2)).dot(t3)
@@ -212,7 +212,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
         nodes = (nodes - np.fix(nodes)).squeeze()
     elif kind.upper() == "H":  # Haber
         j = equidist_pp[:d]
-        nodes = np.outer(i * (i+1) /2, j)
+        nodes = np.outer(i * (i+1) / 2, j)
         nodes = (nodes - np.fix(nodes)).squeeze()
     elif kind.upper() == "R":  # pseudo-random
         nodes = np.random.rand(n, d).squeeze()
@@ -256,7 +256,6 @@ def qnwlege(n, a, b):
 
     """
     return _make_multidim_func(_qnwlege1, n, a, b)
-    return nodes, weights
 
 
 def _qnwlege1(n, a, b):
@@ -283,6 +282,7 @@ def _qnwlege1(n, a, b):
         An n element array of weights
 
     """
+    # import ipdb; ipdb.set_trace()
     maxit = 100
     m = np.fix((n + 1) / 2.0)
     xm = 0.5 * (b + a)
@@ -290,12 +290,11 @@ def _qnwlege1(n, a, b):
     nodes = np.zeros(n)
 
     weights = nodes.copy()
-    i = np.arange(1, m+1, dtype='int')
+    i = np.arange(m, dtype='int')
 
-    z = np.cos(np.pi * (i - 0.25) / (n + 0.5))
-    z1 = 50000
-    its = 0
-    while all(np.abs(z - z1)) > 1e-14 and its < maxit:
+    z = np.cos(np.pi * ((i + 1.0) - 0.25) / (n + 0.5))
+
+    for its in range(maxit):
         p1 = 1.0
         p2 = 0.0
         for j in range(1, n+1):
@@ -304,22 +303,24 @@ def _qnwlege1(n, a, b):
             p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j
 
         pp = n * (z * p1 - p2)/(z * z - 1.0)
-        z1 = z
+        z1 = z.copy()
         z = z1 - p1/pp
+        if all(np.abs(z - z1) < 1e-14):
+            break
 
-    if its == maxit:
+    if its == maxit - 1:
         raise ValueError("Maximum iterations in _qnwlege1")
 
-    nodes[i-1] = xm - xl * z
-    nodes[n - i] = xm + xl * z
+    nodes[i] = xm - xl * z
+    nodes[- i - 1] = xm + xl * z
 
-    weights[i-1] = 2 * xl / ((1 - z * z) * pp * pp)
-    weights[n - i] = weights[i-1]
+    weights[i] = 2 * xl / ((1 - z * z) * pp * pp)
+    weights[- i - 1] = weights[i]
 
     return nodes, weights
 
 
-def qnwnorm(n, mu=None, sig2=None):
+def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
     """
     Computes nodes and weights for multivariate normal distribution
 
@@ -360,7 +361,7 @@ def qnwnorm(n, mu=None, sig2=None):
         sig2 = np.asarray(sig2).reshape(d, d)
 
     if all([x.size == 1 for x in [n, mu, sig2]]):
-        nodes, weights =  _qnwnorm1(n)
+        nodes, weights = _qnwnorm1(n)
     else:
         nodes = []
         weights = []
@@ -373,9 +374,17 @@ def qnwnorm(n, mu=None, sig2=None):
         nodes = gridmake(*nodes)
         weights = ckron(*weights[::-1])
 
-    nodes = nodes.dot(la.sqrtm(sig2)) + mu  # Broadcast ok
+    if usesqrtm:
+        new_sig2 = la.sqrtm(sig2)
+    else:  # cholesky
+        new_sig2 = la.cholesky(sig2)
 
-    return nodes, weights
+    if d > 1:
+        nodes = nodes.dot(new_sig2) + mu  # Broadcast ok
+    else:  # nodes.dot(sig) will not be aligned in scalar case.
+        nodes = nodes * new_sig2 + mu
+
+    return nodes.squeeze(), weights
 
 
 def _qnwnorm1(n):
@@ -429,13 +438,13 @@ def _qnwnorm1(n):
             pp = math.sqrt(2 * n) * p2
             z1 = z
             z = z1 - p1/pp
-            if abs(z - z1)< 1e-14:
+            if abs(z - z1) < 1e-14:
                 break
 
         if its == maxit:
             raise ValueError("Failed to converge in _qnwnorm1")
 
-        nodes[n -1 - i] = z
+        nodes[n - 1 - i] = z
         nodes[i] = -z
         weights[i] = 2 / (pp*pp)
         weights[n - 1 - i] = weights[i]
@@ -538,7 +547,7 @@ def _qnwsimp1(n, a, b):
 
     nodes = np.linspace(a, b, n)
     dx = nodes[1] - nodes[0]
-    weights = np.tile([2.0, 4.0], (n + 1.0) /2.0)
+    weights = np.tile([2.0, 4.0], (n + 1.0) / 2.0)
     weights = weights[:n]
     weights[0] = weights[-1] = 1
     weights = (dx / 3.0) * weights
@@ -761,28 +770,28 @@ def _qnwbeta1(n, a=1, b=1):
 
     # Find "reasonable" starting values.  Why these numbers?
     for i in range(n):
-        if i==0:
+        if i == 0:
             an = a/n
             bn = b/n
             r1 = (1+a) * (2.78/(4+n*n) + .768*an/n)
             r2 = 1 + 1.48*an + .96*bn + .452*an*an + .83*an*bn
             z = 1 - r1/r2
-        elif i==1:
+        elif i == 1:
             r1 = (4.1+a) / ((1+a)*(1+0.156*a))
             r2 = 1 + 0.06 * (n-8) * (1+0.12*a)/n
             r3 = 1 + 0.012*b * (1+0.25*abs(a))/n
             z = z - (1-z) * r1 * r2 * r3
-        elif i==2:
+        elif i == 2:
             r1 = (1.67+0.28*a)/(1+0.37*a)
             r2 = 1+0.22*(n-8)/n
             r3 = 1+8*b/((6.28+b)*n*n)
             z = z-(nodes[0]-z)*r1*r2*r3
-        elif i==n-2:
+        elif i == n - 2:
             r1 = (1+0.235*b)/(0.766+0.119*b)
             r2 = 1/(1+0.639*(n-4)/(1+0.71*(n-4)))
             r3 = 1/(1+20*a/((7.5+a)*n*n))
             z = z+(z-nodes[-4])*r1*r2*r3
-        elif i==n-1:
+        elif i == n - 1:
             r1 = (1+0.37*b) / (1.67+0.28*b)
             r2 = 1 / (1+0.22*(n-8)/n)
             r3 = 1 / (1+8*a/((6.28+a)*n*n))
@@ -818,7 +827,7 @@ def _qnwbeta1(n, a=1, b=1):
 
             its += 1
 
-        if its==maxiter:
+        if its == maxiter:
             raise ValueError("Max Iteration reached.  Failed to converge")
 
         nodes[i] = z
@@ -906,14 +915,14 @@ def _qnwgamma1(n, a=None):
         elif i == 1:
             z = z + (15 + 6.25*a) / (1 + 0.9*a + 2.5*n)
         else:
-          j = i-1
-          z = z + ((1 + 2.55*j) / (1.9*j) + 1.26*j*a / (1 + 3.5*j)) * \
-             (z - nodes[j-1]) / (1 + 0.3*a)
+            j = i-1
+            z = z + ((1 + 2.55*j) / (1.9*j) + 1.26*j*a / (1 + 3.5*j)) * \
+                (z - nodes[j-1]) / (1 + 0.3*a)
 
         # root finding iterations
         its = 0
         z1 = -10000
-        while abs(z - z1)>1e-10 and its < maxit:
+        while abs(z - z1) > 1e-10 and its < maxit:
             p1 = 1.0
             p2 = 0.0
             for j in range(1, n+1):
@@ -926,11 +935,10 @@ def _qnwgamma1(n, a=None):
             z = z1 - p1/pp
             its += 1
 
-        if its==maxit:
+        if its == maxit:
             raise ValueError('Failure to converge')
 
         nodes[i] = z
         weights[i] = factor / (pp*n*p2)
 
     return nodes, weights
-
