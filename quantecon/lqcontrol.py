@@ -13,15 +13,15 @@ import riccati
 class LQ:
     """
     This class is for analyzing linear quadratic optimal control problems of
-    either the infinite horizon form 
+    either the infinite horizon form
 
         min E sum_{t=0}^{infty} beta^t r(x_t, u_t)
-        
-    with 
-    
-        r(x_t, u_t) := x_t' R x_t + u_t' Q u_t 
 
-    or the finite horizon form 
+    with
+
+        r(x_t, u_t) := x_t' R x_t + u_t' Q u_t
+
+    or the finite horizon form
 
     min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + x_T' R_f x_T
 
@@ -48,10 +48,10 @@ class LQ:
     def __init__(self, Q, R, A, B, C=None, beta=1, T=None, Rf=None):
         """
         Provides parameters describing the LQ model
-        
+
         Parameters
         ============
-        
+
             * R and Rf are n x n, symmetric and nonnegative definite
             * Q is k x k, symmetric and positive definite
             * A is n x n
@@ -102,26 +102,26 @@ class LQ:
     def update_values(self):
         """
         This method is for updating in the finite horizon case.  It shifts the
-        current value function 
+        current value function
 
             V_t(x) = x' P_t x + d_t
-        
+
         and the optimal policy F_t one step *back* in time, replacing the pair
-        P_t and d_t with P_{t-1} and d_{t-1}, and F_t with F_{t-1}  
+        P_t and d_t with P_{t-1} and d_{t-1}, and F_t with F_{t-1}
         """
         # === Simplify notation === #
         Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
         P, d = self.P, self.d
         # == Some useful matrices == #
-        S1 = Q + self.beta * dot(B.T, dot(P, B))   
+        S1 = Q + self.beta * dot(B.T, dot(P, B))
         S2 = self.beta * dot(B.T, dot(P, A))
         S3 = self.beta * dot(A.T, dot(P, A))
         # == Compute F as (Q + B'PB)^{-1} (beta B'PA) == #
-        self.F = solve(S1, S2)  
+        self.F = solve(S1, S2)
         # === Shift P back in time one step == #
-        new_P = R - dot(S2.T, solve(S1, S2)) + S3  
+        new_P = R - dot(S2.T, self.F) + S3
         # == Recalling that trace(AB) = trace(BA) == #
-        new_d = self.beta * (d + np.trace(dot(P, dot(C, C.T))))  
+        new_d = self.beta * (d + np.trace(dot(P, dot(C, C.T))))
         # == Set new state == #
         self.P, self.d = new_P, new_d
 
@@ -141,8 +141,8 @@ class LQ:
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
         P = riccati.dare(A0, B0, Q, R)
         # == Compute F == #
-        S1 = Q + self.beta * dot(B.T, dot(P, B))  
-        S2 = self.beta * dot(B.T, dot(P, A)) 
+        S1 = Q + self.beta * dot(B.T, dot(P, B))
+        S2 = self.beta * dot(B.T, dot(P, A))
         F = solve(S1, S2)
         # == Compute d == #
         d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
@@ -153,7 +153,7 @@ class LQ:
     def compute_sequence(self, x0, ts_length=None):
         """
         Compute and return the optimal state and control sequences x_0,...,
-        x_T and u_0,..., u_T  under the assumption that {w_t} is iid and 
+        x_T and u_0,..., u_T  under the assumption that {w_t} is iid and
         N(0, 1).
 
         Parameters
@@ -171,7 +171,7 @@ class LQ:
 
         u_path : numpy.ndarray
             A k x T matrix, where the t-th column represents u_t
-        
+
         """
         # === Simplify notation === #
         Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
@@ -196,11 +196,11 @@ class LQ:
                 self.update_values()
             policies.append(self.F)
         # == Use policy sequence to generate states and controls == #
-        F = policies.pop() 
+        F = policies.pop()
         x_path[:, 0] = x0.flatten()
         u_path[:, 0] = - dot(F, x0).flatten()
         for t in range(1, T):
-            F = policies.pop() 
+            F = policies.pop()
             Ax, Bu = dot(A, x_path[:, t-1]), dot(B, u_path[:, t-1])
             x_path[:, t] =  Ax + Bu + w_path[:, t]
             u_path[:, t] = - dot(F, x_path[:, t])
