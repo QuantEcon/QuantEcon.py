@@ -1,6 +1,6 @@
 """
 Filename: linproc.py
-Authors: John Stachurski and Thomas Sargent
+Authors: Thomas Sargent, John Stachurski
 
 Provides functions for visualizing scalar ARMA processes.
 

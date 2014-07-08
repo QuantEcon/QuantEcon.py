@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: quadsums.py
 Authors: Thomas Sargent,  John Stachurski
-LastModified: 11/12/2013
 
 This module provides functions to compute quadratic sums of the form described
 in the docstrings.

@@ -1,8 +1,6 @@
 """
-Origin: QE by John Stachurski and Thomas J. Sargent
 Filename: riccati.py
-Authors: John Stachurski and Thomas Sargent
-LastModified: 11/09/2013
+Authors: Thomas Sargent, John Stachurski
 
 Solves the discrete-time algebraic Riccati equation 
 """
