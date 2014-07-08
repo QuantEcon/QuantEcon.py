@@ -1,6 +1,6 @@
 """
 Filename: mc_tools.py
-Authors: John Stachurski and Thomas J. Sargent
+Authors: Thomas J. Sargent, John Stachurski
 """
 
 import numpy as np
