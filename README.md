@@ -1,9 +1,23 @@
 
 ## Quantitative Economics 
 
-This repository collects code for [Quantitative Economics](http://quant-econ.net),  an on-line course on quantitative economic modeling authored by [Thomas J. Sargent](https://files.nyu.edu/ts43/public/) and [John Stachurski](http://johnstachurski.net).
+This repository collects code for quantitative economic modeling
 
-We recommend you start by visiting the [lecture series main page](http://quant-econ.net), which provides detailed information on working with this code repository.
+Comprehensive documentation is currently being prepared
+
+At present, the majority of the code is described at [quant-econ.net](http://quant-econ.net), in an on-line course authored by [Thomas J. Sargent](https://files.nyu.edu/ts43/public/) and [John Stachurski](http://johnstachurski.net)
+
+Note however that this code repository is a separate project from [quant-econ.net](http://quant-econ.net), and we welcome contributions and pull requests
+
+At present, the lead developers of this repository (in alphabetical order) are
+
+* Chase Coleman
+* Spencer Lyon
+* Matthew McKay
+* Thomas J. Sargent
+* John Stachurski
+* Pablo Winant
+
 
 ### Downloading the Repository
 
@@ -12,9 +26,15 @@ Either
 * Click the 'Download ZIP' button on the right, or
 * Use [Git](https://help.github.com) to clone the repository
 
-### Browsing Program Files On-Line
+### The quantecon Package
 
-You can browse all the files in the repository directly (without downloading) by clicking on the "programs" folder above.
+This repository includes the Python package `quantecon`
+
+Assuming you have [pip](https://pypi.python.org/pypi/pip) on your computer --- as will be the case if you've [installed Anaconda](http://quant-econ.net/getting_started.html#installing-anaconda) --- you can install the latest stable release of `quantecon` by typing
+
+    pip install quantecon
+
+at a terminal prompt
 
 
 ### About Git / GitHub
