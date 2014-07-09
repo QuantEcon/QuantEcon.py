@@ -7,16 +7,16 @@ Comprehensive documentation is currently being prepared
 
 At present, the majority of the code is described at [quant-econ.net](http://quant-econ.net), in an on-line course authored by [Thomas J. Sargent](https://files.nyu.edu/ts43/public/) and [John Stachurski](http://johnstachurski.net)
 
-Note however that this code repository is a separate project from [quant-econ.net](http://quant-econ.net), and we welcome contributions and pull requests
+However this code repository is a separate project from [quant-econ.net](http://quant-econ.net), and we welcome contributions and pull requests
 
 At present, the lead developers of this repository (in alphabetical order) are
 
-* Chase Coleman
-* Spencer Lyon
-* Matthew McKay
-* Thomas J. Sargent
-* John Stachurski
-* Pablo Winant
+* [Chase Coleman](https://github.com/cc7768)
+* [Spencer Lyon](https://github.com/spencerlyon2)
+* [Matthew McKay](https://github.com/sanguineturtle)
+* [Thomas J. Sargent](https://files.nyu.edu/ts43/public/)
+* [John Stachurski](http://johnstachurski.net)
+* [Pablo Winant](http://www.mosphere.fr/)
 
 
 ### Downloading the Repository
