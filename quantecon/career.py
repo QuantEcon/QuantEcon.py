@@ -92,14 +92,14 @@ class CareerWorkerProblem:
 
         Parameters
         ----------
-            v : np.ndarray
-                A 2D NumPy array representing the value function
-                Interpretation: :math:`v[i, j] = v(\theta_i, \epsilon_j)`
+        v : np.ndarray
+            A 2D NumPy array representing the value function
+            Interpretation: :math:`v[i, j] = v(\theta_i, \epsilon_j)`
 
         Returns
         -------
-            new_v : np.ndarray
-                The updated value function Tv as an array of shape v.shape
+        new_v : np.ndarray
+            The updated value function Tv as an array of shape v.shape
 
         """
         new_v = np.empty(v.shape)
@@ -119,18 +119,18 @@ class CareerWorkerProblem:
         
         Parameters
         ----------
-            v : np.ndarray
-                A 2D NumPy array representing the value function
-                Interpretation: :math:`v[i, j] = v(\theta_i, \epsilon_j)`
+        v : np.ndarray
+            A 2D NumPy array representing the value function
+            Interpretation: :math:`v[i, j] = v(\theta_i, \epsilon_j)`
 
         Returns
         -------
-            policy : np.ndarray
-                A 2D NumPy array, where policy[i, j] is the optimal action 
-                at :math:`(\theta_i, \epsilon_j)`.  
+        policy : np.ndarray
+            A 2D NumPy array, where policy[i, j] is the optimal action 
+            at :math:`(\theta_i, \epsilon_j)`.  
 
-                The optimal action is represented as an integer in the set 1,
-                2, 3, where 1 = 'stay put', 2 = 'new job' and 3 = 'new life'
+            The optimal action is represented as an integer in the set 1,
+            2, 3, where 1 = 'stay put', 2 = 'new job' and 3 = 'new life'
 
         """
         policy = np.empty(v.shape, dtype=int)
