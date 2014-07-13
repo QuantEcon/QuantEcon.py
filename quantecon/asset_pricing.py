@@ -7,6 +7,12 @@ geometric growth driven by a finite state Markov chain.  The transition matrix
 of the Markov chain is P, and the set of states is s.  The discount
 factor is beta, and gamma is the coefficient of relative risk aversion in the
 household's utility function.
+
+References
+----------
+
+    http://quant-econ.net/markov_asset.html
+
 """
 
 import numpy as np
@@ -16,11 +22,6 @@ class AssetPrices:
     """
     A class to compute asset prices when the endowment follows a finite Markov
     chain.
-
-    References
-    ----------
-
-        http://quant-econ.net/markov_asset.html
 
     Examples
     --------

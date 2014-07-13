@@ -2,23 +2,10 @@
 Filename: jv.py
 Authors: Thomas Sargent, John Stachurski 
 
-A Jovanovic-type model of employment with on-the-job search. The value
-function is given by
+References
+-----------
 
-  V(x) = max_{phi, s} w(x, phi, s)
-
-  for w(x, phi, s) := x(1 - phi - s) 
-                        + beta (1 - pi(s)) V(G(x, phi)) 
-                        + beta pi(s) E V[ max(G(x, phi), U)]
-Here
-
-    * x = human capital
-    * s = search effort
-    * phi = investment in human capital 
-    * pi(s) = probability of new offer given search level s
-    * x(1 - phi - s) = wage
-    * G(x, phi) = updated human capital when current job retained
-    * U = a random variable with distribution F -- new draw of human capital
+    http://quant-econ.net/jv.html
 
 """
 
@@ -31,13 +18,51 @@ from scipy import interp
 epsilon = 1e-4  #  A small number, used in the optimization routine
 
 class JvWorker:
+    """
+    A Jovanovic-type model of employment with on-the-job search. The value
+    function is given by
+
+    .. math::
+      V(x) = \max_{\phi, s} w(x, \phi, s)
+
+      for 
+          
+    .. math::
+        w(x, \phi, s) := x(1 - \phi - s) 
+                            + \beta (1 - \pi(s)) V(G(x, \phi)) 
+                            + \beta \pi(s) E V[ \max(G(x, \phi), U)]
+    Here
+
+    * x = human capital
+    * s = search effort
+    * :math:`\phi` = investment in human capital 
+    * :math:`\pi(s)` = probability of new offer given search level s
+    * :math:`x(1 - \phi - s)` = wage
+    * :math:`G(x, \phi)` = updated human capital when current job retained
+    * :math:`U` = RV with distribution F -- new draw of human capital
+    """
 
     def __init__(self, A=1.4, alpha=0.6, beta=0.96, grid_size=50):
+        """
+        Parameters
+        ----------
+        A : float, optional
+            Parameter in human capital transition function
+        alpha : float, optional
+            Parameter in human capital transition function
+        beta : float, optional
+            Discount factor
+        grid_size : int
+            Grid size for discretization
+
+        """
         self.A, self.alpha, self.beta = A, alpha, beta
+
         # === set defaults for G, pi and F === #
         self.G = lambda x, phi: A * (x * phi)**alpha 
         self.pi = np.sqrt 
         self.F = stats.beta(2, 2)  
+
         # === Set up grid over the state space for DP === #
         # Max of grid is the max of a large quantile value for F and the 
         # fixed point y = G(y, 1).
@@ -47,16 +72,34 @@ class JvWorker:
 
     def bellman_operator(self, V, brute_force=False, return_policies=False):
         """
-        Thus function returns the
-        approximate value function TV by applying the Bellman operator
-        associated with the model to the function V.  Returns TV, or the
-        V-greedy policies s_policy and phi_policy when return_policies=True.
+        Returns the approximate value function TV by applying the Bellman operator
+        associated with the model to the function V.
+        
+        Returns TV, or the V-greedy policies s_policy and phi_policy when
+        return_policies=True.  In the function, the array V is replaced below
+        with a function Vf that implements linear interpolation over the
+        points (V(x), x) for x in x_grid.  
+        
 
-        In the function, the array V is replaced below with a function Vf that
-        implements linear interpolation over the points (V(x), x) for x in 
-        x_grid.  If the brute_force flag is true, then grid search is 
-        performed at each maximization step.  In either case, T returns a 
-        NumPy array representing the updated values TV(x) over x in x_grid.
+        Parameters
+        ----------
+        V : np.ndarray
+            Array representing an approximate value function
+        brute_force : bool, optional
+            Default is False. If the brute_force flag is True, then grid
+            search is performed at each maximization step.  
+        return_policies : bool, optional
+            Indicates whether to return just the updated value function TV or
+            both the greedy policy computed from V and TV
+            
+        
+        Returns
+        -------
+        s_policy : np.ndarray (if return_policies == True)
+            The greedy policy computed from V
+        new_V : np.ndarray
+            The updated value function Tv, as an array representing the
+            values TV(x) over x in x_grid.
 
         """
         # === simplify names, set up arrays, etc. === #
