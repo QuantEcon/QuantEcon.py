@@ -2,14 +2,7 @@
 Filename: kalman.py
 Authors: Thomas Sargent, John Stachurski 
 
-Implements the Kalman filter for the state space model
-
-    x_{t+1} = A x_t + w_{t+1}
-    y_t = G x_t + v_t.
-
-Here x_t is the hidden state and y_t is the measurement.  The shocks {w_t} 
-and {v_t} are iid zero mean Gaussians with covariance matrices Q and R
-respectively.
+Implements the Kalman filter for a linear Gaussian state space model.
 """
 
 import numpy as np
@@ -18,24 +11,43 @@ from scipy.linalg import inv
 import riccati
 
 class Kalman:
+    """
+    Implements the Kalman filter for the Gaussian state space model
+
+    .. math::
+        x_{t+1} = A x_t + w_{t+1}
+        y_t = G x_t + v_t.
+
+    Here :math:`x_t` is the hidden state and :math:`y_t` is the measurement.  
+    The shocks :math:`w_t` and :math:`v_t` are iid zero mean Gaussians 
+    with covariance matrices :math:`Q` and :math:`R` respectively.
+
+    References
+    ----------
+
+        http://quant-econ.net/kalman.html
+
+
+    """
 
     def __init__(self, A, G, Q, R):
         """
         Provides initial parameters describing the state space model
 
-            x_{t+1} = A x_t + w_{t+1}       (w_t ~ N(0, Q))
-
-            y_t = G x_t + v_t               (v_t ~ N(0, R))
+        .. math::
+            x_{t+1} = A x_t + w_{t+1}       w_t \sim N(0, Q)
+            y_t = G x_t + v_t               v_t \sim N(0, R)
         
         Parameters
-        ============
-        
-        All arguments should be scalars or array_like
-
-            * A is n x n
-            * Q is n x n, symmetric and nonnegative definite
-            * G is k x n
-            * R is k x k, symmetric and nonnegative definite
+        -----------
+        A : np.ndarray or scalar
+            The n x n matrix A
+        Q : np.ndarray or scalar
+            Q is n x n, symmetric and nonnegative definite
+        G : np.ndarray or scalar
+            G is k x n
+        R : np.ndarray or scalar
+            R is k x k, symmetric and nonnegative definite
 
         """
         self.A, self.G, self.Q, self.R = map(self.convert, (A, G, Q, R))
@@ -45,16 +57,32 @@ class Kalman:
         """
         Convert array_like objects (lists of lists, floats, etc.) into well
         formed 2D NumPy arrays
+
+        Parameters
+        ----------
+        x : scalar or array_like
+            Argument to be converted into a 2D NumPy array
+
+        Returns
+        -------
+        np.ndarray
+            A 2D NumPy array
+
         """
         return np.atleast_2d(np.asarray(x, dtype='float32'))
 
     def set_state(self, x_hat, Sigma):
         """
-        Set the state, which is the mean x_hat and covariance matrix Sigma of
-        the prior/predictive density.  
+        Set the state of the filter (mean and variance of prior density). 
 
-            * x_hat is n x 1
-            * Sigma is n x n and positive definite
+        Parameters
+        ----------
+         x_hat : array_like
+            An n x 1 array representing the mean x_hat and covariance matrix
+            Sigma of the prior/predictive density.
+        Sigma : array_like
+            An n x n array representing the covariance matrix Sigma of the
+            prior/predictive density.  Must be positive definite.
 
         Must be Python scalars or NumPy arrays.
         """
@@ -65,12 +93,18 @@ class Kalman:
     def prior_to_filtered(self, y):
         """
         Updates the moments (x_hat, Sigma) of the time t prior to the time t
-        filtering distribution, using current measurement y_t.  The parameter
-        y should be a Python scalar or NumPy array.  The updates are according
-        to 
+        filtering distribution, using current measurement y_t.  
+        
+        The updates are according to 
 
-            x_hat^F = x_hat + Sigma G' (G Sigma G' + R)^{-1}(y - G x_hat)
-            Sigma^F = Sigma - Sigma G' (G Sigma G' + R)^{-1} G Sigma
+        .. math::
+            x_hat^F = x_hat + \Sigma G' (G \Sigma G' + R)^{-1}(y - G x_hat)
+            \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G \Sigma
+
+        Parameters
+        ----------
+        y : scalar or array_like
+            The current measurement
 
         """
         # === simplify notation === #
@@ -89,7 +123,7 @@ class Kalman:
     def filtered_to_forecast(self):
         """
         Updates the moments of the time t filtering distribution to the
-        moments of the predictive distribution -- which becomes the time t+1
+        moments of the predictive distribution, which becomes the time t+1
         prior
         """
         # === simplify notation === #
@@ -102,18 +136,31 @@ class Kalman:
 
     def update(self, y):
         """
-        Updates x_hat and Sigma given k x 1 ndarray y.  The full update, from
-        one period to the next
+        Updates `x_hat` and `Sigma` given k x 1 ndarray `y`.  The full update,
+        from one period to the next
+
+        Parameters
+        ----------
+        y : np.ndarray
+            A k x 1 ndarray y representing the current measurement
+
         """
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
 
     def stationary_values(self):
         """
-        Computes the limit of Sigma_t as t goes to infinity by solving the
-        associated Riccati equation.  Computation is via the doubling
-        algorithm (see the documentation in riccati.dare).  Returns the limit
-        and the stationary Kalman gain.
+        Computes the limit of :math:`Sigma_t` as :math:`t \to \infty` by solving 
+        the associated Riccati equation.  Computation is via the doubling
+        algorithm (see the documentation in riccati.dare).
+
+        Returns
+        -------
+        Sigma_infinity : np.ndarray
+            The infinite limit of Sigma_t
+        K_infinity : np.ndarray
+            The stationary Kalman gain.
+
         """
         # === simplify notation === #
         A, Q, G, R = self.A, self.Q, self.G, self.R
