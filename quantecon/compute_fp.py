@@ -18,21 +18,21 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
 
     Parameters
     ----------
-        T : callable
-            A callable object (e.g., function) that acts on v
-        v : object
-            An object such that T(v) is defined 
-        error_tol : float, optional
-            Error tolerance
-        max_iter : int, optional
-            Maximum number of iterations
-        verbose : bool, optional
-            If true then print current error at each iterate
+    T : callable
+        A callable object (e.g., function) that acts on v
+    v : object
+        An object such that T(v) is defined 
+    error_tol : float, optional
+        Error tolerance
+    max_iter : int, optional
+        Maximum number of iterations
+    verbose : bool, optional
+        If True then print current error at each iterate.  Default is True.
 
     Returns
     -------
-        v : object
-            The approximate fixed point
+    v : object
+        The approximate fixed point
 
     """
     iterate = 0 

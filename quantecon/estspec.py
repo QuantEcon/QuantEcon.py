@@ -5,7 +5,7 @@ Authors: Thomas Sargent, John Stachurski
 Functions for working with periodograms of scalar data.
 """
 
-from __future__ import division, print_function  # Omit for Python 3.x
+from __future__ import division, print_function  
 import numpy as np
 from numpy.fft import fft
 from pandas import ols, Series
@@ -15,18 +15,27 @@ def smooth(x, window_len=7, window='hanning'):
     Smooth the data in x using convolution with a window of requested size
     and type.
 
-    Parameters:
+    Parameters
+    ----------
+    x np.ndarray
+        A flat NumPy array containing the data to smooth
+    window_len : int, optional
+        An odd integer giving the length of the window.  Defaults to 7.
+    window : string
+        A string giving the window type. Possible values are 'flat', 
+        'hanning', 'hamming', 'bartlett' or 'blackman'
 
-        * x is a flat NumPy array --- the data to smooth
+    Returns
+    -------
+    np.ndarray
+        The smoothed values
 
-        * window_len is an odd integer --- the length of the window
-
-        * window is a string giving the window type 
-          ('flat', 'hanning', 'hamming', 'bartlett' or 'blackman')
-
+    Notes
+    -----
     Application of the smoothing window at the top and bottom of x is done by
     reflecting x around these points to extend it sufficiently in each
     direction.
+
 
     """
     if len(x) < window_len:
@@ -44,13 +53,13 @@ def smooth(x, window_len=7, window='hanning'):
                'bartlett': np.bartlett,
                'blackman': np.blackman}
 
-    # === reflect x around x[0] and x[-1] prior to convolution === #
+    # === Reflect x around x[0] and x[-1] prior to convolution === #
     k = int(window_len / 2)
     xb = x[:k]   # First k elements
     xt = x[-k:]  # Last k elements
     s = np.concatenate((xb[::-1], x, xt[::-1]))
     
-    # === select window values === #
+    # === Select window values === #
     if window == 'flat':  
         w = np.ones(window_len)  # moving average
     else:
@@ -74,12 +83,22 @@ def periodogram(x, window=None, window_len=7):
     corresponding values I(w_j) are returned.  If a window type is given then
     smoothing is performed.
 
-        * x is a flat NumPy array --- the time series data
+    Parameters
+    ----------
+    x np.ndarray
+        A flat NumPy array containing the data to smooth
+    window_len : int, optional
+        An odd integer giving the length of the window.  Defaults to 7.
+    window : string
+        A string giving the window type. Possible values are 'flat', 
+        'hanning', 'hamming', 'bartlett' or 'blackman'
 
-        * window is a string giving the window type 
-          ('flat', 'hanning', 'hamming', 'bartlett' or 'blackman')
-
-        * window_len is an odd integer --- the length of the window
+    Returns
+    -------
+    w : np.ndarray
+        Fourier frequences at which periodogram is evaluated
+    I_w : np.ndarray
+        Values of periodogram at the Fourier frequences
 
     """
     n = len(x)
@@ -98,14 +117,24 @@ def ar_periodogram(x, window='hanning', window_len=7):
     and the residuals are used to compute a first-pass periodogram with
     smoothing.  The fitted coefficients are then used for recoloring.
 
-    Parameters:
+    Parameters
+    ----------
+    x np.ndarray
+        A flat NumPy array containing the data to smooth
+    window_len : int, optional
+        An odd integer giving the length of the window.  Defaults to 7.
+    window : string
+        A string giving the window type. Possible values are 'flat', 
+        'hanning', 'hamming', 'bartlett' or 'blackman'
 
-        * x is a NumPy array containing time series data
-        * window is a string indicating window type 
-        * window_len is an odd integer
+    Returns
+    -------
+    w : np.ndarray
+        Fourier frequences at which periodogram is evaluated
+    I_w : np.ndarray
+        Values of periodogram at the Fourier frequences
 
-    See the periodogram function documentation for more details on the window
-    arguments.
+
     """              
     # === run regression === #
     x_current, x_lagged = x[1:], x[:-1]  # x_t and x_{t-1}

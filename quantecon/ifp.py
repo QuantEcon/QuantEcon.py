@@ -2,6 +2,15 @@
 Filename: ifp.py
 Authors: Thomas Sargent, John Stachurski 
 
+Tools for solving the standard optimal savings / income fluctuation problem
+for an infinitely lived consumer facing an exogenous income process that
+evolves according to a Markov chain.
+
+References
+----------
+
+    http://quant-econ.net/ifp.html
+
 """
 
 import numpy as np
@@ -30,14 +39,26 @@ class ConsumerProblem:
             u=np.log, 
             du=lambda x: 1/x):
         """
-        Parameters:
-
-            * r and beta are scalars with r > 0 and (1 + r) * beta < 1
-            * Pi is a 2D NumPy array --- the Markov matrix for {z_t}
-            * z_vals is an array/list containing the state space of {z_t}
-            * u is the utility function and du is the derivative
-            * b is the borrowing constraint
-            * grid_max and grid_size describe the grid used in the solution
+        Parameters
+        ----------
+        r : scalar
+            A strictly positive scalar giving the interest rate
+        beta : scalar
+            The discount factor, must satisfy (1 + r) * beta < 1
+        Pi : np.ndarray
+            A 2D NumPy array giving the Markov matrix for {z_t}
+        z_vals : array_like
+            The state space of {z_t}
+        u : callable
+            The utility function 
+        du : callable
+            The derivative of u
+        b : float
+            The borrowing constraint
+        grid_max : float
+            Max of the grid used to solve the problem
+        grid_min : float
+            Min of the grid used to solve the problem
 
         """
         self.u, self.du = u, du
@@ -51,24 +72,34 @@ class ConsumerProblem:
         """
         The approximate Bellman operator, which computes and returns the
         updated value function TV (or the V-greedy policy c if return_policy
-        == True).
+        is True).
 
         Parameters
-        ===========
-            V : a NumPy array of dim len(cp.asset_grid) x len(cp.z_vals)
+        ----------
+        V : np.ndarray
+            A NumPy array of dim len(cp.asset_grid) x len(cp.z_vals)
+        return_policy : bool, optional
+            Indicates whether to return the greed policy given V or the 
+            updated value function TV.  Default is TV.
+
+        Returns
+        -------
+        np.ndarray
+            Returns either the greed policy given V or the updated value
+            function TV.
 
         """
-        # === simplify names, set up arrays === #
+        # === Simplify names, set up arrays === #
         R, Pi, beta, u, b = self.R, self.Pi, self.beta, self.u, self.b  
         asset_grid, z_vals = self.asset_grid, self.z_vals        
         new_V = np.empty(V.shape)
         new_c = np.empty(V.shape)
         z_idx = range(len(z_vals))  
 
-        # === linear interpolation of V along the asset grid === #
+        # === Linear interpolation of V along the asset grid === #
         vf = lambda a, i_z: interp(a, asset_grid, V[:, i_z]) 
 
-        # === solve r.h.s. of Bellman equation === #
+        # === Solve r.h.s. of Bellman equation === #
         for i_a, a in enumerate(asset_grid):
             for i_z, z in enumerate(z_vals):
                 def obj(c):  # objective function to be *minimized*
@@ -85,17 +116,24 @@ class ConsumerProblem:
 
     def coleman_operator(self, c):
         """
-        The approximate Coleman operator.  Iteration with this operator
-        corresponds to policy function iteration.  Computes and returns the
-        updated consumption policy c.
+        The approximate Coleman operator.  
+        
+        Iteration with this operator corresponds to policy function iteration.
+        Computes and returns the updated consumption policy c.  The array c is
+        replaced with a function cf that implements univariate linear
+        interpolation over the asset grid for each possible value of z.
 
-        Parameters:
+        Parameters
+        ----------
+        c : np.ndarray
+            A NumPy array of dim len(cp.asset_grid) x len(cp.z_vals)
 
-            * c is a NumPy array of dimension len(asset_grid) x len(z_vals)
+        Returns
+        -------
+        np.ndarray
+            The updated policy, where updating is by the Coleman operator.
+            function TV.
 
-        The array c is replaced with a function cf that implements univariate
-        linear interpolation over the asset grid for each possible value of
-        z.
         """
         # === simplify names, set up arrays === #
         R, Pi, beta, du, b = self.R, self.Pi, self.beta, self.du, self.b  
@@ -131,14 +169,21 @@ class ConsumerProblem:
         """
         Creates a suitable initial conditions V and c for value function and
         policy function iteration respectively.
+
+        Returns
+        -------
+        np.ndarray : V
+            Initial condition for value function iteration
+        np.ndarray : c
+            Initial condition for Coleman operator iteration
         """
-        # === simplify names, set up arrays === #
+        # === Simplify names, set up arrays === #
         R, beta, u, b = self.R, self.beta, self.u, self.b             
         asset_grid, z_vals = self.asset_grid, self.z_vals        
         shape = len(asset_grid), len(z_vals)         
         V, c = np.empty(shape), np.empty(shape)
 
-        # === populate V and c === #
+        # === Populate V and c === #
         for i_a, a in enumerate(asset_grid):
             for i_z, z in enumerate(z_vals):
                 c_max = R * a + z + b
