@@ -10,18 +10,29 @@ import numpy as np
 
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
     """
-    Computes and returns T^k v, where T is an operator, v is an initial
-    condition and k is the number of iterates. Provided that T is a
-    contraction mapping or similar, T^k v will be an approximation to the
-    fixed point.
+    Computes and returns T^k v, an approximate fixed point.
+    
+    Here T is an operator, v is an initial condition and k is the number of
+    iterates. Provided that T is a contraction mapping or similar, 
+    T^k v will be an approximation to the fixed point.
 
     Parameters
-    =============
+    ----------
         T : callable
-        A function that acts on v
-    
-        v : an object
+            A callable object (e.g., function) that acts on v
+        v : object
+            An object such that T(v) is defined 
+        error_tol : float, optional
+            Error tolerance
+        max_iter : int, optional
+            Maximum number of iterations
+        verbose : bool, optional
+            If true then print current error at each iterate
 
+    Returns
+    -------
+        v : object
+            The approximate fixed point
 
     """
     iterate = 0 
