@@ -8,7 +8,10 @@ Defining various quadrature routines.
 Based on the quadrature routines found in the CompEcon toolbox by
 Miranda and Fackler.
 
-TODO: Add reference to CompEcon
+References
+----------
+Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
+and Finance, MIT Press, 2002.
 
 """
 from __future__ import division
@@ -23,57 +26,9 @@ __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
            'qnwsimp', 'qnwtrap', 'qnwunif', 'quadrect', 'qnwbeta',
            'qnwgamma']
 
-
-def _make_multidim_func(one_d_func, n, *args):
-    """
-    A helper function to cut down on code repetition. Almost all of the
-    code in qnwcheb, qnwlege, qnwsimp, qnwtrap is just dealing
-    various forms of input arguments and then shelling out to the
-    corresponding 1d version of the function.
-
-    This routine does all the argument checking and passes things
-    through the appropriate 1d function before using a tensor product
-    to combine weights and nodes.
-
-    Parameters
-    ----------
-    one_d_func : function
-        The 1d function to be called along each dimension
-
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    args :
-        These are the arguments to various qnw____ functions.  For the
-        majority of the functions this is just a and b, but some differ.
-
-    """
-    args = list(args)
-    n = np.asarray(n)
-    args = map(np.asarray, args)
-
-    if all([x.size == 1 for x in [n] + args]):
-        return one_d_func(n, *args)
-
-    d = n.size
-
-    for i in range(len(args)):
-        if args[i].size == 1:
-            args[i] = np.repeat(args[i], d)
-
-    nodes = []
-    weights = []
-
-    for i in range(d):
-        ai = [x[i] for x in args]
-        _1d = one_d_func(n[i], *ai)
-        nodes.append(_1d[0])
-        weights.append(_1d[1])
-
-    weights = ckron(*weights[::-1])  # reverse ordered tensor product
-
-    nodes = gridmake(*nodes)
-    return nodes, weights
+## ------------------ ##
+#- Exported Functions -#
+## ------------------ ##
 
 
 def qnwcheb(n, a=1, b=1):
@@ -82,67 +37,39 @@ def qnwcheb(n, a=1, b=1):
 
     Parameters
     ----------
-    n : int or array-like(float)
+    n : int or array_like(float)
         A length-d iterable of the number of nodes in each dimension
 
-    a : float or array-like(float)
+    a : scalar or array_like(float)
         A length-d iterable of lower endpoints. If a scalar is given,
         that constant is repeated d times, where d is the number of
         dimensions
 
-    b : float or array-like(float)
+    b : scalar or array_like(float)
         A length-d iterable of upper endpoints. If a scalar is given,
         that constant is repeated d times, where d is the number of
         dimensions
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         Quadrature nodes
 
-    weights : np.ndarray
+    weights : np.ndarray(dtype=float)
         Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwcheb`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     return _make_multidim_func(_qnwcheb1, n, a, b)
-
-
-def _qnwcheb1(n, a, b):
-    """
-    Compute univariate Guass-Checbychev quadrature nodes and weights
-
-    Parameters
-    ----------
-    n : int
-        The number of nodes
-
-    a : int
-        The lower endpoint
-
-    b : int
-        The upper endpoint
-
-    Returns
-    -------
-    nodes : np.ndarray
-        An n element array of nodes
-
-    nodes : np.ndarray
-        An n element array of weights
-
-    """
-    nodes = (b+a)/2 - (b-a)/2 * np.cos(np.pi/n * np.linspace(0.5, n-0.5, n))
-
-    # Create temporary arrays to be used in computing weights
-    t1 = np.arange(1, n+1) - 0.5
-    t2 = np.arange(0.0, n, 2)
-    t3 = np.concatenate([np.array([1.0]),
-                         -2.0/(np.arange(1.0, n-1, 2)*np.arange(3.0, n+1, 2))])
-
-    # compute weights and return
-    weights = ((b-a)/n)*np.cos(np.pi/n*np.outer(t1, t2)).dot(t3)
-
-    return nodes, weights
 
 
 def qnwequi(n, a, b, kind="N", equidist_pp=None):
@@ -156,12 +83,12 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
     n : int
         Number of sequence points
 
-    a : float or array-like(float)
+    a : scalar or array_like(float)
         A length-d iterable of lower endpoints. If a scalar is given,
         that constant is repeated d times, where d is the number of
         dimensions
 
-    b : float or array-like(float)
+    b : scalar or array_like(float)
         A length-d iterable of upper endpoints. If a scalar is given,
         that constant is repeated d times, where d is the number of
         dimensions
@@ -174,16 +101,26 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
         - H - Haber
         - R - pseudo Random
 
-    equidist_pp : array-like, optional(default=None)
+    equidist_pp : array_like, optional(default=None)
         TODO: I don't know what this does
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         Quadrature nodes
 
-    weights : np.ndarray
+    weights : np.ndarray(dtype=float)
         Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwequi`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     if equidist_pp is None:
@@ -233,91 +170,39 @@ def qnwlege(n, a, b):
 
     Parameters
     ----------
-    n : int or array-like(float)
+    n : int or array_like(float)
         A length-d iterable of the number of nodes in each dimension
 
-    a : float or array-like(float)
+    a : scalar or array_like(float)
         A length-d iterable of lower endpoints. If a scalar is given,
         that constant is repeated d times, where d is the number of
         dimensions
 
-    b : float or array-like(float)
+    b : scalar or array_like(float)
         A length-d iterable of upper endpoints. If a scalar is given,
         that constant is repeated d times, where d is the number of
         dimensions
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         Quadrature nodes
 
-    weights : np.ndarray
+    weights : np.ndarray(dtype=float)
         Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwlege`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     return _make_multidim_func(_qnwlege1, n, a, b)
-
-
-def _qnwlege1(n, a, b):
-    """
-    Compute univariate Guass-Legendre quadrature nodes and weights
-
-    Parameters
-    ----------
-    n : int
-        The number of nodes
-
-    a : int
-        The lower endpoint
-
-    b : int
-        The upper endpoint
-
-    Returns
-    -------
-    nodes : np.ndarray
-        An n element array of nodes
-
-    nodes : np.ndarray
-        An n element array of weights
-
-    """
-    # import ipdb; ipdb.set_trace()
-    maxit = 100
-    m = np.fix((n + 1) / 2.0)
-    xm = 0.5 * (b + a)
-    xl = 0.5 * (b - a)
-    nodes = np.zeros(n)
-
-    weights = nodes.copy()
-    i = np.arange(m, dtype='int')
-
-    z = np.cos(np.pi * ((i + 1.0) - 0.25) / (n + 0.5))
-
-    for its in range(maxit):
-        p1 = 1.0
-        p2 = 0.0
-        for j in range(1, n+1):
-            p3 = p2
-            p2 = p1
-            p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j
-
-        pp = n * (z * p1 - p2)/(z * z - 1.0)
-        z1 = z.copy()
-        z = z1 - p1/pp
-        if all(np.abs(z - z1) < 1e-14):
-            break
-
-    if its == maxit - 1:
-        raise ValueError("Maximum iterations in _qnwlege1")
-
-    nodes[i] = xm - xl * z
-    nodes[- i - 1] = xm + xl * z
-
-    weights[i] = 2 * xl / ((1 - z * z) * pp * pp)
-    weights[- i - 1] = weights[i]
-
-    return nodes, weights
 
 
 def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
@@ -326,25 +211,35 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
 
     Parameters
     ----------
-    n : int or array-like(float)
+    n : int or array_like(float)
         A length-d iterable of the number of nodes in each dimension
 
-    mu : float or array-like(float), optional(default=zeros(d))
+    mu : scalar or array_like(float), optional(default=zeros(d))
         The means of each dimension of the random variable. If a scalar
         is given, that constant is repeated d times, where d is the
         number of dimensions
 
-    sig2 : array-like(float), optional(default=eye(d))
+    sig2 : array_like(float), optional(default=eye(d))
         A d x d array representing the variance-covariance matrix of the
         multivariate normal distribution.
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         Quadrature nodes
 
-    weights : np.ndarray
+    weights : np.ndarray(dtype=float)
         Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwnorm`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     n = np.asarray(n)
@@ -387,6 +282,509 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
     return nodes.squeeze(), weights
 
 
+def qnwlogn(n, mu=None, sig2=None):
+    """
+    Computes nodes and weights for multivariate lognormal distribution
+
+    Parameters
+    ----------
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    mu : scalar or array_like(float), optional(default=zeros(d))
+        The means of each dimension of the random variable. If a scalar
+        is given, that constant is repeated d times, where d is the
+        number of dimensions
+
+    sig2 : array_like(float), optional(default=eye(d))
+        A d x d array representing the variance-covariance matrix of the
+        multivariate normal distribution.
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        Quadrature nodes
+
+    weights : np.ndarray(dtype=float)
+        Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwlogn`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    nodes, weights = qnwnorm(n, mu, sig2)
+    return np.exp(nodes), weights
+
+
+def qnwsimp(n, a, b):
+    """
+    Computes multivariate Simpson quadrature nodes and weights.
+
+    Parameters
+    ----------
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    a : scalar or array_like(float)
+        A length-d iterable of lower endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    b : scalar or array_like(float)
+        A length-d iterable of upper endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        Quadrature nodes
+
+    weights : np.ndarray(dtype=float)
+        Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwsimp`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    return _make_multidim_func(_qnwsimp1, n, a, b)
+
+
+def qnwtrap(n, a, b):
+    """
+    Computes multivariate trapezoid rule quadrature nodes and weights.
+
+    Parameters
+    ----------
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    a : scalar or array_like(float)
+        A length-d iterable of lower endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    b : scalar or array_like(float)
+        A length-d iterable of upper endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        Quadrature nodes
+
+    weights : np.ndarray(dtype=float)
+        Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwtrap`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    return _make_multidim_func(_qnwtrap1, n, a, b)
+
+
+def qnwunif(n, a, b):
+    """
+    Computes quadrature nodes and weights for multivariate uniform
+    distribution
+
+    Parameters
+    ----------
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    a : scalar or array_like(float)
+        A length-d iterable of lower endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    b : scalar or array_like(float)
+        A length-d iterable of upper endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        Quadrature nodes
+
+    weights : np.ndarray(dtype=float)
+        Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwunif`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    n, a, b = map(np.asarray, [n, a, b])
+    nodes, weights = qnwlege(n, a, b)
+    weights = weights / np.prod(b - a)
+    return nodes, weights
+
+
+def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
+    """
+    Integrate the d-dimensional function f on a rectangle with lower and
+    upper bound for dimension i defined by a[i] and b[i], respectively;
+    using n[i] points.
+
+    Parameters
+    ----------
+    f : function
+        The function to integrate over. This should be a function
+        that accepts as its first argument a matrix representing points
+        along each dimension (each dimension is a column). Other
+        arguments that need to be passed to the function are caught by
+        *args and **kwargs
+
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    a : scalar or array_like(float)
+        A length-d iterable of lower endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    b : scalar or array_like(float)
+        A length-d iterable of upper endpoints. If a scalar is given,
+        that constant is repeated d times, where d is the number of
+        dimensions
+
+    kind : string, optional(default='lege')
+        Specifies which type of integration to perform. Valid
+        values are:
+
+        lege - Gauss-Legendre
+        cheb - Gauss-Chebyshev
+        trap - trapezoid rule
+        simp - Simpson rule
+        N    - Neiderreiter equidistributed sequence
+        W    - Weyl equidistributed sequence
+        H    - Haber  equidistributed sequence
+        R    - Monte Carlo
+
+    *args, **kwargs :
+        Other arguments passed to the function f
+
+    Returns
+    -------
+    out : scalar (float)
+        The value of the integral on the region [a, b]
+
+    Notes
+    -----
+    Based of original function ``quadrect`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    if kind.lower() == "lege":
+        nodes, weights = qnwlege(n, a, b)
+    elif kind.lower() == "cheb":
+        nodes, weights = qnwcheb(n, a, b)
+    elif kind.lower() == "trap":
+        nodes, weights = qnwtrap(n, a, b)
+    elif kind.lower() == "simp":
+        nodes, weights = qnwsimp(n, a, b)
+    else:
+        nodes, weights = qnwequi(n, a, b, kind)
+
+    out = weights.dot(f(nodes, *args, **kwargs))
+    return out
+
+
+def qnwbeta(n, a=1.0, b=1.0):
+    """
+    Computes nodes and weights for beta distribution
+
+    Parameters
+    ----------
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    a : scalar or array_like(float), optional(default=1.0)
+        A length-d
+
+    b : array_like(float), optional(default=1.0)
+        A d x d array representing the variance-covariance matrix of the
+        multivariate normal distribution.
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        Quadrature nodes
+
+    weights : np.ndarray(dtype=float)
+        Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwbeta`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    return _make_multidim_func(_qnwbeta1, n, a, b)
+
+
+def qnwgamma(n, a=None):
+    """
+    Computes nodes and weights for gamma distribution
+
+    Parameters
+    ----------
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    mu : scalar or array_like(float), optional(default=zeros(d))
+        The means of each dimension of the random variable. If a scalar
+        is given, that constant is repeated d times, where d is the
+        number of dimensions
+
+    sig2 : array_like(float), optional(default=eye(d))
+        A d x d array representing the variance-covariance matrix of the
+        multivariate normal distribution.
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        Quadrature nodes
+
+    weights : np.ndarray(dtype=float)
+        Weights for quadrature nodes
+
+    Notes
+    -----
+    Based of original function ``qnwgamma`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    return _make_multidim_func(_qnwgamma1, n, a)
+
+## ------------------ ##
+#- Internal Functions -#
+## ------------------ ##
+
+
+def _make_multidim_func(one_d_func, n, *args):
+    """
+    A helper function to cut down on code repetition. Almost all of the
+    code in qnwcheb, qnwlege, qnwsimp, qnwtrap is just dealing
+    various forms of input arguments and then shelling out to the
+    corresponding 1d version of the function.
+
+    This routine does all the argument checking and passes things
+    through the appropriate 1d function before using a tensor product
+    to combine weights and nodes.
+
+    Parameters
+    ----------
+    one_d_func : function
+        The 1d function to be called along each dimension
+
+    n : int or array_like(float)
+        A length-d iterable of the number of nodes in each dimension
+
+    args :
+        These are the arguments to various qnw____ functions.  For the
+        majority of the functions this is just a and b, but some differ.
+
+    Returns
+    -------
+    func : function
+        The multi-dimensional version of the parameter ``one_d_func``
+
+
+    """
+    args = list(args)
+    n = np.asarray(n)
+    args = map(np.asarray, args)
+
+    if all([x.size == 1 for x in [n] + args]):
+        return one_d_func(n, *args)
+
+    d = n.size
+
+    for i in range(len(args)):
+        if args[i].size == 1:
+            args[i] = np.repeat(args[i], d)
+
+    nodes = []
+    weights = []
+
+    for i in range(d):
+        ai = [x[i] for x in args]
+        _1d = one_d_func(n[i], *ai)
+        nodes.append(_1d[0])
+        weights.append(_1d[1])
+
+    weights = ckron(*weights[::-1])  # reverse ordered tensor product
+
+    nodes = gridmake(*nodes)
+    return nodes, weights
+
+
+def _qnwcheb1(n, a, b):
+    """
+    Compute univariate Guass-Checbychev quadrature nodes and weights
+
+    Parameters
+    ----------
+    n : int
+        The number of nodes
+
+    a : int
+        The lower endpoint
+
+    b : int
+        The upper endpoint
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        An n element array of nodes
+
+    nodes : np.ndarray(dtype=float)
+        An n element array of weights
+
+    Notes
+    -----
+    Based of original function ``qnwcheb1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    nodes = (b+a)/2 - (b-a)/2 * np.cos(np.pi/n * np.linspace(0.5, n-0.5, n))
+
+    # Create temporary arrays to be used in computing weights
+    t1 = np.arange(1, n+1) - 0.5
+    t2 = np.arange(0.0, n, 2)
+    t3 = np.concatenate([np.array([1.0]),
+                        -2.0/(np.arange(1.0, n-1, 2)*np.arange(3.0, n+1, 2))])
+
+    # compute weights and return
+    weights = ((b-a)/n)*np.cos(np.pi/n*np.outer(t1, t2)).dot(t3)
+
+    return nodes, weights
+
+
+def _qnwlege1(n, a, b):
+    """
+    Compute univariate Guass-Legendre quadrature nodes and weights
+
+    Parameters
+    ----------
+    n : int
+        The number of nodes
+
+    a : int
+        The lower endpoint
+
+    b : int
+        The upper endpoint
+
+    Returns
+    -------
+    nodes : np.ndarray(dtype=float)
+        An n element array of nodes
+
+    nodes : np.ndarray(dtype=float)
+        An n element array of weights
+
+    Notes
+    -----
+    Based of original function ``qnwlege1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
+    """
+    # import ipdb; ipdb.set_trace()
+    maxit = 100
+    m = np.fix((n + 1) / 2.0)
+    xm = 0.5 * (b + a)
+    xl = 0.5 * (b - a)
+    nodes = np.zeros(n)
+
+    weights = nodes.copy()
+    i = np.arange(m, dtype='int')
+
+    z = np.cos(np.pi * ((i + 1.0) - 0.25) / (n + 0.5))
+
+    for its in range(maxit):
+        p1 = 1.0
+        p2 = 0.0
+        for j in range(1, n+1):
+            p3 = p2
+            p2 = p1
+            p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j
+
+        pp = n * (z * p1 - p2)/(z * z - 1.0)
+        z1 = z.copy()
+        z = z1 - p1/pp
+        if all(np.abs(z - z1) < 1e-14):
+            break
+
+    if its == maxit - 1:
+        raise ValueError("Maximum iterations in _qnwlege1")
+
+    nodes[i] = xm - xl * z
+    nodes[- i - 1] = xm + xl * z
+
+    weights[i] = 2 * xl / ((1 - z * z) * pp * pp)
+    weights[- i - 1] = weights[i]
+
+    return nodes, weights
+
+
 def _qnwnorm1(n):
     """
     Compute nodes and weights for quadrature of univariate standard
@@ -399,11 +797,21 @@ def _qnwnorm1(n):
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         An n element array of nodes
 
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         An n element array of weights
+
+    Notes
+    -----
+    Based of original function ``qnwnorm1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     maxit = 100
@@ -455,68 +863,6 @@ def _qnwnorm1(n):
     return nodes, weights
 
 
-def qnwlogn(n, mu=None, sig2=None):
-    """
-    Computes nodes and weights for multivariate lognormal distribution
-
-    Parameters
-    ----------
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    mu : float or array-like(float), optional(default=zeros(d))
-        The means of each dimension of the random variable. If a scalar
-        is given, that constant is repeated d times, where d is the
-        number of dimensions
-
-    sig2 : array-like(float), optional(default=eye(d))
-        A d x d array representing the variance-covariance matrix of the
-        multivariate normal distribution.
-
-    Returns
-    -------
-    nodes : np.ndarray
-        Quadrature nodes
-
-    weights : np.ndarray
-        Weights for quadrature nodes
-
-    """
-    nodes, weights = qnwnorm(n, mu, sig2)
-    return np.exp(nodes), weights
-
-
-def qnwsimp(n, a, b):
-    """
-    Computes multivariate Simpson quadrature nodes and weights.
-
-    Parameters
-    ----------
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    a : float or array-like(float)
-        A length-d iterable of lower endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    b : float or array-like(float)
-        A length-d iterable of upper endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    Returns
-    -------
-    nodes : np.ndarray
-        Quadrature nodes
-
-    weights : np.ndarray
-        Weights for quadrature nodes
-
-    """
-    return _make_multidim_func(_qnwsimp1, n, a, b)
-
-
 def _qnwsimp1(n, a, b):
     """
     Compute univariate Simpson quadrature nodes and weights
@@ -534,11 +880,21 @@ def _qnwsimp1(n, a, b):
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         An n element array of nodes
 
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         An n element array of weights
+
+    Notes
+    -----
+    Based of original function ``qnwsimp1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     if n % 2 == 0:
@@ -553,37 +909,6 @@ def _qnwsimp1(n, a, b):
     weights = (dx / 3.0) * weights
 
     return nodes, weights
-
-
-def qnwtrap(n, a, b):
-    """
-    Computes multivariate trapezoid rule quadrature nodes and weights.
-
-    Parameters
-    ----------
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    a : float or array-like(float)
-        A length-d iterable of lower endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    b : float or array-like(float)
-        A length-d iterable of upper endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    Returns
-    -------
-    nodes : np.ndarray
-        Quadrature nodes
-
-    weights : np.ndarray
-        Weights for quadrature nodes
-
-    """
-    return _make_multidim_func(_qnwtrap1, n, a, b)
 
 
 def _qnwtrap1(n, a, b):
@@ -603,11 +928,21 @@ def _qnwtrap1(n, a, b):
 
     Returns
     -------
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         An n element array of nodes
 
-    nodes : np.ndarray
+    nodes : np.ndarray(dtype=float)
         An n element array of weights
+
+    Notes
+    -----
+    Based of original function ``qnwtrap1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     if n < 1:
@@ -623,114 +958,7 @@ def _qnwtrap1(n, a, b):
     return nodes, weights
 
 
-def qnwunif(n, a, b):
-    """
-    Computes quadrature nodes and weights for multivariate uniform
-    distribution
-
-    Parameters
-    ----------
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    a : float or array-like(float)
-        A length-d iterable of lower endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    b : float or array-like(float)
-        A length-d iterable of upper endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    Returns
-    -------
-    nodes : np.ndarray
-        Quadrature nodes
-
-    weights : np.ndarray
-        Weights for quadrature nodes
-
-    """
-    n, a, b = map(np.asarray, [n, a, b])
-    nodes, weights = qnwlege(n, a, b)
-    weights = weights / np.prod(b - a)
-    return nodes, weights
-
-
-def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
-    """
-    Integrate the d-dimensional function f on a rectangle with lower and
-    upper bound for dimension i defined by a[i] and b[i], respectively;
-    using n[i] points.
-
-    Parameters
-    ----------
-    f : function
-        The function to integrate over. This should be a function
-        that accepts as its first argument a matrix representing points
-        along each dimension (each dimension is a column). Other
-        arguments that need to be passed to the function are caught by
-        *args and **kwargs
-
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    a : float or array-like(float)
-        A length-d iterable of lower endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    b : float or array-like(float)
-        A length-d iterable of upper endpoints. If a scalar is given,
-        that constant is repeated d times, where d is the number of
-        dimensions
-
-    kind : string, optional(default='lege')
-        Specifies which type of integration to perform. Valid
-        values are:
-
-        lege - Gauss-Legendre
-        cheb - Gauss-Chebyshev
-        trap - trapezoid rule
-        simp - Simpson rule
-        N    - Neiderreiter equidistributed sequence
-        W    - Weyl equidistributed sequence
-        H    - Haber  equidistributed sequence
-        R    - Monte Carlo
-
-    *args, **kwargs :
-        Other arguments passed to the function f
-
-    Returns
-    -------
-    out : TODO
-        The value of the integral on the region [a, b]
-
-    """
-    if kind.lower() == "lege":
-        nodes, weights = qnwlege(n, a, b)
-    elif kind.lower() == "cheb":
-        nodes, weights = qnwcheb(n, a, b)
-    elif kind.lower() == "trap":
-        nodes, weights = qnwtrap(n, a, b)
-    elif kind.lower() == "simp":
-        nodes, weights = qnwsimp(n, a, b)
-    else:
-        nodes, weights = qnwequi(n, a, b, kind)
-
-    out = weights.dot(f(nodes, *args, **kwargs))
-    return out
-
-
-def qnwbeta(n, a=1, b=1):
-    """
-    multi dimensional case
-    """
-    return _make_multidim_func(_qnwbeta1, n, a, b)
-
-
-def _qnwbeta1(n, a=1, b=1):
+def _qnwbeta1(n, a=1.0, b=1.0):
     """
     Computes nodes and weights for quadrature on the beta distribution.
     Default is a=b=1 which is just a uniform distribution
@@ -743,19 +971,30 @@ def _qnwbeta1(n, a=1, b=1):
     n : scalar : int
         The number of quadrature points
 
-    a : scalar : float
-        First Beta distribution parameter (default value is 1)
+    a : scalar : float, optional(default=1)
+        First Beta distribution parameter
 
-    b : scalar : float
-        Second Beta distribution parameter (default value is 1)
+    b : scalar : float, optional(default=1)
+        Second Beta distribution parameter
 
     Returns
     -------
-    nodes : array(ndim=1) : float
+    nodes : np.ndarray(dtype=float, ndim=1)
         The quadrature points
 
-    weights : array(ndim=1) : float
+    weights : np.ndarray(dtype=float, ndim=1)
         The quadrature weights that correspond to nodes
+
+    Notes
+    -----
+    Based of original function ``_qnwbeta1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
+
     """
     # We subtract one and write a + 1 where we actually want a, and a
     # where we want a - 1
@@ -842,36 +1081,6 @@ def _qnwbeta1(n, a=1, b=1):
     return nodes, weights
 
 
-def qnwgamma(n, a=None):
-    """
-    Computes nodes and weights for gamma distribution
-
-    Parameters
-    ----------
-    n : int or array-like(float)
-        A length-d iterable of the number of nodes in each dimension
-
-    mu : float or array-like(float), optional(default=zeros(d))
-        The means of each dimension of the random variable. If a scalar
-        is given, that constant is repeated d times, where d is the
-        number of dimensions
-
-    sig2 : array-like(float), optional(default=eye(d))
-        A d x d array representing the variance-covariance matrix of the
-        multivariate normal distribution.
-
-    Returns
-    -------
-    nodes : np.ndarray
-        Quadrature nodes
-
-    weights : np.ndarray
-        Weights for quadrature nodes
-
-    """
-    return _make_multidim_func(_qnwgamma1, n, a)
-
-
 def _qnwgamma1(n, a=None):
     """
     Insert docs.  Default is a=0
@@ -889,11 +1098,21 @@ def _qnwgamma1(n, a=None):
 
     Returns
     -------
-    nodes : array(ndim=1) : float
+    nodes : np.ndarray(dtype=float, ndim=1)
         The quadrature points
 
-    weights : array(ndim=1) : float
+    weights : np.ndarray(dtype=float, ndim=1)
         The quadrature weights that correspond to nodes
+
+    Notes
+    -----
+    Based of original function ``qnwgamma1`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     if a is None:

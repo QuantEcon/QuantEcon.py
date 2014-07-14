@@ -7,7 +7,10 @@ Utility functions used in CompEcon
 
 Based routines found in the CompEcon toolbox by Miranda and Fackler.
 
-TODO: Add reference to CompEcon
+References
+----------
+Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
+and Finance, MIT Press, 2002.
 
 """
 from functools import reduce
@@ -28,16 +31,35 @@ def ckron(*arrays):
     out : np.ndarray
         The result of repeated kronecker products
 
+    Notes
+    -----
+    Based of original function `ckron` in CompEcon toolbox by Miranda
+    and Fackler
+
     References
     ----------
-    emulates the function ckron.m in the CompEcon toolbox
+    Miranda, Mario J, and Paul L Fackler. Applied Computational
+    Economics and Finance, MIT Press, 2002.
 
     """
     return reduce(np.kron, arrays)
 
 
-
 def gridmake(*arrays):
+    """
+    TODO: finish this docstring
+
+    Notes
+    -----
+    Based of original function ``gridmake`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
+    and Finance, MIT Press, 2002.
+
+    """
     if all([i.ndim == 1 for i in arrays]):
         d = len(arrays)
         if d == 2:
@@ -52,8 +74,21 @@ def gridmake(*arrays):
         raise NotImplementedError("Come back here")
 
 
-
 def _gridmake2(x1, x2):
+    """
+    TODO: finish this docstring
+
+    Notes
+    -----
+    Based of original function ``gridmake2`` in CompEcon toolbox by
+    Miranda and Fackler
+
+    References
+    ----------
+    Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
+    and Finance, MIT Press, 2002.
+
+    """
     if x1.ndim == 1 and x2.ndim == 1:
         return np.column_stack([np.tile(x1, x2.shape[0]),
                                np.repeat(x2, x1.shape[0])])
