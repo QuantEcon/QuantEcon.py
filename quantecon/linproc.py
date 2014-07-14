@@ -33,6 +33,17 @@ class LinearProcess(object):
         * theta = (theta_1, theta_2,..., theta_q)
         * sigma is a scalar, the standard deviation of the white noise
 
+    Parameters
+    ----------
+    phi : float(scalar or sequence/array)
+        Autocorrelation values for the the autocorrelated variable.
+        See above for explanation.
+    theta : float(scalar or sequence/array)
+        Autocorrelation values for the white noise of the model.
+        See above for explanation
+    sigma : float(scalar)
+        The standard deviation of the white noise
+
     Attributes
     ----------
     phi : float(scalar or array)
@@ -51,21 +62,6 @@ class LinearProcess(object):
     """
 
     def __init__(self, phi, theta=0, sigma=1) :
-        """
-        Initializes the linear process class.
-
-        Parameters
-        ----------
-        phi : float(scalar or sequence/array)
-            Autocorrelation values for the the autocorrelated variable.
-            See above for explanation.
-        theta : float(scalar or sequence/array)
-            Autocorrelation values for the white noise of the model.
-            See above for explanation
-        sigma : float(scalar)
-            The standard deviation of the white noise
-
-        """
         self._phi, self._theta = phi, theta
         self.sigma = sigma
         self.set_params()
