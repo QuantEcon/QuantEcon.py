@@ -3,10 +3,10 @@ Filename: asset_pricing.py
 Authors: David Evans, John Stachurski and Thomas J. Sargent
 
 Computes asset prices in an endowment economy when the endowment obeys
-geometric growth driven by a finite state Markov chain.  The transition matrix
-of the Markov chain is P, and the set of states is s.  The discount
-factor is beta, and gamma is the coefficient of relative risk aversion in the
-household's utility function.
+geometric growth driven by a finite state Markov chain.  The transition
+matrix of the Markov chain is P, and the set of states is s.  The
+discount factor is beta, and gamma is the coefficient of relative risk
+aversion in the household's utility function.
 
 References
 ----------
@@ -20,8 +20,37 @@ from numpy.linalg import solve
 
 class AssetPrices:
     """
-    A class to compute asset prices when the endowment follows a finite Markov
-    chain.
+    A class to compute asset prices when the endowment follows a finite
+    Markov chain.
+
+    Parameters
+    ----------
+    beta : scalar, float
+        Discount factor
+
+    P : array_like(float)
+        Transition matrix
+
+    s : array_like(float)
+        Growth rate of consumption
+
+    gamma : scalar(float)
+        Coefficient of risk aversion
+
+    Attributes
+    ----------
+    beta : scalar(float)
+        Discount factor
+
+    P : array_like(float)
+        Transition matrix
+
+    s : array_like(float)
+        Growth rate of consumption
+
+    gamma : scalar(float)
+        Coefficient of risk aversion
+
 
     Examples
     --------
@@ -43,29 +72,10 @@ class AssetPrices:
         >>> p_s = 150.0
         >>> w_bar, w_bars = ap.call_option(zeta, p_s, T = [10,20,30])
 
-
     """
 
 
     def __init__(self, beta, P, s, gamma):
-        """
-        Initializes an instance of AssetPrices
-
-        Parameters
-        ----------
-        beta : float
-            Discount factor
-
-        P : array_like
-            Transition matrix
-
-        s : array_like
-            Growth rate of consumption
-
-        gamma : float
-            Coefficient of risk aversion
-
-        """
         self.beta, self.gamma = beta, gamma
         self.P, self.s = P, s
         self.n = self.P.shape[0]
@@ -77,7 +87,7 @@ class AssetPrices:
 
         Returns
         -------
-        v : np.ndarray
+        v : array_like(float)
             Lucas tree prices
         """
         # == Simplify names == #
@@ -87,6 +97,7 @@ class AssetPrices:
         I = np.identity(self.n)
         O = np.ones(self.n)
         v = beta * solve(I - beta * P_tilde, P_tilde.dot(O))
+
         return v
 
     def consol_price(self, zeta):
@@ -95,12 +106,12 @@ class AssetPrices:
 
         Parameters
         ----------
-        zeta : float
+        zeta : scalar(float)
             Coupon of the console
 
         Returns
         -------
-        p_bar : np.ndarray
+        p_bar : array_like(float)
             Console bond prices
 
         """
@@ -111,35 +122,37 @@ class AssetPrices:
         I = np.identity(self.n)
         O = np.ones(self.n)
         p_bar = beta * solve(I - beta * P_check, P_check.dot(zeta * O))
+
         return p_bar
 
     def call_option(self, zeta, p_s, T=[], epsilon=1e-8):
         """
-        Computes price of a call option on a consol bond, both finite and
-        infinite horizon
+        Computes price of a call option on a consol bond, both finite
+        and infinite horizon
 
         Parameters
         ----------
-        zeta : float
+        zeta : scalar(float)
             Coupon of the console
 
-        p_s : float
+        p_s : scalar(float)
             Strike price
 
-        T : list of integers
+        T : iterable(integers)
             Length of option in the finite horizon case
 
-        epsilon : float, optional
+        epsilon : scalar(float), optional(default=1e-8)
             Tolerance for infinite horizon problem
 
         Returns
         -------
-        w_bar : np.ndarray
+        w_bar : array_like(float)
             Infinite horizon call option prices
 
         w_bars : dict
-            A dictionary of key-value pairs {t: vec}, where t is one of the
-            dates in the list T and vec is the option prices at that date
+            A dictionary of key-value pairs {t: vec}, where t is one of
+            the dates in the list T and vec is the option prices at that
+            date
 
         """
         # == Simplify names, initialize variables == #
