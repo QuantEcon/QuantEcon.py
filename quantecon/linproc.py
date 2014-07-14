@@ -13,41 +13,62 @@ from scipy.signal import dimpulse, freqz, dlsim
 
 class LinearProcess(object):
     """
-    This class provides functions for working with scalar ARMA processes.  In
-    particular, it defines methods for computing and plotting the
-    autocovariance function, the spectral density, the impulse-response
-    function and simulated time series.
+    This class represents scalar ARMA(p, q) processes.
+
+    If phi and theta are scalars, then the model is
+    understood to be
+
+        X_t = phi X_{t-1} + epsilon_t + theta epsilon_{t-1}
+
+    where {epsilon_t} is a white noise process with standard deviation
+    sigma.  If phi and theta are arrays or sequences, then the
+    interpretation is the ARMA(p, q) model
+
+        X_t = phi_1 X_{t-1} + ... + phi_p X_{t-p} +
+        epsilon_t + theta_1 epsilon_{t-1} + ...  + theta_q epsilon_{t-q}
+
+    where
+
+        * phi = (phi_1, phi_2,..., phi_p)
+        * theta = (theta_1, theta_2,..., theta_q)
+        * sigma is a scalar, the standard deviation of the white noise
+
+    Attributes
+    ----------
+    phi : float(scalar or array)
+        Autocorrelation values for the the autocorrelated variable.  See
+        above for explanation.
+    theta : float(scalar or array)
+        Autocorrelation values for the errors of the model.  See above
+        for explanation.
+    ar_poly : array_like
+        The polynomial form that is needed by scipy.signal to do the
+        processing we desire.  Corresponds with the phi values
+    ma_poly : array_like
+        The polynomial form that is needed by scipy.signal to do the
+        processing we desire.  Corresponds with the theta values
 
     """
-    
+
     def __init__(self, phi, theta=0, sigma=1) :
         """
-        This class represents scalar ARMA(p, q) processes.  The parameters phi
-        and theta can be NumPy arrays, array-like sequences (lists, tuples) or
-        scalars.
+        Initializes the linear process class.
 
-        If phi and theta are scalars, then the model is
-        understood to be 
-        
-            X_t = phi X_{t-1} + epsilon_t + theta epsilon_{t-1}  
-            
-        where {epsilon_t} is a white noise process with standard deviation
-        sigma.  If phi and theta are arrays or sequences, then the
-        interpretation is the ARMA(p, q) model 
-
-            X_t = phi_1 X_{t-1} + ... + phi_p X_{t-p} + 
-            epsilon_t + theta_1 epsilon_{t-1} + ...  + theta_q epsilon_{t-q}
-
-        where
-
-            * phi = (phi_1, phi_2,..., phi_p)
-            * theta = (theta_1, theta_2,..., theta_q)
-            * sigma is a scalar, the standard deviation of the white noise
+        Parameters
+        ----------
+        phi : float(scalar or sequence/array)
+            Autocorrelation values for the the autocorrelated variable.
+            See above for explanation.
+        theta : float(scalar or sequence/array)
+            Autocorrelation values for the white noise of the model.
+            See above for explanation
+        sigma : float(scalar)
+            The standard deviation of the white noise
 
         """
         self._phi, self._theta = phi, theta
         self.sigma = sigma
-        self.set_params()  
+        self.set_params()
 
     def get_phi(self):
         return self._phi
@@ -68,17 +89,18 @@ class LinearProcess(object):
 
     def set_params(self):
         """
-        Internally, scipy.signal works with systems of the form 
-        
-            ar_poly(L) X_t = ma_poly(L) epsilon_t 
+        Internally, scipy.signal works with systems of the form
+
+            ar_poly(L) X_t = ma_poly(L) epsilon_t
 
         where L is the lag operator. To match this, we set
-        
+
             ar_poly = (1, -phi_1, -phi_2,..., -phi_p)
-            ma_poly = (1, theta_1, theta_2,..., theta_q) 
-            
-        In addition, ar_poly must be at least as long as ma_poly.  This can be
-        achieved by padding it out with zeros when required.
+            ma_poly = (1, theta_1, theta_2,..., theta_q)
+
+        In addition, ar_poly must be at least as long as ma_poly.
+        This can be achieved by padding it out with zeros when required.
+
         """
         # === set up ma_poly === #
         ma_poly = np.asarray(self._theta)
@@ -92,50 +114,97 @@ class LinearProcess(object):
         self.ar_poly = np.insert(ar_poly, 0, 1)      # The array (1, -phi)
 
         # === pad ar_poly with zeros if required === #
-        if len(self.ar_poly) < len(self.ma_poly):    
+        if len(self.ar_poly) < len(self.ma_poly):
             temp = np.zeros(len(self.ma_poly) - len(self.ar_poly))
             self.ar_poly = np.hstack((self.ar_poly, temp))
-        
+
     def impulse_response(self, impulse_length=30):
         """
-        Get the impulse response corresponding to our model.  Returns psi,
-        where psi[j] is the response at lag j.  Note: psi[0] is unity.
-        """        
-        sys = self.ma_poly, self.ar_poly, 1 
+        Get the impulse response corresponding to our model.
+
+        Returns
+        -------
+        psi : float(array)
+            psi[j] is the response at lag j of the impulse response.
+            We take psi[0] as unity.
+
+        """
+        sys = self.ma_poly, self.ar_poly, 1
         times, psi = dimpulse(sys, n=impulse_length)
         psi = psi[0].flatten()  # Simplify return value into flat array
         return psi
 
-    def spectral_density(self, two_pi=True, res=1200): 
+    def spectral_density(self, two_pi=True, res=1200):
         """
-        Compute the spectral density function over [0, pi] if two_pi is False
-        and [0, 2 pi] otherwise.  The spectral density is the discrete time
-        Fourier transform of the autocovariance function.  In particular,
+        Compute the spectral density function.  The spectral density is
+        the discrete time Fourier transform of the autocovariance
+        function.  In particular,
 
             f(w) = sum_k gamma(k) exp(-ikw)
 
-        where gamma is the autocovariance function and the sum is over the set
-        of all integers.
-        """       
+        where gamma is the autocovariance function and the sum is over
+        the set of all integers.
+
+        Parameters
+        ----------
+        two_pi : Boolean, optional)
+            Compute the spectral density function over [0, pi] if
+            two_pi is False and [0, 2 pi] otherwise.  Default value is
+            True
+        res : int(scalar or array_like), optional
+            By default the spectral density is computed at 1200
+            frequencies evenly spaced around the unit circle, but if an
+            array the computes the response at the frequencies given by
+            the array
+
+        Returns
+        -------
+        w : float(array_like)
+            The normalized frequencies at which h was computed, in
+            radians/sample
+        spect : float(array_like)
+            The frequency response
+
+        """
         w, h = freqz(self.ma_poly, self.ar_poly, worN=res, whole=two_pi)
-        spect = h * conj(h) * self.sigma**2 
+        spect = h * conj(h) * self.sigma**2
+
         return w, spect
 
     def autocovariance(self, num_autocov=16) :
         """
         Compute the autocovariance function over the integers
-        range(num_autocov) using the spectral density and the inverse Fourier
-        transform.
+        range(num_autocov) using the spectral density and the inverse
+        Fourier transform.
+
+        Parameters
+        ----------
+        num_autocov : int, optional
+            The number of autocovariances to calculate
         """
         spect = self.spectral_density()[1]
         acov = np.fft.ifft(spect).real
+
         return acov[:num_autocov]  # num_autocov should be <= len(acov) / 2
 
     def simulation(self, ts_length=90) :
-        " Compute a simulated sample path. "        
+        """
+        Compute a simulated sample path.
+
+        Parameters
+        ----------
+        ts_length : int, optional
+            Number of periods to simulate for
+
+        Returns
+        -------
+        vals : float(array_like)
+            A simulation of the model that corresponds to this class
+        """
         sys = self.ma_poly, self.ar_poly, 1
         u = np.random.randn(ts_length, 1)
         vals = dlsim(sys, u)[1]
+
         return vals.flatten()
 
     def plot_impulse_response(self, ax=None, show=True):
@@ -155,7 +224,7 @@ class LinearProcess(object):
         if show:
             fig, ax = plt.subplots()
         ax.set_title('Spectral density')
-        w, spect = self.spectral_density(two_pi=False)  
+        w, spect = self.spectral_density(two_pi=False)
         ax.semilogy(w, spect)
         ax.set_xlim(0, pi)
         ax.set_ylim(0, np.max(spect))
@@ -168,19 +237,19 @@ class LinearProcess(object):
         if show:
             fig, ax = plt.subplots()
         ax.set_title('Autocovariance')
-        acov = self.autocovariance() 
+        acov = self.autocovariance()
         ax.stem(range(len(acov)), acov)
         ax.set_xlim(-0.5, len(acov) - 0.5)
         ax.set_xlabel('time')
-        ax.set_ylabel('autocovariance')     
+        ax.set_ylabel('autocovariance')
         if show:
             plt.show()
 
     def plot_simulation(self, ax=None, show=True):
         if show:
             fig, ax = plt.subplots()
-        ax.set_title('Sample path')    
-        x_out = self.simulation() 
+        ax.set_title('Sample path')
+        x_out = self.simulation()
         ax.plot(x_out)
         ax.set_xlabel('time')
         ax.set_ylabel('state space')
