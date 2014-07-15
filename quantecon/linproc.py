@@ -18,14 +18,19 @@ class LinearProcess(object):
     If phi and theta are scalars, then the model is
     understood to be
 
+    .. math::
+
         X_t = phi X_{t-1} + epsilon_t + theta epsilon_{t-1}
 
     where {epsilon_t} is a white noise process with standard deviation
     sigma.  If phi and theta are arrays or sequences, then the
     interpretation is the ARMA(p, q) model
 
-        X_t = phi_1 X_{t-1} + ... + phi_p X_{t-p} +
-        epsilon_t + theta_1 epsilon_{t-1} + ...  + theta_q epsilon_{t-q}
+    .. math::
+
+        X_t = \phi_1 X_{t-1} + ... + \phi_p X_{t-p} +
+        \varepsilon_t + \theta_1 \varepsilon_{t-1} +...
+        + \theta_q \varepsilon_{t-q}
 
     where
 
@@ -35,27 +40,29 @@ class LinearProcess(object):
 
     Parameters
     ----------
-    phi : float(scalar or sequence/array)
+    phi : scalar or iterable or array_like(float)
         Autocorrelation values for the the autocorrelated variable.
         See above for explanation.
-    theta : float(scalar or sequence/array)
+    theta : scalar or iterable or array_like(float)
         Autocorrelation values for the white noise of the model.
         See above for explanation
-    sigma : float(scalar)
+    sigma : scalar(float)
         The standard deviation of the white noise
 
     Attributes
     ----------
-    phi : float(scalar or array)
-        Autocorrelation values for the the autocorrelated variable.  See
-        above for explanation.
-    theta : float(scalar or array)
-        Autocorrelation values for the errors of the model.  See above
-        for explanation.
-    ar_poly : array_like
+    phi : scalar or iterable or array_like(float)
+        Autocorrelation values for the the autocorrelated variable.
+        See above for explanation.
+    theta : scalar or iterable or array_like(float)
+        Autocorrelation values for the white noise of the model.
+        See above for explanation
+    sigma : scalar(float)
+        The standard deviation of the white noise
+    ar_poly : array_like(float)
         The polynomial form that is needed by scipy.signal to do the
         processing we desire.  Corresponds with the phi values
-    ma_poly : array_like
+    ma_poly : array_like(float)
         The polynomial form that is needed by scipy.signal to do the
         processing we desire.  Corresponds with the theta values
 
@@ -120,7 +127,7 @@ class LinearProcess(object):
 
         Returns
         -------
-        psi : float(array)
+        psi : array_like(float)
             psi[j] is the response at lag j of the impulse response.
             We take psi[0] as unity.
 
@@ -128,6 +135,7 @@ class LinearProcess(object):
         sys = self.ma_poly, self.ar_poly, 1
         times, psi = dimpulse(sys, n=impulse_length)
         psi = psi[0].flatten()  # Simplify return value into flat array
+
         return psi
 
     def spectral_density(self, two_pi=True, res=1200):
@@ -147,18 +155,18 @@ class LinearProcess(object):
             Compute the spectral density function over [0, pi] if
             two_pi is False and [0, 2 pi] otherwise.  Default value is
             True
-        res : int(scalar or array_like), optional
-            By default the spectral density is computed at 1200
-            frequencies evenly spaced around the unit circle, but if an
-            array the computes the response at the frequencies given by
-            the array
+        res : scalar or array_like(int), optional(default=1200)
+            If res is a scalar then the spectral density is computed at
+            `res` frequencies evenly spaced around the unit circle, but
+            if an array the computes the response at the frequencies
+            given by the array
 
         Returns
         -------
-        w : float(array_like)
+        w : array_like(float)
             The normalized frequencies at which h was computed, in
             radians/sample
-        spect : float(array_like)
+        spect : array_like(float)
             The frequency response
 
         """
@@ -175,8 +183,9 @@ class LinearProcess(object):
 
         Parameters
         ----------
-        num_autocov : int, optional
+        num_autocov : scalar(int), optional(default=16)
             The number of autocovariances to calculate
+
         """
         spect = self.spectral_density()[1]
         acov = np.fft.ifft(spect).real
@@ -189,13 +198,14 @@ class LinearProcess(object):
 
         Parameters
         ----------
-        ts_length : int, optional
+        ts_length : scalar(int), optional(default=90)
             Number of periods to simulate for
 
         Returns
         -------
-        vals : float(array_like)
+        vals : array_like(float)
             A simulation of the model that corresponds to this class
+
         """
         sys = self.ma_poly, self.ar_poly, 1
         u = np.random.randn(ts_length, 1)
