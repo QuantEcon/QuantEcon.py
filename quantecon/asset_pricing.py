@@ -27,13 +27,10 @@ class AssetPrices:
     ----------
     beta : scalar, float
         Discount factor
-
     P : array_like(float)
         Transition matrix
-
     s : array_like(float)
         Growth rate of consumption
-
     gamma : scalar(float)
         Coefficient of risk aversion
 
@@ -41,16 +38,14 @@ class AssetPrices:
     ----------
     beta : scalar(float)
         Discount factor
-
     P : array_like(float)
         Transition matrix
-
     s : array_like(float)
         Growth rate of consumption
-
     gamma : scalar(float)
         Coefficient of risk aversion
-
+    n : scalar(int)
+        The number of rows in P
 
     Examples
     --------
