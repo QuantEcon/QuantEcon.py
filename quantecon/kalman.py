@@ -11,11 +11,13 @@ from scipy.linalg import inv
 import riccati
 
 class Kalman:
-    """
+    r"""
     Implements the Kalman filter for the Gaussian state space model
 
-        x_{t+1} = A x_t + w_{t+1}
-        y_t = G x_t + v_t.
+    .. math::
+
+        x_{t+1} &= A x_t + w_{t+1}\\
+        y_t &= G x_t + v_t.
 
     Here x_t is the hidden state and y_t is the measurement. The shocks
     w_t and v_t are iid zero mean Gaussians with covariance matrices Q
@@ -89,7 +91,7 @@ class Kalman:
 
         Parameters
         ----------
-         x_hat : array_like(float)
+        x_hat : array_like(float)
             An n x 1 array representing the mean x_hat and covariance
             matrix Sigma of the prior/predictive density.
         Sigma : array_like(float)
@@ -103,14 +105,18 @@ class Kalman:
         self.current_x_hat.shape = self.n, 1
 
     def prior_to_filtered(self, y):
-        """
+        r"""
         Updates the moments (x_hat, Sigma) of the time t prior to the
         time t filtering distribution, using current measurement y_t.
 
         The updates are according to
 
-        x_hat^F = x_hat + \Sigma G' (G \Sigma G' + R)^{-1}(y - G x_hat)
-        \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G \Sigma
+        .. math::
+
+            x_{hat}^F &= x_{hat} + \Sigma G' (G \Sigma G' + R)^{-1}
+            (y - G x_{hat}) \\
+            \Sigma^F &= \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
+            \Sigma
 
         Parameters
         ----------
@@ -134,8 +140,8 @@ class Kalman:
     def filtered_to_forecast(self):
         """
         Updates the moments of the time t filtering distribution to the
-        moments of the predictive distribution, which becomes the time t+1
-        prior
+        moments of the predictive distribution, which becomes the time
+        t+1 prior
         """
         # === simplify notation === #
         A, Q = self.A, self.Q
