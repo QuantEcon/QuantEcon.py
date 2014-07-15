@@ -14,11 +14,13 @@ class Kalman:
     """
     Implements the Kalman filter for the Gaussian state space model
 
+    .. math::
+
         x_{t+1} = A x_t + w_{t+1}
         y_t = G x_t + v_t.
 
-    Here x_t is the hidden state and y_t is the measurement. The shocks
-    w_t and v_t are iid zero mean Gaussians with covariance matrices Q
+    Here :math:`x_t` is the hidden state and :math:`y_t` is the measurement. The shocks
+    :math:`w_t` and :math:`v_t` are iid zero mean Gaussians with covariance matrices Q
     and R respectively.
 
     Parameters
@@ -109,12 +111,17 @@ class Kalman:
 
         The updates are according to
 
-        x_hat^F = x_hat + \Sigma G' (G \Sigma G' + R)^{-1}(y - G x_hat)
-        \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G \Sigma
+        .. math::
+
+            x_hat^F = x_hat+\Sigma G'(G \Sigma G' + R)^{-1}(y - G x_hat)
+
+        .. math::
+
+            \Sigma^F = \Sigma-\Sigma G' (G \Sigma G' + R)^{-1} G \Sigma
 
         Parameters
         ----------
-        y : scalar or array_like
+        y : scalar or array_like(float)
             The current measurement
 
         """
@@ -134,8 +141,8 @@ class Kalman:
     def filtered_to_forecast(self):
         """
         Updates the moments of the time t filtering distribution to the
-        moments of the predictive distribution, which becomes the time t+1
-        prior
+        moments of the predictive distribution, which becomes the time
+        t+1 prior
         """
         # === simplify notation === #
         A, Q = self.A, self.Q
@@ -167,9 +174,9 @@ class Kalman:
 
         Returns
         -------
-        Sigma_infinity : np.ndarray
+        Sigma_infinity : array_like or scalar(float)
             The infinite limit of Sigma_t
-        K_infinity : np.ndarray
+        K_infinity : array_like or scalar(float)
             The stationary Kalman gain.
 
         """
@@ -180,4 +187,5 @@ class Kalman:
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)
+
         return Sigma_infinity, K_infinity

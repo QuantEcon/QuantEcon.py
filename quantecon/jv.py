@@ -22,9 +22,13 @@ class JvWorker:
     A Jovanovic-type model of employment with on-the-job search. The
     value function is given by
 
+    .. math::
+
       V(x) = \max_{\phi, s} w(x, \phi, s)
 
-      for
+    for
+
+    .. math::
 
       w(x, \phi, s) := x(1 - \phi - s)
                         + \beta (1 - \pi(s)) V(G(x, \phi))
@@ -33,10 +37,10 @@ class JvWorker:
 
     * x = human capital
     * s = search effort
-    * \phi = investment in human capital
-    * \pi(s) = probability of new offer given search level s
-    * x(1 - \phi - s) = wage
-    * G(x, \phi) = updated human capital when current job retained
+    * :math:`\phi` = investment in human capital
+    * :math:`\pi(s)` = probability of new offer given search level s
+    * :math:`x(1 - \phi - s)` = wage
+    * :math:`G(x, \phi)` = updated human capital when current job retained
     * U = RV with distribution F -- new draw of human capital
 
     Parameters

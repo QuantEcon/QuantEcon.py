@@ -2,7 +2,8 @@
 Filename: lqcontrol.py
 Authors: Thomas J. Sargent, John Stachurski
 
-Provides a class called LQ for solving linear quadratic control problems.
+Provides a class called LQ for solving linear quadratic control
+problems.
 """
 
 import numpy as np
@@ -12,64 +13,122 @@ import riccati
 
 class LQ:
     """
-    This class is for analyzing linear quadratic optimal control problems of
-    either the infinite horizon form
+    This class is for analyzing linear quadratic optimal control
+    problems of either the infinite horizon form
+
+    .. math::
 
         min E sum_{t=0}^{infty} beta^t r(x_t, u_t)
 
     with
 
+    .. math::
+
         r(x_t, u_t) := x_t' R x_t + u_t' Q u_t
 
     or the finite horizon form
 
-    min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + x_T' R_f x_T
+    .. math::
+
+        min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + x_T' R_f x_T
 
     Both are minimized subject to the law of motion
 
+    .. math::
+
         x_{t+1} = A x_t + B u_t + C w_{t+1}
 
-    Here x is n x 1, u is k x 1, w is j x 1 and the matrices are conformable
-    for these dimensions.  The sequence {w_t} is assumed to be white noise,
-    with zero mean and E w_t w_t' = I, the j x j identity.
+    Here `x` is `n x 1`, `u` is `k x 1`, `w` is `j x 1` and the matrices
+    are conformable for these dimensions.  The sequence {w_t} is assumed
+    to be white noise, with zero mean and :math:`E w_t w_t' = I`, the `j
+    x j` identity.
 
     If C is not supplied as a parameter, the model is assumed to be
-    deterministic (and C is set to a zero matrix of appropriate dimension).
+    deterministic (and C is set to a zero matrix of appropriate
+    dimension).
 
-    For this model, the time t value (i.e., cost-to-go) function V_t takes the
-    form
+    For this model, the time t value (i.e., cost-to-go) function V_t
+    takes the form
+
+    .. math::
 
         x' P_T x + d_T
 
-    and the optimal policy is of the form u_T = -F_T x_T.  In the infinite
-    horizon case, V, P, d and F are all stationary.
+    and the optimal policy is of the form :math:`u_T = -F_T x_T`.  In
+    the infinite horizon case, V, P, d and F are all stationary.
+
+    Parameters
+    ----------
+    Q : array_like(float)
+        Q is the payoff(or cost) matrix that corresponds with the
+        state variable x and is `k x k`. Should be symmetric and
+        positive definite
+    R : array_like(float)
+        R is the payoff(or cost) matrix that corresponds with the
+        control variable u and is `n x n`. Should be symetric and
+        non-negative definite
+    A : array_like(float)
+        A is part of the state transition as described above and
+        corresponds to the state variable today. It should be `n x n`.
+    B : array_like(float)
+        B is part of the state transition as described above and
+        corresponds to the control variable today. It should be `n x k`.
+    C : array_like(float), optional(default=None)
+        C is part of the state transition as described above and
+        corresponds to the random variable today.  If the model is
+        deterministic then C should take default value of `None`
+    beta : scalar(float), optional(default=1)
+        beta is the discount parameter
+    T : scalar(int), optional(default=None)
+        T is the number of periods in a finite horizon problem.
+    Rf : array_like(float), optional(default=None)
+        Rf is the final (in a finite horizon model) payoff(or cost)
+        matrix that corresponds with the control variable u and is `n x
+        n`.  Should be symetric and non-negative definite
+
+
+    Attributes
+    ----------
+    Q : array_like(float)
+        Q is the payoff(or cost) matrix that corresponds with the
+        state variable x and is `k x k`. Should be symmetric and
+        positive definite
+    R : array_like(float)
+        R is the payoff(or cost) matrix that corresponds with the
+        control variable u and is `n x n`. Should be symetric and
+        non-negative definite
+    A : array_like(float)
+        A is part of the state transition as described above and
+        corresponds to the state variable today. It should be `n x n`.
+    B : array_like(float)
+        B is part of the state transition as described above and
+        corresponds to the control variable today. It should be `n x k`.
+    C : array_like(float)
+        C is part of the state transition as described above and
+        corresponds to the random variable today.  If the model is
+        deterministic then C should take default value of `None`
+    beta : scalar(float)
+        beta is the discount parameter
+    T : scalar(int)
+        T is the number of periods in a finite horizon problem.  If no
+        T is supplied then assumed to be infinite horizon problem.
+    Rf : array_like(float)
+        Rf is the final (in a finite horizon model) payoff(or cost)
+        matrix that corresponds with the control variable u and is `n x
+        n`.  Should be symetric and non-negative definite
+    P : array_like(float)
+        P is part of the value function representation of V(x) = xPx + d
+    d : array_like(float)
+        d is part of the value function representation of V(x) = xPx + d
+    F : array_like(float)
+        F is the policy rule that determines the choice of control in
+        each period.
+    k, n, j : scalar(int)
+        The dimensions of the matrices as presented above
+
     """
 
     def __init__(self, Q, R, A, B, C=None, beta=1, T=None, Rf=None):
-        """
-        Provides parameters describing the LQ model
-
-        Parameters
-        ============
-
-            * R and Rf are n x n, symmetric and nonnegative definite
-            * Q is k x k, symmetric and positive definite
-            * A is n x n
-            * B is n x k
-            * C is n x j, or None for a deterministic model
-            * beta is a scalar in (0, 1] and T is an int
-
-        All arguments should be scalars or NumPy ndarrays.
-
-        Here T is the time horizon. If T is not supplied, then the LQ problem
-        is assumed to be infinite horizon.  If T is supplied, then the
-        terminal reward matrix Rf should also be specified.  For
-        interpretation of the other parameters, see the docstring of the LQ
-        class.
-
-        We also initialize the pair (P, d) that represents the value function
-        via V(x) = x' P x + d, and the policy function matrix F.
-        """
         # == Make sure all matrices can be treated as 2D arrays == #
         converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
         self.A, self.B, self.Q, self.R = map(converter, (A, B, Q, R))
@@ -134,20 +193,37 @@ class LQ:
         in the infinite horizon case.  Also computes the control matrix F from
         u = - Fx
 
+        Returns
+        -------
+        P : array_like(float)
+            P is part of the value function representation of
+            V(x) = xPx + d
+        F : array_like(float)
+            F is the policy rule that determines the choice of control
+            in each period.
+        d : array_like(float)
+            d is part of the value function representation of
+            V(x) = xPx + d
+
         """
         # === simplify notation === #
         Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+
         # === solve Riccati equation, obtain P === #
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
         P = riccati.dare(A0, B0, Q, R)
+
         # == Compute F == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
         S2 = self.beta * dot(B.T, dot(P, A))
         F = solve(S1, S2)
+
         # == Compute d == #
         d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
+
         # == Bind states and return values == #
         self.P, self.F, self.d = P, F, d
+
         return P, F, d
 
     def compute_sequence(self, x0, ts_length=None):
@@ -158,43 +234,49 @@ class LQ:
 
         Parameters
         ===========
-        x0 : numpy.ndarray
+        x0 : array_like(float)
             The initial state, a vector of length n
 
-        ts_length : int
+        ts_length : scalar(int)
             Length of the simulation -- defaults to T in finite case
 
         Returns
         ========
-        x_path : numpy.ndarray
+        x_path : array_like(float)
             An n x T matrix, where the t-th column represents x_t
 
-        u_path : numpy.ndarray
+        u_path : array_like(float)
             A k x T matrix, where the t-th column represents u_t
 
         """
+
         # === Simplify notation === #
         Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+
         # == Preliminaries, finite horizon case == #
         if self.T:
             T = self.T if not ts_length else min(ts_length, self.T)
             self.P, self.d = self.Rf, 0
+
         # == Preliminaries, infinite horizon case == #
         else:
             T = ts_length if ts_length else 100
             self.stationary_values()
+
         # == Set up initial condition and arrays to store paths == #
         x0 = np.asarray(x0)
         x0 = x0.reshape(self.n, 1)  # Make sure x0 is a column vector
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
         w_path = dot(C, np.random.randn(self.j, T+1))
+
         # == Compute and record the sequence of policies == #
         policies = []
         for t in range(T):
             if self.T:  # Finite horizon case
                 self.update_values()
             policies.append(self.F)
+
         # == Use policy sequence to generate states and controls == #
         F = policies.pop()
         x_path[:, 0] = x0.flatten()
@@ -206,4 +288,5 @@ class LQ:
             u_path[:, t] = - dot(F, x_path[:, t])
         Ax, Bu = dot(A, x_path[:, T-1]), dot(B, u_path[:, T-1])
         x_path[:, T] =  Ax + Bu + w_path[:, T]
+
         return x_path, u_path, w_path

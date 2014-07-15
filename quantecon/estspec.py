@@ -76,6 +76,8 @@ def periodogram(x, window=None, window_len=7):
     """
     Computes the periodogram
 
+    .. math::
+
         I(w) = (1 / n) | sum_{t=0}^{n-1} x_t e^{itw} |^2
 
     at the Fourier frequences w_j := 2 pi j / n, j = 0, ..., n - 1,
