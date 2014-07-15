@@ -12,7 +12,7 @@ from scipy.signal import dimpulse, freqz, dlsim
 
 
 class LinearProcess(object):
-    """
+    r"""
     This class represents scalar ARMA(p, q) processes.
 
     If phi and theta are scalars, then the model is
@@ -20,7 +20,7 @@ class LinearProcess(object):
 
     .. math::
 
-        X_t = phi X_{t-1} + epsilon_t + theta epsilon_{t-1}
+        X_t = \phi X_{t-1} + \epsilon_t + \theta \epsilon_{t-1}
 
     where {epsilon_t} is a white noise process with standard deviation
     sigma.  If phi and theta are arrays or sequences, then the
@@ -29,14 +29,16 @@ class LinearProcess(object):
     .. math::
 
         X_t = \phi_1 X_{t-1} + ... + \phi_p X_{t-p} +
-        \varepsilon_t + \theta_1 \varepsilon_{t-1} +...
-        + \theta_q \varepsilon_{t-q}
+
+        \epsilon_t + \theta_1 \epsilon_{t-1} + ...  +
+        \theta_q \epsilon_{t-q}
 
     where
 
-        * phi = (phi_1, phi_2,..., phi_p)
-        * theta = (theta_1, theta_2,..., theta_q)
-        * sigma is a scalar, the standard deviation of the white noise
+        * :math:`\phi = (\phi_1, \phi_2,..., \phi_p)`
+        * :math:`\theta = (\theta_1, \theta_2,..., \theta_q)`
+        * :math:`\sigma` is a scalar, the standard deviation of the
+          white noise
 
     Parameters
     ----------
@@ -91,15 +93,20 @@ class LinearProcess(object):
     theta = property(get_theta, set_theta)
 
     def set_params(self):
-        """
+        r"""
         Internally, scipy.signal works with systems of the form
 
-            ar_poly(L) X_t = ma_poly(L) epsilon_t
+        .. math::
+
+            ar_{poly}(L) X_t = ma_{poly}(L) \epsilon_t
 
         where L is the lag operator. To match this, we set
 
-            ar_poly = (1, -phi_1, -phi_2,..., -phi_p)
-            ma_poly = (1, theta_1, theta_2,..., theta_q)
+        .. math::
+
+            ar_{poly} = (1, -\phi_1, -\phi_2,..., -\phi_p)
+
+            ma_{poly} = (1, \theta_1, \theta_2,..., \theta_q)
 
         In addition, ar_poly must be at least as long as ma_poly.
         This can be achieved by padding it out with zeros when required.
@@ -107,14 +114,14 @@ class LinearProcess(object):
         """
         # === set up ma_poly === #
         ma_poly = np.asarray(self._theta)
-        self.ma_poly = np.insert(ma_poly, 0, 1)      # The array (1, theta)
+        self.ma_poly = np.insert(ma_poly, 0, 1)  # The array (1, theta)
 
         # === set up ar_poly === #
         if np.isscalar(self._phi):
             ar_poly = np.array(-self._phi)
         else:
             ar_poly = -np.asarray(self._phi)
-        self.ar_poly = np.insert(ar_poly, 0, 1)      # The array (1, -phi)
+        self.ar_poly = np.insert(ar_poly, 0, 1)  # The array (1, -phi)
 
         # === pad ar_poly with zeros if required === #
         if len(self.ar_poly) < len(self.ma_poly):
@@ -139,12 +146,14 @@ class LinearProcess(object):
         return psi
 
     def spectral_density(self, two_pi=True, res=1200):
-        """
+        r"""
         Compute the spectral density function.  The spectral density is
         the discrete time Fourier transform of the autocovariance
         function.  In particular,
 
-            f(w) = sum_k gamma(k) exp(-ikw)
+        .. math::
+
+            f(w) = \sum_k \gamma(k) exp(-ikw)
 
         where gamma is the autocovariance function and the sum is over
         the set of all integers.
@@ -190,7 +199,8 @@ class LinearProcess(object):
         spect = self.spectral_density()[1]
         acov = np.fft.ifft(spect).real
 
-        return acov[:num_autocov]  # num_autocov should be <= len(acov) / 2
+        # num_autocov should be <= len(acov) / 2
+        return acov[:num_autocov]
 
     def simulation(self, ts_length=90) :
         """
@@ -264,8 +274,8 @@ class LinearProcess(object):
 
     def quad_plot(self) :
         """
-        Plots the impulse response, spectral_density, autocovariance, and one
-        realization of the process.
+        Plots the impulse response, spectral_density, autocovariance,
+        and one realization of the process.
         """
         num_rows, num_cols = 2, 2
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))

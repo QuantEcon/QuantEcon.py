@@ -12,13 +12,13 @@ from scipy.linalg import solve
 import riccati
 
 class LQ:
-    """
-    This class is for analyzing linear quadratic optimal control
-    problems of either the infinite horizon form
+    r"""
+    This class is for analyzing linear quadratic optimal control problems of
+    either the infinite horizon form
 
     .. math::
 
-        min E sum_{t=0}^{infty} beta^t r(x_t, u_t)
+        \min E \sum_{t=0}^{\infty} \beta^t r(x_t, u_t)
 
     with
 
@@ -30,7 +30,7 @@ class LQ:
 
     .. math::
 
-        min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + x_T' R_f x_T
+        \min E \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + x_T' R_f x_T
 
     Both are minimized subject to the law of motion
 
@@ -38,10 +38,10 @@ class LQ:
 
         x_{t+1} = A x_t + B u_t + C w_{t+1}
 
-    Here `x` is `n x 1`, `u` is `k x 1`, `w` is `j x 1` and the matrices
-    are conformable for these dimensions.  The sequence {w_t} is assumed
-    to be white noise, with zero mean and :math:`E w_t w_t' = I`, the `j
-    x j` identity.
+    Here x is n x 1, u is k x 1, w is j x 1 and the matrices are
+    conformable for these dimensions.  The sequence {w_t} is assumed to
+    be white noise, with zero mean and :math:`E w_t w_t' = I`, the j x j
+    identity.
 
     If C is not supplied as a parameter, the model is assumed to be
     deterministic (and C is set to a zero matrix of appropriate
@@ -50,7 +50,7 @@ class LQ:
     For this model, the time t value (i.e., cost-to-go) function V_t
     takes the form
 
-    .. math::
+    .. math ::
 
         x' P_T x + d_T
 
@@ -160,13 +160,18 @@ class LQ:
 
     def update_values(self):
         """
-        This method is for updating in the finite horizon case.  It shifts the
-        current value function
+        This method is for updating in the finite horizon case.  It
+        shifts the current value function
+
+        .. math::
 
             V_t(x) = x' P_t x + d_t
 
-        and the optimal policy F_t one step *back* in time, replacing the pair
-        P_t and d_t with P_{t-1} and d_{t-1}, and F_t with F_{t-1}
+        and the optimal policy :math:`F_t` one step *back* in time,
+        replacing the pair :math:`P_t` and :math:`d_t` with
+        :math`P_{t-1}` and :math:`d_{t-1}`, and :math:`F_t` with
+        :math:`F_{t-1}`
+
         """
         # === Simplify notation === #
         Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
@@ -186,12 +191,15 @@ class LQ:
 
     def stationary_values(self):
         """
-        Computes the matrix P and scalar d that represent the value function
+        Computes the matrix P and scalar d that represent the value
+        function
+
+        .. math::
 
             V(x) = x' P x + d
 
-        in the infinite horizon case.  Also computes the control matrix F from
-        u = - Fx
+        in the infinite horizon case.  Also computes the control matrix
+        F from u = - Fx
 
         Returns
         -------
@@ -228,9 +236,9 @@ class LQ:
 
     def compute_sequence(self, x0, ts_length=None):
         """
-        Compute and return the optimal state and control sequences x_0,...,
-        x_T and u_0,..., u_T  under the assumption that {w_t} is iid and
-        N(0, 1).
+        Compute and return the optimal state and control sequences
+        :math:`x_0,..., x_T` and :math:`u_0,..., u_T`  under the
+        assumption that :math:`{w_t}` is iid and N(0, 1).
 
         Parameters
         ===========
