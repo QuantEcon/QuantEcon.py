@@ -74,6 +74,29 @@ class CareerWorkerProblem:
         Parameter `a` from the job distribution
     G_b : scalar(int or float), optional(default=1)
         Parameter `b` from the job distribution
+
+    Attributes
+    ----------
+    beta : scalar(float)
+        Discount factor
+    B : scalar(float)
+        Upper bound of for both epsilon and theta
+    N : scalar(int)
+        Number of possible realizations for both epsilon and theta
+    theta : array_like(float, ndim=1)
+        A grid of values from 0 to B
+    epsilon : array_like(float, ndim=1)
+        A grid of values from 0 to B
+    F_probs : array_like(float, ndim=1)
+        The probabilities of different values for F
+    G_probs : array_like(float, ndim=1)
+        The probabilities of different values for G
+    F_mean : scalar(float)
+        The mean of the distribution for F
+    G_mean : scalar(float)
+        The mean of the distribution for G
+
+
     """
 
     def __init__(self, B=5.0, beta=0.95, N=50, F_a=1, F_b=1, G_a=1, G_b=1):

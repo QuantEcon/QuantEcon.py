@@ -22,7 +22,6 @@ class DiscreteRV(object):
     ----------
     q : array_like(float)
         Nonnegative numbers that sum to 1
-
     Q : array_like(float)
         The cumulative sum of q
 

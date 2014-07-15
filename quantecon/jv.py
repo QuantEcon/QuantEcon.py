@@ -18,7 +18,7 @@ from scipy import interp
 epsilon = 1e-4  #  A small number, used in the optimization routine
 
 class JvWorker:
-    """
+    r"""
     A Jovanovic-type model of employment with on-the-job search. The
     value function is given by
 
@@ -62,8 +62,6 @@ class JvWorker:
         Parameter in human capital transition function
     beta : scalar(float)
         Discount factor
-    grid_size : scalar(int)
-        Grid size for discretization
     x_grid : array_like(float)
         The grid over the human capital
 

@@ -61,10 +61,6 @@ class ConsumerProblem:
         The state space of {z_t}
     b : scalar(float)
         The borrowing constraint
-    grid_max : scalar(float)
-        Max of the grid used to solve the problem
-    grid_size : scalar(int)
-        Number of grid points to solve problem, a grid on [-b, grid_max]
     u : callable
         The utility function
     du : callable
