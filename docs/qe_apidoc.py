@@ -44,6 +44,8 @@ module_template = """{mod_name}
 
 .. automodule:: quantecon.{mod_name}
     :members:
+    :undoc-members:
+    :show-inheritance:
 """
 
 all_index_template = """=======================

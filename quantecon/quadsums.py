@@ -20,7 +20,7 @@ def var_quadratic_sum(A, C, H, beta, x0):
 
     .. math::
 
-        q(x_0) := E \sum_{t=0}^{\infty} \beta^t x_t' H x_t
+        q(x_0) = E \sum_{t=0}^{\infty} \beta^t x_t' H x_t
 
     Here {x_t} is the VAR process x_{t+1} = A x_t + C w_t with {w_t}
     standard normal and x_0 the initial condition.
@@ -68,7 +68,7 @@ def m_quadratic_sum(A, B, max_it=50):
 
     .. math::
 
-        V = \sum_{j=0}^{\infty} A^j B A^j'
+        V = \sum_{j=0}^{\infty} A^j B A^{j'}
 
     V is computed by using a doubling algorithm. In particular, we
     iterate to convergence on V_j with the following recursions for j =
