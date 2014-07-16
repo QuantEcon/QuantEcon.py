@@ -1,5 +1,6 @@
-"""
+r"""
 Filename: lucastree.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Solves the price function for the Lucas tree in a continuous state
@@ -9,26 +10,33 @@ linear AR(1) process
 
 .. math::
 
-    log y' = alpha log y + sigma epsilon
+    log y' = \alpha log y + \sigma \epsilon
 
 where y' is a next period y and epsilon is an iid standard normal shock.
 Hence
 
 .. math::
 
-    y' = y^alpha * xi   where xi = e^(sigma * epsilon)
+    y' = y^{\alpha} * \xi,
+
+where
+
+.. math::
+
+    \xi = e^(\sigma * \epsilon)
 
 The distribution phi of xi is
 
 .. math::
 
-    phi = LN(0, sigma^2) where LN means lognormal
+    \phi = LN(0, \sigma^2),
+
+where LN means lognormal.
 
 Example usage:
 
     tree = lucas_tree(gamma=2, beta=0.95, alpha=0.90, sigma=0.1)
     grid, price_vals = compute_price(tree)
-
 
 """
 from __future__ import division  # Omit for Python 3.x
@@ -111,8 +119,8 @@ def compute_lt_price(lt, grid=None):
 
     def lucas_operator(f):
         """
-        The approximate Lucas operator, which computes and returns the updated
-        function Tf on the grid points.
+        The approximate Lucas operator, which computes and returns the
+        updated function Tf on the grid points.
 
         Parameters
         ----------

@@ -1,5 +1,6 @@
 """
 Filename: ecdf.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Implements the empirical cumulative distribution function given an array

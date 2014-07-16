@@ -1,8 +1,10 @@
 """
 Filename: riccati.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Solves the discrete-time algebraic Riccati equation
+
 """
 
 import numpy as np
@@ -29,9 +31,9 @@ def dare(A, B, R, Q, tolerance=1e-10, max_iter=150):
         n x n, should be symmetric and positive definite
     Q : array_like(float, ndim=2)
         k x k, should be symmetric and non-negative definite
-    tolerance=1e-10 : scalar(int), optional(default=1e-10)
+    tolerance : scalar(int), optional(default=1e-10)
         The tolerance level for convergence
-    max_iter=150 : scalar(float), optional(default=150)
+    max_iter : scalar(float), optional(default=150)
         The maximum number of iterations allowed
 
     Returns

@@ -1,8 +1,10 @@
 """
 Filename: kalman.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Implements the Kalman filter for a linear Gaussian state space model.
+
 """
 
 import numpy as np
@@ -19,9 +21,9 @@ class Kalman:
         x_{t+1} &= A x_t + w_{t+1}\\
         y_t &= G x_t + v_t.
 
-    Here :math:`x_t` is the hidden state and :math:`y_t` is the measurement. The shocks
-    :math:`w_t` and :math:`v_t` are iid zero mean Gaussians with covariance matrices Q
-    and R respectively.
+    Here :math:`x_t` is the hidden state and :math:`y_t` is the
+    measurement. The shocks :math:`w_t` and :math:`v_t` are iid zero
+    mean Gaussians with covariance matrices Q and R respectively.
 
     Parameters
     -----------
@@ -53,12 +55,10 @@ class Kalman:
     current_xhat : array_like or scalar(float)
         The mean of the state
 
-
     References
     ----------
 
-        http://quant-econ.net/kalman.html
-
+    http://quant-econ.net/kalman.html
 
     """
 
@@ -91,14 +91,13 @@ class Kalman:
 
         Parameters
         ----------
-        x_hat : array_like(float)
+        x_hat : scalar(float) or array_like(float)
             An n x 1 array representing the mean x_hat and covariance
             matrix Sigma of the prior/predictive density.
-        Sigma : array_like(float)
+        Sigma : scalar(float) or array_like(float)
             An n x n array representing the covariance matrix Sigma of
             the prior/predictive density.  Must be positive definite.
 
-        Note: Must be Python scalars or NumPy arrays.
         """
         self.current_Sigma = self.convert(Sigma)
         self.current_x_hat = self.convert(x_hat)
@@ -142,6 +141,7 @@ class Kalman:
         Updates the moments of the time t filtering distribution to the
         moments of the predictive distribution, which becomes the time
         t+1 prior
+
         """
         # === simplify notation === #
         A, Q = self.A, self.Q

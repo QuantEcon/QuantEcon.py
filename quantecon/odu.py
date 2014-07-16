@@ -1,5 +1,6 @@
 """
 Filename: odu.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Solves the "Offer Distribution Unknown" Model by value function
@@ -97,9 +98,10 @@ class SearchProblem:
 
     def bellman_operator(self, v):
         """
+
         The Bellman operator.  Including for comparison. Value function
-        iteration is not recommended for this problem.  See the reservation
-        wage operator below.
+        iteration is not recommended for this problem.  See the
+        reservation wage operator below.
 
         Parameters
         ----------
@@ -193,7 +195,7 @@ class SearchProblem:
         for i, pi in enumerate(self.pi_grid):
             def integrand(x):
                 "Integral expression on right-hand side of operator"
-                return npmax(x, phi_f(q(x,pi))) * (pi * f(x) + (1 - pi) * g(x))
+                return npmax(x, phi_f(q(x,pi))) * (pi*f(x) + (1 - pi)*g(x))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             new_phi[i] = (1 - beta) * c + beta * integral
 

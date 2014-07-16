@@ -1,5 +1,6 @@
 """
 Authors: Thomas J. Sargent, John Stachurski
+
 Filename: lss.py
 
 Computes quantities related to the Gaussian linear state space model
@@ -9,6 +10,7 @@ Computes quantities related to the Gaussian linear state space model
         y_t = G x_t
 
 The shocks {w_t} are iid and N(0, I)
+
 """
 
 import numpy as np
@@ -88,8 +90,9 @@ class LSS:
 
     def convert(self, x):
         """
-        Convert array_like objects (lists of lists, floats, etc.) into well
-        formed 2D NumPy arrays
+        Convert array_like objects (lists of lists, floats, etc.) into
+        well formed 2D NumPy arrays
+
         """
         return np.atleast_2d(np.asarray(x, dtype='float32'))
 
@@ -155,7 +158,6 @@ class LSS:
 
     def moment_sequence(self):
         """
-
         Create a generator to calculate the population mean and
         variance-convariance matrix for both x_t and y_t, starting at
         the initial condition (self.mu_0, self.Sigma_0).  Each iteration
@@ -189,9 +191,9 @@ class LSS:
 
     def stationary_distributions(self, max_iter=200, tol=1e-5):
         """
-        Compute the moments of the stationary distributions of x_t and y_t if
-        possible.  Computation is by iteration, starting from the initial
-        conditions self.mu_0 and self.Sigma_0
+        Compute the moments of the stationary distributions of x_t and
+        y_t if possible.  Computation is by iteration, starting from the
+        initial conditions self.mu_0 and self.Sigma_0
 
         Parameters
         ----------

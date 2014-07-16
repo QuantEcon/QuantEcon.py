@@ -1,5 +1,6 @@
 """
 Filename: lae.py
+
 Authors: Thomas J. Sargent, John Stachurski,
 
 Computes a sequence of marginal densities for a continuous state space

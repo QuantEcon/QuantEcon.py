@@ -1,9 +1,12 @@
 """
 Filename: discrete_rv.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Generates an array of draws from a discrete random variable with a
-specified vector of probabilities. """
+specified vector of probabilities.
+
+"""
 
 from numpy import cumsum
 from numpy.random import uniform
@@ -34,12 +37,14 @@ class DiscreteRV(object):
     def get_q(self):
         """
         Getter method for q.
+
         """
         return self._q
 
     def set_q(self, val):
         """
         Setter method for q.
+
         """
         self._q = val
         self.Q = cumsum(val)
@@ -50,7 +55,8 @@ class DiscreteRV(object):
         """
         Returns k draws from q.
 
-        For each such draw, the value i is returned with probability q[i].
+        For each such draw, the value i is returned with probability
+        q[i].
 
         Parameters
         -----------
@@ -61,6 +67,7 @@ class DiscreteRV(object):
         -------
         array_like(int)
             An array of k independent draws from q
+
         """
         return self.Q.searchsorted(uniform(0, 1, size=k))
 

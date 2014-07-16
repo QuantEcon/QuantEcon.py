@@ -1,5 +1,6 @@
 """
 Filename: ifp.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Tools for solving the standard optimal savings / income fluctuation
@@ -33,8 +34,7 @@ class ConsumerProblem:
         A strictly positive scalar giving the interest rate
     beta : scalar(float), optional(default=0.96)
         The discount factor, must satisfy (1 + r) * beta < 1
-    Pi : array_like(float), optional(default=((0.60, 0.40),
-                                              (0.05, 0.95))
+    Pi : array_like(float), optional(default=((0.60, 0.40),(0.05, 0.95))
         A 2D NumPy array giving the Markov matrix for {z_t}
     z_vals : array_like(float), optional(default=(0.5, 0.95))
         The state space of {z_t}
@@ -65,7 +65,6 @@ class ConsumerProblem:
         The utility function
     du : callable
         The derivative of u
-
 
     """
 
@@ -129,10 +128,11 @@ class ConsumerProblem:
         """
         The approximate Coleman operator.
 
-        Iteration with this operator corresponds to policy function iteration.
-        Computes and returns the updated consumption policy c.  The array c is
-        replaced with a function cf that implements univariate linear
-        interpolation over the asset grid for each possible value of z.
+        Iteration with this operator corresponds to policy function
+        iteration. Computes and returns the updated consumption policy
+        c.  The array c is replaced with a function cf that implements
+        univariate linear interpolation over the asset grid for each
+        possible value of z.
 
         Parameters
         ----------
@@ -142,8 +142,8 @@ class ConsumerProblem:
         Returns
         -------
         array_like(float)
-            The updated policy, where updating is by the Coleman operator.
-            function TV.
+            The updated policy, where updating is by the Coleman
+            operator. function TV.
 
         """
         # === simplify names, set up arrays === #
@@ -156,10 +156,10 @@ class ConsumerProblem:
         # === linear interpolation to get consumption function === #
         def cf(a):
             """
-            The call cf(a) returns an array containing the values c(a, z) for
-            each z in z_vals.  For each such z, the value c(a, z) is
-            constructed by univariate linear approximation over asset space,
-            based on the values in the array c
+            The call cf(a) returns an array containing the values c(a,
+            z) for each z in z_vals.  For each such z, the value c(a, z)
+            is constructed by univariate linear approximation over asset
+            space, based on the values in the array c
             """
             for i in range(z_size):
                 vals[i] = interp(a, asset_grid, c[:, i])
@@ -187,6 +187,7 @@ class ConsumerProblem:
             Initial condition for value function iteration
         c : array_like(float)
             Initial condition for Coleman operator iteration
+
         """
         # === Simplify names, set up arrays === #
         R, beta, u, b = self.R, self.beta, self.u, self.b
