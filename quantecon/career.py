@@ -1,5 +1,6 @@
 """
 Filename: career.py
+
 Authors: Thomas Sargent, John Stachurski
 
 A collection of functions to solve the career / job choice model due to
@@ -8,7 +9,7 @@ Derek Neal.
 References
 ----------
 
-  http://quant-econ.net/career.html
+http://quant-econ.net/career.html
 
 ..  [Neal1999] Neal, D. (1999). The Complexity of Job Mobility among
     Young Men, Journal of Labor Economics, 17(2), 237-261.
@@ -20,15 +21,15 @@ from scipy.special import binom, beta
 
 
 def gen_probs(n, a, b):
-    """
+    r"""
     Generate the vector of probabilities for the Beta-binomial
     (n, a, b) distribution.
 
     The Beta-binomial distribution takes the form
 
     .. math::
-        p(k \,|\, n, a, b)
-        = {n \choose k} \frac{B(k + a, n - k + b)}{B(a, b)},
+        p(k \,|\, n, a, b) =
+        {n \choose k} \frac{B(k + a, n - k + b)}{B(a, b)},
         \qquad k = 0, \ldots, n
 
     Parameters
@@ -96,10 +97,10 @@ class CareerWorkerProblem:
     G_mean : scalar(float)
         The mean of the distribution for G
 
-
     """
 
-    def __init__(self, B=5.0, beta=0.95, N=50, F_a=1, F_b=1, G_a=1, G_b=1):
+    def __init__(self, B=5.0, beta=0.95, N=50, F_a=1, F_b=1, G_a=1,
+                 G_b=1):
         self.beta, self.N, self.B = beta, N, B
         self.theta = np.linspace(0, B, N)     # set of theta values
         self.epsilon = np.linspace(0, B, N)   # set of epsilon values

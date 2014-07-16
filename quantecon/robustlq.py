@@ -1,8 +1,10 @@
 """
 Filename: robustlq.py
+
 Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski
 
 Solves robust LQ control problems.
+
 """
 
 from __future__ import division  # Remove for Python 3.sx
@@ -74,6 +76,7 @@ class RBLQ:
         The robustness factor in the robust control problem
     k, n, j : scalar(int)
         The dimensions of the matrices
+
     """
 
     def __init__(self, Q, R, A, B, C, beta, theta):
@@ -327,8 +330,8 @@ class RBLQ:
     def evaluate_F(self, F):
         """
         Given a fixed policy F, with the interpretation u = -F x, this
-        function computes the matrix P_F and constant d_F associated with
-        discounted cost J_F(x) = x' P_F x + d_F.
+        function computes the matrix P_F and constant d_F associated
+        with discounted cost J_F(x) = x' P_F x + d_F.
 
         Parameters
         ----------
@@ -347,7 +350,6 @@ class RBLQ:
             Matrix for discounted entropy
         o_F : scalar(float)
             Constant for discounted entropy
-
 
         """
         # == Simplify names == #

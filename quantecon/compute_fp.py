@@ -4,6 +4,7 @@ Authors: Thomas Sargent, John Stachurski
 
 Compute the fixed point of a given operator T, starting from
 specified initial condition v.
+
 """
 
 import numpy as np

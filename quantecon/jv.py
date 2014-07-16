@@ -1,5 +1,6 @@
 """
 Filename: jv.py
+
 Authors: Thomas Sargent, John Stachurski
 
 References
@@ -24,15 +25,16 @@ class JvWorker:
 
     .. math::
 
-      V(x) = \max_{\phi, s} w(x, \phi, s)
+        V(x) = \max_{\phi, s} w(x, \phi, s)
 
     for
 
     .. math::
 
-      w(x, \phi, s) := x(1 - \phi - s)
+        w(x, \phi, s) := x(1 - \phi - s)
                         + \beta (1 - \pi(s)) V(G(x, \phi))
                         + \beta \pi(s) E V[ \max(G(x, \phi), U)]
+
     Here
 
     * x = human capital
@@ -40,7 +42,7 @@ class JvWorker:
     * :math:`\phi` = investment in human capital
     * :math:`\pi(s)` = probability of new offer given search level s
     * :math:`x(1 - \phi - s)` = wage
-    * :math:`G(x, \phi)` = updated human capital when current job retained
+    * :math:`G(x, \phi)` = new human capital when current job retained
     * U = RV with distribution F -- new draw of human capital
 
     Parameters
@@ -84,8 +86,8 @@ class JvWorker:
 
     def bellman_operator(self, V, brute_force=False, return_policies=False):
         """
-        Returns the approximate value function TV by applying the Bellman operator
-        associated with the model to the function V.
+        Returns the approximate value function TV by applying the
+        Bellman operator associated with the model to the function V.
 
         Returns TV, or the V-greedy policies s_policy and phi_policy when
         return_policies=True.  In the function, the array V is replaced below
@@ -101,8 +103,8 @@ class JvWorker:
             Default is False. If the brute_force flag is True, then grid
             search is performed at each maximization step.
         return_policies : bool, optional(default=False)
-            Indicates whether to return just the updated value function TV or
-            both the greedy policy computed from V and TV
+            Indicates whether to return just the updated value function
+            TV or both the greedy policy computed from V and TV
 
 
         Returns

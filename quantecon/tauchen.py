@@ -1,5 +1,6 @@
 """
 Filename: tauchen.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Discretizes Gaussian linear AR(1) processes via Tauchen's method

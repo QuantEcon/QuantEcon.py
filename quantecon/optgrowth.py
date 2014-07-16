@@ -1,5 +1,6 @@
 """
 Filename: optgrowth.py
+
 Authors: John Stachurski and Thomas Sargent
 
 Solving the optimal growth problem via value function iteration.

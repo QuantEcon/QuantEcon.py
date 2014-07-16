@@ -1,8 +1,10 @@
 """
 Filename: estspec.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Functions for working with periodograms of scalar data.
+
 """
 
 from __future__ import division, print_function
@@ -32,10 +34,9 @@ def smooth(x, window_len=7, window='hanning'):
 
     Notes
     -----
-    Application of the smoothing window at the top and bottom of x is done by
-    reflecting x around these points to extend it sufficiently in each
-    direction.
-
+    Application of the smoothing window at the top and bottom of x is
+    done by reflecting x around these points to extend it sufficiently
+    in each direction.
 
     """
     if len(x) < window_len:

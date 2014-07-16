@@ -1,9 +1,11 @@
 """
 Filename: lqcontrol.py
+
 Authors: Thomas J. Sargent, John Stachurski
 
 Provides a class called LQ for solving linear quadratic control
 problems.
+
 """
 
 import numpy as np
@@ -13,8 +15,8 @@ import riccati
 
 class LQ:
     r"""
-    This class is for analyzing linear quadratic optimal control problems of
-    either the infinite horizon form
+    This class is for analyzing linear quadratic optimal control
+    problems of either the infinite horizon form
 
     .. math::
 

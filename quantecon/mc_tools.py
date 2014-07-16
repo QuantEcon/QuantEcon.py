@@ -1,6 +1,8 @@
 """
 Filename: mc_tools.py
+
 Authors: Thomas J. Sargent, John Stachurski
+
 """
 import numpy as np
 from discrete_rv import DiscreteRV
@@ -22,6 +24,7 @@ def mc_compute_stationary(P):
 
     Note: Currently only supports transition matrices with a unique
     invariant distribution.  See issue 19.
+
     """
     n = len(P)                               # P is n x n
     I = np.identity(n)                       # Identity matrix
@@ -34,8 +37,8 @@ def mc_compute_stationary(P):
 
 def mc_sample_path(P, init=0, sample_size=1000):
     """
-    Generates one sample path from a finite Markov chain with (n x n) Markov
-    matrix P on state space S = {0,...,n-1}.
+    Generates one sample path from a finite Markov chain with (n x n)
+    Markov matrix P on state space S = {0,...,n-1}.
 
     Parameters
     ----------

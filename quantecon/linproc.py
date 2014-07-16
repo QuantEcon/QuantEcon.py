@@ -1,5 +1,6 @@
 """
 Filename: linproc.py
+
 Authors: Thomas Sargent, John Stachurski
 
 Provides functions for visualizing scalar ARMA processes.
@@ -276,6 +277,7 @@ class LinearProcess(object):
         """
         Plots the impulse response, spectral_density, autocovariance,
         and one realization of the process.
+
         """
         num_rows, num_cols = 2, 2
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))

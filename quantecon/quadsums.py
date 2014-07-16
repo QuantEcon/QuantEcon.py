@@ -1,5 +1,6 @@
 """
 Filename: quadsums.py
+
 Authors: Thomas Sargent,  John Stachurski
 
 This module provides functions to compute quadratic sums of the form described
@@ -62,14 +63,18 @@ def var_quadratic_sum(A, C, H, beta, x0):
 
 
 def m_quadratic_sum(A, B, max_it=50):
-    """
+    r"""
     Computes the quadratic sum
+
+    .. math::
 
         V = \sum_{j=0}^{\infty} A^j B A^j'
 
     V is computed by using a doubling algorithm. In particular, we
     iterate to convergence on V_j with the following recursions for j =
     1, 2,... starting from V_0 = B, a_0 = A:
+
+    .. math::
 
         a_j = a_{j-1} a_{j-1}
 

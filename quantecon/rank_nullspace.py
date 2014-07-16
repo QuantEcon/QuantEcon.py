@@ -25,8 +25,8 @@ def rank_est(A, atol=1e-13, rtol=0):
     r : scalar(int)
         The estimated rank of the matrix.
 
-    Note: If both `atol` and `rtol` are positive, the combined tolerance is the
-    maximum of the two; that is:
+    Note: If both `atol` and `rtol` are positive, the combined tolerance
+    is the maximum of the two; that is:
 
         tol = max(atol, rtol * smax)
 
@@ -35,8 +35,9 @@ def rank_est(A, atol=1e-13, rtol=0):
     See also
     --------
     numpy.linalg.matrix_rank
-        matrix_rank is basically the same as this function, but it does not
-        provide the option of the absolute tolerance.
+        matrix_rank is basically the same as this function, but it does
+        not provide the option of the absolute tolerance.
+
     """
 
     A = np.atleast_2d(A)
@@ -72,11 +73,11 @@ def nullspace(A, atol=1e-13, rtol=0):
         If `A` is an array with shape (m, k), then `ns` will be an array
         with shape (k, n), where n is the estimated dimension of the
         nullspace of `A`.  The columns of `ns` are a basis for the
-        nullspace; each element in numpy.dot(A, ns) will be approximately
-        zero.
+        nullspace; each element in numpy.dot(A, ns) will be
+        approximately zero.
 
-    Note: If both `atol` and `rtol` are positive, the combined tolerance is the
-    maximum of the two; that is:
+    Note: If both `atol` and `rtol` are positive, the combined tolerance
+    is the maximum of the two; that is:
 
         tol = max(atol, rtol * smax)
 
