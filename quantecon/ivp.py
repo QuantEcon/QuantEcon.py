@@ -3,19 +3,38 @@ from scipy import integrate, interpolate
 
 
 class IVP(object):
-    """Base class for solving initial value problems (IVPs)."""
+    """
+    Base class for solving initial value problems (IVPs) of the form:
 
-    def __init__(self, f, jac, args=None):
+    :math:`y'(t) = f(t,y)`
+
+    using finite difference methods. The class uses various integrators from
+    the ``scipy.ode`` module to perform the integration and parametric B-spline
+    interpolation from ``scipy.interpolate`` to approximate the value of the
+    solution between grid points.
+
+    """
+
+    def __init__(self, f, jac=None, args=None):
         """
-        Initializes an IVP object with the following attributes:
+        Creates an instance of the IVP class.
 
-            f:    (callable) Function returning the RHS of a system of ODEs.
+        Attributes
+        ----------
+        f : callable ``f(t, y, *args)``
+            Right hand side of the system of equations defining the ODE. The
+            independent variable, `t`, is a ``scalar``; `y` is an ``ndarray``
+            of endogenous variables with ``y.shape == (n,)``. The function `f`
+            should return a ``scalar``, ``ndarray`` or ``list`` (but not a
+            ``tuple``).
 
-            jac:  (callable) Function returning the model's Jacobian matrix of
-                  partial derivatives. Must take the same arguments as f.
+        jac : callable ``jac(t, y, *args)``, optional(default=None)
+            Jacobian of the right hand side of the system of equations defining
+            the ODE.
+            :math:`\mathcal{J}_{i,j} = \frac{\partial f_i}}{\partial y_j}`
 
-            args: (tuple) Tuple of extra arguments which should be passed to
-                  functions f and jac. Default is None.
+        args : tuple, optional(default=None)
+            Additional arguments that should be passed to both `f` and `jac`.
 
         """
         self.f = f
