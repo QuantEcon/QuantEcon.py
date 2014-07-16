@@ -38,8 +38,8 @@ class LAE:
     X : array_like(float)
         A vector containing observations
 
-    Example
-    -------
+    Examples
+    --------
     >>> psi = LAE(p, X)
     >>> y = np.linspace(0, 1, 100)
     >>> psi(y)  # Evaluate look ahead estimate at grid of points y
