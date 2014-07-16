@@ -24,15 +24,13 @@ class IVP(object):
         f : callable ``f(t, y, *args)``
             Right hand side of the system of equations defining the ODE. The
             independent variable, `t`, is a ``scalar``; `y` is an ``ndarray``
-            of endogenous variables with ``y.shape == (n,)``. The function `f`
+            of dependent variables with ``y.shape == (n,)``. The function `f`
             should return a ``scalar``, ``ndarray`` or ``list`` (but not a
             ``tuple``).
-
         jac : callable ``jac(t, y, *args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
             :math:`\mathcal{J}_{i,j} = \frac{\partial f_i}}{\partial y_j}`
-
         args : tuple, optional(default=None)
             Additional arguments that should be passed to both `f` and `jac`.
 
@@ -45,99 +43,214 @@ class IVP(object):
     def integrate(self, t0, y0, h=1.0, T=None, g=None, tol=None,
                   integrator='dopri5', step=False, relax=False, **kwargs):
         """
-        Generates solution trajectories of the model given some initial
-        conditions.
+        Integrates the ODE given some initial condition.
 
-        Arguments:
+        Arguments
+        ---------
+            t0 : float
+                Initial condition for the independent variable.
+            y0 : array_like (float, shape=(n,))
+                Initial condition for the dependent variables.
+            h : float, optional(default=1.0)
+                Step-size for computing the solution. Can be positive or
+                negative depending on the desired direction of integration.
+            T : int, optional(default=None)
+                Terminal value for the independent variable. One of either `T`
+                or `g` must be specified.
+            g : callable ``g(t, vec, args)``, optional(default=None)
+                Provides a stopping condition for the integration. If specified
+                user must also specify a stopping tolerance, `tol`.
+            tol : float, optional (default=None)
+                Stopping tolerance for the integration. Only required if `g` is
+                also specifed.
+            integrator : str, optional(default='dopri5')
+                Must be one of 'vode', 'lsoda', 'dopri5', or 'dop853'
+            step : bool, optional(default=False)
+                Allows access to internal steps for those solvers that use
+                adaptive step size routines. Currently only 'vode', 'zvode',
+                and 'lsoda' support `step=True`.
+            relax : bool, optional(default=False)
+                Currently only 'vode', 'zvode', and 'lsoda' support
+                `relax=True`.
+            **kwargs : dict, optional(default=None)
+                Dictionary of integrator specific keyword arguments. See the
+                Notes section below for a detailed discussion of the valid
+                keyword arguments for each of the supported integrators.
 
-            t0:         (float) Initial condition for the independent variable.
+        Notes
+        -----
+        Descriptions of the available integrators are listed below.
 
-            y0:         (float) Initial condition for the dependent variable.
+        "vode"
 
-            h:          (float) Step-size for computing the solution.
+            Real-valued Variable-coefficient Ordinary Differential Equation
+            solver, with fixed-leading-coefficient implementation. It provides
+            implicit Adams method (for non-stiff problems) and a method based
+            on backward differentiation formulas (BDF) (for stiff problems).
 
-            T:          (int) Length of desired trajectory.
+            Source: http://www.netlib.org/ode/vode.f
 
-            g:          (callable) Function of the form g(t, vec, f_args) that
-                        provides stopping conditions for the integration.
-                        If specified, user must also specify a stopping
-                        tolerance, tol. Default is None.
+            .. warning::
 
-            tol:        (float) Stopping tolerance. On required if g is given.
-                        Default is None.
+               This integrator is not re-entrant. You cannot have two `ode`
+               instances using the "vode" integrator at the same time.
 
-            integrator: (str) Must be one of:
+            This integrator accepts the following keyword arguments:
 
-                        'forward_euler':    Basic implementation of Euler's
-                                            method with fixed step size. See
-                                            Judd (1998), Chapter 10, pg 341 for
-                                            more detail.
+            - atol : float or sequence
+              absolute tolerance for solution
+            - rtol : float or sequence
+              relative tolerance for solution
+            - lband : None or int
+            - rband : None or int
+              Jacobian band width, jac[i,j] != 0 for i-lband <= j <= i+rband.
+              Setting these requires your jac routine to return the jacobian
+              in packed format, jac_packed[i-j+lband, j] = jac[i,j].
+            - method: 'adams' or 'bdf'
+              Which solver to use, Adams (non-stiff) or BDF (stiff)
+            - with_jacobian : bool
+              Whether to use the jacobian
+            - nsteps : int
+              Maximum number of (internally defined) steps allowed during one
+              call to the solver.
+            - first_step : float
+            - min_step : float
+            - max_step : float
+              Limits for the step sizes used by the integrator.
+            - order : int
+              Maximum order used by the integrator,
+              order <= 12 for Adams, <= 5 for BDF.
 
-                        'backward_euler':   Basic implementation of the
-                                            implicit Euler method with a
-                                            fixed step size.  See Judd (1998),
-                                            Chapter 10, pg. 343 for more detail.
+        "zvode"
 
-                        'trapezoidal_rule': Basic implementation of the
-                                            trapezoidal rule with a fixed step
-                                            size.  See Judd (1998), Chapter 10,
-                                            pg. 344 for more detail.
+            Complex-valued Variable-coefficient Ordinary Differential Equation
+            solver, with fixed-leading-coefficient implementation.  It provides
+            implicit Adams method (for non-stiff problems) and a method based
+            on backward differentiation formulas (BDF) (for stiff problems).
 
-                        'erk2':             Second-order explicit Runge-Kutta.
+            Source: http://www.netlib.org/ode/zvode.f
 
-                        'erk3':             Third-order explicit Runge-Kutta.
+            .. warning::
 
-                        'erk4':             Fourth-order explicit Runge-Kutta.
+               This integrator is not re-entrant. You cannot have two `ode`
+               instances using the "zvode" integrator at the same time.
 
-                        'erk5':             Fifth-order explicit Runge-Kutta.
+            This integrator accepts the same keyword arguments as "vode".
 
-                        'vode':             Real-valued Variable-coefficient ODE
-                                            equation solver, with fixed leading
-                                            coefficient implementation. It
-                                            provides implicit Adams method (for
-                                            non-stiff problems) and a method
-                                            based on backward differentiation
-                                            formulas (BDF) (for stiff problems).
+            .. note::
 
-                        'lsoda':            Real-valued Variable-coefficient ODE
-                                            equation solver, with fixed leading
-                                            coefficient implementation. It
-                                            provides automatic method switching
-                                            between implicit Adams method (for
-                                            non-stiff problems) and a method
-                                            based on backward differentiation
-                                            formulas (BDF) (for stiff problems).
+                When using ZVODE for a stiff system, it should only be used for
+                the case in which the function f is analytic, that is, when
+                each f(i) is an analytic function of each y(j).  Analyticity
+                means that the partial derivative df(i)/dy(j) is a unique
+                complex number, and this fact is critical in the way ZVODE
+                solves the dense or banded linear systems that arise in the
+                stiff case.  For a complex stiff ODE system in which f is not
+                analytic, ZVODE is likely to have convergence failures, and
+                for this problem one should instead use DVODE on the equivalent
+                real system (in the real and imaginary parts of y).
 
-                        'dopri5':           Embedded explicit Runge-Kutta method
-                                            with order 4(5). See Dormand and
-                                            Prince (1980) for details.
-                        'dop85':
+        "lsoda"
 
-                        See documentation for integrate.ode for more details and
-                        references for 'vode', 'lsoda', 'dopri5', and 'dop85',
-                        as well as the rest of the ODE solvers available via
-                        ODEPACK.
+            Real-valued Variable-coefficient Ordinary Differential Equation
+            solver, with fixed-leading-coefficient implementation. It provides
+            automatic method switching between implicit Adams method (for
+            non-stiff problems) and a method based on backward differentiation
+            formulas (BDF) (for stiff problems).
 
-            step:       (boolean) Allows access to internal steps for those
-                        solvers that use adaptive step size routines. Currently
-                        only 'vode', 'zvode', and 'lsoda' allow support step.
-                        Default is False.
+            Source: http://www.netlib.org/odepack
 
-            relax:      (boolean) The following integrators support run_relax:
-                        'vode', 'zvode', 'lsoda'. Default is False.
+            .. warning::
 
-            **kwargs:   (dict) Dictionary of integrator specific keyword args.
+               This integrator is not re-entrant. You cannot have two `ode`
+               instances using the "lsoda" integrator at the same time.
 
-        Returns:
+            This integrator accepts the following keyword arguments:
 
-           solution: (array-like) Simulated solution trajectory.
+            - atol : float or sequence
+              absolute tolerance for solution
+            - rtol : float or sequence
+              relative tolerance for solution
+            - lband : None or int
+            - rband : None or int
+              Jacobian band width, jac[i,j] != 0 for i-lband <= j <= i+rband.
+              Setting these requires your jac routine to return the jacobian
+              in packed format, jac_packed[i-j+lband, j] = jac[i,j].
+            - with_jacobian : bool
+              Whether to use the jacobian
+            - nsteps : int
+              Maximum number of (internally defined) steps allowed during one
+              call to the solver.
+            - first_step : float
+            - min_step : float
+            - max_step : float
+              Limits for the step sizes used by the integrator.
+            - max_order_ns : int
+              Maximum order used in the nonstiff case (default 12).
+            - max_order_s : int
+              Maximum order used in the stiff case (default 5).
+            - max_hnil : int
+              Maximum number of messages reporting too small step size (t+h=t)
+              (default 0)
+            - ixpr : int
+              Whether to generate extra printing at method switches. Default is
+              False.
+
+        "dopri5"
+
+            This is an explicit Runge-Kutta method of order (4)5 due to Dormand
+            and Prince (with adaptive step-size control and dense output).
+
+            Authors:
+
+                E. Hairer and G. Wanner
+                Universite de Geneve, Dept. de Mathematiques
+                CH-1211 Geneve 24, Switzerland
+                e-mail: ernst.hairer@math.unige.ch,
+                        gerhard.wanner@math.unige.ch
+
+            This code is described in [HNW93]_.
+
+            This integrator accepts the following keyword arguments:
+
+            - atol : float or sequence
+              absolute tolerance for solution
+            - rtol : float or sequence
+              relative tolerance for solution
+            - nsteps : int
+              Maximum number of (internally defined) steps allowed during one
+              call to the solver.
+            - first_step : float
+            - max_step : float
+            - safety : float
+              Safety factor on new step selection (default 0.9)
+            - ifactor : float
+            - dfactor : float
+              Maximum factor to increase/decrease step size by in one step
+            - beta : float
+              Beta parameter for stabilised step size control.
+            - verbosity : int
+              Switch for printing messages (< 0 for no messages).
+
+        "dop853"
+
+            This is an explicit Runge-Kutta method of order 8(5,3) due to
+            Dormand and Prince (with adaptive step-size control and dense
+            output).
+
+            Options and references the same as "dopri5".
+
+        Returns
+        -------
+            solution: array_like (float)
+                Simulated solution trajectory.
 
         """
         # select the integrator
         self.ode.set_integrator(integrator, **kwargs)
 
         # pass the model parameters as additional args
-        if self.args != None:
+        if self.args is not None:
             self.ode.set_f_params(*self.args)
             self.ode.set_jac_params(*self.args)
 
@@ -149,51 +262,53 @@ class IVP(object):
 
         # generate a solution trajectory
         while self.ode.successful():
+
             self.ode.integrate(self.ode.t + h, step, relax)
             current_step = np.hstack((self.ode.t, self.ode.y))
             solution = np.vstack((solution, current_step))
 
             # check terminal conditions
-            if g is not None and g(self.ode.t, self.ode.y, *self.args) < tol:
+            if (g is not None) and (g(self.ode.t, self.ode.y, *self.args) < tol):
                 break
 
-            elif T is not None and h > 0 and self.ode.t >= T:
+            elif (T is not None) and (h > 0) and (self.ode.t >= T):
                 break
 
-            elif T is not None and h < 0 and self.ode.t <= T:
+            elif (T is not None) and (h < 0) and (self.ode.t <= T):
                 break
 
             else:
-                pass
+                continue
 
         return solution
 
     def interpolate(self, traj, ti, k=3, der=0, ext=0):
         """
-        Parameteric B-spline interpolation in N-dimensions.
+        Parametric B-spline interpolation in N-dimensions.
 
-        Arguments:
+        Arguments
+        ---------
+            traj : array_like (float)
+                Solution trajectory providing the data points for constructing
+                the B-spline representation.
+            ti : array_like (float)
+                Array of values for the independent variable at which to
+                interpolate the value of the B-spline.
+            k : int, optional(default=3)
+                Degree of the desired B-spline. Degree must satisfy
+                :math:`1 \le k \le 5`.
+            der : int, optional(default=0)
+                The order of derivative of the spline to compute (must be less
+                than or equal to `k`).
+            ext : int, optional(default=2) Controls the value of returned
+                elements for outside the original knot sequence provided by
+                traj. For extrapolation, set `ext=0`; `ext=1` returns zero;
+                `ext=2` raises a `ValueError`.
 
-            traj: (array-like) Solution trajectory providing the data points for
-                  constructing the B-spline representation.
-
-            ti:   (array-like) Array of values for the independent variable at
-                  which to interpolate the value of the B-spline.
-
-            k:    (int) Degree of the desired B-spline. Degree must satsify
-                  1 <= k <= 5. Default is k=3 for cubic B-spline interpolation.
-
-            der:  (int) The order of derivative of the spline to compute
-                  (must be less than or equal to k). Default is zero.
-
-            ext: (int) Controls the value of returned elements for outside the
-                 original knot sequence provided by traj. For extrapolation, set
-                 ext=0; ext=1 returns zero; ext=2 raises a ValueError. Default
-                 is to perform extrapolation.
-
-        Returns:
-
-            interp_traj: (array) The interpolated trajectory.
+        Returns
+        -------
+            interp_traj: array (float)
+                The interpolated trajectory.
 
         """
         # array of parameter values
@@ -216,52 +331,62 @@ class IVP(object):
 
     def compare_trajectories(self, traj1, traj2):
         """
-        Returns the absolute difference between two solution trajectories.
+        Return the element-wise absolute difference between two trajectories.
 
-        Arguments:
+        Arguments
+        ---------
+            traj1 : array_like (float)
+                Array containing a solution trajectory.
+            traj2 : array_like (float)
+                Array containing a solution trajectory.
 
-            traj1: (array-like) (T,n+1) array containing a solution trajectory.
-            traj2: (array-like) (T,n+1) array containing a solution trajectory.
+        Returns
+        -------
+            abs_diff: array_like (float)
+                Array containing the element-wise absolute difference between
+                traj1 and traj2.
 
-        Returns:
-
-            abs_diff: (array-like) (T,n) array of the element-wise absolute
-                      difference between traj1 and traj2.
         """
         abs_diff = np.abs(traj1[:, 1:] - traj2[:, 1:])
-
         return abs_diff
 
-    def get_L2_errors(self, traj1, traj2):
+    def get_l2_errors(self, traj1, traj2):
         """
-        Computes a measure of the total difference between two trajectories
-        using the L^2 norm.
+        Computes a measure of the difference between two trajectories using
+        the :math: `L^2` norm.
 
-        Arguments:
+        Arguments
+        ---------
+            traj1 : array_like (float)
+                Array containing a solution trajectory.
+            traj2 : array_like (float)
+                Array containing a solution trajectory.
 
-            traj1: (array-like) (T,n+1) array containing a solution trajectory.
-            traj2: (array-like) (T,n+1) array containing a solution trajectory.
-
-        Returns:
-
-            L2_error: (float) Average difference between two trajectories.
+        Returns
+        -------
+            l2_error: float
+                Measure of the total difference between two trajectories.
 
         """
-        L2_error = np.sum(self.compare_trajectories(traj1, traj2)**2)**0.5
-        return L2_error
+        l2_error = np.sum(self.compare_trajectories(traj1, traj2)**2)**0.5
+        return l2_error
 
     def get_maximal_errors(self, traj1, traj2):
         """
-        Computes a measure of the point-wise distance between two trajectories.
+        Computes a measure of the distance between two trajectories using the
+        :math:`L^{\infty}` norm.
 
-        Arguments:
+        Arguments
+        ---------
+            traj1 : array_like (float)
+                Array containing a solution trajectory.
+            traj2 : array_like (float)
+                Array containing a solution trajectory.
 
-            traj1: (array-like) (T,n+1) array containing a solution trajectory.
-            traj2: (array-like) (T,n+1) array containing a solution trajectory.
-
-        Returns:
-
-            maximal_error: (float) Maximal difference between two trajectories.
+        Returns
+        -------
+            maximal_error: float
+                Maximal difference between two trajectories.
 
         """
         maximal_error = np.max(self.compare_trajectories(traj1, traj2))
