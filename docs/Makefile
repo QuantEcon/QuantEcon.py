@@ -1,4 +1,4 @@
-# Makefile for Sphinx documentation
+	# Makefile for Sphinx documentation
 #
 
 # You can set these variables from the command line.
@@ -48,6 +48,20 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
+
+srcclean:
+	rm -rf source/modules*
+	rm -rf source/models*
+	rm -rf source/tools*
+	rm -f source/index.rst
+	rm -f source/models.rst
+	rm -f source/tools.rst
+
+myhtml:
+	make srcclean
+	cd .. && python setup.py install && cd docs
+	python qe_apidoc.py
+	make html
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

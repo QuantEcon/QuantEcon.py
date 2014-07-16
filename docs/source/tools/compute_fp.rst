@@ -1,0 +1,5 @@
+compute_fp
+==========
+
+.. automodule:: quantecon.compute_fp
+    :members:

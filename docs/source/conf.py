@@ -33,6 +33,11 @@ sys.path.extend([
 
 ])
 
+## numpydoc settings
+
+numpydoc_class_members_toctree = False
+numydoc_show_class_members= True
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
