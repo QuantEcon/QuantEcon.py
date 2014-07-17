@@ -3,7 +3,10 @@ Testing suite for ces.py
 
 """
 import unittest
-import ..ces
+
+from numpy import testing
+
+import ..ces as ces
 
 
 class CESTestSuite(unittest.TestCase):
@@ -36,7 +39,19 @@ class CobbDouglasCase(CESTestSuite):
 
     def test_marginal_product_capital(self):
         """Test CES marginal product of capital."""
-        raise NotImplementedError
+        # inputs
+        T = 100
+        capital = np.repeat(4.0, T)
+        techology = np.ones(T)
+        labor = np.repeat(3.0, T)
+
+        # CRTS test case
+        alpha = 0.5
+        beta = 1 - alpha
+        expected_mpk = np.repeat(0.75, T)
+        actual_mpk = ces.marginal_product_capital(capital, techology, labor,
+                                                  alpha, beta, self.sigma)
+        testing.assert_almost_equal(expected_mpk, actual_mpk)
 
     def test_marginal_product_labor(self):
         """Test CES marginal product of labor."""
