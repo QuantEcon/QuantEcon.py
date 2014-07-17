@@ -3,7 +3,7 @@ Test suite for solow.py
 
 """
 import unittest
-import ..ivp
+import ..solow
 
 
 class SolowTestSuite(unittest.TestCase):
