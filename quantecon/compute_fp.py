@@ -1,33 +1,34 @@
 """
 Filename: compute_fp.py
-Authors: Thomas Sargent, John Stachurski 
+Authors: Thomas Sargent, John Stachurski
 
-Compute the fixed point of a given operator T, starting from 
+Compute the fixed point of a given operator T, starting from
 specified initial condition v.
+
 """
 
 import numpy as np
 
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
     """
-    Computes and returns T^k v, an approximate fixed point.
-    
-    Here T is an operator, v is an initial condition and k is the number of
-    iterates. Provided that T is a contraction mapping or similar, 
-    T^k v will be an approximation to the fixed point.
+    Computes and returns :math:`T^k v`, an approximate fixed point.
+
+    Here T is an operator, v is an initial condition and k is the number
+    of iterates. Provided that T is a contraction mapping or similar,
+    :math:`T^k v` will be an approximation to the fixed point.
 
     Parameters
     ----------
     T : callable
         A callable object (e.g., function) that acts on v
     v : object
-        An object such that T(v) is defined 
-    error_tol : float, optional
+        An object such that T(v) is defined
+    error_tol : scalar(float), optional(default=1e-3)
         Error tolerance
-    max_iter : int, optional
+    max_iter : scalar(int), optional(default=50)
         Maximum number of iterations
-    verbose : bool, optional
-        If True then print current error at each iterate.  Default is True.
+    verbose : bool, optional(default=True)
+        If True then print current error at each iterate.
 
     Returns
     -------
@@ -35,7 +36,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
         The approximate fixed point
 
     """
-    iterate = 0 
+    iterate = 0
     error = error_tol + 1
     while iterate < max_iter and error > error_tol:
         new_v = T(v)
@@ -44,5 +45,6 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
         if verbose:
             print "Computed iterate %d with error %f" % (iterate, error)
         v = new_v
+
     return v
 
