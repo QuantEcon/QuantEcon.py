@@ -40,7 +40,7 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
         raise NotImplementedError
     else:
         MPK = ((alpha * K**(rho - 1) / (alpha * K**rho + beta * (A * L)**rho)) *
-               output(K, A, L, alpha, sigma))
+               output(K, A, L, alpha, beta, sigma))
 
     return MPK
 
@@ -82,7 +82,7 @@ def marginal_product_labor(K, A, L, alpha, beta, sigma):
         raise NotImplementedError
     else:
         MPL = ((beta * (A * L)**(rho - 1) * A / (alpha * K**rho + beta * (A * L)**rho)) *
-               output(K, A, L, alpha, sigma))
+               output(K, A, L, alpha, beta, sigma))
 
     return MPL
 
