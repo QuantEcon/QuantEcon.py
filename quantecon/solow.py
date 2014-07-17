@@ -1,5 +1,4 @@
 from __future__ import division
-
 import numpy as np
 
 import ces
@@ -98,17 +97,17 @@ def ces_break_even_investment(k, g, n, delta):
     return break_even_investment
 
 
-def ces_jacobian(k, t, g, n, s, alpha, delta, sigma):
+def ces_jacobian(t, k, g, n, s, alpha, delta, sigma):
     """
     Jacobian for the Solow model with constant elasticity of substitution (CES)
     production.
 
     Arguments
     ---------
-    k : array_like (float)
-        Capital (per worker/effective worker).
     t : array_like (float)
         Time.
+    k : array_like (float)
+        Capital (per worker/effective worker).
     g : float
         Growth rate of technology.
     n : float
@@ -137,7 +136,7 @@ def ces_jacobian(k, t, g, n, s, alpha, delta, sigma):
     return jac
 
 
-def ces_k_dot(k, t, g, n, s, alpha, delta, sigma):
+def ces_k_dot(t, k, g, n, s, alpha, delta, sigma):
     """
     Equation of motion for capital (per worker/effective worker) for a
     Solow growth model with constant elasticity of substitution (CES)
@@ -145,10 +144,10 @@ def ces_k_dot(k, t, g, n, s, alpha, delta, sigma):
 
     Arguments
     ---------
-    k : array_like (float)
-        Capital (per worker/effective worker).
     t : array_like (float)
         Time.
+    k : array_like (float)
+        Capital (per worker/effective worker).
     g : float
         Growth rate of technology.
     n : float
