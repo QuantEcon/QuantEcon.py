@@ -1,3 +1,5 @@
+from __future__ import division
+
 import numpy as np
 
 
@@ -38,7 +40,7 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
         MPK = np.nan * K
     else:
         MPK = ((alpha * K**(rho - 1) / (alpha * K**rho + beta * (A * L)**rho)) *
-               ces_output(K, A, L, alpha, sigma))
+               output(K, A, L, alpha, sigma))
 
     return MPK
 
