@@ -1,5 +1,6 @@
 import numpy as np
 
+import ces
 import ivp
 
 
@@ -63,7 +64,7 @@ def ces_actual_investment(k, s, alpha, sigma):
         production of new capital.
 
     """
-    actual_investment = s * ces_output(k, 1, 1, alpha, 1-alpha, sigma)
+    actual_investment = s * ces.output(k, 1, 1, alpha, 1-alpha, sigma)
     return actual_investment
 
 
@@ -93,6 +94,45 @@ def ces_break_even_investment(k, g, n, delta):
     """
     break_even_investment = (n + g + delta) * k
     return break_even_investment
+
+
+def ces_jacobian(k, t, g, n, s, alpha, delta, sigma):
+    """
+    Jacobian for the Solow model with constant elasticity of substitution (CES)
+    production.
+
+    Arguments
+    ---------
+    k : array_like (float)
+        Capital (per worker/effective worker).
+    t : array_like (float)
+        Time.
+    g : float
+        Growth rate of technology.
+    n : float
+        Growth rate of the labor force.
+    s : float
+        Savings rate. Must satisfy ``0 < s < 1``.
+    alpha : float
+        Importance of capital relative to effective labor in production. Must
+        satisfy :math:`0 < \alpha < 1`.
+    delta : float
+        Depreciation rate of physical capital. Must satisfy
+        :math:`0 < \delta`.
+    sigma : float
+        Elasticity of substitution between capital and effective labor in
+        production. Must satisfy :math:`0 \le \sigma`.
+
+    Returns
+    -------
+    jac : array_like (float)
+        Derivative of the equation of motion for capital (per worker/effective
+        worker) with respect to `k`.
+
+    """
+    jac = (s * ces.marginal_product_capital(k, 1, 1, alpha, 1-alpha, sigma) -
+           (n + g + delta))
+    return jac
 
 
 def ces_k_dot(k, t, g, n, s, alpha, delta, sigma):
@@ -132,47 +172,6 @@ def ces_k_dot(k, t, g, n, s, alpha, delta, sigma):
     k_dot = (ces_actual_investment(k, s, alpha, sigma) -
              ces_break_even_investment(k, g, n, delta))
     return k_dot
-
-
-def ces_output(K, A, L, alpha, beta, sigma):
-    """
-    Constant elasticity of substitution (CES) production function with labor
-    augmenting technology.
-
-    Arguments
-    ---------
-    K : array_like (float)
-        Capital
-    L : array_like (float)
-        Labor
-    A : array_like (float)
-        Technology
-    alpha : float
-        Importance of capital in production. Must satisfy :math:`0 < \alpha`.
-    beta : float
-        Importance of effective labor in production. Must satisfy
-        :math:`0 < \beta`.
-    sigma : float
-        Elasticity of substitution between capital and effective labor in
-        production. Must satisfy :math:`0 \le \sigma`.
-
-    Returns
-    -------
-    Y : array_like (float)
-        Output
-
-    """
-    rho = (sigma - 1) / sigma
-
-    # CES nests both Cobb-Douglas and Leontief functions
-    if abs(rho) < 1e-3:
-        Y = K**alpha * (A * L)**beta
-    elif sigma < 1e-3:
-        Y = np.minimum(alpha * K, beta * A * L)
-    else:
-        Y = (alpha * K**rho + beta * (A * L)**rho)**(1 / rho)
-
-    return Y
 
 
 def cobb_douglas_analytic_solution(k0, t, g, n, s, alpha, delta):
