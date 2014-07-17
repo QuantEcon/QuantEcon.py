@@ -6,7 +6,7 @@ import unittest
 
 from numpy import testing
 
-import ..ces as ces
+from ..ces import *
 
 
 class CESTestSuite(unittest.TestCase):
