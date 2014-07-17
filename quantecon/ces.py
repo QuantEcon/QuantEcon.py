@@ -37,7 +37,7 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
     if abs(rho) < 1e-3:
         MPK = alpha * K**(alpha - 1) * (A * L)**beta
     elif sigma < 1e-3:
-        MPK = np.nan * K
+        raise NotImplementedError
     else:
         MPK = ((alpha * K**(rho - 1) / (alpha * K**rho + beta * (A * L)**rho)) *
                output(K, A, L, alpha, sigma))
@@ -79,7 +79,7 @@ def marginal_product_labor(K, A, L, alpha, beta, sigma):
     if abs(rho) < 1e-3:
         MPL = (1 - beta) * K**alpha * (A * L)**(beta - 1)
     elif sigma < 1e-3:
-        MPL = np.nan * L
+        raise NotImplementedError
     else:
         MPL = ((beta * (A * L)**(rho - 1) * A / (alpha * K**rho + beta * (A * L)**rho)) *
                output(K, A, L, alpha, sigma))
