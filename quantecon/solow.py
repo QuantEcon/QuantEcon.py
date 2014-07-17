@@ -1,3 +1,5 @@
+from __future__ import division
+
 import numpy as np
 
 import ces
@@ -13,17 +15,17 @@ class Model(ivp.IVP):
 
         Arguments
         ----------
-        k_dot : callable, ``k_dot(t, k, params)``
+        k_dot : callable, ``k_dot(t, k, *params)``
             Equation of motion for capital (per worker/effective worker). The
             independent variable, `t`, is time; `k`, is capital (per worker/
-            effective worker); `params` is a dictionary of model parameters.
-        jacobian : callable, ``jacobian(t, k, params)``
+            effective worker); `params` is a tuple of model parameters.
+        jacobian : callable, ``jacobian(t, k, *params)``
             The derivative of the equation of motion for capital (per worker/
             effective worker) with respect to `k`. The independent variable, t,
-            is time; k, (per worker/effective worker); `params` is a dictionary
+            is time; k, (per worker/effective worker); `params` is a tuple
             of model parameters.
-        params : dict
-            Dictionary of model parameters. Standard parameters for a Solow
+        params : tuple
+            Tuple of model parameters. Standard parameters for a Solow
             growth model are:
 
             - `g`: Growth rate of technology (rate of technological progress).
@@ -36,7 +38,7 @@ class Model(ivp.IVP):
             production function.
 
         """
-        super(Model, self).__init__(k_dot, jacobian, (params,))
+        super(Model, self).__init__(k_dot, jacobian, params)
 
 
 def ces_actual_investment(k, s, alpha, sigma):
@@ -92,7 +94,7 @@ def ces_break_even_investment(k, g, n, delta):
         (per worker/effective worker).
 
     """
-    break_even_investment = (n + g + delta) * k
+    break_even_investment = (g + n + delta) * k
     return break_even_investment
 
 
@@ -131,7 +133,7 @@ def ces_jacobian(k, t, g, n, s, alpha, delta, sigma):
 
     """
     jac = (s * ces.marginal_product_capital(k, 1, 1, alpha, 1-alpha, sigma) -
-           (n + g + delta))
+           (g + n + delta))
     return jac
 
 
