@@ -12,10 +12,10 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
     ---------
     K : array_like (float)
         Capital
-    L : array_like (float)
-        Labor
     A : array_like (float)
         Technology
+    L : array_like (float)
+        Labor
     alpha : float
         Importance of capital in production. Must satisfy :math:`0 < \alpha`.
     beta : float
