@@ -39,7 +39,7 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
     elif sigma < 1e-3:
         raise NotImplementedError
     else:
-        MPK = ((alpha * K**(rho - 1) / (alpha * K**rho + beta * (A * L)**rho)) *
+        MPK = ((1 / K) * output_elasticity_capital(K, A, L, alpha, beta, sigma) *
                output(K, A, L, alpha, beta, sigma))
 
     return MPK
@@ -81,7 +81,7 @@ def marginal_product_labor(K, A, L, alpha, beta, sigma):
     elif sigma < 1e-3:
         raise NotImplementedError
     else:
-        MPL = ((beta * (A * L)**(rho - 1) * A / (alpha * K**rho + beta * (A * L)**rho)) *
+        MPL = ((1 / L) * output_elasticity_labor(K, A, L, alpha, beta, sigma) *
                output(K, A, L, alpha, beta, sigma))
 
     return MPL
