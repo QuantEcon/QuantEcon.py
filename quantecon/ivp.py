@@ -47,8 +47,8 @@ class IVP(object):
         """
         Integrates the ODE given some initial condition.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
             t0 : float
                 Initial condition for the independent variable.
             y0 : array_like (float, shape=(n,))
@@ -288,8 +288,8 @@ class IVP(object):
         """
         Parametric B-spline interpolation in N-dimensions.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
             traj : array_like (float)
                 Solution trajectory providing the data points for constructing
                 the B-spline representation.
@@ -335,8 +335,8 @@ class IVP(object):
         """
         Return the element-wise absolute difference between two trajectories.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
             traj1 : array_like (float)
                 Array containing a solution trajectory.
             traj2 : array_like (float)
@@ -357,8 +357,8 @@ class IVP(object):
         Computes a measure of the difference between two trajectories using
         the :math: `L^2` norm.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
             traj1 : array_like (float)
                 Array containing a solution trajectory.
             traj2 : array_like (float)
@@ -378,8 +378,8 @@ class IVP(object):
         Computes a measure of the distance between two trajectories using the
         :math:`L^{\infty}` norm.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
             traj1 : array_like (float)
                 Array containing a solution trajectory.
             traj2 : array_like (float)
