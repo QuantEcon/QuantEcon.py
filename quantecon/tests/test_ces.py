@@ -9,6 +9,7 @@ import sympy as sp
 
 from ..ces import *
 
+
 class CESTestSuite(unittest.TestCase):
     """Base class for ces.py module tests."""
 
@@ -248,6 +249,7 @@ class LeontiefCase(CESTestSuite):
         actual_elasticity = test_elasticity(capital, technology, labor,
                                             alpha, beta, sigma)
         testing.assert_almost_equal(expected_elasticity, actual_elasticity)
+
 
 class GeneralCESCase(CESTestSuite):
 
