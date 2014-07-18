@@ -43,19 +43,31 @@ class CobbDouglasCase(CESTestSuite):
         T = 100
         capital = np.repeat(4.0, T)
         techology = np.ones(T)
-        labor = np.repeat(3.0, T)
+        labor = np.repeat(9.0, T)
 
         # CRTS test case
         alpha = 0.5
         beta = 1 - alpha
         expected_mpk = np.repeat(0.75, T)
-        actual_mpk = ces.marginal_product_capital(capital, techology, labor,
-                                                  alpha, beta, self.sigma)
+        actual_mpk = marginal_product_capital(capital, techology, labor,
+                                              alpha, beta, self.sigma)
         testing.assert_almost_equal(expected_mpk, actual_mpk)
 
     def test_marginal_product_labor(self):
         """Test CES marginal product of labor."""
-        raise NotImplementedError
+        # inputs
+        T = 100
+        capital = np.repeat(8.0, T)
+        techology = np.ones(T)
+        labor = np.repeat(27.0, T)
+
+        # CRTS test case
+        alpha = 1 / 3.0
+        beta = 1 - alpha
+        expected_mpl = np.repeat(4.0 / 9.0, T)
+        actual_mpl = marginal_product_labor(capital, techology, labor,
+                                            alpha, beta, self.sigma)
+        testing.assert_almost_equal(expected_mpl, actual_mpl)
 
     def test_output(self):
         """Test CES output."""
