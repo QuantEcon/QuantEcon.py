@@ -225,10 +225,14 @@ class LeontiefCase(CESTestSuite):
 
         # vectorize original function to accept parameter arrays
         test_elasticity = np.vectorize(output_elasticity_capital)
+        test_output = np.vectorize(output)
+        test_mpk = np.vectorize(marginal_product_capital)
 
         # conduct the test
-        expected_elasticity = self.np_elasticity_YK(capital, technology, labor,
-                                                    alpha, beta, sigma)
+        K = capital
+        Y = test_output(capital, technology, labor, alpha, beta, sigma)
+        MPK = test_mpk(capital, technology, labor, alpha, beta, sigma)
+        expected_elasticity = (K / Y) * MPK
         actual_elasticity = test_elasticity(capital, technology, labor,
                                             alpha, beta, sigma)
         testing.assert_almost_equal(expected_elasticity, actual_elasticity)
@@ -241,10 +245,14 @@ class LeontiefCase(CESTestSuite):
 
         # vectorize original function to accept parameter arrays
         test_elasticity = np.vectorize(output_elasticity_labor)
+        test_output = np.vectorize(output)
+        test_mpl = np.vectorize(marginal_product_labor)
 
         # conduct the test
-        expected_elasticity = self.np_elasticity_YL(capital, technology, labor,
-                                                    alpha, beta, sigma)
+        L = labor
+        Y = test_output(capital, technology, labor, alpha, beta, sigma)
+        MPL = test_mpl(capital, technology, labor, alpha, beta, sigma)
+        expected_elasticity = (L / Y) * MPL
         actual_elasticity = test_elasticity(capital, technology, labor,
                                             alpha, beta, sigma)
         testing.assert_almost_equal(expected_elasticity, actual_elasticity)
