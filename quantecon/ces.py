@@ -31,12 +31,10 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
         Marginal product of capital.
 
     """
-    rho = (sigma - 1) / sigma
-
     # CES nests both Cobb-Douglas and Leontief functions
-    if abs(rho) < 1e-3:
+    if np.isclose(sigma, 1.0):
         MPK = alpha * K**(alpha - 1) * (A * L)**beta
-    elif sigma < 1e-3:
+    elif np.isclose(sigma, 0.0):
         MPK = np.where(alpha * K < beta * A * L, alpha, 0)
     else:
         MPK = ((1 / K) * output_elasticity_capital(K, A, L, alpha, beta, sigma) *
@@ -73,12 +71,10 @@ def marginal_product_labor(K, A, L, alpha, beta, sigma):
         Marginal product of labor.
 
     """
-    rho = (sigma - 1) / sigma
-
     # CES nests both Cobb-Douglas and Leontief functions
-    if abs(rho) < 1e-3:
+    if np.isclose(sigma, 1.0):
         MPL = beta * K**alpha * (A * L)**(beta - 1) * A
-    elif sigma < 1e-3:
+    elif np.isclose(sigma, 0.0):
         MPL = np.where(beta * A * L < alpha * K, beta * A, 0)
     else:
         MPL = ((1 / L) * output_elasticity_labor(K, A, L, alpha, beta, sigma) *
@@ -115,14 +111,13 @@ def output(K, A, L, alpha, beta, sigma):
         Output
 
     """
-    rho = (sigma - 1) / sigma
-
     # CES nests both Cobb-Douglas and Leontief functions
-    if abs(rho) < 1e-3:
+    if np.isclose(sigma, 1.0):
         Y = K**alpha * (A * L)**beta
-    elif sigma < 1e-3:
+    elif np.isclose(sigma, 0.0):
         Y = np.minimum(alpha * K, beta * A * L)
     else:
+        rho = (sigma - 1) / sigma
         Y = (alpha * K**rho + beta * (A * L)**rho)**(1 / rho)
 
     return Y
@@ -156,14 +151,13 @@ def output_elasticity_capital(K, A, L, alpha, beta, sigma):
         Output elasticity with respect to capital.
 
     """
-    rho = (sigma - 1) / sigma
-
     # CES nests both Cobb-Douglas and Leontief functions
-    if abs(rho) < 1e-3:
+    if np.isclose(sigma, 1.0):
         epsilon_YK = alpha
-    elif sigma < 1e-3:
+    elif np.isclose(sigma, 0.0):
         raise NotImplementedError
     else:
+        rho = (sigma - 1) / sigma
         epsilon_YK = alpha * K**rho / (alpha * K**rho + beta * (A * L)**rho)
 
     return epsilon_YK
@@ -197,14 +191,13 @@ def output_elasticity_labor(K, A, L, alpha, beta, sigma):
         Output elasticity with respect to labor.
 
     """
-    rho = (sigma - 1) / sigma
-
     # CES nests both Cobb-Douglas and Leontief functions
-    if abs(rho) < 1e-3:
+    if np.isclose(sigma, 1.0):
         epsilon_YL = beta
-    elif sigma < 1e-3:
+    elif np.isclose(sigma, 0.0):
         raise NotImplementedError
     else:
+        rho = (sigma - 1) / sigma
         epsilon_YL = beta * (A * L)**rho / (alpha * K**rho + beta * (A * L)**rho)
 
     return epsilon_YL
