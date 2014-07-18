@@ -4,14 +4,19 @@ Filename: lae.py
 Authors: Thomas J. Sargent, John Stachurski,
 
 Computes a sequence of marginal densities for a continuous state space
-Markov chain X_t where the transition probabilities can be represented
-as densities. The estimate of the marginal density of X_t is
+Markov chain :math:`X_t` where the transition probabilities can be represented
+as densities. The estimate of the marginal density of :math:`X_t` is
 
 .. math::
 
-    (1/n) \sum_{i=0}^n p(X_{t-1}^i, y)
+    \frac{1}{n} \sum_{i=0}^n p(X_{t-1}^i, y)
 
 This is a density in y.
+
+References
+----------
+
+    http://quant-econ.net/stationary_densities.html
 
 """
 
