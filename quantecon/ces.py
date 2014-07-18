@@ -77,7 +77,7 @@ def marginal_product_labor(K, A, L, alpha, beta, sigma):
 
     # CES nests both Cobb-Douglas and Leontief functions
     if abs(rho) < 1e-3:
-        MPL = beta * K**alpha * (A * L)**(beta - 1)
+        MPL = beta * K**alpha * (A * L)**(beta - 1) * A
     elif sigma < 1e-3:
         raise NotImplementedError
     else:
