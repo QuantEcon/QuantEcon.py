@@ -12,8 +12,8 @@ class Model(ivp.IVP):
         """
         Creates an instance of the Solow model.
 
-        Arguments
-        ----------
+        Arttributs
+        -----------
         k_dot : callable, ``k_dot(t, k, *params)``
             Equation of motion for capital (per worker/effective worker). The
             independent variable, `t`, is time; `k`, is capital (per worker/
@@ -45,8 +45,8 @@ def ces_actual_investment(k, s, alpha, sigma):
     Total amount of output (per worker/effective worker) invested into the
     production of new capital.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     k : array_like (float)
         Capital (per worker/effective worker).
     s : float
@@ -74,8 +74,8 @@ def ces_break_even_investment(k, g, n, delta):
     Amount of investment required to maintain current levels of capital (per
     worker/effective worker).
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     k : array_like (float)
         Capital (per worker/effective worker).
     g : float
@@ -102,8 +102,8 @@ def ces_jacobian(t, k, g, n, s, alpha, delta, sigma):
     Jacobian for the Solow model with constant elasticity of substitution (CES)
     production.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     t : array_like (float)
         Time.
     k : array_like (float)
@@ -142,8 +142,8 @@ def ces_k_dot(t, k, g, n, s, alpha, delta, sigma):
     Solow growth model with constant elasticity of substitution (CES)
     production function.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     t : array_like (float)
         Time.
     k : array_like (float)
@@ -179,8 +179,8 @@ def cobb_douglas_analytic_solution(k0, t, g, n, s, alpha, delta):
     """
     Analytic solution for the Solow model with Cobb-Douglas production.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
         k0 : float
             Initial value for capital (per worker/effective worker)
         t : array_like (float, shape=(T,))

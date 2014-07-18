@@ -8,8 +8,8 @@ def marginal_product_capital(K, A, L, alpha, beta, sigma):
     Marginal product of capital for constant elasticity of substitution (CES)
     production function with labor augmenting technology.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     K : array_like (float)
         Capital
     A : array_like (float)
@@ -50,8 +50,8 @@ def marginal_product_labor(K, A, L, alpha, beta, sigma):
     Marginal product of labor for constant elasticity of substitution (CES)
     production function with labor augmenting technology.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     K : array_like (float)
         Capital
     A : array_like (float)
@@ -92,8 +92,8 @@ def output(K, A, L, alpha, beta, sigma):
     Constant elasticity of substitution (CES) production function with labor
     augmenting technology.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     K : array_like (float)
         Capital
     A : array_like (float)
@@ -133,8 +133,8 @@ def output_elasticity_capital(K, A, L, alpha, beta, sigma):
     Elasticity of output with respect to capital for the constant elasticity
     of substitution (CES) production function with labor augmenting technology.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     K : array_like (float)
         Capital
     A : array_like (float)
@@ -174,8 +174,8 @@ def output_elasticity_labor(K, A, L, alpha, beta, sigma):
     Elasticity of output with respect to labor for the constant elasticity
     of substitution (CES) production function with labor augmenting technology.
 
-    Arguments
-    ---------
+    Parameters
+    ----------
     K : array_like (float)
         Capital
     A : array_like (float)
