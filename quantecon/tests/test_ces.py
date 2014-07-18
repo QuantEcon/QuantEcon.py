@@ -155,24 +155,7 @@ class CobbDouglasCase(CESTestSuite):
 class LeontiefCase(CESTestSuite):
 
     def setUp(self):
-        """Use SymPy to construct some functions for use in testing."""
-        sp.var('K, A, L, alpha, beta, sigma')
-
-        # compute symbolic expressions
-        _sp_output = sp.Min(alpha * K**alpha, beta * A * L)
-        _sp_mpk = sp.diff(_sp_output, K)
-        _sp_mpl = sp.diff(_sp_output, L)
-        _sp_elasticity_YK = (K / _sp_output) * _sp_mpk
-        _sp_elasticity_YL = (L / _sp_output) * _sp_mpl
-
-        # wrap SymPy expressions into callable NumPy funcs
-        args = (K, A, L, alpha, beta, sigma)
-        self.np_output = sp.lambdify(args, _sp_output, 'numpy')
-        self.np_mpk = sp.lambdify(args, _sp_mpk, 'numpy')
-        self.np_mpl = sp.lambdify(args, _sp_mpl, 'numpy')
-        self.np_elasticity_YK = sp.lambdify(args, _sp_elasticity_YK, 'numpy')
-        self.np_elasticity_YL = sp.lambdify(args, _sp_elasticity_YL, 'numpy')
-
+        """Create a grid of inputs and parameters over which to iterate."""
         # create a grid of input values
         T = 10
         eps = 1e-2
@@ -188,7 +171,7 @@ class LeontiefCase(CESTestSuite):
         self.parameter_grid = np.meshgrid(alpha_vals, beta_vals, sigma_vals)
 
     def test_marginal_product_capital(self):
-        """Test Cobb-Douglas marginal product of capital."""
+        """Test Leontief  marginal product of capital."""
         # unpack grids
         capital, technology, labor = self.input_grid
         alpha, beta, sigma = self.parameter_grid
@@ -197,14 +180,14 @@ class LeontiefCase(CESTestSuite):
         test_mpk = np.vectorize(marginal_product_capital)
 
         # conduct the test
-        expected_mpk = self.np_mpk(capital, technology, labor,
-                                   alpha, beta, sigma)
+        expected_mpk = np.where(alpha * capital < beta * technology * labor,
+                                alpha, 0.0)
         actual_mpk = test_mpk(capital, technology, labor,
                               alpha, beta, sigma)
         testing.assert_almost_equal(expected_mpk, actual_mpk)
 
     def test_marginal_product_labor(self):
-        """Test Cobb-Douglas marginal product of labor."""
+        """Test Leontief  marginal product of labor."""
         # unpack grids
         capital, technology, labor = self.input_grid
         alpha, beta, sigma = self.parameter_grid
@@ -213,14 +196,14 @@ class LeontiefCase(CESTestSuite):
         test_mpl = np.vectorize(marginal_product_labor)
 
         # conduct the test
-        expected_mpl = self.np_mpl(capital, technology, labor,
-                                   alpha, beta, sigma)
+        expected_mpl = np.where(beta * technology * labor < alpha * capital,
+                                beta * technology, 0.0)
         actual_mpl = test_mpl(capital, technology, labor,
                               alpha, beta, sigma)
         testing.assert_almost_equal(expected_mpl, actual_mpl)
 
     def test_output(self):
-        """Test Cobb-Douglas output."""
+        """Test Leontief  output."""
         # unpack grids
         capital, technology, labor = self.input_grid
         alpha, beta, sigma = self.parameter_grid
@@ -229,14 +212,13 @@ class LeontiefCase(CESTestSuite):
         test_output = np.vectorize(output)
 
         # conduct the test
-        expected_output = self.np_output(capital, technology, labor,
-                                         alpha, beta, sigma)
+        expected_output = np.minimum(alpha * capital, beta * technology * labor)
         actual_output = test_output(capital, technology, labor,
                                     alpha, beta, sigma)
         testing.assert_almost_equal(expected_output, actual_output)
 
     def test_output_elasticity_capital(self):
-        """Test Cobb-Douglas elasticity of output with respect to capital."""
+        """Test Leontief  elasticity of output with respect to capital."""
         # unpack grids
         capital, technology, labor = self.input_grid
         alpha, beta, sigma = self.parameter_grid
@@ -252,7 +234,7 @@ class LeontiefCase(CESTestSuite):
         testing.assert_almost_equal(expected_elasticity, actual_elasticity)
 
     def test_output_elasticity_labor(self):
-        """Test Cobb-Douglas elasticity of output with respect to labor."""
+        """Test Leontief elasticity of output with respect to labor."""
         # unpack grids
         capital, technology, labor = self.input_grid
         alpha, beta, sigma = self.parameter_grid
