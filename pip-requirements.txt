@@ -1,0 +1,14 @@
+# These are the required packages for the quant-econ package to build
+
+ipython
+
+numpy
+
+numpydoc
+
+scipy
+
+matplotlib
+
+pandas
+

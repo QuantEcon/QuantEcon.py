@@ -1,8 +1,10 @@
 """
 Filename: riccati.py
+
 Authors: Thomas Sargent, John Stachurski
 
-Solves the discrete-time algebraic Riccati equation 
+Solves the discrete-time algebraic Riccati equation
+
 """
 
 import numpy as np
@@ -11,26 +13,34 @@ from numpy.linalg import solve
 
 def dare(A, B, R, Q, tolerance=1e-10, max_iter=150):
     """
-    Solves the discrete-time algebraic Riccati equation 
-    
-        X = A'XA - A'XB(B'XB + R)^{-1}B'XA + Q  
+    Solves the discrete-time algebraic Riccati equation
 
-    via the doubling algorithm.  An explanation of the algorithm can be found
-    in "Optimal Filtering" by B.D.O. Anderson and J.B. Moore (Dover
-    Publications, 2005, p. 159).
+        X = A'XA - A'XB(B'XB + R)^{-1}B'XA + Q
+
+    via the doubling algorithm.  An explanation of the algorithm can be
+    found in "Optimal Filtering" by B.D.O. Anderson and J.B. Moore
+    (Dover Publications, 2005, p. 159).
 
     Parameters
-    ============
-    All arguments should be NumPy ndarrays.
-
-        * A is k x k
-        * B is k x n
-        * Q is k x k, symmetric and nonnegative definite
-        * R is n x n, symmetric and positive definite
+    ----------
+    A : array_like(float, ndim=2)
+        k x k array.
+    B : array_like(float, ndim=2)
+        k x n array
+    R : array_like(float, ndim=2)
+        n x n, should be symmetric and positive definite
+    Q : array_like(float, ndim=2)
+        k x k, should be symmetric and non-negative definite
+    tolerance : scalar(int), optional(default=1e-10)
+        The tolerance level for convergence
+    max_iter : scalar(float), optional(default=150)
+        The maximum number of iterations allowed
 
     Returns
-    ========
-    X : a  k x k numpy.ndarray representing the approximate solution
+    -------
+    X : array_like(float, ndim=2)
+        The fixed point of the Riccati equation; a  k x k array
+        representing the approximate solution
 
     """
     # == Set up == #
@@ -75,14 +85,14 @@ if __name__ == '__main__': ## Example of useage
     a = np.array([[0.1, 0.1, 0.0],
                   [0.1, 0.0, 0.1],
                   [0.0, 0.4, 0.0]])
-                       
-    b = np.array([[1.0, 0.0], 
-                  [0.0, 0.0], 
+
+    b = np.array([[1.0, 0.0],
+                  [0.0, 0.0],
                   [0.0, 1.0]])
-                       
-    r = np.array([[0.5, 0.0], 
+
+    r = np.array([[0.5, 0.0],
                   [0.0, 1.0]])
-                       
+
     q = np.array([[1, 0.0, 0.0],
                   [0.0, 1, 0.0],
                   [0.0, 0.0, 10.0]])

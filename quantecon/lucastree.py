@@ -1,30 +1,44 @@
-"""
+r"""
 Filename: lucastree.py
+
 Authors: Thomas Sargent, John Stachurski
 
-Solves the price function for the Lucas tree in a continuous state setting,
-using piecewise linear approximation for the sequence of candidate price
-functions.  The consumption endownment follows the log linear AR(1) process
+Solves the price function for the Lucas tree in a continuous state
+setting, using piecewise linear approximation for the sequence of
+candidate price functions.  The consumption endownment follows the log
+linear AR(1) process
 
-    log y' = alpha log y + sigma epsilon
+.. math::
+
+    log y' = \alpha log y + \sigma \epsilon
 
 where y' is a next period y and epsilon is an iid standard normal shock.
 Hence
 
-    y' = y^alpha * xi   where xi = e^(sigma * epsilon)
+.. math::
+
+    y' = y^{\alpha} * \xi,
+
+where
+
+.. math::
+
+    \xi = e^(\sigma * \epsilon)
 
 The distribution phi of xi is
 
-    phi = LN(0, sigma^2) where LN means lognormal
+.. math::
+
+    \phi = LN(0, \sigma^2),
+
+where LN means lognormal.
 
 Example usage:
 
     tree = lucas_tree(gamma=2, beta=0.95, alpha=0.90, sigma=0.1)
     grid, price_vals = compute_price(tree)
 
-
 """
-
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 from collections import namedtuple
@@ -32,9 +46,9 @@ from scipy import interp
 from scipy.stats import lognorm
 from scipy.integrate import fixed_quad
 
-# == Use a namedtuple to store the parameters of the Lucas tree == #
 
-lucas_tree = namedtuple('lucas_tree', 
+# == Use a namedtuple to store the parameters of the Lucas tree == #
+lucas_tree = namedtuple('lucas_tree',
         ['gamma',   # Risk aversion
          'beta',    # Discount factor
          'alpha',   # Correlation coefficient
@@ -47,12 +61,20 @@ def compute_lt_price(lt, grid=None):
     Compute the equilibrium price function associated with Lucas tree lt
 
     Parameters
-    ==========
-    lt : namedtuple, lucas_tree
+    ----------
+    lt : namedtuple(lucas_tree)
         A namedtuple containing the parameters of the Lucas tree
 
-    grid : a NumPy array giving the grid points on which to return the
-        function values.  Grid points should be nonnegative.
+    grid : array_like(float), optional(default=None)
+        The grid points on which to return the function values. Grid
+        points should be nonnegative.
+
+    Returns
+    -------
+    grid : array_like(float)
+        The grid that was used to calculate the prices
+    price : array_like(float)
+        The prices at the grid points
 
     """
     # == Simplify names, set up distribution phi == #
@@ -61,7 +83,7 @@ def compute_lt_price(lt, grid=None):
 
     # == Set up a function for integrating w.r.t. phi == #
 
-    int_min, int_max = np.exp(-4 * sigma), np.exp(4 * sigma)  
+    int_min, int_max = np.exp(-4 * sigma), np.exp(4 * sigma)
     def integrate(g):
         "Integrate over three standard deviations"
         integrand = lambda z: g(z) * phi.pdf(z)
@@ -84,7 +106,7 @@ def compute_lt_price(lt, grid=None):
     else:
         grid_min, grid_max, grid_size = min(grid), max(grid), len(grid)
 
-    # == Compute the function h in the Lucas operator as a vector of == # 
+    # == Compute the function h in the Lucas operator as a vector of == #
     # == values on the grid == #
 
     h = np.empty(grid_size)
@@ -97,14 +119,19 @@ def compute_lt_price(lt, grid=None):
 
     def lucas_operator(f):
         """
-        The approximate Lucas operator, which computes and returns the updated
-        function Tf on the grid poitns.
+        The approximate Lucas operator, which computes and returns the
+        updated function Tf on the grid points.
 
         Parameters
-        ==========
+        ----------
+        f : array_like(float)
+            A candidate function on R_+ represented as points on a grid
+            and should be flat NumPy array with len(f) = len(grid)
 
-        f : flat NumPy array with len(f) = len(grid)
-            A candidate function on R_+ represented as points on a grid 
+        Returns
+        -------
+        Tf : array_like(float)
+            The updated function Tf
 
         """
         Tf = np.empty(len(f))
@@ -116,7 +143,6 @@ def compute_lt_price(lt, grid=None):
         return Tf
 
     # == Now compute the price by iteration == #
-
     error_tol, max_iter = 1e-3, 50
     error = error_tol + 1
     iterate = 0
@@ -128,7 +154,9 @@ def compute_lt_price(lt, grid=None):
         print error
         f = new_f
 
-    return grid, f * grid**gamma # p(y) = f(y) / u'(y) = f(y) * y^gamma
+    price = f * grid**gamma
+
+    return grid, price # p(y) = f(y) / u'(y) = f(y) * y^gamma
 
 
 
