@@ -3,11 +3,25 @@ Test suite for ivp.py
 
 """
 import unittest
-import ..ivp
+
+from ..ivp import *
+from ..solow import *
 
 
 class IVPTestSuite(unittest.TestCase):
-    pass
+    """Base class for ivp.py module tests."""
+
+    def setUp(self):
+        raise NotImplementedError
+
+    def test_integrate(self):
+        """Test ODE integration."""
+        raise NotImplementedError
+
+    def test_interpolate(self):
+        """Test B_splien interpolation."""
+        raise NotImplementedError
+
 
 if __name__ == '__main__':
     IVPTest = unittest.TestLoader().loadTestsFromTestCase(IVPTestSuite)
