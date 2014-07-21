@@ -333,24 +333,24 @@ class IVP(object):
 
     def compare_trajectories(self, traj1, traj2):
         """
-        Return the element-wise absolute difference between two trajectories.
+        Return the element-wise difference between two trajectories.
 
         Parameters
         ----------
-            traj1 : array_like (float)
+            traj1 : array_like (float, shape=(T, N+1))
                 Array containing a solution trajectory.
-            traj2 : array_like (float)
+            traj2 : array_like (float, shape=(T, N+1))
                 Array containing a solution trajectory.
 
         Returns
         -------
             abs_diff: array_like (float)
-                Array containing the element-wise absolute difference between
-                traj1 and traj2.
+                Array containing the element-wise difference between traj1 and
+                traj2.
 
         """
-        abs_diff = np.abs(traj1[:, 1:] - traj2[:, 1:])
-        return abs_diff
+        diff = traj1[:, 1:] - traj2[:, 1:]
+        return diff
 
     def get_l2_errors(self, traj1, traj2):
         """
@@ -391,5 +391,5 @@ class IVP(object):
                 Maximal difference between two trajectories.
 
         """
-        maximal_error = np.max(self.compare_trajectories(traj1, traj2))
+        maximal_error = np.max(np.abs(self.compare_trajectories(traj1, traj2)))
         return maximal_error
