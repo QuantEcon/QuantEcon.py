@@ -175,16 +175,16 @@ def ces_k_dot(t, k, g, n, s, alpha, delta, sigma):
     return k_dot
 
 
-def cobb_douglas_analytic_solution(k0, t, g, n, s, alpha, delta):
+def cobb_douglas_analytic_solution(t, k0, g, n, s, alpha, delta, sigma=1.0):
     """
     Analytic solution for the Solow model with Cobb-Douglas production.
 
     Parameters
     ----------
-        k0 : float
-            Initial value for capital (per worker/effective worker)
         t : array_like (float, shape=(T,))
             Array of points at which the solution is desired.
+        k0 : float
+            Initial value for capital (per worker/effective worker)
         g : float
             Growth rate of technology.
         n : float
@@ -197,6 +197,10 @@ def cobb_douglas_analytic_solution(k0, t, g, n, s, alpha, delta):
         delta : float
             Depreciation rate of physical capital. Must satisfy
             :math:`0 < \delta`.
+        sigma : float, optional(default=1.0)
+            Elasticity of substitution between capital and effective labor in
+            production. Must satisfy :math:`\sigma=1.0` in order to have
+            Cobb-Douglas production.
 
     Returns
     -------
