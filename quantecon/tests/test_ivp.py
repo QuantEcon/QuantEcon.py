@@ -19,7 +19,7 @@ class IVPTestSuite(unittest.TestCase):
         raise NotImplementedError
 
     def test_interpolate(self):
-        """Test B_splien interpolation."""
+        """Test B_spline interpolation."""
         raise NotImplementedError
 
 
