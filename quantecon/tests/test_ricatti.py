@@ -1,9 +1,9 @@
 """
 Filename: test_tauchen.py
 Authors: Chase Coleman
-Date: 07/18/2014
+Date: 07/22/2014
 
-Tests for tauchen.py file
+Tests for ricatti.py file
 
 """
 import sys
