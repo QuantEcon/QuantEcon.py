@@ -52,7 +52,7 @@ def var_quadratic_sum(A, C, H, beta, x0):
 
     """
     # == Make sure that A, C, H and x0 are array_like == #
-    A, C, H = map(np.atleast_2d, (A, C, H))
+    A, C, H = list(map(np.atleast_2d, (A, C, H)))
     x0 = np.atleast_1d(x0)
     # == Start computations == #
     Q = scipy.linalg.solve_discrete_lyapunov(sqrt(beta) * A.T, H)
