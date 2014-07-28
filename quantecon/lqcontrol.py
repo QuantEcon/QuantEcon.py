@@ -11,7 +11,7 @@ problems.
 import numpy as np
 from numpy import dot
 from scipy.linalg import solve
-import riccati
+from . import riccati
 
 class LQ:
     r"""
@@ -133,7 +133,7 @@ class LQ:
     def __init__(self, Q, R, A, B, C=None, beta=1, T=None, Rf=None):
         # == Make sure all matrices can be treated as 2D arrays == #
         converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
-        self.A, self.B, self.Q, self.R = map(converter, (A, B, Q, R))
+        self.A, self.B, self.Q, self.R = list(map(converter, (A, B, Q, R)))
         # == Record dimensions == #
         self.k, self.n = self.Q.shape[0], self.R.shape[0]
 

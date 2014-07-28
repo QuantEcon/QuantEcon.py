@@ -75,7 +75,7 @@ class LSS:
     """
 
     def __init__(self, A, C, G, mu_0=None, Sigma_0=None):
-        self.A, self.G, self.C = map(self.convert, (A, G, C))
+        self.A, self.G, self.C = list(map(self.convert, (A, G, C)))
         self.k, self.n = self.G.shape
         self.m = self.C.shape[1]
         # == Default initial conditions == #
