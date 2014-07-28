@@ -5,7 +5,7 @@ Authors: Thomas J. Sargent, John Stachurski
 
 """
 import numpy as np
-from discrete_rv import DiscreteRV
+from .discrete_rv import DiscreteRV
 
 
 def mc_compute_stationary(P):

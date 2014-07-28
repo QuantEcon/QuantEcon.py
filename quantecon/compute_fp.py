@@ -43,7 +43,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
         iterate += 1
         error = np.max(np.abs(new_v - v))
         if verbose:
-            print "Computed iterate %d with error %f" % (iterate, error)
+            print("Computed iterate %d with error %f" % (iterate, error))
         v = new_v
 
     return v

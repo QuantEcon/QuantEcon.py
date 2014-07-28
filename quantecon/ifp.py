@@ -104,7 +104,7 @@ class ConsumerProblem:
         asset_grid, z_vals = self.asset_grid, self.z_vals
         new_V = np.empty(V.shape)
         new_c = np.empty(V.shape)
-        z_idx = range(len(z_vals))
+        z_idx = list(range(len(z_vals)))
 
         # === Linear interpolation of V along the asset grid === #
         vf = lambda a, i_z: interp(a, asset_grid, V[:, i_z])

@@ -9,8 +9,8 @@ Solves robust LQ control problems.
 
 from __future__ import division  # Remove for Python 3.sx
 import numpy as np
-from lqcontrol import LQ
-from quadsums import var_quadratic_sum
+from .lqcontrol import LQ
+from .quadsums import var_quadratic_sum
 from numpy import dot, log, sqrt, identity, hstack, vstack, trace
 from scipy.linalg import solve, inv, det, solve_discrete_lyapunov
 
@@ -82,7 +82,7 @@ class RBLQ:
     def __init__(self, Q, R, A, B, C, beta, theta):
 
         # == Make sure all matrices can be treated as 2D arrays == #
-        A, B, C, Q, R = map(np.atleast_2d, (A, B, C, Q, R))
+        A, B, C, Q, R = list(map(np.atleast_2d, (A, B, C, Q, R)))
         self.A, self.B, self.C, self.Q, self.R = A, B, C, Q, R
         # == Record dimensions == #
         self.k = self.Q.shape[0]
