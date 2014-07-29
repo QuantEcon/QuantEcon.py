@@ -18,7 +18,7 @@ import sys
 import numpy as np
 from numpy import sqrt, max, eye, dot, zeros, cumsum, array
 from numpy.random import randn
-import scipy.linalg 
+import scipy.linalg
 import matplotlib.pyplot as plt
 from collections import namedtuple
 from quantecon import nullspace, mc_sample_path, var_quadratic_sum
@@ -114,19 +114,19 @@ def compute_paths(T, econ):
         # == Generate a time series x of length T starting from x0 == #
         nx, nw = C.shape
         x = zeros((nx, T))
-        w = randn(nw, T)    
-        x[:, 0] = x0.T    
-        for t in range(1,T):    
+        w = randn(nw, T)
+        x[:, 0] = x0.T
+        for t in range(1,T):
             x[:, t] = dot(A, x[:, t-1]) + dot(C, w[:, t])
 
     # == Compute exogenous variable sequences == #
     g, d, b, s = (dot(S, x).flatten() for S in (Sg, Sd, Sb, Ss))
-        
+
     # == Solve for Lagrange multiplier in the govt budget constraint == #
-    ## In fact we solve for nu = lambda / (1 + 2*lambda).  Here nu is the 
+    ## In fact we solve for nu = lambda / (1 + 2*lambda).  Here nu is the
     ## solution to a quadratic equation a(nu**2 - nu) + b = 0 where
     ## a and b are expected discounted sums of quadratic forms of the state.
-    Sm = Sb - Sd - Ss    
+    Sm = Sb - Sd - Ss
     # == Compute a and b == #
     if econ.discrete:
         ns = P.shape[0]
@@ -147,27 +147,27 @@ def compute_paths(T, econ):
     Congress and start over.
     """
     disc = a0**2 - 4 * a0 * b0
-    if disc >= 0:  
+    if disc >= 0:
         nu = 0.5 * (a0 - sqrt(disc)) / a0
     else:
-        print "There is no Ramsey equilibrium for these parameters."
-        print warning_msg.format('high', 'Republican')
+        print("There is no Ramsey equilibrium for these parameters.")
+        print(warning_msg.format('high', 'Republican'))
         sys.exit(0)
 
     # == Test that the Lagrange multiplier has the right sign == #
-    if nu * (0.5 - nu) < 0:  
-        print "Negative multiplier on the government budget constraint."
-        print warning_msg.format('low', 'Democratic')
+    if nu * (0.5 - nu) < 0:
+        print("Negative multiplier on the government budget constraint.")
+        print(warning_msg.format('low', 'Democratic'))
         sys.exit(0)
 
     # == Solve for the allocation given nu and x == #
-    Sc = 0.5 * (Sb + Sd - Sg - nu * Sm)    
-    Sl = 0.5 * (Sb - Sd + Sg - nu * Sm)   
+    Sc = 0.5 * (Sb + Sd - Sg - nu * Sm)
+    Sl = 0.5 * (Sb - Sd + Sg - nu * Sm)
     c = dot(Sc, x).flatten()
     l = dot(Sl, x).flatten()
     p = dot(Sb - Sc, x).flatten()  # Price without normalization
     tau = 1 - l / (b - c)
-    rvn = l * tau  
+    rvn = l * tau
 
     # == Compute remaining variables == #
     if econ.discrete:
@@ -179,7 +179,7 @@ def compute_paths(T, econ):
         temp = dot(P[state,:], dot(Sb - Sc, x_vals).T).flatten()
         xi = p[1:] / temp[:T-1]
     else:
-        H = dot(Sl.T, Sl) - dot((Sb - Sc).T, Sl - Sg) 
+        H = dot(Sl.T, Sl) - dot((Sb - Sc).T, Sl - Sg)
         L = np.empty(T)
         for t in range(T):
             L[t] = var_quadratic_sum(A, C, H, beta, x[:, t])
@@ -195,7 +195,7 @@ def compute_paths(T, econ):
     Pi = cumsum(pi * xi)
 
     # == Prepare return values == #
-    path = Path(g=g, 
+    path = Path(g=g,
             d=d,
             b=b,
             s=s,
@@ -219,7 +219,7 @@ def gen_fig_1(path):
     the docstring of that function for details.
     """
 
-    T = len(path.c)  
+    T = len(path.c)
 
     # == Prepare axes == #
     num_rows, num_cols = 2, 2
@@ -242,21 +242,21 @@ def gen_fig_1(path):
 
     # == Plot govt expenditure and debt == #
     ax = axes[0, 1]
-    ax.plot(range(1,T+1), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
-    ax.plot(range(1,T+1), path.g, label=r'$g_t$', **p_args)
-    ax.plot(range(1,T), path.B[1:T], label=r'$B_{t+1}$', **p_args)
+    ax.plot(list(range(1,T+1)), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
+    ax.plot(list(range(1,T+1)), path.g, label=r'$g_t$', **p_args)
+    ax.plot(list(range(1,T)), path.B[1:T], label=r'$B_{t+1}$', **p_args)
     ax.legend(ncol=3, **legend_args)
 
     # == Plot risk free return == #
     ax = axes[1, 0]
-    ax.plot(range(1,T+1), path.R - 1, label=r'$R_t - 1$', **p_args)
+    ax.plot(list(range(1,T+1)), path.R - 1, label=r'$R_t - 1$', **p_args)
     ax.legend(ncol=1, **legend_args)
 
     # == Plot revenue, expenditure and risk free rate == #
     ax = axes[1, 1]
-    ax.plot(range(1,T+1), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
-    ax.plot(range(1,T+1), path.g, label=r'$g_t$', **p_args)
-    axes[1, 1].plot(range(1,T), path.pi, label=r'$\pi_{t+1}$', **p_args)
+    ax.plot(list(range(1,T+1)), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
+    ax.plot(list(range(1,T+1)), path.g, label=r'$g_t$', **p_args)
+    axes[1, 1].plot(list(range(1,T)), path.pi, label=r'$\pi_{t+1}$', **p_args)
     ax.legend(ncol=3, **legend_args)
 
     plt.show()
@@ -268,7 +268,7 @@ def gen_fig_2(path):
     the docstring of that function for details.
     """
 
-    T = len(path.c)  
+    T = len(path.c)
 
     # == Prepare axes == #
     num_rows, num_cols = 2, 1
@@ -281,14 +281,14 @@ def gen_fig_2(path):
 
     # == Plot adjustment factor == #
     ax = axes[0]
-    ax.plot(range(2,T+1), path.xi, label=r'$\xi_t$', **p_args)
+    ax.plot(list(range(2,T+1)), path.xi, label=r'$\xi_t$', **p_args)
     ax.grid()
     ax.set_xlabel(r'Time')
     ax.legend(ncol=1, **legend_args)
 
     # == Plot adjusted cumulative return == #
     ax = axes[1]
-    ax.plot(range(2,T+1), path.Pi, label=r'$\Pi_t$', **p_args) 
+    ax.plot(list(range(2,T+1)), path.Pi, label=r'$\Pi_t$', **p_args)
     ax.grid()
     ax.set_xlabel(r'Time')
     ax.legend(ncol=1, **legend_args)

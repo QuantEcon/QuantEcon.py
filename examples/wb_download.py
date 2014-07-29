@@ -6,6 +6,9 @@ LastModified: 29/08/2013
 
 Dowloads data from the World Bank site on GDP per capita and plots result for
 a subset of countries.
+
+NOTE: This is not dually compatible with Python 3.  Python 2 and Python
+3 call the urllib package differently.
 """
 import pandas as pd
 import matplotlib.pyplot as plt
