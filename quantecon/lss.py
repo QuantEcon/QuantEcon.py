@@ -218,7 +218,7 @@ class LSS:
         """
         # == Initialize iteration == #
         m = self.moment_sequence()
-        mu_x, mu_y, Sigma_x, Sigma_y = m.next()
+        mu_x, mu_y, Sigma_x, Sigma_y = next(m)
         i = 0
         error = tol + 1
         # == Loop until convergence or failuer == #
@@ -230,7 +230,7 @@ class LSS:
 
             else:
                 i += 1
-                mu_x1, mu_y1, Sigma_x1, Sigma_y1 = m.next()
+                mu_x1, mu_y1, Sigma_x1, Sigma_y1 = next(m)
                 error_mu = np.max(np.abs(mu_x1 - mu_x))
                 error_Sigma = np.max(np.abs(Sigma_x1 - Sigma_x))
                 error = max(error_mu, error_Sigma)
