@@ -10,8 +10,8 @@ fig, ax = plt.subplots()
 data = distribution.rvs(n)
 
 if 0:
-    ax.plot(range(n), data, 'bo', alpha=0.5)
-    ax.vlines(range(n), 0, data, lw=0.2)
+    ax.plot(list(range(n)), data, 'bo', alpha=0.5)
+    ax.vlines(list(range(n)), 0, data, lw=0.2)
     ax.set_title("{} observations from the Cauchy distribution".format(n))
 
 if 1:
@@ -21,8 +21,8 @@ if 1:
         sample_mean[i] = np.mean(data[:i])
 
     # == Plot == #
-    ax.plot(range(n), sample_mean, 'r-', lw=3, alpha=0.6, label=r'$\bar X_n$')
-    ax.plot(range(n), [0] * n, 'k--', lw=0.5)
+    ax.plot(list(range(n)), sample_mean, 'r-', lw=3, alpha=0.6, label=r'$\bar X_n$')
+    ax.plot(list(range(n)), [0] * n, 'k--', lw=0.5)
     ax.legend()
 
 fig.show()

@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 phi = -0.8
-times = range(16)
+times = list(range(16))
 y1 = [phi**k / (1 - phi**2) for k in times]
 y2 = [np.cos(np.pi * k) for k in times]
 y3 = [a * b for a, b in zip(y1, y2)]

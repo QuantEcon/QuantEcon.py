@@ -3,7 +3,7 @@ Plots consumption, income and debt for the simple infinite horizon LQ
 permanent income model with Gaussian iid income.
 """
 
-from __future__ import division
+
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,9 +37,9 @@ if 1:
     legend_args = {'bbox_to_anchor' : bbox, 'loc' : 'upper left', 'mode' : 'expand'}
 
     w, b, c = time_path()
-    ax.plot(range(T+1), mu + sigma * w, 'g-', label="non-financial income", **p_args)
-    ax.plot(range(T+1), c, 'k-', label="consumption", **p_args)
-    ax.plot(range(T+1), b, 'b-', label="debt", **p_args)
+    ax.plot(list(range(T+1)), mu + sigma * w, 'g-', label="non-financial income", **p_args)
+    ax.plot(list(range(T+1)), c, 'k-', label="consumption", **p_args)
+    ax.plot(list(range(T+1)), b, 'b-', label="debt", **p_args)
     ax.legend(ncol=3, **legend_args)
 
     plt.show()
@@ -57,7 +57,7 @@ if 0:
     for i in range(250):
         rcolor = random.choice(('c', 'g', 'b', 'k'))
         w, b, c = time_path()
-        ax.plot(range(T+1), c, color=rcolor, **p_args)
+        ax.plot(list(range(T+1)), c, color=rcolor, **p_args)
 
     plt.show()
 
