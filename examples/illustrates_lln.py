@@ -34,7 +34,7 @@ plt.subplots_adjust(hspace=0.5)
 
 for ax in axes:
     # == Choose a randomly selected distribution == #
-    name = random.choice(distributions.keys())
+    name = random.choice(list(distributions.keys()))
     distribution = distributions.pop(name)
 
     # == Generate n draws from the distribution == #
@@ -46,12 +46,12 @@ for ax in axes:
         sample_mean[i] = np.mean(data[:i])
 
     # == Plot == #
-    ax.plot(range(n), data, 'o', color='grey', alpha=0.5)
+    ax.plot(list(range(n)), data, 'o', color='grey', alpha=0.5)
     axlabel = r'$\bar X_n$' + ' for ' + r'$X_i \sim$' + ' ' + name
-    ax.plot(range(n), sample_mean, 'g-', lw=3, alpha=0.6, label=axlabel)
+    ax.plot(list(range(n)), sample_mean, 'g-', lw=3, alpha=0.6, label=axlabel)
     m = distribution.mean()
-    ax.plot(range(n), [m] * n, 'k--', lw=1.5, label=r'$\mu$')
-    ax.vlines(range(n), m, data, lw=0.2)
+    ax.plot(list(range(n)), [m] * n, 'k--', lw=1.5, label=r'$\mu$')
+    ax.vlines(list(range(n)), m, data, lw=0.2)
     ax.legend(**legend_args)
 
 plt.show()
