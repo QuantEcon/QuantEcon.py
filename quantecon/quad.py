@@ -1,6 +1,6 @@
 """
 Filename: quad.py
-Authors: Chase Coleman, Spencer Lyon, John Stachurski, Thomas Sargent
+Authors: Chase Coleman, Spencer Lyon
 Date: 2014-07-01
 
 Defining various quadrature routines.
