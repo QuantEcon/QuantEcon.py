@@ -180,6 +180,7 @@ def model_tool():
              "lqcontrol",
              "lss",
              "mc_tools",
+             "quad",
              "quadsums",
              "rank_nullspace",
              "riccati",
