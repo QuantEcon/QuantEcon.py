@@ -24,4 +24,3 @@ ax.plot(wp.x_grid, phi_policy, 'b-', label='phi')
 ax.plot(wp.x_grid, s_policy, 'g-', label='s')
 ax.legend()
 plt.show()
-
