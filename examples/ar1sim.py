@@ -16,7 +16,7 @@ def proto1(a, b, sigma, T, num_reps, phi=norm.rvs):
 
 
 def proto2(a, b, sigma, T, num_reps, x0=None, phi=norm.rvs):
-    """ 
+    """
     More efficient, eliminates one loop.
     """
     if not x0 == None:
@@ -35,7 +35,7 @@ def ols_estimates(X):
         X_row = X[i,:].flatten()
         x = X_row[:-1]  # All but last one
         y = X_row[1:]   # All but first one
-        estimates[i] = np.dot(x, y) / np.dot(x, x) 
+        estimates[i] = np.dot(x, y) / np.dot(x, x)
     return estimates
 
 def ope_estimates(X):
@@ -55,20 +55,20 @@ X_obs = proto2(theta, 0, 1, n, num_reps)
 if 0:
     theta_hats = ols_estimates(X_obs)
     r = np.sqrt(n) * (theta_hats - theta)
-    print "OLS Expected: {}".format(1 - theta**2)
-    print "OLS Realized: {}".format(r.var())
+    print("OLS Expected: {}".format(1 - theta**2))
+    print("OLS Realized: {}".format(r.var()))
 
 if 0:
     theta_hats = ope_estimates(X_obs)
     r = np.sqrt(n) * (theta_hats - theta)
     e = (1 - theta**2) * (1 + (1 - theta**2) / (2 * theta**2))
-    print "OPE Expected: {}".format(e)
-    print "OPE Realized: {}".format(r.var())
+    print("OPE Expected: {}".format(e))
+    print("OPE Realized: {}".format(r.var()))
 
 s2_hats = X_obs.var(axis=1)
 r = np.sqrt(n) * (s2_hats - 1 / (1 - theta**2))
 e = 2 * (1 + theta**2) / (1 - theta**2)**3
-print "Expected: {}".format(e)
-print "Realized: {}".format(r.var())
+print("Expected: {}".format(e))
+print("Realized: {}".format(r.var()))
 
 

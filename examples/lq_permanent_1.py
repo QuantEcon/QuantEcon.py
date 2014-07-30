@@ -52,13 +52,13 @@ bbox = (0., 1.02, 1., .102)
 legend_args = {'bbox_to_anchor' : bbox, 'loc' : 3, 'mode' : 'expand'}
 p_args = {'lw' : 2, 'alpha' : 0.7}
 
-axes[0].plot(range(1, T+1), income, 'g-', label="non-financial income", **p_args)
-axes[0].plot(range(T), c, 'k-', label="consumption", **p_args)
+axes[0].plot(list(range(1, T+1)), income, 'g-', label="non-financial income", **p_args)
+axes[0].plot(list(range(T)), c, 'k-', label="consumption", **p_args)
 axes[0].legend(ncol=2, **legend_args)
 
-axes[1].plot(range(1, T+1), np.cumsum(income - mu), 'r-', label="cumulative unanticipated income", **p_args)
-axes[1].plot(range(T+1), assets, 'b-', label="assets", **p_args)
-axes[1].plot(range(T), np.zeros(T), 'k-')
+axes[1].plot(list(range(1, T+1)), np.cumsum(income - mu), 'r-', label="cumulative unanticipated income", **p_args)
+axes[1].plot(list(range(T+1)), assets, 'b-', label="assets", **p_args)
+axes[1].plot(list(range(T)), np.zeros(T), 'k-')
 axes[1].legend(ncol=2, **legend_args)
 
 plt.show()

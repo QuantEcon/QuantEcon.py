@@ -20,7 +20,7 @@ For the linear regulator, we take the state and control to be
 
 """
 
-from __future__ import division
+
 import pandas as pd
 import numpy as np
 from scipy.linalg import eig
@@ -77,7 +77,7 @@ def evaluate_policy(theta, F):
     x0 = np.array([[1.], [0.], [0.]])
     value = - x0.T.dot(P_F.dot(x0)) - d_F
     entropy = x0.T.dot(O_F.dot(x0)) + o_F
-    return map(float, (value, entropy))
+    return list(map(float, (value, entropy)))
 
 
 def value_and_entropy(emax, F, bw, grid_size=1000):
@@ -183,7 +183,7 @@ for c, df_pair in zip(colors, df_pairs):
         x, y = (np.asarray(a, dtype='float') for a in (x, y))
         egrid = np.linspace(0, emax, 100)
         curve = Curve(x, y)
-        print ax.plot(egrid, curve(egrid), color=c, **plot_args)
+        print(ax.plot(egrid, curve(egrid), color=c, **plot_args))
         curves.append(curve)
     # == Color fill between curves == #
     ax.fill_between(egrid, 
