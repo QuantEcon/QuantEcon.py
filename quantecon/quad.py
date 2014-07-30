@@ -750,7 +750,7 @@ def _qnwlege1(n, a, b):
     """
     # import ipdb; ipdb.set_trace()
     maxit = 100
-    m = np.fix((n + 1) / 2.0)
+    m = np.fix((n + 1) / 2.0).astype(int)
     xm = 0.5 * (b + a)
     xl = 0.5 * (b - a)
     nodes = np.zeros(n)
@@ -817,7 +817,7 @@ def _qnwnorm1(n):
     """
     maxit = 100
     pim4 = 1 / np.pi**(0.25)
-    m = np.fix((n + 1) / 2)
+    m = np.fix((n + 1) / 2).astype(int)
     nodes = np.zeros(n)
     weights = np.zeros(n)
 
