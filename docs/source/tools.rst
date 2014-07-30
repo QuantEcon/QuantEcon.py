@@ -14,6 +14,7 @@ Tools
    tools/lqcontrol
    tools/lss
    tools/mc_tools
+   tools/quad
    tools/quadsums
    tools/rank_nullspace
    tools/riccati
