@@ -1,13 +1,13 @@
 """
 Filename: test_quad.py
-Authors: Chase Coleman, Spencer Lyon, John Stachurski, Thomas Sargent
+Authors: Spencer Lyon
 Date: 2014-07-02
 
 Tests for quantecon.quad module
 
 Notes
 -----
-Many of tests were derived from the file demqua03 in the CompEcon
+Many of tests were derived from the file demqua## in the CompEcon
 toolbox.
 
 For all other tests, the MATLAB code is provided here in
