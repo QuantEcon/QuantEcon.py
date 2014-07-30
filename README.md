@@ -1,5 +1,5 @@
 
-## Quantitative Economics 
+## Quantitative Economics
 
 This repository collects code for quantitative economic modeling
 
@@ -36,10 +36,14 @@ Assuming you have [pip](https://pypi.python.org/pypi/pip) on your computer --- a
 
 at a terminal prompt
 
+#### Current Build and Coverage Status:
+[![Build Status](https://travis-ci.org/jstac/quant-econ.svg?branch=tests)](https://travis-ci.org/jstac/quant-econ)
+[![Coverage Status](https://coveralls.io/repos/jstac/quant-econ/badge.png)](https://coveralls.io/r/jstac/quant-econ)
+
 
 ### About Git / GitHub
 
-This code repository is hosted by [GitHub](http://github.com).  The primary function of GitHub is to host open source code repositories in a manner that facilitates sharing and collaboration.  
+This code repository is hosted by [GitHub](http://github.com).  The primary function of GitHub is to host open source code repositories in a manner that facilitates sharing and collaboration.
 
 If you wand to learn a bit more about Git and GitHub, you'll find it's an excellent investment. A good place to start is the [GitHub help page](https://help.github.com/).
 
