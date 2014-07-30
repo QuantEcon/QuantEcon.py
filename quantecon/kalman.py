@@ -10,7 +10,7 @@ Implements the Kalman filter for a linear Gaussian state space model.
 import numpy as np
 from numpy import dot
 from scipy.linalg import inv
-import riccati
+from . import riccati
 
 class Kalman:
     r"""
@@ -63,7 +63,7 @@ class Kalman:
     """
 
     def __init__(self, A, G, Q, R):
-        self.A, self.G, self.Q, self.R = map(self.convert, (A, G, Q, R))
+        self.A, self.G, self.Q, self.R = list(map(self.convert, (A, G, Q, R)))
         self.k, self.n = self.G.shape
 
     def convert(self, x):

@@ -35,7 +35,7 @@ def gen_x_draws(k):
 
 nmax = 5
 reps = 100000
-ns = range(1, nmax + 1)
+ns = list(range(1, nmax + 1))
 
 # == Form a matrix Z such that each column is reps independent draws of X == #
 Z = np.empty((reps, nmax))
@@ -61,7 +61,7 @@ verts = []
 for n in ns:
     density = gaussian_kde(Y[:,n-1])
     ys = density(xs)
-    verts.append(zip(xs, ys))
+    verts.append(list(zip(xs, ys)))
 
 poly = PolyCollection(verts, facecolors = [str(g) for g in greys])
 poly.set_alpha(0.85)

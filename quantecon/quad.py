@@ -15,12 +15,13 @@ and Finance, MIT Press, 2002.
 
 """
 from __future__ import division
+
 import math
 import numpy as np
 import scipy.linalg as la
 from scipy.special import gammaln
 import sympy as sym
-from ce_util import ckron, gridmake
+from .ce_util import ckron, gridmake
 
 __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
            'qnwsimp', 'qnwtrap', 'qnwunif', 'quadrect', 'qnwbeta',
@@ -126,9 +127,9 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
     if equidist_pp is None:
         equidist_pp = np.sqrt(np.array(list(sym.primerange(0, 7920))))
 
-    n, a, b = map(np.atleast_1d, map(np.asarray, [n, a, b]))
+    n, a, b = list(map(np.atleast_1d, list(map(np.asarray, [n, a, b]))))
 
-    d = max(map(len, [n, a, b]))
+    d = max(list(map(len, [n, a, b])))
     n = np.prod(n)
 
     if a.size == 1:
@@ -444,7 +445,7 @@ def qnwunif(n, a, b):
     Economics and Finance, MIT Press, 2002.
 
     """
-    n, a, b = map(np.asarray, [n, a, b])
+    n, a, b = list(map(np.asarray, [n, a, b]))
     nodes, weights = qnwlege(n, a, b)
     weights = weights / np.prod(b - a)
     return nodes, weights
@@ -639,7 +640,7 @@ def _make_multidim_func(one_d_func, n, *args):
     """
     args = list(args)
     n = np.asarray(n)
-    args = map(np.asarray, args)
+    args = list(map(np.asarray, args))
 
     if all([x.size == 1 for x in [n] + args]):
         return one_d_func(n, *args)
@@ -749,7 +750,7 @@ def _qnwlege1(n, a, b):
     """
     # import ipdb; ipdb.set_trace()
     maxit = 100
-    m = np.fix((n + 1) / 2.0)
+    m = np.fix((n + 1) / 2.0).astype(int)
     xm = 0.5 * (b + a)
     xl = 0.5 * (b - a)
     nodes = np.zeros(n)
@@ -816,7 +817,7 @@ def _qnwnorm1(n):
     """
     maxit = 100
     pim4 = 1 / np.pi**(0.25)
-    m = np.fix((n + 1) / 2)
+    m = np.fix((n + 1) / 2).astype(int)
     nodes = np.zeros(n)
     weights = np.zeros(n)
 
