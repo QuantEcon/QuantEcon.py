@@ -47,7 +47,7 @@ def dare(A, B, R, Q, tolerance=1e-10, max_iter=150):
     error = tolerance + 1
     fail_msg = "Convergence failed after {} iterations."
     # == Make sure that all arrays are two-dimensional == #
-    A, B, Q, R = map(np.atleast_2d, (A, B, Q, R))
+    A, B, Q, R = list(map(np.atleast_2d, (A, B, Q, R)))
     k = Q.shape[0]
     I = np.identity(k)
 
@@ -98,4 +98,4 @@ if __name__ == '__main__': ## Example of useage
                   [0.0, 0.0, 10.0]])
 
     x = dare(a, b, r, q)
-    print x
+    print(x)

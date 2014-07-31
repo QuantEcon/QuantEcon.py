@@ -12,11 +12,12 @@ References
 
 import numpy as np
 from scipy.integrate import fixed_quad as integrate
-from scipy.optimize import fmin_slsqp as minimize
+from scipy.optimize import minimize
 import scipy.stats as stats
 from scipy import interp
 
-epsilon = 1e-4  #  A small number, used in the optimization routine
+epsilon = 1e-4  # A small number, used in the optimization routine
+
 
 class JvWorker:
     r"""
@@ -83,7 +84,6 @@ class JvWorker:
         grid_max = max(A**(1 / (1 - alpha)), self.F.ppf(1 - epsilon))
         self.x_grid = np.linspace(epsilon, grid_max, grid_size)
 
-
     def bellman_operator(self, V, brute_force=False, return_policies=False):
         """
         Returns the approximate value function TV by applying the
@@ -123,10 +123,11 @@ class JvWorker:
         N = len(self.x_grid)
         new_V, s_policy, phi_policy = np.empty(N), np.empty(N), np.empty(N)
         a, b = F.ppf(0.005), F.ppf(0.995)  # Quantiles, for integration
-        c1 = lambda z: 1 - sum(z)          # used to enforce s + phi <= 1
+        c1 = lambda z: 1.0 - sum(z)          # used to enforce s + phi <= 1
         c2 = lambda z: z[0] - epsilon      # used to enforce s >= epsilon
         c3 = lambda z: z[1] - epsilon      # used to enforce phi >= epsilon
-        guess, constraints = (0.2, 0.2), [c1, c2, c3]
+        guess = (0.2, 0.2)
+        constraints = [{"type": "ineq", "fun": i} for i in [c1, c2, c3]]
 
         # === solve r.h.s. of Bellman equation === #
         for i, x in enumerate(self.x_grid):
@@ -136,23 +137,24 @@ class JvWorker:
                 s, phi = z
                 h = lambda u: Vf(np.maximum(G(x, phi), u)) * F.pdf(u)
                 integral, err = integrate(h, a, b)
-                q = pi(s) * integral + (1 - pi(s)) * Vf(G(x, phi))
+                q = pi(s) * integral + (1.0 - pi(s)) * Vf(G(x, phi))
                 # == minus because we minimize == #
-                return - x * (1 - phi - s) - beta * q
+                return - x * (1.0 - phi - s) - beta * q
 
             # === either use SciPy solver === #
             if not brute_force:
-                max_s, max_phi = minimize(w, guess,
-                        ieqcons=constraints, disp=0)
+                max_s, max_phi = minimize(w, guess, constraints=constraints,
+                                          options={"disp": 0},
+                                          method="COBYLA")["x"]
                 max_val = -w((max_s, max_phi))
 
             # === or search on a grid === #
             else:
-                search_grid = np.linspace(epsilon, 1, 15)
-                max_val = -1
+                search_grid = np.linspace(epsilon, 1.0, 15)
+                max_val = -1.0
                 for s in search_grid:
                     for phi in search_grid:
-                        current_val = -w((s, phi)) if s + phi <= 1 else -1
+                        current_val = -w((s, phi)) if s + phi <= 1.0 else -1.0
                         if current_val > max_val:
                             max_val, max_s, max_phi = current_val, s, phi
 
@@ -164,5 +166,3 @@ class JvWorker:
             return s_policy, phi_policy
         else:
             return new_V
-
-
