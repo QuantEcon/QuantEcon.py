@@ -3,7 +3,7 @@ Impulse response functions for the LQ permanent income model permanent and
 transitory shocks.
 """
 
-from __future__ import division
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -44,15 +44,15 @@ for ax in axes:
 ax = axes[0]
 b, c = time_path(permanent=0)
 ax.set_title('impulse-response, transitory income shock')
-ax.plot(range(T+1), c, 'g-', label="consumption", **p_args)
-ax.plot(range(T+1), b, 'b-', label="debt", **p_args)
+ax.plot(list(range(T+1)), c, 'g-', label="consumption", **p_args)
+ax.plot(list(range(T+1)), b, 'b-', label="debt", **p_args)
 ax.legend(loc='upper right')
 
 ax = axes[1]
 b, c = time_path(permanent=1)
 ax.set_title('impulse-response, permanent income shock')
-ax.plot(range(T+1), c, 'g-', label="consumption", **p_args)
-ax.plot(range(T+1), b, 'b-', label="debt", **p_args)
+ax.plot(list(range(T+1)), c, 'g-', label="consumption", **p_args)
+ax.plot(list(range(T+1)), b, 'b-', label="debt", **p_args)
 ax.legend(loc='lower right')
 plt.show()
 

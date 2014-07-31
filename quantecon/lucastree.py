@@ -151,7 +151,7 @@ def compute_lt_price(lt, grid=None):
         new_f = lucas_operator(f)
         iterate += 1
         error = np.max(np.abs(new_f - f))
-        print error
+        print(error)
         f = new_f
 
     price = f * grid**gamma
