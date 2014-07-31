@@ -8,7 +8,8 @@ Tests jv.py with a particular parameterization.
 
 """
 import matplotlib.pyplot as plt
-from quantecon import compute_fixed_point, JvWorker
+from quantecon import compute_fixed_point
+from quantecon.models import JvWorker
 
 # === solve for optimal policy === #
 wp = JvWorker(grid_size=25)
