@@ -40,10 +40,10 @@ def smooth(x, window_len=7, window='hanning'):
 
     """
     if len(x) < window_len:
-        raise ValueError, "Input vector length must be >= window length."
+        raise ValueError("Input vector length must be >= window length.")
 
     if window_len < 3:
-        raise ValueError, "Window length must be at least 3."
+        raise ValueError("Window length must be at least 3.")
 
     if not window_len % 2:  # window_len is even
         window_len +=1

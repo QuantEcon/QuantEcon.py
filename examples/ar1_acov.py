@@ -12,7 +12,7 @@ plt.subplots_adjust(hspace=0.4)
 temp = r'autocovariance, $\phi = {0:.2}$'
 for i, phi in enumerate((0.8, -0.8)):
     ax = axes[i]
-    times = range(16)
+    times = list(range(16))
     acov = [phi**k / (1 - phi**2) for k in times]
     ax.plot(times, acov, 'bo-', alpha=0.6, label=temp.format(phi))
     ax.legend(loc='upper right')
