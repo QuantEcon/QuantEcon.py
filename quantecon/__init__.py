@@ -1,8 +1,6 @@
-'''
+"""
 Import the main names to top level.
-
-'''
-
+"""
 from .asset_pricing import AssetPrices
 from .career import CareerWorkerProblem
 from .compute_fp import compute_fixed_point
@@ -26,4 +24,3 @@ from .riccati import dare
 from .robustlq import RBLQ
 from .tauchen import approx_markov
 from .quad import *
-
