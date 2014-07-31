@@ -14,27 +14,27 @@ class CESTestSuite(unittest.TestCase):
     """Base class for ces.py module tests."""
 
     def setUp(self):
-        raise NotImplementedError
+        pass
 
     def test_marginal_product_capital(self):
         """Test CES marginal product of capital."""
-        raise NotImplementedError
+        pass
 
     def test_marginal_product_labor(self):
         """Test CES marginal product of labor."""
-        raise NotImplementedError
+        pass
 
     def test_output(self):
         """Test CES output."""
-        raise NotImplementedError
+        pass
 
     def test_output_elasticity_capital(self):
         """Test CES elasticity of output with respect to capital."""
-        raise NotImplementedError
+        pass
 
     def test_output_elasticity_labor(self):
         """Test CES elasticity of output with respect to capital."""
-        raise NotImplementedError
+        pass
 
 
 class CobbDouglasCase(CESTestSuite):
