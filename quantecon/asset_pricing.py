@@ -19,7 +19,8 @@ References
 import numpy as np
 from numpy.linalg import solve
 
-class AssetPrices:
+
+class AssetPrices(object):
     r"""
     A class to compute asset prices when the endowment follows a finite
     Markov chain.
@@ -83,12 +84,20 @@ class AssetPrices:
           153.80497466, 603.87100476])}
 
     """
-
-
     def __init__(self, beta, P, s, gamma):
         self.beta, self.gamma = beta, gamma
         self.P, self.s = P, s
         self.n = self.P.shape[0]
+
+    @property
+    def P_tilde(self):
+        P, s, gamma = self.P, self.s, self.gamma
+        return P * s**(1.0-gamma)  # using broadcasting
+
+    @property
+    def P_check(self):
+        P, s, gamma = self.P, self.s, self.gamma
+        return P * s**(-gamma)  # using broadcasting
 
     def tree_price(self):
         """
@@ -102,9 +111,10 @@ class AssetPrices:
 
         """
         # == Simplify names == #
-        P, s, gamma, beta = self.P, self.s, self.gamma, self.beta
+        beta = self.beta
+
         # == Compute v == #
-        P_tilde = P * s**(1-gamma) #using broadcasting
+        P_tilde = self.P_tilde
         I = np.identity(self.n)
         O = np.ones(self.n)
         v = beta * solve(I - beta * P_tilde, P_tilde.dot(O))
@@ -127,9 +137,10 @@ class AssetPrices:
 
         """
         # == Simplify names == #
-        P, s, gamma, beta = self.P, self.s, self.gamma, self.beta
+        beta = self.beta
+
         # == Compute price == #
-        P_check = P * s**(-gamma)
+        P_check = self.P_check
         I = np.identity(self.n)
         O = np.ones(self.n)
         p_bar = beta * solve(I - beta * P_check, P_check.dot(zeta * O))
@@ -167,10 +178,12 @@ class AssetPrices:
 
         """
         # == Simplify names, initialize variables == #
-        P, s, gamma, beta = self.P, self.s, self.gamma, self.beta
-        P_check = P * s**(-gamma)
+        beta = self.beta
+        P_check = self.P_check
+
         # == Compute consol price == #
         v_bar = self.consol_price(zeta)
+
         # == Compute option price == #
         w_bar = np.zeros(self.n)
         error = epsilon + 1
@@ -179,11 +192,14 @@ class AssetPrices:
         while error > epsilon:
             if t in T:
                 w_bars[t] = w_bar
+
             # == Maximize across columns == #
             to_stack = (beta*P_check.dot(w_bar), v_bar-p_s)
-            w_bar_new = np.amax(np.vstack(to_stack), axis = 0 )
+            w_bar_new = np.amax(np.vstack(to_stack), axis=0)
+
             # == Find maximal difference of each component == #
             error = np.amax(np.abs(w_bar-w_bar_new))
+
             # == Update == #
             w_bar = w_bar_new
             t += 1
