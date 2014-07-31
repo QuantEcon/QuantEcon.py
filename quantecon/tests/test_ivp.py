@@ -36,15 +36,59 @@ class SolowModelCase(IVPTestSuite):
 
     def test_integrate(self):
         """Test ODE integration."""
+        # analytic test case using Cobb-Douglas production technology.
         t0 = 0.0
         k0 = 0.5
 
-        traj = self.ivp.integrate(t0, k0, h=1.0, T=10.0, integrator='dopri5')
+        # tighten tolerances so tests don't file due to numerical issues
+        kwargs = {'atol': 1e-12, 'rtol': 1e-9}
 
-        expected_sol = cobb_douglas_analytic_solution(traj[:0], k0, *self.ivp.args)
-        actual_sol = traj[:, 1]
+        integrators = ['dopri5', 'dop853', 'vode', 'lsoda']
 
-        testing.assert_almost_equal(expected_sol, actual_sol)
+        for integrator in integrators:
+
+            tmp_numeric_traj = self.ivp.integrate(t0, k0, h=1e-1, T=100.0,
+                                                  integrator=integrator,
+                                                  **kwargs)
+
+            tmp_grid_pts = tmp_numeric_traj[:, 0]
+            tmp_analytic_traj = cobb_douglas_analytic_solution(tmp_grid_pts,
+                                                               k0,
+                                                               *self.ivp.args)
+
+            expected_sol = tmp_analytic_traj[:, 1]
+            actual_sol = tmp_numeric_traj[:, 1]
+
+            testing.assert_almost_equal(expected_sol, actual_sol)
+
+    def test_interpolate(self):
+        """Test B-spline interpolation."""
+        # analytic test case using Cobb-Douglas production technology.
+        t0 = 0.0
+        k0 = 0.5
+
+        # tighten tolerances so tests don't file due to numerical issues
+        kwargs = {'atol': 1e-12, 'rtol': 1e-9}
+
+        integrators = ['dopri5', 'dop853', 'vode', 'lsoda']
+
+        for integrator in integrators:
+
+            tmp_numeric_traj = self.ivp.integrate(t0, k0, h=1e-1, T=100.0,
+                                                  integrator=integrator,
+                                                  **kwargs)
+            T = tmp_numeric_traj[:, 0][-1]
+            tmp_grid_pts = np.linspace(t0, T, 1000)
+
+            tmp_interp_traj = self.ivp.interpolate(tmp_numeric_traj, tmp_grid_pts, k=3)
+            tmp_analytic_traj = cobb_douglas_analytic_solution(tmp_grid_pts,
+                                                               k0,
+                                                               *self.ivp.args)
+
+            expected_sol = tmp_analytic_traj[:, 1]
+            actual_sol = tmp_interp_traj[:, 1]
+
+            testing.assert_almost_equal(expected_sol, actual_sol)
 
 
 class SpenceModelCase(IVPTestSuite):
