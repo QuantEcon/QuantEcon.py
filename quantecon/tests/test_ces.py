@@ -267,15 +267,3 @@ class LeontiefCase(GeneralCESCase):
         actual_elasticity = test_elasticity(capital, technology, labor,
                                             alpha, beta, sigma)
         testing.assert_almost_equal(expected_elasticity, actual_elasticity)
-
-
-if __name__ == '__main__':
-    test_loader = unittest.TestLoader()
-
-    cobb_douglas = test_loader.loadTestsFromTestCase(CobbDouglasCase)
-    leontief = test_loader.loadTestsFromTestCase(LeontiefCase)
-    general_ces = test_loader.loadTestsFromTestCase(GeneralCESCase)
-
-    unittest.TextTestRunner(verbosity=2).run(cobb_douglas)
-    unittest.TextTestRunner(verbosity=2).run(leontief)
-    unittest.TextTestRunner(verbosity=2).run(general_ces)
