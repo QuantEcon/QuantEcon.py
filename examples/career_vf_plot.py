@@ -11,9 +11,10 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 from matplotlib import cm
 import quantecon as qe
+from quantecon.models import CareerWorkerProblem
 
 # === solve for the value function === #
-wp = qe.CareerWorkerProblem()
+wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
 v = qe.compute_fixed_point(wp.bellman, v_init)
 
@@ -21,11 +22,11 @@ v = qe.compute_fixed_point(wp.bellman, v_init)
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(111, projection='3d')
 tg, eg = np.meshgrid(wp.theta, wp.epsilon)
-ax.plot_surface(tg, 
-                eg,  
-                v.T, 
-                rstride=2, cstride=2, 
-                cmap=cm.jet, 
+ax.plot_surface(tg,
+                eg,
+                v.T,
+                rstride=2, cstride=2,
+                cmap=cm.jet,
                 alpha=0.5,
                 linewidth=0.25)
 ax.set_zlim(150, 200)
