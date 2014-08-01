@@ -26,6 +26,7 @@ class TestDiscreteRV(unittest.TestCase):
         cls.drv = DiscreteRV(cls.x)
 
     def test_Q_updates(self):
+        "discrete_rv: Q attributes updates on q change?"
         Q_init = np.copy(self.drv.Q)
 
         # change q, see if Q updates
@@ -44,9 +45,11 @@ class TestDiscreteRV(unittest.TestCase):
         assert_allclose(Q_init, self.drv.Q)
 
     def test_Q_end_1(self):
+        "discrete_rv: Q sums to 1"
         assert (self.drv.Q[-1] - 1.0 < 1e-10)
 
     def test_draw_lln(self):
+        "discrete_rv: lln satisfied?"
         raise SkipTest("Takes too long, but it is interesting")
         draws = self.drv.draw(1000000)
         counts = pd.Series(Counter(draws))

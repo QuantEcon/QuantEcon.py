@@ -33,14 +33,16 @@ class TestAssetPrices(unittest.TestCase):
         cls.ap = AssetPrices(bet, P, s, gamma)
 
     def test_P_shape(self):
+        "asset_pricing: is P square"
         shp = self.ap.P.shape
         assert shp[0] == shp[1]
 
     def test_n(self):
+        "asset_pricing: n computed correctly"
         assert self.ap.n == self.ap.P.shape[0]
 
     def test_P_tilde(self):
-        "construct P_tilde by hand using nested for loops"
+        "asset_pricing: test P_tilde by hand using nested loops"
         # unpack variables and allocate memory for new P_tilde
         n, s, P, gam = (self.ap.n, self.ap.s, self.ap.P, self.ap.gamma)
         p_tilde_2 = np.empty_like(self.ap.P)
@@ -53,7 +55,7 @@ class TestAssetPrices(unittest.TestCase):
         assert_allclose(self.ap.P_tilde, p_tilde_2)
 
     def test_P_check(self):
-        "construct P_check by hand using nested for loops"
+        "asset_pricing: test P_check by hand using nested loops"
         # unpack variables and allocate memory for new P_tilde
         n, s, P, gam = (self.ap.n, self.ap.s, self.ap.P, self.ap.gamma)
         p_check_2 = np.empty_like(self.ap.P)
@@ -66,12 +68,15 @@ class TestAssetPrices(unittest.TestCase):
         assert_allclose(self.ap.P_check, p_check_2)
 
     def test_tree_price_size(self):
+        "asset_pricing: test lucas_tree price size"
         assert self.ap.tree_price().size == self.ap.n
 
     def test_consol_price_size(self):
+        "asset_pricing: test consol_price price size"
         assert self.ap.consol_price(zeta).size == self.ap.n
 
     def test_call_option_size(self):
+        "asset_pricing: test call_option price size"
         assert self.ap.call_option(zeta, p_s)[0].size == self.ap.n
 
     def test_tree_price(self):
