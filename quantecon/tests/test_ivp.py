@@ -20,7 +20,7 @@ class SolowModelCase(unittest.TestCase):
         self.ivp = IVP(f=ces_k_dot, jac=ces_jacobian, args=params)
 
     def test_compute_residual(self):
-        """Test B-spline interpolation."""
+        """Test accuracy of IVP solvers."""
         # analytic test case using Cobb-Douglas production technology.
         t0 = 0.0
         k0 = 0.5
@@ -38,9 +38,9 @@ class SolowModelCase(unittest.TestCase):
             T = tmp_numeric_traj[:, 0][-1]
             tmp_grid_pts = np.linspace(t0, T, 1000)
 
-            tmp_residual = self.ivp.test_compute_residual(tmp_numeric_traj,
-                                                          tmp_grid_pts,
-                                                          k=3)
+            tmp_residual = self.ivp.compute_residual(tmp_numeric_traj,
+                                                     tmp_grid_pts,
+                                                     k=3)
             expected_residual = np.zeros((1000, 2))
             actual_residual = tmp_residual
 
