@@ -39,11 +39,27 @@ def test_var_identitysum():
 
 
 def test_m_simplesum():
-    pass
+    a = np.sqrt(.95)
+    b = 1
+
+    retval = m_quadratic_sum(a, b)
+
+    self.assertTrue(abs(retval - 20) < 1e-8)
 
 
-def test_m_identitysum():
-    pass
+def test_m_matsum():
+
+    a = np.eye(3) * .99
+    b = np.eye(3)
+
+    retval = m_quadratic_sum(a, b)
+
+    summedval = np.zeros_like(a)
+
+    for i in range(5000):
+        summedval = summedval + a**i * b * a.T**i
+
+    assert_allclose(retval, summedval, atol=1e-5, rtol=0)
 
 
 
