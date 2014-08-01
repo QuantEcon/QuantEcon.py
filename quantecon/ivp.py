@@ -331,7 +331,7 @@ class IVP(object):
 
         return interp_traj
 
-    def residual(self, traj, ti, k=3, ext=2):
+    def compute_residual(self, traj, ti, k=3, ext=2):
         """
         The residual is the difference between the derivative of the B-spline
         approximation of the solution trajectory and the right-hand side of the
