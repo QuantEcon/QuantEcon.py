@@ -98,11 +98,3 @@ class SolowModelCase(unittest.TestCase):
             actual_sol = tmp_interp_traj[:, 1]
 
             testing.assert_almost_equal(expected_sol, actual_sol)
-
-
-class SpenceModelCase(IVPTestSuite):
-    pass
-
-if __name__ == '__main__':
-    IVPTest = unittest.TestLoader().loadTestsFromTestCase(IVPTestSuite)
-    unittest.TextTestRunner(verbosity=2).run(suite1)
