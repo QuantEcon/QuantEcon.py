@@ -5,3 +5,4 @@ build/
 /dist/
 /*.egg_info
 *.DS_Store
+*.TODO
