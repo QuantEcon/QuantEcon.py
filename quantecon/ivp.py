@@ -72,9 +72,17 @@ class IVP(object):
                 evaluated along the approximated solution trajectory.
 
         """
+        # B-spline approximations of the solution and its derivative
         interp_soln = self.interpolate(traj, ti, k, 0, ext)
         interp_deriv = self.interpolate(traj, ti, k, 1, ext)
-        residual = interp_deriv - self.f(ti, interp_soln[:, 1:])
+
+        # rhs of ode evaluated along approximate solution
+        tup = (ti[:, np.newaxis], self.f(ti, interp_soln[:, 1:], *self.args))
+        rhs_ode = np.hstack(tup)
+
+        # should be roughly zero everywhere (if approximation is any good!)
+        residual = interp_deriv - rhs_ode
+
         return residual
 
     def integrate(self, t0, y0, h=1.0, T=None, g=None, tol=None,
