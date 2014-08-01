@@ -13,7 +13,7 @@ from __future__ import division
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.asset_pricing import AssetPrices
+from quantecon.models import AssetPrices
 
 # parameters for object
 n = 5

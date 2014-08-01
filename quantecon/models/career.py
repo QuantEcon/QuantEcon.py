@@ -94,9 +94,14 @@ class CareerWorkerProblem(object):
         new_v = np.empty(v.shape)
         for i in range(self.N):
             for j in range(self.N):
+                # stay put
                 v1 = self.theta[i] + self.epsilon[j] + self.beta * v[i, j]
+
+                # new job
                 v2 = (self.theta[i] + self.G_mean + self.beta *
                       np.dot(v[i, :], self.G_probs))
+
+                # new life
                 v3 = (self.G_mean + self.F_mean + self.beta *
                       np.dot(self.F_probs, np.dot(v, self.G_probs)))
                 new_v[i, j] = max(v1, v2, v3)
