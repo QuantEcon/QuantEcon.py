@@ -42,6 +42,41 @@ class IVP(object):
         self.args = args
         self.ode = integrate.ode(f, jac)
 
+    def compute_residual(self, traj, ti, k=3, ext=2):
+        """
+        The residual is the difference between the derivative of the B-spline
+        approximation of the solution trajectory and the right-hand side of the
+        original ODE evaluated along the approximated solution trajectory.
+
+        Parameters
+        ----------
+            traj : array_like (float)
+                Solution trajectory providing the data points for constructing
+                the B-spline representation.
+            ti : array_like (float)
+                Array of values for the independent variable at which to
+                interpolate the value of the B-spline.
+            k : int, optional(default=3)
+                Degree of the desired B-spline. Degree must satisfy
+                :math:`1 \le k \le 5`.
+            ext : int, optional(default=2)
+                Controls the value of returned elements for outside the
+                original knot sequence provided by traj. For extrapolation, set
+                `ext=0`; `ext=1` returns zero; `ext=2` raises a `ValueError`.
+
+        Returns
+        -------
+            residual: array (float)
+                Difference between the derivative of the B-spline approximation
+                of the solution trajectory and the right-hand side of the ODE
+                evaluated along the approximated solution trajectory.
+
+        """
+        interp_soln = self.interpolate(traj, ti, k, 0, ext)
+        interp_deriv = self.interpolate(traj, ti, k, 1, ext)
+        residual = interp_deriv - self.f(ti, interp_soln[:, 1:])
+        return residual
+
     def integrate(self, t0, y0, h=1.0, T=None, g=None, tol=None,
                   integrator='dopri5', step=False, relax=False, **kwargs):
         """
@@ -330,38 +365,3 @@ class IVP(object):
         interp_traj = np.hstack((ti[:, np.newaxis], np.array(out).T))
 
         return interp_traj
-
-    def compute_residual(self, traj, ti, k=3, ext=2):
-        """
-        The residual is the difference between the derivative of the B-spline
-        approximation of the solution trajectory and the right-hand side of the
-        original ODE evaluated along the approximated solution trajectory.
-
-        Parameters
-        ----------
-            traj : array_like (float)
-                Solution trajectory providing the data points for constructing
-                the B-spline representation.
-            ti : array_like (float)
-                Array of values for the independent variable at which to
-                interpolate the value of the B-spline.
-            k : int, optional(default=3)
-                Degree of the desired B-spline. Degree must satisfy
-                :math:`1 \le k \le 5`.
-            ext : int, optional(default=2)
-                Controls the value of returned elements for outside the
-                original knot sequence provided by traj. For extrapolation, set
-                `ext=0`; `ext=1` returns zero; `ext=2` raises a `ValueError`.
-
-        Returns
-        -------
-            residual: array (float)
-                Difference between the derivative of the B-spline approximation
-                of the solution trajectory and the right-hand side of the ODE
-                evaluated along the approximated solution trajectory.
-
-        """
-        interp_soln = self.interpolate(traj, ti, k, 0, ext)
-        interp_deriv = self.interpolate(traj, ti, k, 1, ext)
-        residual = interp_deriv - self.f(ti, interp_soln[:, 1:])
-        return residual
