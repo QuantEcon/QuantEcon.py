@@ -92,19 +92,19 @@ class TestSmooth(unittest.TestCase):
         pass
 
     def test_smooth_raise_long_window(self):
-        "raise error if smooth(*a, window_len) too large"
+        "estspec: raise error if smooth(*a, window_len) too large"
         self.assertRaises(ValueError, smooth, self.x_20, window_len=25)
 
     def test_smooth_short_window_err(self):
-        "raise error in smooth(*a, window_len) if window_len too small"
+        "estspec: raise error in smooth(*a, window_len) if window_len too small"
         self.assertRaises(ValueError, smooth, self.x_20, window_len=2)
 
     def test_smooth_default_hanning(self):
-        "smooth defaults to hanning on unrecognized window"
+        "estspec: smooth defaults to hanning on unrecognized window"
         with capture(smooth, x=self.x_20, window="foobar") as output:
             self.assertRegexpMatches(output, "Defaulting")
 
     def test_smooth_window_len_must_be_odd(self):
-        "smooth changes even window_len to odd"
+        "estspec: smooth changes even window_len to odd"
         with capture(smooth, x=self.x_20, window_len=4) as output:
             self.assertRegexpMatches(output, "reset")

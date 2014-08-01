@@ -9,6 +9,8 @@ References
 
 https://www.math.ucdavis.edu/~hunter/book/ch3.pdf
 
+TODO: add multivariate case
+
 """
 from __future__ import division
 import unittest
@@ -34,6 +36,7 @@ class TestFPLogisticEquation(unittest.TestCase):
         return 4.0 * mu * x * (1.0 - x)
 
     def test_contraction_1(self):
+        "compute_fp: convergence inside interval of convergence"
         f = lambda x: self.T(x, self.mu_1)
         for i in self.unit_inverval:
             # should have fixed point of 0.0
@@ -41,6 +44,7 @@ class TestFPLogisticEquation(unittest.TestCase):
                             < 1e-4)
 
     def test_not_contraction_2(self):
+        "compute_fp: no convergence outside interval of convergence"
         f = lambda x: self.T(x, self.mu_2)
         for i in self.unit_inverval:
             # This shouldn't converge to 0.0
@@ -48,6 +52,7 @@ class TestFPLogisticEquation(unittest.TestCase):
                              < 1e-4)
 
     def test_contraction_2(self):
+        "compute_fp: convergence inside interval of convergence"
         f = lambda x: self.T(x, self.mu_2)
         fp = (4 * self.mu_2 - 1) / (4 * self.mu_2)
         for i in self.unit_inverval:
@@ -56,6 +61,7 @@ class TestFPLogisticEquation(unittest.TestCase):
                             < 1e-4)
 
     def test_not_contraction_1(self):
+        "compute_fp: no convergence outside interval of convergence"
         f = lambda x: self.T(x, self.mu_1)
         fp = (4 * self.mu_1 - 1) / (4 * self.mu_1)
         for i in self.unit_inverval:

@@ -48,16 +48,13 @@ def _get_vfi_pfi_guesses(cp, force_new=False):
         # See if the ifp group already exists
         group_existed = True
         try:
-            print("in First try")
             ifp_group = f.getNode("/ifp")
         except:
-            print("in First except")
             # doesn't exist
             group_existed = False
             ifp_group = f.create_group("/", "ifp", "data for ifp.py tests")
 
         if force_new or not group_existed:
-            print("in First if")
             # group doesn't exist, or forced to create new data.
             # This function updates f in place and returns v_vfi, c_vfi, c_pfi
             v_vfi, c_vfi, c_pfi = _new_solutions(cp, f, ifp_group)
@@ -68,23 +65,19 @@ def _get_vfi_pfi_guesses(cp, force_new=False):
         # if we made it here, the group exists and we should try to read
         # existing solutions
         try:  # read in vfi
-            print("in second try")
             # Try reading vfi
             c_vfi = ifp_group.c_vfi[:]
             v_vfi = ifp_group.v_vfi[:]
 
         except:
-            print("in second except")
             # doesn't exist. Let's create it
             v_vfi, c_vfi = _new_solutions(cp, f, ifp_group, which="vfi")
 
         try:  # read in pfi
-            print("in third try")
             # Try reading pfi
             c_pfi = ifp_group.c_pfi[:]
 
         except:
-            print("in third except")
             # doesn't exist. Let's create it
             c_pfi = _new_solutions(cp, f, ifp_group, which="pfi")
 
@@ -94,7 +87,6 @@ def _get_vfi_pfi_guesses(cp, force_new=False):
 def _new_solutions(cp, f, grp, which="both"):
     v_init, c_init = cp.initialize()
     if which == "both":
-        print("in new both")
 
         v_vfi, c_vfi = _solve_via_vfi(cp, v_init, return_both=True)
         c_pfi = _solve_via_pfi(cp, c_init)
@@ -107,7 +99,6 @@ def _new_solutions(cp, f, grp, which="both"):
         return v_vfi, c_vfi, c_pfi
 
     elif which == "vfi":
-        print("in new vfi")
         v_vfi, c_vfi = _solve_via_vfi(cp, v_init, return_both=True)
         write_array(f, grp, c_vfi, "c_vfi")
         write_array(f, grp, v_vfi, "v_vfi")
@@ -115,7 +106,6 @@ def _new_solutions(cp, f, grp, which="both"):
         return v_vfi, c_vfi
 
     elif which == "pfi":
-        print("in new pfi")
         c_pfi = _solve_via_pfi(cp, c_init)
         write_array(f, grp, c_pfi, "c_pfi")
 
@@ -141,15 +131,15 @@ class TestConsumerProblem(unittest.TestCase):
         cls.c_pfi = _solve_via_pfi(cls.cp, old_pfi_sol * 0.99999)
 
     def test_bellman_coleman_solutions_agree(self):
-        "bellman and coleman solutions agree"
+        "ifp: bellman and coleman solutions agree"
         self.assertLessEqual(max_abs_diff(self.c_vfi, self.c_pfi), 0.2)
 
     def test_bellman_fp(self):
-        "solution to bellman is a fixed point"
+        "ifp: solution to bellman is a fixed point"
         new_v = self.cp.bellman_operator(self.v_vfi)
         self.assertLessEqual(max_abs_diff(self.v_vfi, new_v), 1e-3)
 
     def test_coleman_fp(self):
-        "solution to coleman is a fixed point"
+        "ifp: solution to coleman is a fixed point"
         new_c = self.cp.coleman_operator(self.c_pfi)
         self.assertLessEqual(max_abs_diff(self.c_pfi, new_c), 1e-3)
