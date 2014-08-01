@@ -32,7 +32,7 @@ class LQ:
 
     .. math::
 
-        \min E \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + x_T' R_f x_T
+        \min E \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + \beta^T x_T' R_f x_T
 
     Both are minimized subject to the law of motion
 
@@ -257,6 +257,9 @@ class LQ:
 
         u_path : array_like(float)
             A k x T matrix, where the t-th column represents u_t
+
+        w_path : array_like(float)
+            A j x T matrix, where the t-th column represent w_t
 
         """
 
