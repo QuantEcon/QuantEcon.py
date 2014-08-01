@@ -221,7 +221,7 @@ class LQ:
 
         # === solve Riccati equation, obtain P === #
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
-        P = riccati.dare(A0, B0, Q, R)
+        P = riccati.dare(A0, B0, R, Q)
 
         # == Compute F == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
