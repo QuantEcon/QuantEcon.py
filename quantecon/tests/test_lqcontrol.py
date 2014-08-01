@@ -9,6 +9,7 @@ import sys
 import os
 import unittest
 import numpy as np
+from scipy.linalg import LinAlgError
 from numpy.testing import assert_allclose
 from quantecon.lqcontrol import LQ
 
@@ -17,30 +18,75 @@ class TestLQControl(unittest.TestCase):
 
     def setUp(self):
         # Initial Values
-        self.q = 1.
-        self.r = 1.
-        self.rf = 1.
-        self.a = .95
-        self.b = -1.
-        self.c = .05
-        self.beta = .95
-        self.T = 2
+        q = 1.
+        r = 1.
+        rf = 1.
+        a = .95
+        b = -1.
+        c = .05
+        beta = .95
+        T = 1
 
         self.lq_scalar = LQ(q, r, a, b, c, beta, T, rf)
+
+
+        Q = np.array([[0., 0.], [0., 1]])
+        R = np.array([[1., 0.], [0., 0]])
+        RF = np.eye(2) * 100
+        A = np.ones((2, 2)) * .95
+        B = np.ones((2, 2)) * -1
+
+        self.lq_mat = LQ(Q, R, A, B, beta=beta, T=T, Rf=RF)
+
 
     def tearDown(self):
         del self.lq_scalar
         del self.lq_mat
 
 
-    def test_stationarity(self):
-        vals = self.ss.stationary_distributions(max_iter=1000, tol=1e-9)
-        ssmux, ssmuy, sssigx, sssigy = vals
+    def test_scalar_sequences(self):
 
-        self.assertTrue(abs(ssmux - ssmuy) < 2e-8)
-        self.assertTrue(abs(sssigx - sssigy) < 2e-8)
-        self.assertTrue(abs(ssmux) < 2e-8)
-        self.assertTrue(abs(sssigx - self.ss.C/(1 - self.ss.A**2)))
+        lq_scalar = self.lq_scalar
+        x0 = 2
+
+        x_seq, u_seq, w_seq = lq_scalar.compute_sequence(x0)
+
+        # Solution found by hand
+        u_0 = (-2*lq_scalar.A*lq_scalar.B*lq_scalar.beta*lq_scalar.Rf) / \
+            (2*lq_scalar.Q+lq_scalar.beta*lq_scalar.Rf*2*lq_scalar.B**2) \
+            * x0
+        x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[0, -1]
+
+        assert_allclose(u_0, u_seq)
+        assert_allclose(x_1, x_seq[0, -1])
+
+
+    def test_mat_sequences(self):
+
+        lq_mat = self.lq_mat
+        x0 = np.random.randn(2) * 25
+
+        x_seq, u_seq, w_seq = lq_mat.compute_sequence(x0)
+
+        assert_allclose(np.sum(u_seq), .95 * np.sum(x0))
+        assert_allclose(x_seq[:, -1], np.zeros_like(x0))
+
+
+    def test_stationary_mat(self):
+        lq_mat = self.lq_mat
+
+        try:
+            P, F, d = lq_mat.stationary_values()
+            f_answer = np.array([[-.95, -.95], [0., 0.]])
+            p_answer = np.array([1., 0])
+
+            assert_allclose(f_answer, F)
+            assert_allclose(P, p_answer)
+
+        except LinAlgError:
+            print("Singular matrix problems")
+            assert False
+
 
 
 if __name__ == '__main__':
