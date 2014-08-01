@@ -1,9 +1,8 @@
 """
-Filename: test_carrer.py
-Authors: Spencer Lyon
-Date: 2014-07-31
-
 Tests for quantecon.carrer module
+
+@author : Spencer Lyon
+@date : 2014-07-31
 
 """
 from __future__ import division
