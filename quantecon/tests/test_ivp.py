@@ -6,23 +6,8 @@ import unittest
 import ..ivp
 
 
-class IVPTestSuite(unittest.TestCase):
 
-    """Base class for ivp.py module tests."""
-
-    def setUp(self):
-        raise NotImplementedError
-
-    def test_integrate(self):
-        """Test ODE integration."""
-        raise NotImplementedError
-
-    def test_interpolate(self):
-        """Test B_spline interpolation."""
-        raise NotImplementedError
-
-
-class SolowModelCase(IVPTestSuite):
+class SolowModelCase(unittest.TestCase):
 
     def setUp(self):
         # specify some parameters (g, n, s, alpha, delta, sigma)
