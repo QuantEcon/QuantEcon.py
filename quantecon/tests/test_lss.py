@@ -21,7 +21,7 @@ class TestLinearStateSpace(unittest.TestCase):
         A = .95
         C = .05
         G = 1.
-        mu_0 = 2.5
+        mu_0 = .75
 
         self.ss = LSS(A, C, G, mu_0)
 
@@ -38,7 +38,7 @@ class TestLinearStateSpace(unittest.TestCase):
         self.assertTrue(abs(sssigx - self.ss.C/(1 - self.ss.A**2)))
 
     def test_replicate(self):
-        xval, yval = self.ss.replicate(T=200, num_reps=1000)
+        xval, yval = self.ss.replicate(T=100, num_reps=5000)
 
         assert_allclose(xval, yval)
         self.assertTrue(xval.size == 1000)
