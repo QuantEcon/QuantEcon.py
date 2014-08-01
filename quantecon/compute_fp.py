@@ -9,6 +9,7 @@ specified initial condition v.
 
 import numpy as np
 
+
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
     """
     Computes and returns :math:`T^k v`, an approximate fixed point.
@@ -47,4 +48,3 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1):
         v = new_v
 
     return v
-
