@@ -182,7 +182,7 @@ class Kalman:
         # === simplify notation === #
         A, Q, G, R = self.A, self.Q, self.G, self.R
         # === solve Riccati equation, obtain Kalman gain === #
-        Sigma_infinity = riccati.dare(A.T, G.T, R, Q)
+        Sigma_infinity = riccati.dare(A.T, G.T, Q, R)
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)

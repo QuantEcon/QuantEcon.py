@@ -2,7 +2,7 @@
 Import the main names to top level.
 """
 
-import models as models
+from . import models as models
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
 from .ecdf import ECDF
@@ -18,4 +18,4 @@ from .rank_nullspace import rank_est, nullspace
 from .riccati import dare
 from .robustlq import RBLQ
 from .tauchen import approx_markov
-import quad as quad
+from . import quad as quad
