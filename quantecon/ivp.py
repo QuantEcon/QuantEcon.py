@@ -327,7 +327,7 @@ class IVP(object):
 
         return solution
 
-    def interpolate(self, traj, ti, k=3, der=0, ext=0):
+    def interpolate(self, traj, ti, k=3, der=0, ext=2):
         """
         Parametric B-spline interpolation in N-dimensions.
 
