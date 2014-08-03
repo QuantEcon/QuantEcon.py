@@ -9,7 +9,7 @@ estimate of the density psi_t of k_t is
 
     (1/n) sum_{i=0}^n p(k_{t-1}^i, y)
 
-This is a density in y.  
+This is a density in y.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +22,8 @@ delta = 0.1
 a_sigma = 0.4       # A = exp(B) where B ~ N(0, a_sigma)
 alpha = 0.4         # We set f(k) = k**alpha
 psi_0 = beta(5, 5, scale=0.5)  # Initial distribution
-phi = lognorm(a_sigma) 
+phi = lognorm(a_sigma)
+
 
 def p(x, y):
     """
@@ -40,10 +41,10 @@ k = np.empty((n, T))
 A = phi.rvs((n, T))
 k[:, 0] = psi_0.rvs(n)  # Draw first column from initial distribution
 for t in range(T-1):
-    k[:, t+1] = s * A[:,t] * k[:, t]**alpha + (1 - delta) * k[:, t]
+    k[:, t+1] = s * A[:, t] * k[:, t]**alpha + (1 - delta) * k[:, t]
 
 # == Generate T instances of LAE using this data, one for each date t == #
-laes = [LAE(p, k[:, t]) for t in range(T)]  
+laes = [LAE(p, k[:, t]) for t in range(T)]
 
 # == Plot == #
 fig, ax = plt.subplots()

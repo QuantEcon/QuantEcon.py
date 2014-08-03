@@ -10,7 +10,7 @@ from collections import Counter
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
-from nose import SkipTest
+from nose.plugins.attrib import attr
 import pandas as pd
 from quantecon import DiscreteRV
 
@@ -48,9 +48,9 @@ class TestDiscreteRV(unittest.TestCase):
         "discrete_rv: Q sums to 1"
         assert (self.drv.Q[-1] - 1.0 < 1e-10)
 
+    @attr("slow")
     def test_draw_lln(self):
         "discrete_rv: lln satisfied?"
-        raise SkipTest("Takes too long, but it is interesting")
         draws = self.drv.draw(1000000)
         counts = pd.Series(Counter(draws))
         counts = (counts / counts.sum()).values
