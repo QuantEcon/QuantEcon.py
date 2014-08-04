@@ -7,7 +7,6 @@ Solves the discrete-time algebraic Riccati equation
 
 """
 
-import sys
 import numpy as np
 from numpy import dot
 from numpy.linalg import solve
@@ -17,7 +16,7 @@ import warnings
 warnings.simplefilter("ignore", RuntimeWarning)
 
 
-def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=150):
+def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
     """
     Solves the discrete-time algebraic Riccati equation
 
@@ -43,7 +42,7 @@ def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=150):
         k x k, should be symmetric and non-negative definite
     tolerance : scalar(float), optional(default=1e-10)
         The tolerance level for convergence
-    max_iter : scalar(int), optional(default=150)
+    max_iter : scalar(int), optional(default=500)
         The maximum number of iterations allowed
 
     Returns
@@ -73,9 +72,8 @@ def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=150):
     BTA = dot(B.T, A)
     for gamma in candidates:
         Z = R + gamma * BB
-        if np.linalg.cond(Z) > 1 / sys.float_info.epsilon:
-            pass  # Z is ill conditioned or not invertible
-        else:
+        cn = np.linalg.cond(Z)
+        if np.isfinite(cn):
             Q_tilde = - Q + dot(C.T, solve(Z, C + gamma * BTA)) + gamma * I
             G0 = dot(B, solve(Z, B.T))
             A0 = dot(I - gamma * G0, A) - dot(B, solve(Z, C))

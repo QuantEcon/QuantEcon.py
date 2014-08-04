@@ -63,11 +63,11 @@ class LQ:
     ----------
     Q : array_like(float)
         Q is the payoff(or cost) matrix that corresponds with the
-        state variable x and is `k x k`. Should be symmetric and
-        positive definite
+        control variable u and is `k x k`. Should be symmetric and
+        nonnegative definite
     R : array_like(float)
         R is the payoff(or cost) matrix that corresponds with the
-        control variable u and is `n x n`. Should be symetric and
+        state variable x and is `n x n`. Should be symetric and
         non-negative definite
     A : array_like(float)
         A is part of the state transition as described above and
@@ -93,11 +93,11 @@ class LQ:
     ----------
     Q : array_like(float)
         Q is the payoff(or cost) matrix that corresponds with the
-        state variable x and is `k x k`. Should be symmetric and
-        positive definite
+        control variable u and is `k x k`. Should be symmetric and
+        non-negative definite
     R : array_like(float)
         R is the payoff(or cost) matrix that corresponds with the
-        control variable u and is `n x n`. Should be symetric and
+        state variable x and is `n x n`. Should be symetric and
         non-negative definite
     A : array_like(float)
         A is part of the state transition as described above and
