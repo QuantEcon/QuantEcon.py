@@ -73,15 +73,19 @@ class TestLQControl(unittest.TestCase):
 
 
     def test_stationary_mat(self):
+        x0 = np.random.randn(2) * 25
         lq_mat = self.lq_mat
 
         try:
             P, F, d = lq_mat.stationary_values()
             f_answer = np.array([[-.95, -.95], [0., 0.]])
-            p_answer = np.array([1., 0])
+            p_answer = np.array([[1., 0], [0., 0.]])
+
+            val_func_lq = np.dot(x0, P).dot(x0)
+            val_func_answer = x0[0]**2
 
             assert_allclose(f_answer, F)
-            assert_allclose(P, p_answer)
+            assert_allclose(val_func_lq, val_func_answer)
 
         except LinAlgError:
             print("Singular matrix problems")

@@ -1,6 +1,6 @@
 """
 Filename: test_tauchen.py
-Authors: Chase Coleman
+Authors: Chase Coleman, John Stachurski
 Date: 07/22/2014
 
 Tests for ricatti.py file
@@ -13,7 +13,7 @@ from quantecon.riccati import dare
 def dare_test_golden_num_float():
     val = dare(1.0, 1.0, 1.0, 1.0)
     gold_ratio = (1 + np.sqrt(5)) / 2.
-    assert_allclose(val, gold_ratio) 
+    assert_allclose(val, gold_ratio)
 
 def dare_test_golden_num_2d():
     A, B, R, Q = np.eye(2), np.eye(2), np.eye(2), np.eye(2)
@@ -40,7 +40,7 @@ def dare_test_tjm_1():
 
 def dare_test_tjm_2():
     A = [[0, -1],
-         [0, 2]] 
+         [0, 2]]
     B = [[1, 0],
          [1, 1]]
     Q = [[1, 0],
@@ -57,11 +57,11 @@ def dare_test_tjm_3():
     r = 0.5
     I = np.identity(2)
     A = [[2 + r**2, 0],
-         [0,        0]] 
+         [0,        0]]
     A = np.array(A)
     B = I
     R = [[1, r],
-         [r, r*r]] 
+         [r, r*r]]
     Q = I - np.dot(A.T, A) + np.dot(A.T, np.linalg.solve(R + I, A))
     X = dare(A, B, Q, R)
     Y = np.identity(2)
