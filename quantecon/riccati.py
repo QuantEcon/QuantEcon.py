@@ -22,11 +22,8 @@ def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
 
         X = A'XA - (C + B'XA)'(B'XB + R)^{-1}(C + B'XA) + Q
 
-    via a modified structured doubling algorithm.  
-    
-    An explanation of the algorithm can be
-    found in "Optimal Filtering" by B.D.O. Anderson and J.B. Moore
-    (Dover Publications, 2005, p. 159).
+    via a modified structured doubling algorithm.  An explanation of the
+    algorithm can be found in the reference below.
 
     Parameters
     ----------
@@ -50,6 +47,13 @@ def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
     X : array_like(float, ndim=2)
         The fixed point of the Riccati equation; a  k x k array
         representing the approximate solution
+
+    References
+    ----------
+    Chiang, Chun-Yueh, Hung-Yuan Fan, and Wen-Wei Lin. "STRUCTURED DOUBLING
+    ALGORITHM FOR DISCRETE-TIME ALGEBRAIC RICCATI EQUATIONS WITH SINGULAR
+    CONTROL WEIGHTING MATRICES." Taiwanese Journal of Mathematics 14, no. 3A
+    (2010): pp-935.
 
     """
     # == Set up == #
