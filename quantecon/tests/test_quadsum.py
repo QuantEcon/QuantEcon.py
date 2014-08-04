@@ -35,7 +35,7 @@ def test_var_identitysum():
 
     val = var_quadratic_sum(A, C, H, beta, x0)
 
-    assert abs(val-60) < 1e-10
+    assert(abs(val-60) < 1e-10)
 
 
 def test_m_simplesum():
@@ -44,7 +44,7 @@ def test_m_simplesum():
 
     retval = m_quadratic_sum(a, b)
 
-    self.assertTrue(abs(retval - 20) < 1e-8)
+    assert(abs(retval - 20) < 1e-8)
 
 
 def test_m_matsum():
