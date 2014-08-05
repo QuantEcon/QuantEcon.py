@@ -44,8 +44,8 @@ class TestKalman(unittest.TestCase):
         sig_recursion = (A.dot(sig_inf).dot(A.T) -
                             kal_recursion.dot(G).dot(sig_inf).dot(A.T) + Q)
 
-        assert_allclose(kal_gain, kal_recursion)
-        assert_allclose(sig_inf, sig_recursion)
+        assert_allclose(kal_gain, kal_recursion, rtol=1e-4, atol=1e-2)
+        assert_allclose(sig_inf, sig_recursion, rtol=1e-4, atol=1e-2)
 
 
     def test_update_using_stationary(self):
@@ -58,8 +58,8 @@ class TestKalman(unittest.TestCase):
 
         kf.update(np.zeros((2, 1)))
 
-        assert_allclose(kf.current_Sigma, sig_inf)
-        assert_allclose(kf.current_x_hat.squeeze(), np.zeros(2))
+        assert_allclose(kf.current_Sigma, sig_inf, rtol=1e-4, atol=1e-2)
+        assert_allclose(kf.current_x_hat.squeeze(), np.zeros(2), rtol=1e-4, atol=1e-2)
 
 
     def test_update_nonstationary(self):
@@ -79,8 +79,8 @@ class TestKalman(unittest.TestCase):
 
         new_xhat = A.dot(curr_x) + curr_k.dot(y_observed - G.dot(curr_x))
 
-        assert_allclose(kf.current_Sigma, new_sigma)
-        assert_allclose(kf.current_x_hat, new_xhat)
+        assert_allclose(kf.current_Sigma, new_sigma, rtol=1e-4, atol=1e-2)
+        assert_allclose(kf.current_x_hat, new_xhat, rtol=1e-4, atol=1e-2)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestKalman)
