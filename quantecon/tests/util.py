@@ -67,6 +67,57 @@ def get_h5_data_file():
     return tables.open_file(data_file, "a", "Data for quantecon tests")
 
 
+def get_h5_data_group(grp_name, parent="/", f=get_h5_data_file()):
+    """
+    Try to fetch the group named grp_name from the file f. If it doesn't
+    yet exist, it is created
+
+    Parameters
+    ----------
+    grp_name : str
+        A string specifying the name of the new group. This should be
+        only the group name, not including any information about the
+        group's parent (path)
+
+    parent : str, optional(default="/")
+        The parent or path for where the group should live. If nothing
+        is given, the group will be created at the root node `"/"`
+
+    f : hdf5 file, optional(default=get_h5_data_file())
+        The file where this should happen. The default is the data file
+        for these tests
+
+    Returns
+    -------
+    existed : bool
+        A boolean specifying whether the group existed or was created
+
+    group : tables.Group
+        The requested group
+
+    Examples
+    --------
+    with get_h5_data_file() as f:
+        my_group = get_h5_data_group("jv")  # data for jv tests
+
+    Notes
+    -----
+    As with other code dealing with I/O from files, it is best to call
+    this function within a context manager as shown in the example.
+
+    """
+    existed = True
+    try:
+        group = f.getNode(parent + grp_name)
+    except:
+        # doesn't exist
+        existed = False
+        msg = "data for {} tests".format(grp_name + ".py")
+        group = f.create_group(parent, grp_name, msg)
+
+    return existed, group
+
+
 def write_array(f, grp, array, name):
     "stores array in into group grp of h5 file f under name name"
     atom = tables.Atom.from_dtype(array.dtype)
