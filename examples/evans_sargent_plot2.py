@@ -25,17 +25,17 @@ legend_args = {'bbox_to_anchor' : bbox, 'loc' : 3, 'mode' : 'expand'}
 p_args = {'lw' : 2, 'alpha' : 0.7}
 
 ax = axes[0]
-ax.plot(tt, uhatdif, label=r'time inconsistency differential for $u$', **p_args)
-ax.set_ylabel(r"$\Delta u$", fontsize=16)
-ax.set_ylim(-3, .1)
-ax.set_yticks((-3.0, -2.0, -1.0, 0.0))
-ax.legend(ncol=1, **legend_args)
-
-ax = axes[1]
 ax.plot(tt2, tauhatdif, label=r'time inconsistency differential for tax rate', **p_args)
 ax.set_ylabel(r"$\Delta\tau$", fontsize=16)
 ax.set_ylim(-0.1, 1.4)
 ax.set_yticks((0.0, 0.4, 0.8, 1.2))
+ax.legend(ncol=1, **legend_args)
+
+ax = axes[1]
+ax.plot(tt, uhatdif, label=r'time inconsistency differential for $u$', **p_args)
+ax.set_ylabel(r"$\Delta u$", fontsize=16)
+ax.set_ylim(-3, .1)
+ax.set_yticks((-3.0, -2.0, -1.0, 0.0))
 ax.legend(ncol=1, **legend_args)
 
 ax = axes[2]
