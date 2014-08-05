@@ -57,8 +57,8 @@ class TestLQControl(unittest.TestCase):
             * x0
         x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + w_seq[0, -1]
 
-        assert_allclose(u_0, u_seq)
-        assert_allclose(x_1, x_seq[0, -1])
+        assert_allclose(u_0, u_seq, rtol=1e-4)
+        assert_allclose(x_1, x_seq[0, -1], rtol=1e-4)
 
 
     def test_mat_sequences(self):
@@ -68,8 +68,8 @@ class TestLQControl(unittest.TestCase):
 
         x_seq, u_seq, w_seq = lq_mat.compute_sequence(x0)
 
-        assert_allclose(np.sum(u_seq), .95 * np.sum(x0))
-        assert_allclose(x_seq[:, -1], np.zeros_like(x0))
+        assert_allclose(np.sum(u_seq), .95 * np.sum(x0), rtol=1e-4)
+        assert_allclose(x_seq[:, -1], np.zeros_like(x0), rtol=1e-4)
 
 
     def test_stationary_mat(self):
@@ -84,8 +84,8 @@ class TestLQControl(unittest.TestCase):
             val_func_lq = np.dot(x0, P).dot(x0)
             val_func_answer = x0[0]**2
 
-            assert_allclose(f_answer, F)
-            assert_allclose(val_func_lq, val_func_answer)
+            assert_allclose(f_answer, F, rtol=1e-4)
+            assert_allclose(val_func_lq, val_func_answer, rtol=1e-4)
 
         except LinAlgError:
             print("Singular matrix problems")
