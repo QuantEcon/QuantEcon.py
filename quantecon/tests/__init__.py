@@ -6,4 +6,4 @@ namespace for quantecon.tests
 
 """
 from . util import (capture, get_data_dir, get_h5_data_file, write_array,
-                    max_abs_diff)
+                    max_abs_diff, get_h5_data_group)
