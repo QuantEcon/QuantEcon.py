@@ -12,6 +12,6 @@ matplotlib
 
 pandas
 
-scikits.statsmodels
+statsmodels
 
 sympy
