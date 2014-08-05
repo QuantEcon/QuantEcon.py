@@ -41,8 +41,8 @@ class TestLinearStateSpace(unittest.TestCase):
         xval, yval = self.ss.replicate(T=100, num_reps=5000)
 
         assert_allclose(xval, yval)
-        self.assertTrue(xval.size == 5000)
-        self.assertTrue(abs(np.mean(xval)) < .01)
+        self.assertEqual(xval.size, 5000)
+        self.assertLessEqual(abs(np.mean(xval)), .01)
 
     # def test_
 

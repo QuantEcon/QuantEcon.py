@@ -143,3 +143,15 @@ class TestConsumerProblem(unittest.TestCase):
         "ifp: solution to coleman is a fixed point"
         new_c = self.cp.coleman_operator(self.c_pfi)
         self.assertLessEqual(max_abs_diff(self.c_pfi, new_c), 1e-3)
+
+    def test_initialize(self):
+        "ifp: initialize function works"
+        i = self.cp.initialize()
+
+        # returned two things?
+        self.assertEqual(len(i), 2)
+
+        shapes = (len(self.cp.asset_grid), len(self.cp.z_vals))
+        self.assertEqual(i[0].shape, shapes)
+        self.assertEqual(i[1].shape, shapes)
+
