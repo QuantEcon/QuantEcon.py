@@ -87,3 +87,8 @@ class TestAssetPrices(unittest.TestCase):
 
     def test_call_option_price(self):
         pass
+
+    def test_multiple_periods_call_option(self):
+        "asset_pricing: T option works to return multiple periods"
+        w_bars = self.ap.call_option(zeta, p_s, T=[5, 7])[1]
+        self.assertEqual(len(w_bars), 2)
