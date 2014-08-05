@@ -22,7 +22,7 @@ class TestKalman(unittest.TestCase):
         self.G = np.eye(2) * .5
         self.R = np.eye(2) * 0.2
 
-        self.kf = Kalman(A, G, Q, R)
+        self.kf = Kalman(self.A, self.G, self.Q, self.R)
 
 
 
@@ -42,7 +42,7 @@ class TestKalman(unittest.TestCase):
         # recursive equations and compare
         kal_recursion = np.dot(A, sig_inf).dot(G.T).dot(mat_inv)
         sig_recursion = (A.dot(sig_inf).dot(A.T) -
-                            kal_gain_eq.dot(G).dot(sig_inf).dot(A.T) + Q)
+                            kal_recursion.dot(G).dot(sig_inf).dot(A.T) + Q)
 
         assert_allclose(kal_gain, kal_recursion)
         assert_allclose(sig_inf, sig_recursion)
