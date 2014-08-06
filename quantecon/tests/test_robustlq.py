@@ -50,7 +50,7 @@ class TestRBLQControl(unittest.TestCase):
         self.rblq_test = RBLQ(Q, R, A, B, C, beta, theta)
         self.lq_test = LQ(Q, R, A, B, C, beta)
 
-        self.Fr, self.Kr, self.Pr = rblq.robust_rule()
+        self.Fr, self.Kr, self.Pr = self.rblq_test.robust_rule()
 
     def tearDown(self):
         del self.rblq_test
