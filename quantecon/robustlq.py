@@ -269,9 +269,9 @@ class RBLQ:
         A2 = self.A - dot(self.B, F)
         B2 = self.C
         lq = LQ(Q2, R2, A2, B2, beta=self.beta)
-        P, neg_K, d = lq.stationary_values()
+        neg_P, neg_K, d = lq.stationary_values()
 
-        return - neg_K, P
+        return -neg_K, -neg_P
 
     def K_to_F(self, K):
         """
@@ -357,8 +357,7 @@ class RBLQ:
         beta, theta = self.beta, self.theta
 
         # == Solve for policies and costs using agent 2's problem == #
-        K_F, neg_P_F = self.F_to_K(F)
-        P_F = - neg_P_F
+        K_F, P_F = self.F_to_K(F)
         I = np.identity(self.j)
         H = inv(I - C.T.dot(P_F.dot(C)) / theta)
         d_F = log(det(H))
