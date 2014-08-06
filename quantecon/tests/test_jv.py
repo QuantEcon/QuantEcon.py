@@ -7,6 +7,7 @@ tests for quantecon.jv
 """
 from __future__ import division
 import unittest
+from nose.plugins.attrib import attr
 from quantecon.models import JvWorker
 from quantecon import compute_fixed_point
 from quantecon.tests import get_h5_data_file, write_array, max_abs_diff
@@ -100,3 +101,9 @@ class TestJvWorkder(unittest.TestCase):
         "jv: solution to bellman is fixed point"
         new_V = self.jv.bellman_operator(self.V)
         self.assertLessEqual(max_abs_diff(new_V, self.V), 1e-4)
+
+    @attr("slow")
+    def test_bruteforce_bellman(self):
+        "jv: bellman_operator bruteforce option returns fp"
+        new_V = self.jv.bellman_operator(self.V, brute_force=True)
+        self.assertEqual(new_V.shape, self.V.shape)

@@ -8,10 +8,14 @@ Utilities for testing within quantecon
 import sys
 import os
 from os.path import join, exists
-from cStringIO import StringIO
 from contextlib import contextmanager
 import numpy as np
 import tables
+
+if sys.version_info[0] == 2:
+    from cStringIO import StringIO
+else:  # python 3
+    from io import StringIO
 
 
 @contextmanager
