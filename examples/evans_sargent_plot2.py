@@ -13,7 +13,7 @@ tt = np.arange(T)  # tt is used to make the plot time index correct.
 tt2 = np.arange(T-1)
 
 n_rows = 4
-fig, axes = plt.subplots(n_rows, 1, figsize=(10, 10))
+fig, axes = plt.subplots(n_rows, 1, figsize=(10, 16))
 
 plt.subplots_adjust(hspace=0.5)
 for ax in axes:
