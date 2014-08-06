@@ -233,7 +233,7 @@ class RBLQ:
         A, B, C, Q, R = self.A, self.B, self.C, self.Q, self.R
         beta, theta = self.beta, self.theta
         # == Set up loop == #
-        P = np.zeros((self.n, self.n)) if not P_init else P_init
+        P = np.zeros((self.n, self.n)) if P_init is None else P_init
         iterate, e = 0, tol + 1
         while iterate < max_iter and e > tol:
             F, new_P = self.b_operator(self.d_operator(P))
