@@ -12,7 +12,7 @@ from evans_sargent import T, y
 tt = np.arange(T)  # tt is used to make the plot time index correct.
 
 n_rows = 3
-fig, axes = plt.subplots(n_rows, 1, figsize=(10, 16))
+fig, axes = plt.subplots(n_rows, 1, figsize=(10, 12))
 
 plt.subplots_adjust(hspace=0.5)
 for ax in axes:
