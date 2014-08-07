@@ -84,7 +84,7 @@ class DMarkov(object):
     def __str__(self):
         return str(self.__repr__)
 
-    def compute_stationary(self, precision=None, tol=None):
+    def mc_compute_stationary(self, precision=None, tol=None):
         P = self.P
 
         stationary_dists = mc_compute_stationary(P, precision=precision, tol=tol)
@@ -92,7 +92,7 @@ class DMarkov(object):
 
         return stationary_dists.squeeze()
 
-    def sample_path(self, init=0, sample_size=1000):
+    def mc_sample_path(self, init=0, sample_size=1000):
         sim = mc_sample_path(self.P, init, sample_size)
 
         return sim
@@ -213,7 +213,7 @@ stationary_dists : np.ndarray : float
 
 # """)
 
-DMarkov.compute_stationary.__func__.__doc__ = _stationary_docstr.format(p_arg="")
+DMarkov.mc_compute_stationary.__func__.__doc__ = _stationary_docstr.format(p_arg="")
 
 
 # For drawing a sample path
@@ -247,4 +247,4 @@ mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg=
 """)
 
 # set docstring for method
-DMarkov.sample_path.__func__.__doc__ = _sample_path_docstr.format(p_arg="")
+DMarkov.mc_sample_path.__func__.__doc__ = _sample_path_docstr.format(p_arg="")
