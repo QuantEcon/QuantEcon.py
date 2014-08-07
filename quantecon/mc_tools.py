@@ -57,16 +57,16 @@ class DMarkov(object):
                       initial distribution
     """
 
-    def __init__(self, P, pi0=None):
+    def __init__(self, P, pi_0=None):
         self.P = P
         n, m = P.shape
         self.n = n
 
-        if pi0 is None:
-            self.pi0 = np.ones(n)/n
+        if pi_0 is None:
+            self.pi_0 = np.ones(n)/n
 
         else:
-            self.pi0 = pi0
+            self.pi_0 = pi_0
 
         # Check Properties
         # double check that P is a square matrix
@@ -137,9 +137,9 @@ def mc_compute_stationary(P, precision=None, tol=None):
 
 
     # Check to make sure all of the elements of invar_dist are positive
-    if np.any(stationary_dists<-1e-16):
+    if np.any(stationary_dists < -1e-16):
         # print("Elements of your invariant distribution were negative; " +
-        #       "trying with additional precision")
+        #       "Re-trying with additional precision")
 
         if precision is None:
             stationary_dists = mc_compute_stationary(P, precision=18, tol=tol)
