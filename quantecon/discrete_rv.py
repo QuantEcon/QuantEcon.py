@@ -11,6 +11,7 @@ specified vector of probabilities.
 from numpy import cumsum
 from numpy.random import uniform
 
+
 class DiscreteRV(object):
     """
     Generates an array of draws from a discrete random variable with
@@ -51,7 +52,6 @@ class DiscreteRV(object):
         self._q = val
         self.Q = cumsum(val)
 
-
     def draw(self, k=1):
         """
         Returns k draws from q.
@@ -71,5 +71,3 @@ class DiscreteRV(object):
 
         """
         return self.Q.searchsorted(uniform(0, 1, size=k))
-
-

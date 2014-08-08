@@ -10,13 +10,14 @@ process that evolves according to a Markov chain.
 References
 ----------
 
-    http://quant-econ.net/ifp.html
+http://quant-econ.net/ifp.html
 
 """
 
 import numpy as np
 from scipy.optimize import fminbound, brentq
 from scipy import interp
+
 
 class ConsumerProblem:
     """
@@ -77,7 +78,6 @@ class ConsumerProblem:
         self.Pi, self.z_vals = np.array(Pi), tuple(z_vals)
         self.asset_grid = np.linspace(-b, grid_max, grid_size)
 
-
     def bellman_operator(self, V, return_policy=False):
         """
         The approximate Bellman operator, which computes and returns the
@@ -122,7 +122,6 @@ class ConsumerProblem:
             return new_c
         else:
             return new_V
-
 
     def coleman_operator(self, c):
         """
@@ -203,5 +202,3 @@ class ConsumerProblem:
                 V[i_a, i_z] = u(c_max) / (1 - beta)
 
         return V, c
-
-

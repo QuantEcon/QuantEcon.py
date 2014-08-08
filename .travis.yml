@@ -1,0 +1,33 @@
+# Thank you for the writeup given by dan-blanchard at https://gist.github.com/dan-blanchard/7045057
+language: python
+python:
+  - 2.7
+  - 3.3
+
+notifications:
+  email: false
+
+branches:
+  only:
+    - master
+
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  - sudo rm -rf /dev/shm
+  - sudo ln -s /run/shm /dev/shm
+install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels
+  # Get packages that we can't get directly from conda
+  - pip install coveralls coverage
+  # - conda install --yes -c dan_blanchard python-coveralls nose-cov
+  - python setup.py install
+
+script:
+  - nosetests --with-coverage --cover-package=quantecon
+
+after_success:
+  - coveralls

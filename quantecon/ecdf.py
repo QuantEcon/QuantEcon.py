@@ -5,12 +5,14 @@ Authors: Thomas Sargent, John Stachurski
 
 Implements the empirical cumulative distribution function given an array
 of observations.
+
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-class ECDF:
+
+class ECDF(object):
     """
     One-dimensional empirical distribution function given a vector of
     observations.
@@ -60,11 +62,10 @@ class ECDF:
 
         """
 
-
         # === choose reasonable interval if [a, b] not specified === #
-        if not a:
+        if a is None:
             a = self.observations.min() - self.observations.std()
-        if not b:
+        if b is None:
             b = self.observations.max() + self.observations.std()
 
         # === generate plot === #
@@ -72,4 +73,3 @@ class ECDF:
         f = np.vectorize(self.__call__)
         plt.plot(x_vals, f(x_vals))
         plt.show()
-
