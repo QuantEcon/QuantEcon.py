@@ -15,6 +15,7 @@ import numpy as np
 import scipy.linalg as la
 import sympy.mpmath as mp
 from .discrete_rv import DiscreteRV
+from warnings import warn
 
 
 class DMarkov(object):
@@ -137,7 +138,7 @@ def mc_compute_stationary(P, precision=None, tol=None):
 
     # Check to make sure all of the elements of invar_dist are positive
     if np.any(stationary_dists < -1e-16):
-        print("Elements of your invariant distribution were negative; " +
+        warn("Elements of your invariant distribution were negative; " +
               "Re-trying with additional precision")
 
         if precision is None:
