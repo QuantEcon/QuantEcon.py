@@ -7,11 +7,15 @@ Utilities for testing within quantecon
 """
 import sys
 import os
-from os.path import join
-from cStringIO import StringIO
+from os.path import join, exists
 from contextlib import contextmanager
 import numpy as np
 import tables
+
+if sys.version_info[0] == 2:
+    from cStringIO import StringIO
+else:  # python 3
+    from io import StringIO
 
 
 @contextmanager
@@ -50,7 +54,12 @@ def get_data_dir():
 
 def get_h5_data_file():
     """
+<<<<<<< HEAD
+    return the data file used for holding test data. If the data
+    directory or file do not exist, they are created.
+=======
     return the data file used for holding test data
+>>>>>>> master
 
     Notes
     -----
@@ -63,7 +72,12 @@ def get_h5_data_file():
 
     """
     data_dir = get_data_dir()
+
+    if not exists(data_dir):
+        os.mkdir(data_dir)
+
     data_file = join(data_dir, "testing_data.h5")
+
     return tables.open_file(data_file, "a", "Data for quantecon tests")
 
 

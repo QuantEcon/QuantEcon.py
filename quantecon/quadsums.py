@@ -52,6 +52,7 @@ def var_quadratic_sum(A, C, H, beta, x0):
 
     """
     # == Make sure that A, C, H and x0 are array_like == #
+
     A, C, H = list(map(np.atleast_2d, (A, C, H)))
     x0 = np.atleast_1d(x0)
     # == Start computations == #
@@ -83,11 +84,11 @@ def m_quadratic_sum(A, B, max_it=50):
 
     Parameters
     ----------
-    A : array_like(float, ndim=1)
+    A : array_like(float, ndim=2)
         An n x n matrix as described above.  We assume in order for
         convergence that the eigenvalues of A have moduli bounded by
         unity
-    B : array_like(float, ndim=1)
+    B : array_like(float, ndim=2)
         An n x n matrix as described above.  We assume in order for
         convergence that the eigenvalues of A have moduli bounded by
         unity
@@ -100,6 +101,7 @@ def m_quadratic_sum(A, B, max_it=50):
         Represents the value V
 
     """
+    A, B = list(map(np.atleast_2d, [A, B]))
     alpha0 = A
     gamma0 = B
 
