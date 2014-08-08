@@ -50,10 +50,10 @@ class DMarkov(object):
 
     Methods
     -------
-    find_stationary_distributions : This method finds stationary
+    mc_compute_stationary : This method finds stationary
                                     distributions
 
-    simulate_markov : Simulates the markov chain for a given
+    mc_sample_path : Simulates the markov chain for a given
                       initial distribution
     """
 
