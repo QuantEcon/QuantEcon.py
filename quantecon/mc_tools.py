@@ -65,6 +65,8 @@ class DMarkov(object):
         else:
             self.pi_0 = pi_0
 
+        self.stationary_dists = None
+
         # Check Properties
         # double check that P is a square matrix
         if n != m:
@@ -76,7 +78,12 @@ class DMarkov(object):
 
     def __repr__(self):
         msg = "Markov process with transition matrix \n P = \n {0}"
-        return msg.format(self.P)
+
+        if self.stationary_dists is None:
+            return msg.format(self.P)
+        else:
+            msg = msg + "\nand stationary distributions \n {1}"
+            return msg.format(self.P, self.stationary_dists)
 
     def __str__(self):
         return str(self.__repr__)
@@ -87,7 +94,7 @@ class DMarkov(object):
         stationary_dists = mc_compute_stationary(P, precision=precision, tol=tol)
         self.stationary_dists = stationary_dists
 
-        return stationary_dists.squeeze()
+        return stationary_dists
 
     def mc_sample_path(self, init=0, sample_size=1000):
         sim = mc_sample_path(self.P, init, sample_size)
@@ -110,17 +117,12 @@ def mc_compute_stationary(P, precision=None, tol=None):
 
         stationary_dists = uniteigvecs/np.sum(uniteigvecs, axis=0)
 
-        # Since we will be accessing the columns of this matrix, we
-        # might consider adding .astype(np.float, order='F') to make it
-        # column major at beginning
-        return stationary_dists
-
     else:
         # Create a list to store eigvals
         stationary_dists_list = []
         if tol is None:
             # If tolerance isn't specified then use 2*precision
-            tol = 2 * 10**(-precision + 1)
+            tol = mp.mpf(2 * 10**(-precision + 1))
 
         with mp.workdps(precision):
             eigvals, eigvecs = mp.eig(mp.matrix(P), left=True, right=False)
@@ -135,8 +137,8 @@ def mc_compute_stationary(P, precision=None, tol=None):
 
     # Check to make sure all of the elements of invar_dist are positive
     if np.any(stationary_dists < -1e-16):
-        # print("Elements of your invariant distribution were negative; " +
-        #       "Re-trying with additional precision")
+        print("Elements of your invariant distribution were negative; " +
+              "Re-trying with additional precision")
 
         if precision is None:
             stationary_dists = mc_compute_stationary(P, precision=18, tol=tol)
@@ -145,7 +147,10 @@ def mc_compute_stationary(P, precision=None, tol=None):
             raise ValueError("Elements of your stationary distribution were" +
                              "negative.  Try computing with higher precision")
 
-        return stationary_dists.squeeze()
+    # Since we will be accessing the columns of this matrix, we
+    # might consider adding .astype(np.float, order='F') to make it
+    # column major at beginning
+    return stationary_dists.squeeze()
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
