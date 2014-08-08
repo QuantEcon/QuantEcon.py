@@ -43,9 +43,6 @@ class DMarkov(object):
         The initial probability distribution.
     stationary_dists : array_like(float, ndim=2)
         An array with invariant distributions as columns
-    ergodic_sets : list(lists(int))
-        A list of lists where each list in the main list
-        has one of the ergodic sets.
 
 
     Methods
