@@ -8,8 +8,8 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm
 from scipy.interpolate import LinearNDInterpolator
 import numpy as np
-
-from quantecon import SearchProblem, compute_fixed_point
+from quantecon import compute_fixed_point
+from quantecon.models import SearchProblem
 
 
 sp = SearchProblem(w_grid_size=100, pi_grid_size=100)

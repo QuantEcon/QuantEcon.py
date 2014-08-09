@@ -15,6 +15,7 @@ from scipy import interp
 from numpy import maximum as npmax
 import numpy as np
 
+
 class SearchProblem:
     """
     A class to store a given parameterization of the "offer distribution
@@ -95,7 +96,6 @@ class SearchProblem:
 
         return new_pi
 
-
     def bellman_operator(self, v):
         """
 
@@ -123,10 +123,10 @@ class SearchProblem:
         new_v = np.empty(N)
 
         for i in range(N):
-            w, pi = self.grid_points[i,:]
+            w, pi = self.grid_points[i, :]
             v1 = w / (1 - beta)
-            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) \
-                    + (1 - pi) * g(m))
+            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m)
+                                                     + (1 - pi) * g(m))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             v2 = c + beta * integral
             new_v[i] = max(v1, v2)
@@ -158,16 +158,15 @@ class SearchProblem:
         policy = np.zeros(N, dtype=int)
 
         for i in range(N):
-            w, pi = self.grid_points[i,:]
+            w, pi = self.grid_points[i, :]
             v1 = w / (1 - beta)
-            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) + \
-                    (1 - pi) * g(m))
+            integrand = lambda m: vf(m, q(m, pi)) * (pi * f(m) +
+                                                     (1 - pi) * g(m))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             v2 = c + beta * integral
             policy[i] = v1 > v2  # Evaluates to 1 or 0
 
         return policy
-
 
     def res_wage_operator(self, phi):
         """
@@ -195,9 +194,8 @@ class SearchProblem:
         for i, pi in enumerate(self.pi_grid):
             def integrand(x):
                 "Integral expression on right-hand side of operator"
-                return npmax(x, phi_f(q(x,pi))) * (pi*f(x) + (1 - pi)*g(x))
+                return npmax(x, phi_f(q(x, pi))) * (pi*f(x) + (1 - pi)*g(x))
             integral, error = fixed_quad(integrand, 0, self.w_max)
             new_phi[i] = (1 - beta) * c + beta * integral
 
         return new_phi
-

@@ -16,11 +16,11 @@ This is a density in y.
 References
 ----------
 
-    http://quant-econ.net/stationary_densities.html
+http://quant-econ.net/stationary_densities.html
 
 """
-
 import numpy as np
+
 
 class LAE:
     """
@@ -56,7 +56,6 @@ class LAE:
         n = len(X)
         self.p, self.X = p, X.reshape((n, 1))
 
-
     def __call__(self, y):
         """
         A vectorized function that returns the value of the look ahead
@@ -79,5 +78,3 @@ class LAE:
         psi_vals = np.mean(v, axis=0)    # Take mean along each row
 
         return psi_vals.flatten()
-
-

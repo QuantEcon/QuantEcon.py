@@ -6,20 +6,29 @@ Authors: Thomas Sargent, John Stachurski
 References
 -----------
 
-    http://quant-econ.net/jv.html
+http://quant-econ.net/jv.html
 
 """
-
+import sys
 import numpy as np
 from scipy.integrate import fixed_quad as integrate
 from scipy.optimize import minimize
 import scipy.stats as stats
 from scipy import interp
 
+# The SLSQP method is faster and more stable, but it didn't give the
+# correct answer in python 3. So, if we are in python 2, use SLSQP, otherwise
+# use the only other option (to handle constraints): COBYLA
+if sys.version_info[0] == 2:
+    method = "SLSQP"
+else:
+    # python 3
+    method = "COBYLA"
+
 epsilon = 1e-4  # A small number, used in the optimization routine
 
 
-class JvWorker:
+class JvWorker(object):
     r"""
     A Jovanovic-type model of employment with on-the-job search. The
     value function is given by
@@ -145,7 +154,7 @@ class JvWorker:
             if not brute_force:
                 max_s, max_phi = minimize(w, guess, constraints=constraints,
                                           options={"disp": 0},
-                                          method="COBYLA")["x"]
+                                          method=method)["x"]
                 max_val = -w((max_s, max_phi))
 
             # === or search on a grid === #
