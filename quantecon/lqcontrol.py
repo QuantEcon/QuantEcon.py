@@ -32,7 +32,7 @@ class LQ:
 
     .. math::
 
-        \min E \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + x_T' R_f x_T
+        \min E \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + \beta^T x_T' R_f x_T
 
     Both are minimized subject to the law of motion
 
@@ -63,11 +63,11 @@ class LQ:
     ----------
     Q : array_like(float)
         Q is the payoff(or cost) matrix that corresponds with the
-        state variable x and is `k x k`. Should be symmetric and
-        positive definite
+        control variable u and is `k x k`. Should be symmetric and
+        nonnegative definite
     R : array_like(float)
         R is the payoff(or cost) matrix that corresponds with the
-        control variable u and is `n x n`. Should be symetric and
+        state variable x and is `n x n`. Should be symetric and
         non-negative definite
     A : array_like(float)
         A is part of the state transition as described above and
@@ -93,11 +93,11 @@ class LQ:
     ----------
     Q : array_like(float)
         Q is the payoff(or cost) matrix that corresponds with the
-        state variable x and is `k x k`. Should be symmetric and
-        positive definite
+        control variable u and is `k x k`. Should be symmetric and
+        non-negative definite
     R : array_like(float)
         R is the payoff(or cost) matrix that corresponds with the
-        control variable u and is `n x n`. Should be symetric and
+        state variable x and is `n x n`. Should be symetric and
         non-negative definite
     A : array_like(float)
         A is part of the state transition as described above and
@@ -221,7 +221,7 @@ class LQ:
 
         # === solve Riccati equation, obtain P === #
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
-        P = riccati.dare(A0, B0, Q, R)
+        P = riccati.dare(A0, B0, R, Q)
 
         # == Compute F == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
@@ -257,6 +257,9 @@ class LQ:
 
         u_path : array_like(float)
             A k x T matrix, where the t-th column represents u_t
+
+        w_path : array_like(float)
+            A j x T matrix, where the t-th column represent w_t
 
         """
 
