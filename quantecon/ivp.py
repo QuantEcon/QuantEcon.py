@@ -133,7 +133,7 @@ class IVP(object):
         interp_deriv = self.interpolate(traj, ti, k, 1, ext)
 
         # rhs of ode evaluated along approximate solution
-        tup = (ti[:, np.newaxis], self.f(ti, interp_soln[:, 1:], *self.args))
+        tup = (ti[:, np.newaxis], self.f(ti, interp_soln[:, 1:].T, *self.args).T)
         rhs_ode = np.hstack(tup)
 
         # should be roughly zero everywhere (if approximation is any good!)
