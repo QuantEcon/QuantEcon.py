@@ -48,6 +48,12 @@ class IVP(object):
         self.args = args
         self.ode = integrate.ode(f, jac)
 
+    def _integrate_fixed_trajectory(self):
+        pass
+
+    def _integrate_variable_trajectory(self):
+        pass
+
     def compute_residual(self, traj, ti, k=3, ext=2):
         """
         The residual is the difference between the derivative of the B-spline
