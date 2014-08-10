@@ -48,10 +48,10 @@ class IVP(object):
         self.args = args
         self.ode = integrate.ode(f, jac)
 
-    def _integrate_fixed_trajectory(self, t0, y0, h, T, step, relax):
+    def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
         # initialize the solution using initial condition
-        solution = np.hstack((t0, y0))
+        solution = np.hstack((self.ode.t, self.ode.y))
 
         while self.ode.successful():
 
@@ -68,10 +68,10 @@ class IVP(object):
 
         return solution
 
-    def _integrate_variable_trajectory(self, t0, y0, h, g, tol, step, relax):
+    def _integrate_variable_trajectory(self, h, g, tol, step, relax):
         """Generates a solution trajectory of variable length."""
         # initialize the solution using initial condition
-        solution = np.hstack((t0, y0))
+        solution = np.hstack((self.ode.t, self.ode.y))
 
         while self.ode.successful():
 
@@ -183,9 +183,9 @@ class IVP(object):
         self.ode.set_initial_value(y0, t0)
 
         if (g is not None) and (tol is not None):
-            solution = self._integrate_variable_trajectory(t0, y0, h, g, tol, step, relax)
+            solution = self._integrate_variable_trajectory(h, g, tol, step, relax)
         elif T is not None:
-            solution = self._integrate_fixed_trajectory(t0, y0, h, T, step, relax)
+            solution = self._integrate_fixed_trajectory(h, T, step, relax)
         else:
             mesg = "Either both 'g' and 'tol', or 'T' must be specified."
             raise ValueError(mesg)
