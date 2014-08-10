@@ -18,4 +18,5 @@ from .rank_nullspace import rank_est, nullspace
 from .riccati import dare
 from .robustlq import RBLQ
 from .tauchen import approx_markov
+from .util import solve_discrete_lyapunov
 from . import quad as quad
