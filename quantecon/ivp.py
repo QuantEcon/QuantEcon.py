@@ -7,7 +7,7 @@ Base class for solving initial value problems (IVPs) of the form:
 
 .. math::
 
-    \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
+    \frac{dX}{dt} = f(t,X),\ X(t_0) = X_0
 
 using finite difference methods. The class uses various integrators from the
 ``scipy.integrate.ode`` module to perform the integration (i.e., solve the ODE)
@@ -31,16 +31,16 @@ class IVP(object):
 
         Attributes
         ----------
-        f : callable ``f(t, y, *args)``
+        f : callable ``f(t, X, *args)``
             Right hand side of the system of equations defining the ODE. The
-            independent variable, `t`, is a ``scalar``; `y` is an ``ndarray``
-            of dependent variables with ``y.shape == (n,)``. The function `f`
+            independent variable, `t`, is a ``scalar``; `X` is an ``ndarray``
+            of dependent variables with ``X.shape == (n,)``. The function `f`
             should return a ``scalar``, ``ndarray`` or ``list`` (but not a
             ``tuple``).
-        jac : callable ``jac(t, y, *args)``, optional(default=None)
+        jac : callable ``jac(t, X, *args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
-            :math:`\mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]`
+            :math:`\mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]`
         args : tuple, optional(default=None)
             Additional arguments that should be passed to both `f` and `jac`.
 
@@ -131,15 +131,16 @@ class IVP(object):
 
         """
         # B-spline approximations of the solution and its derivative
-        interp_soln = self.interpolate(traj, ti, k, 0, ext)
-        interp_deriv = self.interpolate(traj, ti, k, 1, ext)
+        soln = self.interpolate(traj, ti, k, 0, ext)
+        deriv = self.interpolate(traj, ti, k, 1, ext)
 
         # rhs of ode evaluated along approximate solution
-        tup = (ti[:, np.newaxis], self.f(ti, interp_soln[:, 1:].T, *self.args).T)
-        rhs_ode = np.hstack(tup)
+        T = ti.size
+        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.args) for i in range(T))
+        rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
-        residual = interp_deriv - rhs_ode
+        residual = deriv - rhs_ode
 
         return residual
 
@@ -160,7 +161,7 @@ class IVP(object):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable ``g(t, y, args)``, optional(default=None)
+        g : callable ``g(t, X, args)``, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
