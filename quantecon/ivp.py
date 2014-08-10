@@ -7,7 +7,7 @@ Base class for solving initial value problems (IVPs) of the form:
 
 .. math::
 
-    \frac{dy}']{dt} = f(t,y),\ y(t_0) = y_0
+    \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
 
 using finite difference methods. The class uses various integrators from the
 ``scipy.ode`` module to perform the integration (i.e., solve the ODE) and
