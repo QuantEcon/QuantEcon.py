@@ -1,3 +1,20 @@
+"""
+Filename: ivp.py
+
+Authors: David R. Pugh
+
+Base class for solving initial value problems (IVPs) of the form:
+
+.. math::
+
+    \frac{dy}']{dt} = f(t,y),\ y(t_0) = y_0
+
+using finite difference methods. The class uses various integrators from the
+``scipy.ode`` module to perform the integration (i.e., solve the ODE) and
+parametric B-spline interpolation from ``scipy.interpolate`` to approximate
+the value of the solution between grid points.
+
+"""
 from __future__ import division
 
 import numpy as np
@@ -5,17 +22,6 @@ from scipy import integrate, interpolate
 
 
 class IVP(object):
-    """
-    Base class for solving initial value problems (IVPs) of the form:
-
-    :math:`y'(t) = f(t,y)`
-
-    using finite difference methods. The class uses various integrators from
-    the ``scipy.ode`` module to perform the integration and parametric B-spline
-    interpolation from ``scipy.interpolate`` to approximate the value of the
-    solution between grid points.
-
-    """
 
     def __init__(self, f, jac=None, args=None):
         """
@@ -50,26 +56,26 @@ class IVP(object):
 
         Parameters
         ----------
-            traj : array_like (float)
-                Solution trajectory providing the data points for constructing
-                the B-spline representation.
-            ti : array_like (float)
-                Array of values for the independent variable at which to
-                interpolate the value of the B-spline.
-            k : int, optional(default=3)
-                Degree of the desired B-spline. Degree must satisfy
-                :math:`1 \le k \le 5`.
-            ext : int, optional(default=2)
-                Controls the value of returned elements for outside the
-                original knot sequence provided by traj. For extrapolation, set
-                `ext=0`; `ext=1` returns zero; `ext=2` raises a `ValueError`.
+        traj : array_like (float)
+            Solution trajectory providing the data points for constructing the
+            B-spline representation.
+        ti : array_like (float)
+            Array of values for the independent variable at which to
+            interpolate the value of the B-spline.
+        k : int, optional(default=3)
+            Degree of the desired B-spline. Degree must satisfy
+            :math:`1 \le k \le 5`.
+        ext : int, optional(default=2)
+            Controls the value of returned elements for outside the
+            original knot sequence provided by traj. For extrapolation, set
+            `ext=0`; `ext=1` returns zero; `ext=2` raises a `ValueError`.
 
         Returns
         -------
-            residual: array (float)
-                Difference between the derivative of the B-spline approximation
-                of the solution trajectory and the right-hand side of the ODE
-                evaluated along the approximated solution trajectory.
+        residual : array (float)
+            Difference between the derivative of the B-spline approximation
+            of the solution trajectory and the right-hand side of the ODE
+            evaluated along the approximated solution trajectory.
 
         """
         # B-spline approximations of the solution and its derivative
@@ -92,198 +98,34 @@ class IVP(object):
 
         Parameters
         ----------
-            t0 : float
-                Initial condition for the independent variable.
-            y0 : array_like (float, shape=(n,))
-                Initial condition for the dependent variables.
-            h : float, optional(default=1.0)
-                Step-size for computing the solution. Can be positive or
-                negative depending on the desired direction of integration.
-            T : int, optional(default=None)
-                Terminal value for the independent variable. One of either `T`
-                or `g` must be specified.
-            g : callable ``g(t, vec, args)``, optional(default=None)
-                Provides a stopping condition for the integration. If specified
-                user must also specify a stopping tolerance, `tol`.
-            tol : float, optional (default=None)
-                Stopping tolerance for the integration. Only required if `g` is
-                also specifed.
-            integrator : str, optional(default='dopri5')
-                Must be one of 'vode', 'lsoda', 'dopri5', or 'dop853'
-            step : bool, optional(default=False)
-                Allows access to internal steps for those solvers that use
-                adaptive step size routines. Currently only 'vode', 'zvode',
-                and 'lsoda' support `step=True`.
-            relax : bool, optional(default=False)
-                Currently only 'vode', 'zvode', and 'lsoda' support
-                `relax=True`.
-            **kwargs : dict, optional(default=None)
-                Dictionary of integrator specific keyword arguments. See the
-                Notes section below for a detailed discussion of the valid
-                keyword arguments for each of the supported integrators.
-
-        Notes
-        -----
-        Descriptions of the available integrators are listed below.
-
-        "vode"
-
-            Real-valued Variable-coefficient Ordinary Differential Equation
-            solver, with fixed-leading-coefficient implementation. It provides
-            implicit Adams method (for non-stiff problems) and a method based
-            on backward differentiation formulas (BDF) (for stiff problems).
-
-            Source: http://www.netlib.org/ode/vode.f
-
-            .. warning::
-
-               This integrator is not re-entrant. You cannot have two `ode`
-               instances using the "vode" integrator at the same time.
-
-            This integrator accepts the following keyword arguments:
-
-            - atol : float or sequence
-              absolute tolerance for solution
-            - rtol : float or sequence
-              relative tolerance for solution
-            - lband : None or int
-            - rband : None or int
-              Jacobian band width, jac[i,j] != 0 for i-lband <= j <= i+rband.
-              Setting these requires your jac routine to return the jacobian
-              in packed format, jac_packed[i-j+lband, j] = jac[i,j].
-            - method: 'adams' or 'bdf'
-              Which solver to use, Adams (non-stiff) or BDF (stiff)
-            - with_jacobian : bool
-              Whether to use the jacobian
-            - nsteps : int
-              Maximum number of (internally defined) steps allowed during one
-              call to the solver.
-            - first_step : float
-            - min_step : float
-            - max_step : float
-              Limits for the step sizes used by the integrator.
-            - order : int
-              Maximum order used by the integrator,
-              order <= 12 for Adams, <= 5 for BDF.
-
-        "zvode"
-
-            Complex-valued Variable-coefficient Ordinary Differential Equation
-            solver, with fixed-leading-coefficient implementation.  It provides
-            implicit Adams method (for non-stiff problems) and a method based
-            on backward differentiation formulas (BDF) (for stiff problems).
-
-            Source: http://www.netlib.org/ode/zvode.f
-
-            .. warning::
-
-               This integrator is not re-entrant. You cannot have two `ode`
-               instances using the "zvode" integrator at the same time.
-
-            This integrator accepts the same keyword arguments as "vode".
-
-            .. note::
-
-                When using ZVODE for a stiff system, it should only be used for
-                the case in which the function f is analytic, that is, when
-                each f(i) is an analytic function of each y(j).  Analyticity
-                means that the partial derivative df(i)/dy(j) is a unique
-                complex number, and this fact is critical in the way ZVODE
-                solves the dense or banded linear systems that arise in the
-                stiff case.  For a complex stiff ODE system in which f is not
-                analytic, ZVODE is likely to have convergence failures, and
-                for this problem one should instead use DVODE on the equivalent
-                real system (in the real and imaginary parts of y).
-
-        "lsoda"
-
-            Real-valued Variable-coefficient Ordinary Differential Equation
-            solver, with fixed-leading-coefficient implementation. It provides
-            automatic method switching between implicit Adams method (for
-            non-stiff problems) and a method based on backward differentiation
-            formulas (BDF) (for stiff problems).
-
-            Source: http://www.netlib.org/odepack
-
-            .. warning::
-
-               This integrator is not re-entrant. You cannot have two `ode`
-               instances using the "lsoda" integrator at the same time.
-
-            This integrator accepts the following keyword arguments:
-
-            - atol : float or sequence
-              absolute tolerance for solution
-            - rtol : float or sequence
-              relative tolerance for solution
-            - lband : None or int
-            - rband : None or int
-              Jacobian band width, jac[i,j] != 0 for i-lband <= j <= i+rband.
-              Setting these requires your jac routine to return the jacobian
-              in packed format, jac_packed[i-j+lband, j] = jac[i,j].
-            - with_jacobian : bool
-              Whether to use the jacobian
-            - nsteps : int
-              Maximum number of (internally defined) steps allowed during one
-              call to the solver.
-            - first_step : float
-            - min_step : float
-            - max_step : float
-              Limits for the step sizes used by the integrator.
-            - max_order_ns : int
-              Maximum order used in the nonstiff case (default 12).
-            - max_order_s : int
-              Maximum order used in the stiff case (default 5).
-            - max_hnil : int
-              Maximum number of messages reporting too small step size (t+h=t)
-              (default 0)
-            - ixpr : int
-              Whether to generate extra printing at method switches. Default is
-              False.
-
-        "dopri5"
-
-            This is an explicit Runge-Kutta method of order (4)5 due to Dormand
-            and Prince (with adaptive step-size control and dense output).
-
-            Authors:
-
-                E. Hairer and G. Wanner
-                Universite de Geneve, Dept. de Mathematiques
-                CH-1211 Geneve 24, Switzerland
-                e-mail: ernst.hairer@math.unige.ch,
-                        gerhard.wanner@math.unige.ch
-
-            This code is described in [HNW93]_.
-
-            This integrator accepts the following keyword arguments:
-
-            - atol : float or sequence
-              absolute tolerance for solution
-            - rtol : float or sequence
-              relative tolerance for solution
-            - nsteps : int
-              Maximum number of (internally defined) steps allowed during one
-              call to the solver.
-            - first_step : float
-            - max_step : float
-            - safety : float
-              Safety factor on new step selection (default 0.9)
-            - ifactor : float
-            - dfactor : float
-              Maximum factor to increase/decrease step size by in one step
-            - beta : float
-              Beta parameter for stabilised step size control.
-            - verbosity : int
-              Switch for printing messages (< 0 for no messages).
-
-        "dop853"
-
-            This is an explicit Runge-Kutta method of order 8(5,3) due to
-            Dormand and Prince (with adaptive step-size control and dense
-            output).
-
-            Options and references the same as "dopri5".
+        t0 : float
+            Initial condition for the independent variable.
+        y0 : array_like (float, shape=(n,))
+            Initial condition for the dependent variables.
+        h : float, optional(default=1.0)
+            Step-size for computing the solution. Can be positive or negative
+            depending on the desired direction of integration.
+        T : int, optional(default=None)
+            Terminal value for the independent variable. One of either `T`
+            or `g` must be specified.
+        g : callable ``g(t, vec, args)``, optional(default=None)
+            Provides a stopping condition for the integration. If specified
+            user must also specify a stopping tolerance, `tol`.
+        tol : float, optional (default=None)
+            Stopping tolerance for the integration. Only required if `g` is
+            also specifed.
+        integrator : str, optional(default='dopri5')
+            Must be one of 'vode', 'lsoda', 'dopri5', or 'dop853'
+        step : bool, optional(default=False)
+            Allows access to internal steps for those solvers that use adaptive
+            step size routines. Currently only 'vode', 'zvode', and 'lsoda'
+            support `step=True`.
+        relax : bool, optional(default=False)
+            Currently only 'vode', 'zvode', and 'lsoda' support `relax=True`.
+        **kwargs : dict, optional(default=None)
+            Dictionary of integrator specific keyword arguments. See the
+            Notes section of the docstring for `scipy.ode` for a complete
+            description of solver specific keyword arguments.
 
         Returns
         -------
@@ -333,27 +175,27 @@ class IVP(object):
 
         Parameters
         ----------
-            traj : array_like (float)
-                Solution trajectory providing the data points for constructing
-                the B-spline representation.
-            ti : array_like (float)
-                Array of values for the independent variable at which to
-                interpolate the value of the B-spline.
-            k : int, optional(default=3)
-                Degree of the desired B-spline. Degree must satisfy
-                :math:`1 \le k \le 5`.
-            der : int, optional(default=0)
-                The order of derivative of the spline to compute (must be less
-                than or equal to `k`).
-            ext : int, optional(default=2) Controls the value of returned
-                elements for outside the original knot sequence provided by
-                traj. For extrapolation, set `ext=0`; `ext=1` returns zero;
-                `ext=2` raises a `ValueError`.
+        traj : array_like (float)
+            Solution trajectory providing the data points for constructing the
+            B-spline representation.
+        ti : array_like (float)
+            Array of values for the independent variable at which to
+            interpolate the value of the B-spline.
+        k : int, optional(default=3)
+            Degree of the desired B-spline. Degree must satisfy
+            :math:`1 \le k \le 5`.
+        der : int, optional(default=0)
+            The order of derivative of the spline to compute (must be less
+            than or equal to `k`).
+        ext : int, optional(default=2) Controls the value of returned elements
+            for outside the original knot sequence provided by traj. For
+            extrapolation, set `ext=0`; `ext=1` returns zero; `ext=2` raises a
+            `ValueError`.
 
         Returns
         -------
-            interp_traj: array (float)
-                The interpolated trajectory.
+        interp_traj: array (float)
+            The interpolated trajectory.
 
         """
         # array of parameter values
