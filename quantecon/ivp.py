@@ -38,7 +38,7 @@ class IVP(object):
         jac : callable ``jac(t, y, *args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
-            :math:`\mathcal{J}_{i,j} = \frac{\partial f_i}}{\partial y_j}`
+            :math:`\mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]`
         args : tuple, optional(default=None)
             Additional arguments that should be passed to both `f` and `jac`.
 
