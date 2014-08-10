@@ -174,8 +174,8 @@ class IVP(object):
             Currently only 'vode', 'zvode', and 'lsoda' support `relax=True`.
         **kwargs : dict, optional(default=None)
             Dictionary of integrator specific keyword arguments. See the
-            Notes section of the docstring for `scipy.ode` for a complete
-            description of solver specific keyword arguments.
+            Notes section of the docstring for `scipy.integrate.ode` for a
+            complete description of solver specific keyword arguments.
 
         Returns
         -------
