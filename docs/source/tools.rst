@@ -4,6 +4,7 @@ Tools
 .. toctree::
    :maxdepth: 2
 
+   tools/ce_util
    tools/compute_fp
    tools/discrete_rv
    tools/ecdf

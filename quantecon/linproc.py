@@ -219,7 +219,7 @@ class LinearProcess(object):
 
         """
         sys = self.ma_poly, self.ar_poly, 1
-        u = np.random.randn(ts_length, 1)
+        u = np.random.randn(ts_length, 1) * self.sigma
         vals = dlsim(sys, u)[1]
 
         return vals.flatten()
@@ -229,7 +229,7 @@ class LinearProcess(object):
             fig, ax = plt.subplots()
         ax.set_title('Impulse response')
         yi = self.impulse_response()
-        ax.stem(list(range(len(yi)), yi))
+        ax.stem(list(range(len(yi))), yi)
         ax.set_xlim(xmin=(-0.5))
         ax.set_ylim(min(yi)-0.1,max(yi)+0.1)
         ax.set_xlabel('time')

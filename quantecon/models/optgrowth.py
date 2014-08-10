@@ -12,7 +12,7 @@ import numpy as np
 from scipy.optimize import fminbound
 from scipy import interp
 
-class GrowthModel:
+class GrowthModel(object):
     """
 
     This class defines the primitives representing the growth model.
@@ -97,4 +97,3 @@ class GrowthModel:
         """
         Tw, sigma = self.bellman_operator(w, compute_policy=True)
         return sigma
-

@@ -22,6 +22,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
 from quantecon.quad import *
+from quantecon.tests.util import get_data_dir
 
 ### MATLAB code needed to generate data (in addition to a modified demqua03)
 # % set random number seed so we get the same random nums as in python
@@ -71,9 +72,7 @@ from quantecon.quad import *
 
 ### End MATLAB commands
 
-this_dir = os.path.dirname(__file__)
-# this_dir = os.path.abspath(".")
-data_dir = os.path.join(this_dir, "data")
+data_dir = get_data_dir()
 data = loadmat(os.path.join(data_dir, "matlab_quad.mat"), squeeze_me=True)
 
 # Unpack parameters from MATLAB

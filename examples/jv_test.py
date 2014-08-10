@@ -8,7 +8,8 @@ Tests jv.py with a particular parameterization.
 
 """
 import matplotlib.pyplot as plt
-from quantecon import compute_fixed_point, JvWorker
+from quantecon import compute_fixed_point
+from quantecon.models import JvWorker
 
 # === solve for optimal policy === #
 wp = JvWorker(grid_size=25)
@@ -22,5 +23,6 @@ ax.set_xlim(0, max(wp.x_grid))
 ax.set_ylim(-0.1, 1.1)
 ax.plot(wp.x_grid, phi_policy, 'b-', label='phi')
 ax.plot(wp.x_grid, s_policy, 'g-', label='s')
+ax.set_xlabel("x")
 ax.legend()
 plt.show()
