@@ -10,9 +10,11 @@ Base class for solving initial value problems (IVPs) of the form:
     \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
 
 using finite difference methods. The class uses various integrators from the
-``scipy.ode`` module to perform the integration (i.e., solve the ODE) and
-parametric B-spline interpolation from ``scipy.interpolate`` to approximate
-the value of the solution between grid points.
+``scipy.integrate.ode`` module to perform the integration (i.e., solve the ODE)
+and parametric B-spline interpolation from ``scipy.interpolate`` to approximate
+the value of the solution between grid points. The ivp module also provides a
+method for computing the residual of the solution which can be used for
+assessing the overall accuracy of the approximated solution.
 
 """
 from __future__ import division
