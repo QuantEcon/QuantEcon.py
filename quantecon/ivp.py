@@ -86,6 +86,18 @@ class IVP(object):
 
         return solution
 
+    def _set_integrator(self, t0, y0, integrator, **kwargs):
+        """Sets up the integrator prior to integration."""
+        # set the initial condition
+        self.ode.set_initial_value(y0, t0)
+
+        # pass the model parameters as additional args
+        self.ode.set_f_params(*self.args)
+        self.ode.set_jac_params(*self.args)
+
+        # select the integrator
+        self.ode.set_integrator(integrator, **kwargs)
+
     def compute_residual(self, traj, ti, k=3, ext=2):
         """
         The residual is the difference between the derivative of the B-spline
@@ -167,20 +179,11 @@ class IVP(object):
 
         Returns
         -------
-            solution: array_like (float)
-                Simulated solution trajectory.
+        solution: array_like (float)
+            Simulated solution trajectory.
 
         """
-        # select the integrator
-        self.ode.set_integrator(integrator, **kwargs)
-
-        # pass the model parameters as additional args
-        if self.args is not None:
-            self.ode.set_f_params(*self.args)
-            self.ode.set_jac_params(*self.args)
-
-        # set the initial condition
-        self.ode.set_initial_value(y0, t0)
+        self._set_integrator(t0, y0, integrator, **kwargs)
 
         if (g is not None) and (tol is not None):
             solution = self._integrate_variable_trajectory(h, g, tol, step, relax)
