@@ -158,7 +158,7 @@ class IVP(object):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable ``g(t, vec, args)``, optional(default=None)
+        g : callable ``g(t, y, args)``, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
@@ -179,7 +179,7 @@ class IVP(object):
 
         Returns
         -------
-        solution: array_like (float)
+        solution: ndarray (float)
             Simulated solution trajectory.
 
         """
@@ -220,7 +220,7 @@ class IVP(object):
 
         Returns
         -------
-        interp_traj: array (float)
+        interp_traj: ndarray (float)
             The interpolated trajectory.
 
         """
