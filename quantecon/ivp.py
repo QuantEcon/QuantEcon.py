@@ -48,11 +48,43 @@ class IVP(object):
         self.args = args
         self.ode = integrate.ode(f, jac)
 
-    def _integrate_fixed_trajectory(self):
-        pass
+    def _integrate_fixed_trajectory(self, t0, y0, h, T, step, relax):
+        """Generates a solution trajectory of fixed length."""
+        # initialize the solution using initial condition
+        solution = np.hstack((t0, y0))
 
-    def _integrate_variable_trajectory(self):
-        pass
+        while self.ode.successful():
+
+            self.ode.integrate(self.ode.t + h, step, relax)
+            current_step = np.hstack((self.ode.t, self.ode.y))
+            solution = np.vstack((solution, current_step))
+
+            if (h > 0) and (self.ode.t >= T):
+                break
+            elif (h < 0) and (self.ode.t <= T):
+                break
+            else:
+                continue
+
+        return solution
+
+    def _integrate_variable_trajectory(self, t0, y0, h, g, tol, step, relax):
+        """Generates a solution trajectory of variable length."""
+        # initialize the solution using initial condition
+        solution = np.hstack((t0, y0))
+
+        while self.ode.successful():
+
+            self.ode.integrate(self.ode.t + h, step, relax)
+            current_step = np.hstack((self.ode.t, self.ode.y))
+            solution = np.vstack((solution, current_step))
+
+            if g(self.ode.t, self.ode.y, *self.args) < tol:
+                break
+            else:
+                continue
+
+        return solution
 
     def compute_residual(self, traj, ti, k=3, ext=2):
         """
@@ -150,28 +182,13 @@ class IVP(object):
         # set the initial condition
         self.ode.set_initial_value(y0, t0)
 
-        # create a storage container for the trajectory
-        solution = np.hstack((t0, y0))
-
-        # generate a solution trajectory
-        while self.ode.successful():
-
-            self.ode.integrate(self.ode.t + h, step, relax)
-            current_step = np.hstack((self.ode.t, self.ode.y))
-            solution = np.vstack((solution, current_step))
-
-            # check terminal conditions
-            if (g is not None) and (g(self.ode.t, self.ode.y, *self.args) < tol):
-                break
-
-            elif (T is not None) and (h > 0) and (self.ode.t >= T):
-                break
-
-            elif (T is not None) and (h < 0) and (self.ode.t <= T):
-                break
-
-            else:
-                continue
+        if (g is not None) and (tol is not None):
+            solution = self._integrate_variable_trajectory(t0, y0, h, g, tol, step, relax)
+        elif T is not None:
+            solution = self._integrate_fixed_trajectory(t0, y0, h, T, step, relax)
+        else:
+            mesg = "Either both 'g' and 'tol', or 'T' must be specified."
+            raise ValueError(mesg)
 
         return solution
 
