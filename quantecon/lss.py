@@ -17,7 +17,7 @@ import numpy as np
 from numpy import dot
 from numpy.random import multivariate_normal
 from scipy.linalg import eig, solve
-from .util import solve_discrete_lyapunov
+from .matrix_eqn import solve_discrete_lyapunov
 
 class LSS:
     """
