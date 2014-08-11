@@ -2,7 +2,7 @@
 language: python
 python:
   - 2.7
-  # - 3.3
+  - 3.3
 
 notifications:
   email: false
@@ -20,9 +20,9 @@ before_install:
   - sudo rm -rf /dev/shm
   - sudo ln -s /run/shm /dev/shm
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip statsmodels sympy pytables
   # Get packages that we can't get directly from conda
-  - pip install coveralls coverage statsmodels
+  - pip install coveralls coverage
   # - conda install --yes -c dan_blanchard python-coveralls nose-cov
   - python setup.py install
 
