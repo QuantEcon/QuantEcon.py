@@ -1,4 +1,4 @@
-"""
+r"""
 Filename: ivp.py
 
 Authors: David R. Pugh
@@ -23,10 +23,10 @@ import numpy as np
 from scipy import integrate, interpolate
 
 
-class IVP(object):
+class IVP(integrate.ode):
 
     def __init__(self, f, jac=None, args=None):
-        """
+        r"""
         Creates an instance of the IVP class.
 
         Parameters
@@ -49,9 +49,10 @@ class IVP(object):
             Additional arguments that should be passed to both `f` and `jac`.
 
         """
-        self.ode = integrate.ode(f, jac)
-        self.ode.set_f_params(*args)
-        self.ode.set_jac_params(*args)
+        super(IVP, self).__init__(f, jac)
+
+        self.set_f_params(*args)
+        self.set_jac_params(*args)
 
     @property
     def args(self):
@@ -63,28 +64,28 @@ class IVP(object):
         :type: tuple
 
         """
-        return self.ode.f_params
+        return self.f_params
 
     @args.setter
     def args(self, new_args):
         """Set new values for args."""
-        self.ode.set_f_params(*new_args)
-        self.ode.set_jac_params(*new_args)
+        self.set_f_params(*new_args)
+        self.set_jac_params(*new_args)
 
     def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
         # initialize the solution using initial condition
-        solution = np.hstack((self.ode.t, self.ode.y))
+        solution = np.hstack((self.t, self.y))
 
-        while self.ode.successful():
+        while self.successful():
 
-            self.ode.integrate(self.ode.t + h, step, relax)
-            current_step = np.hstack((self.ode.t, self.ode.y))
+            self.integrate(self.t + h, step, relax)
+            current_step = np.hstack((self.t, self.y))
             solution = np.vstack((solution, current_step))
 
-            if (h > 0) and (self.ode.t >= T):
+            if (h > 0) and (self.t >= T):
                 break
-            elif (h < 0) and (self.ode.t <= T):
+            elif (h < 0) and (self.t <= T):
                 break
             else:
                 continue
@@ -94,15 +95,15 @@ class IVP(object):
     def _integrate_variable_trajectory(self, h, g, tol, step, relax):
         """Generates a solution trajectory of variable length."""
         # initialize the solution using initial condition
-        solution = np.hstack((self.ode.t, self.ode.y))
+        solution = np.hstack((self.t, self.y))
 
-        while self.ode.successful():
+        while self.successful():
 
-            self.ode.integrate(self.ode.t + h, step, relax)
-            current_step = np.hstack((self.ode.t, self.ode.y))
+            self.integrate(self.t + h, step, relax)
+            current_step = np.hstack((self.t, self.y))
             solution = np.vstack((solution, current_step))
 
-            if g(self.ode.t, self.ode.y, *self.args) < tol:
+            if g(self.t, self.y, *self.args) < tol:
                 break
             else:
                 continue
@@ -112,10 +113,10 @@ class IVP(object):
     def _initialize_integrator(self, t0, y0, integrator, **kwargs):
         """Initializes the integrator prior to integration."""
         # set the initial condition
-        self.ode.set_initial_value(y0, t0)
+        self.set_initial_value(y0, t0)
 
         # select the integrator
-        self.ode.set_integrator(integrator, **kwargs)
+        self.set_integrator(integrator, **kwargs)
 
     def compute_residual(self, traj, ti, k=3, ext=2):
         """
@@ -153,7 +154,7 @@ class IVP(object):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.ode.f(ti[i], soln[i, 1:], *self.args) for i in range(T))
+        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.args) for i in range(T))
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
