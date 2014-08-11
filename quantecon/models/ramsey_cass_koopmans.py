@@ -7,8 +7,8 @@ Ramsey-Cass-Koopmans optimal growth model.
 import numpy as np
 import sympy as sp
 
-# declare endogenous variables
-c, k = sp.var('c, k')
+# declare independent and endogenous variables
+t, c, k = sp.var('c, k')
 
 # declare model parameters
 g, n = sp.var('g, n')
@@ -40,7 +40,7 @@ _ramsey_system = sp.Matrix([_c_dot, _k_dot]).subs(change_of_vars)
 _ramsey_jacobian = _ramsey_system.jacobian([X[0], X[1]])
 
 # wrap the symbolic expressions as callable numpy funcs
-_args = (X, g, n, alpha, delta, rho, sigma, theta)
+_args = (t, X, g, n, alpha, delta, rho, sigma, theta)
 _f = sp.lambdify(_args, _ramsey_system,
                  modules=[{'ImmutableMatrix': np.array}, "numpy"])
 _jac = sp.lambdify(_args, _ramsey_jacobian,
@@ -88,7 +88,7 @@ def f(t, X, g, n, alpha, delta, rho, sigma, theta):
         Right hand side of the ODE describing the Ramsey-Cass-Koopmans model.
 
     """
-    rhs_ode = _f(X, g, n, alpha, delta, rho, sigma, theta).ravel()
+    rhs_ode = _f(t, X, g, n, alpha, delta, rho, sigma, theta).ravel()
     return rhs_ode
 
 
@@ -130,5 +130,5 @@ def jacobian(t, X, g, n, alpha, delta, rho, sigma, theta):
         Jacobian matrix of partial derivatives.
 
     """
-    jac = _jac(X, g, n, alpha, delta, rho, sigma, theta)
+    jac = _jac(t, X, g, n, alpha, delta, rho, sigma, theta)
     return jac
