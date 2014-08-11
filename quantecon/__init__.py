@@ -12,11 +12,10 @@ from .lae import LAE
 from .linproc import LinearProcess
 from .lqcontrol import LQ
 from .lss import LSS
+from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .mc_tools import DMarkov, mc_sample_path, mc_compute_stationary
 from .quadsums import var_quadratic_sum, m_quadratic_sum
 from .rank_nullspace import rank_est, nullspace
-from .riccati import dare
 from .robustlq import RBLQ
 from .tauchen import approx_markov
-from .util import solve_discrete_lyapunov
 from . import quad as quad
