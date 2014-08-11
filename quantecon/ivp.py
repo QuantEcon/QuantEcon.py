@@ -49,8 +49,27 @@ class IVP(object):
             Additional arguments that should be passed to both `f` and `jac`.
 
         """
-        self.args = args
         self.ode = integrate.ode(f, jac)
+        self.ode.set_f_params(*args)
+        self.ode.set_jac_params(*args)
+
+    @property
+    def args(self):
+        """
+        Additional arguments that should be passed to both `f` and `jac`.
+
+        :getter: Return the current args.
+        :setter: Set new values for args.
+        :type: tuple
+
+        """
+        return self.ode.f_params
+
+    @args.setter
+    def args(self, new_args):
+        """Set new values for args."""
+        self.ode.set_f_params(*new_args)
+        self.ode.set_jac_params(*new_args)
 
     def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
@@ -90,14 +109,10 @@ class IVP(object):
 
         return solution
 
-    def _set_integrator(self, t0, y0, integrator, **kwargs):
-        """Sets up the integrator prior to integration."""
+    def _initialize_integrator(self, t0, y0, integrator, **kwargs):
+        """Initializes the integrator prior to integration."""
         # set the initial condition
         self.ode.set_initial_value(y0, t0)
-
-        # pass the model parameters as additional args
-        self.ode.set_f_params(*self.args)
-        self.ode.set_jac_params(*self.args)
 
         # select the integrator
         self.ode.set_integrator(integrator, **kwargs)
@@ -146,10 +161,10 @@ class IVP(object):
 
         return residual
 
-    def integrate(self, t0, y0, h=1.0, T=None, g=None, tol=None,
-                  integrator='dopri5', step=False, relax=False, **kwargs):
+    def solve(self, t0, y0, h=1.0, T=None, g=None, tol=None,
+              integrator='dopri5', step=False, relax=False, **kwargs):
         """
-        Integrates the ODE given some initial condition.
+        Solve the IVP by integrating the ODE given some initial condition.
 
         Parameters
         ----------
@@ -188,7 +203,7 @@ class IVP(object):
             Simulated solution trajectory.
 
         """
-        self._set_integrator(t0, y0, integrator, **kwargs)
+        self._initialize_integrator(t0, y0, integrator, **kwargs)
 
         if (g is not None) and (tol is not None):
             solution = self._integrate_variable_trajectory(h, g, tol, step, relax)
