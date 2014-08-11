@@ -12,7 +12,8 @@ import numpy as np
 from .lqcontrol import LQ
 from .quadsums import var_quadratic_sum
 from numpy import dot, log, sqrt, identity, hstack, vstack, trace
-from scipy.linalg import solve, inv, det, solve_discrete_lyapunov
+from scipy.linalg import solve, inv, det
+from .util import solve_discrete_lyapunov
 
 class RBLQ:
     r"""
