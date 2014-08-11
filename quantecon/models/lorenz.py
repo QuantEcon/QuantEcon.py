@@ -1,7 +1,7 @@
 """
 Author: David R. Pugh
 
-The Lorenz Equations are a system of three coupled, first-order, non-linear
+The `Lorenz Equations`_ are a system of three coupled, first-order, non-linear
 differential equations which describe the trajectory of a particle through
 time. The system was originally derived by Lorenz as a model of atmospheric
 convection, but the deceptive simplicity of the equations have made them an
@@ -21,6 +21,8 @@ The resulting dynamics are entirely deterministic giving a starting point
 :math`(x_0,y_0,z_0)` and a time interval `t`. Though it looks straightforward,
 for certain choices of the parameters, the trajectories become chaotic, and the
 resulting trajectories display some surprising properties.
+
+.. _`Lorenz Equations`:http://en.wikipedia.org/wiki/Lorenz_system
 
 """
 import numpy as np
