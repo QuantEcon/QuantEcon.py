@@ -29,7 +29,7 @@ class IVP(object):
         """
         Creates an instance of the IVP class.
 
-        Attributes
+        Parameters
         ----------
         f : callable ``f(t, X, *args)``
             Right hand side of the system of equations defining the ODE. The
@@ -40,13 +40,15 @@ class IVP(object):
         jac : callable ``jac(t, X, *args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
-            :math:`\mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]`
+
+            .. :math:
+
+                \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]
+
         args : tuple, optional(default=None)
             Additional arguments that should be passed to both `f` and `jac`.
 
         """
-        self.f = f
-        self.jac = jac
         self.args = args
         self.ode = integrate.ode(f, jac)
 
@@ -136,7 +138,7 @@ class IVP(object):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.args) for i in range(T))
+        rhs_ode = np.vstack(self.ode.f(ti[i], soln[i, 1:], *self.args) for i in range(T))
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
