@@ -27,22 +27,24 @@ import numpy as np
 import sympy as sp
 
 # declare endogenous variables
-X = sp.DeferredVector('X')
+t, x, y, z = sp.var('x, y, z')
 
 # declare model parameters
 beta, rho, sigma = sp.var('beta, rho, sigma')
 
 # define symbolic model equations
-_x_dot = sigma * (X[1] - X[0])
-_y_dot = X[0] * (rho - X[2]) - X[1]
-_z_dot = X[0] * X[1] - beta * X[2]
+_x_dot = sigma * (y - x)
+_y_dot = x * (rho - z) - y
+_z_dot = x * y - beta * z
 
 # define symbolic system and compute the jacobian
-_lorenz_system = sp.Matrix([[_x_dot], [_y_dot], [_z_dot]])
-_lorenz_jacobian = _lorenz_system.jacobian([X])
+X = sp.DeferredVector('X')
+change_of_vars = {'x': X[0], 'y': X[1], 'z': X[2]}
+_lorenz_system = sp.Matrix([[_x_dot], [_y_dot], [_z_dot]]).subs(change_of_vars)
+_lorenz_jacobian = _lorenz_system.jacobian([X[0], X[1], X[2]])
 
 # wrap the symbolic expressions as callable numpy funcs
-_args = (X, beta, rho, sigma)
+_args = (t, X, beta, rho, sigma)
 _f = sp.lambdify(_args, _lorenz_system,
                  modules=[{'ImmutableMatrix': np.array}, "numpy"])
 _jac = sp.lambdify(_args, _lorenz_jacobian,
@@ -69,12 +71,12 @@ def f(t, X, beta, rho, sigma):
 
     Returns
     -------
-    f : ndarray (float, shape=(2,))
-        RHS of the Lorenz system of ODEs.
+    rhs_ode : ndarray (float, shape=(3,))
+        Right hand side of the Lorenz system of ODEs.
 
     """
-    f = np.array(_f(X, beta, rho, sigma)).ravel()
-    return f
+    rhs_ode = _f(t, X, beta, rho, sigma).ravel()
+    return rhs_ode
 
 
 def jacobian(t, X, beta, rho, sigma):
@@ -100,5 +102,5 @@ def jacobian(t, X, beta, rho, sigma):
         Jacobian of the Lorenz system of ODEs.
 
     """
-    jac = np.array(_jac(X, beta, rho, sigma))
+    jac = _jac(t, X, beta, rho, sigma)
     return jac
