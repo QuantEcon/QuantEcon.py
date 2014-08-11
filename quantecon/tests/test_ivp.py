@@ -31,9 +31,9 @@ class LotkaVolterraTest(unittest.TestCase):
         for integrator in integrators:
 
             # tighten tolerances so tests don't file due to numerical issues
-            tmp_numeric_traj = self.ivp.integrate(t0, X0, h=1e-2, T=15.0,
-                                                  integrator=integrator,
-                                                  atol=1e-14, rtol=1e-11)
+            tmp_numeric_traj = self.ivp.solve(t0, X0, h=1e-2, T=15.0,
+                                              integrator=integrator,
+                                              atol=1e-14, rtol=1e-11)
             T = tmp_numeric_traj[:, 0][-1]
             tmp_grid_pts = np.linspace(t0, T, 1000)
 
