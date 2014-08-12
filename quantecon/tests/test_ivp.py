@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 
 from .. import ivp
-from ..models import lotka_volterra
+from .. models import lotka_volterra
 
 
 class LotkaVolterraTest(unittest.TestCase):
