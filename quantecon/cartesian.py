@@ -60,9 +60,9 @@ def mlinspace(a, b, nums, order='C'):
     '''
 
     a = numpy.array(a, dtype='float64')
-    b = numpy.array(a, dtype='float64')
-    nums = numpy.array(a, dtype='int64')
-    nodes = [numpy.linspace(a[i], b[i], nums[i]) for i in orders]
+    b = numpy.array(b, dtype='float64')
+    nums = numpy.array(nums, dtype='int64')
+    nodes = [numpy.linspace(a[i], b[i], nums[i]) for i in range(len(nums))]
 
     return cartesian(nodes, order=order)
 
