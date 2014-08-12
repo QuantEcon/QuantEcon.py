@@ -119,7 +119,7 @@ class IVP(integrate.ode):
         self.set_integrator(integrator, **kwargs)
 
     def compute_residual(self, traj, ti, k=3, ext=2):
-        """
+        r"""
         The residual is the difference between the derivative of the B-spline
         approximation of the solution trajectory and the right-hand side of the
         original ODE evaluated along the approximated solution trajectory.
@@ -164,7 +164,7 @@ class IVP(integrate.ode):
 
     def solve(self, t0, y0, h=1.0, T=None, g=None, tol=None,
               integrator='dopri5', step=False, relax=False, **kwargs):
-        """
+        r"""
         Solve the IVP by integrating the ODE given some initial condition.
 
         Parameters
@@ -217,7 +217,7 @@ class IVP(integrate.ode):
         return solution
 
     def interpolate(self, traj, ti, k=3, der=0, ext=2):
-        """
+        r"""
         Parametric B-spline interpolation in N-dimensions.
 
         Parameters
