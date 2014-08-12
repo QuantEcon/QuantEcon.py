@@ -50,9 +50,7 @@ class IVP(integrate.ode):
 
         """
         super(IVP, self).__init__(f, jac)
-
-        self.set_f_params(*args)
-        self.set_jac_params(*args)
+        self.args = args
 
     @property
     def args(self):
@@ -69,8 +67,12 @@ class IVP(integrate.ode):
     @args.setter
     def args(self, new_args):
         """Set new values for args."""
-        self.set_f_params(*new_args)
-        self.set_jac_params(*new_args)
+        if not isinstance(new_args, tuple):
+            mesg = "IVP.args must be a tuple, not a {}."
+            raise ValueError(mesg.format(new_args.__class__))
+        else:
+            self.set_f_params(*new_args)
+            self.set_jac_params(*new_args)
 
     def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
