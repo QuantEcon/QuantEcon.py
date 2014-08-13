@@ -19,6 +19,24 @@ class Model(object):
 
     @property
     def output(self):
+        """
+        Aggregate production function.
+
+        Output `Y` is assume to be some function of technology, `A`, capital,
+        `K`, and labor, `L`.
+
+        .. math::
+
+            Y = F(A, K, L)
+
+        Standard assumptions are that the function `F` exhibits constant return
+        to scale with respect to capital and labor inputs.
+
+        :getter: Return the current production function.
+        :setter: Set new production function
+        :type: sp.Basic
+
+        """
         return self._output
 
     @property
