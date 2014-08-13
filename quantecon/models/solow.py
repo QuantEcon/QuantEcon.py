@@ -22,12 +22,12 @@ class Model(object):
         """
         Aggregate production function.
 
-        Output `Y` is assume to be some function of technology, `A`, capital,
-        `K`, and labor, `L`.
+        Output `Y` is assumed to be some function of technology, `A`, capital,
+        `K`, and labor, `L`:
 
         .. math::
 
-            Y = F(A, K, L)
+            Y = F(A, K, L).
 
         Standard assumptions are that the function `F` exhibits constant return
         to scale with respect to capital and labor inputs.
@@ -41,14 +41,36 @@ class Model(object):
 
     @property
     def params(self):
+        """
+        Dictionary of model parameters.
+
+        Parameters
+        ----------
+        g : float
+            Growth rate of technology.
+        n : float
+            Growth rate of the labor force.
+        s : float
+            Savings rate. Must satisfy ``0 < s < 1``.
+        delta : float
+            Depreciation rate of physical capital. Must satisfy
+            :math:`0 < \delta`.
+
+        :getter: Return the current production function.
+        :setter: Set new production function
+        :type: sp.Basic
+
+        """
         return self._params
 
     @output.setter
     def output(self, value):
+        """Set a new production function."""
         self._output = self._validate_output(value)
 
     @params.setter
     def params(self, value):
+        """Set a new parameter dictionary."""
         self._params = value
 
     def _validate_output(self, output):
