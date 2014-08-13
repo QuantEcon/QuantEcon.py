@@ -20,12 +20,49 @@ import sympy as sp
 # declare key variables for the model
 A, k, K, L, t = sp.var('A, k, K, L, t')
 
+# declare required model parameters
+g, n, s, delta = sp.var('g, n, s, delta')
+
 
 class Model(object):
 
     def __init__(self, output, params):
         self.output = output
         self.params = params
+
+    @property
+    def intensive_output(self):
+        r"""
+        The assumption of constant returns to scale allows us to work the the
+        intensive form of the production function, `F`. Defining :math:`c=1/AL`
+        one can write
+
+        ..math::
+
+            F\bigg(\frac{K}{AL}, 1) = \frac{1}{AL}F(A, K, L)
+
+        Defining :math:`k=K/AL` and :math:`y=Y/AL` to be capital per effective
+        worker and output per effective worker, respectively, the intensive
+        form of the production function can be written as
+
+        .. math::
+
+            y = f(k).
+
+        Tradionaly assumptions are that the function `f` satisfies :math:`f(0)=0`,
+        is concave (i.e., :math:`f'(k) > 0, f''(k) < 0`), and satisfies the
+        Inada (1964) conditions:
+
+        .. math::
+
+            \lim_{k \rigtharrow 0} = \infty \\
+            \lim_{k \rightarrow \infty} = 0
+
+        :getter: Return the current intensive production function.
+        :type: sp.Basic
+
+        """
+        return self._intensive_output
 
     @property
     def output(self):
@@ -38,14 +75,14 @@ class Model(object):
 
         .. math::
 
-            Y(t) = F(A(t), K(t), L(t))
+            Y(t) = F(K(t), A(t)L(t))
 
         where `t` denotes time. A key assumption of the Solow model is that the
         function `F` exhibits constant returns to scale in capital and labor.
 
         .. math::
 
-            F(A(t), cK(t), cL(t)) = cF(A(t), K(t), L(t)) = cY(t)
+            F(cK(t), cA(t)L(t)) = cF(K(t), A(t)L(t)) = cY(t)
 
         for any :math:`c \ge 0`.
 
@@ -61,8 +98,8 @@ class Model(object):
         """
         Dictionary of model parameters.
 
-        Parameters
-        ----------
+        The following parameters are required:
+
         g : float
             Growth rate of technology.
         n : float
@@ -72,6 +109,9 @@ class Model(object):
         delta : float
             Depreciation rate of physical capital. Must satisfy
             :math:`0 < \delta`.
+
+        Note that there will likely be additional model parameters specific to
+        the specified production function.
 
         :getter: Return the current dictionary of model parameters.
         :setter: Set a new dictionary of model parameters.
@@ -84,6 +124,9 @@ class Model(object):
     def output(self, value):
         """Set a new production function."""
         self._output = self._validate_output(value)
+
+        # set the intensive form
+        self._intensive_output = self._output.subs({'A': 1.0, 'K': k, 'L': 1.0})
 
     @params.setter
     def params(self, value):
@@ -116,15 +159,6 @@ class Model(object):
         else:
             return params
 
-# declare model parameters
-g, n, s, alpha, delta, sigma = sp.var('g, n, s, alpha, delta, sigma')
-
-# define the the production function
-rho = (sigma - 1) / sigma
-Y = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
-
-# define the intensive form of the production function
-y = Y.subs({'A': 1.0, 'K': k, 'L': 1.0})
 
 # define symbolic model equations
 _k_dot = s * y - (g + n + delta) * k
@@ -220,3 +254,18 @@ def jacobian(t, X, g, n, s, alpha, delta, sigma):
     """
     jac = _jac(t, X, g, n, s, alpha, delta, sigma)
     return jac
+
+
+def main():
+    """Simple test case."""
+    # define production function parameters
+    alpha, sigma = sp.var('alpha, sigma')
+
+    # define the the production function
+    rho = (sigma - 1) / sigma
+    Y = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
+
+    return Model(output=Y, params=None)
+
+if __name__ == '__main__':
+    model = main()
