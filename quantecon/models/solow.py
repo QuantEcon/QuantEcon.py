@@ -1,14 +1,24 @@
 """
 Author: David R. Pugh
 
-Solow (1956) model of economic growth.
+Solow (1956) model of economic growth focuses on the behavior of four variables:
+output, `Y`, capital, `K`, labor, `L`, and knowledge (or technology or the
+``effectiveness of labor''), `A`. At each point in time the economy has some
+amounts of capital, labor, and knowledge that can be combined to produce output
+according to some production function, `F`.
+
+.. math::
+
+    Y(t) = F(A(t), K(t), L(t))
+
+where `t` denotes time.
 
 """
 import numpy as np
 import sympy as sp
 
-# basic variables for a Solow model
-A, k, K, L = sp.var('A, k, K, L')
+# declare key variables for the model
+A, k, K, L, t = sp.var('A, k, K, L, t')
 
 
 class Model(object):
@@ -19,21 +29,28 @@ class Model(object):
 
     @property
     def output(self):
-        """
-        Aggregate production function.
-
-        Output `Y` is assumed to be some function of technology, `A`, capital,
-        `K`, and labor, `L`:
+        r"""
+        Solow (1956) model of economic growth focuses on the behavior of four
+        variables: output, `Y`, capital, `K`, labor, `L`, and knowledge (or
+        technology or the ``effectiveness of labor''), `A`. At each point in
+        time the economy has some amounts of capital, labor, and knowledge that
+        can be combined to produce output according to some function, `F`.
 
         .. math::
 
-            Y = F(A, K, L).
+            Y(t) = F(A(t), K(t), L(t))
 
-        Standard assumptions are that the function `F` exhibits constant return
-        to scale with respect to capital and labor inputs.
+        where `t` denotes time. A key assumption of the Solow model is that the
+        function `F` exhibits constant returns to scale in capital and labor.
+
+        .. math::
+
+            F(A(t), cK(t), cL(t)) = cF(A(t), K(t), L(t)) = cY(t)
+
+        for any :math:`c \ge 0`.
 
         :getter: Return the current production function.
-        :setter: Set new production function
+        :setter: Set a new production function
         :type: sp.Basic
 
         """
@@ -56,9 +73,9 @@ class Model(object):
             Depreciation rate of physical capital. Must satisfy
             :math:`0 < \delta`.
 
-        :getter: Return the current production function.
-        :setter: Set new production function
-        :type: sp.Basic
+        :getter: Return the current dictionary of model parameters.
+        :setter: Set a new dictionary of model parameters.
+        :type: dict
 
         """
         return self._params
@@ -85,20 +102,46 @@ class Model(object):
         else:
             return output
 
+    def _validate_params(self, params):
+        """Validate the model parameters."""
+        if not isinstance(params, dict):
+            mesg = "SolowModel.params must be a dict, not a {}."
+            raise ValueError(mesg.format(params.__class__))
+        if params['s'] <= 0.0 or params['s'] >= 1.0:
+            raise ValueError('Savings rate must be in (0, 1).')
+        if params['delta'] <= 0.0 or params['delta'] >= 1.0:
+            raise ValueError('Depreciation rate must be in (0, 1).')
+        if params['g'] + params['n'] + params['delta'] <= 0.0:
+            raise ValueError("Sum of g, n, and delta must be positive.")
+        else:
+            return params
+
+# declare model parameters
+g, n, s, alpha, delta, sigma = sp.var('g, n, s, alpha, delta, sigma')
+
+# define the the production function
+rho = (sigma - 1) / sigma
+Y = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
+
+# define the intensive form of the production function
+y = Y.subs({'A': 1.0, 'K': k, 'L': 1.0})
 
 # define symbolic model equations
-#_k_dot = s * y - (g + n + delta) * k
+_k_dot = s * y - (g + n + delta) * k
 
 # define symbolic system and compute the jacobian
-#_solow_system = sp.Matrix([_k_dot])
-#_solow_jacobian = _solow_system.jacobian([k])
+X = sp.DeferredVector('X')
+change_of_vars = {'k': X[0]}
+
+_solow_system = sp.Matrix([_k_dot]).subs(change_of_vars)
+_solow_jacobian = _solow_system.jacobian([X[0]])
 
 # wrap the symbolic expressions as callable numpy funcs
-#_args = (k, g, n, s, alpha, delta, sigma)
-#_f = sp.lambdify(_args, _solow_system,
-#                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
-#_jac = sp.lambdify(_args, _solow_jacobian,
-#                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
+_args = (t, X, g, n, s, alpha, delta, sigma)
+_f = sp.lambdify(_args, _solow_system,
+                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
+_jac = sp.lambdify(_args, _solow_jacobian,
+                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
 
 
 def f(t, k, g, n, s, alpha, delta, sigma):
@@ -111,8 +154,9 @@ def f(t, k, g, n, s, alpha, delta, sigma):
     ----------
     t : array_like (float)
         Time.
-    k : array_like (float)
-        Capital (per worker/effective worker).
+    X : ndarray (float, shape=(1,))
+        Endogenous variables of the Solow model. Ordering is `X = [k]` where
+        `k` is capital (per worker/effective worker).
     g : float
         Growth rate of technology.
     n : float
@@ -135,21 +179,22 @@ def f(t, k, g, n, s, alpha, delta, sigma):
         Rate of change of capital (per worker/effective worker).
 
     """
-    k_dot = _f(k, g, n, s, alpha, delta, sigma).ravel()
+    k_dot = _f(t, k, g, n, s, alpha, delta, sigma).ravel()
     return k_dot
 
 
-def jacobian(t, k, g, n, s, alpha, delta, sigma):
+def jacobian(t, X, g, n, s, alpha, delta, sigma):
     """
     Jacobian for the Solow model with constant elasticity of substitution (CES)
     production.
 
     Parameters
     ----------
-    t : array_like (float)
+    t : float
         Time.
-    k : array_like (float)
-        Capital (per worker/effective worker).
+    X : ndarray (float, shape=(1,))
+        Endogenous variables of the Solow model. Ordering is `X = [k]` where
+        `k` is capital (per worker/effective worker).
     g : float
         Growth rate of technology.
     n : float
@@ -173,20 +218,5 @@ def jacobian(t, k, g, n, s, alpha, delta, sigma):
         worker) with respect to `k`.
 
     """
-    jac = _jac(k, g, n, s, alpha, delta, sigma)
+    jac = _jac(t, X, g, n, s, alpha, delta, sigma)
     return jac
-
-
-def main():
-    """Basic test case."""
-    # declare model parameters
-    g, n, s, alpha, delta, sigma = sp.var('g, n, s, alpha, delta, sigma')
-
-    # define the intensive for for the production function
-    rho = (sigma - 1) / sigma
-    Y = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
-
-    return Model(output=Y, params=None)
-
-if __name__ == '__main__':
-    model = main()
