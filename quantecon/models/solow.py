@@ -7,15 +7,29 @@ Solow (1956) model of economic growth.
 import numpy as np
 import sympy as sp
 
-# declare endogenous variables
-k = sp.var('k')
 
-# declare model parameters
-g, n, s, alpha, delta, sigma = sp.var('g, n, s, alpha, delta, sigma')
+class Model(object):
 
-# define the intensive for for the production function
-rho = (sigma - 1) / sigma
-y = (alpha * k**rho + (1 - alpha))**(1 / rho)
+    def __init__(self, output, params):
+        self.output = output
+        self.params = params
+
+    @property
+    def output(self):
+        return self._output
+
+    @property
+    def params(self):
+        return self._params
+
+    @output.setter
+    def output(self, value):
+        self._output = value
+
+    @params.setter
+    def params(self, value):
+        self._params = value
+
 
 # define symbolic model equations
 _k_dot = s * y - (g + n + delta) * k
@@ -106,3 +120,19 @@ def jacobian(t, k, g, n, s, alpha, delta, sigma):
     """
     jac = _jac(k, g, n, s, alpha, delta, sigma)
     return jac
+
+
+def main():
+    """Basic test case."""
+    # declare endogenous variables
+    k = sp.var('k')
+
+    # declare model parameters
+    g, n, s, alpha, delta, sigma = sp.var('g, n, s, alpha, delta, sigma')
+
+    # define the intensive for for the production function
+    rho = (sigma - 1) / sigma
+    y = (alpha * k**rho + (1 - alpha))**(1 / rho)
+
+if __name__ == '__main__':
+    main()
