@@ -7,6 +7,9 @@ Solow (1956) model of economic growth.
 import numpy as np
 import sympy as sp
 
+# basic variables for a Solow model
+A, k, K, L = sp.var('A, k, K, L')
+
 
 class Model(object):
 
@@ -24,26 +27,38 @@ class Model(object):
 
     @output.setter
     def output(self, value):
-        self._output = value
+        self._output = self._validate_output(value)
 
     @params.setter
     def params(self, value):
         self._params = value
 
+    def _validate_output(self, output):
+        """Validate the production function."""
+        if not isinstance(output, sp.Basic):
+            mesg = ("Output must be an instance of {}.".format(sp.Basic))
+            raise ValueError(mesg)
+        if not ({A, K, L} < output.atoms()):
+            mesg = ("Output must be an expression of technology, 'A', " +
+                    "capital, 'K', and labor, 'L'.")
+            raise ValueError(mesg)
+        else:
+            return output
+
 
 # define symbolic model equations
-_k_dot = s * y - (g + n + delta) * k
+#_k_dot = s * y - (g + n + delta) * k
 
 # define symbolic system and compute the jacobian
-_solow_system = sp.Matrix([_k_dot])
-_solow_jacobian = _solow_system.jacobian([k])
+#_solow_system = sp.Matrix([_k_dot])
+#_solow_jacobian = _solow_system.jacobian([k])
 
 # wrap the symbolic expressions as callable numpy funcs
-_args = (k, g, n, s, alpha, delta, sigma)
-_f = sp.lambdify(_args, _solow_system,
-                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
-_jac = sp.lambdify(_args, _solow_jacobian,
-                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
+#_args = (k, g, n, s, alpha, delta, sigma)
+#_f = sp.lambdify(_args, _solow_system,
+#                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
+#_jac = sp.lambdify(_args, _solow_jacobian,
+#                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
 
 
 def f(t, k, g, n, s, alpha, delta, sigma):
@@ -124,15 +139,14 @@ def jacobian(t, k, g, n, s, alpha, delta, sigma):
 
 def main():
     """Basic test case."""
-    # declare endogenous variables
-    k = sp.var('k')
-
     # declare model parameters
     g, n, s, alpha, delta, sigma = sp.var('g, n, s, alpha, delta, sigma')
 
     # define the intensive for for the production function
     rho = (sigma - 1) / sigma
-    y = (alpha * k**rho + (1 - alpha))**(1 / rho)
+    Y = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
+
+    return Model(output=Y, params=None)
 
 if __name__ == '__main__':
-    main()
+    model = main()
