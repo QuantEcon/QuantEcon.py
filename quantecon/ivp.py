@@ -18,6 +18,7 @@ assessing the overall accuracy of the approximated solution.
 
 """
 from __future__ import division
+import types
 
 import numpy as np
 from scipy import integrate, interpolate
@@ -67,7 +68,7 @@ class IVP(integrate.ode):
     @args.setter
     def args(self, new_args):
         """Set new values for args."""
-        if not isinstance(new_args, tuple):
+        if not isinstance(new_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
             raise ValueError(mesg.format(new_args.__class__))
         else:
