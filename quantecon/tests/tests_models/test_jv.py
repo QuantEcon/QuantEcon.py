@@ -6,8 +6,9 @@ tests for quantecon.jv
 
 """
 from __future__ import division
+import sys
 import unittest
-from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from quantecon.models import JvWorker
 from quantecon import compute_fixed_point
 from quantecon.tests import get_h5_data_file, write_array, max_abs_diff
@@ -18,11 +19,17 @@ alpha = 0.6
 beta = 0.96
 grid_size = 50
 
+if sys.version_info[0] == 2:
+    v_nm = "V"
+else:  # python 3
+    raise SkipTest("Python 3 tests aren't ready.")
+    v_nm = "V_py3"
+
 
 def _new_solution(jv, f, grp):
     "gets new solution and updates data file"
     V = _solve_via_vfi(jv)
-    write_array(f, grp, V, "V")
+    write_array(f, grp, V, v_nm)
 
     return V
 
@@ -59,7 +66,10 @@ def _get_vf_guess(jv, force_new=False):
         # existing solutions
         try:
             # Try reading vfi
-            V = jv_group.V[:]
+            if sys.version_info[0] == 2:
+                V = jv_group.V[:]
+            else:  # python 3
+                V = jv_group.V_py3[:]
 
         except:
             # doesn't exist. Let's create it
@@ -101,9 +111,3 @@ class TestJvWorkder(unittest.TestCase):
         "jv: solution to bellman is fixed point"
         new_V = self.jv.bellman_operator(self.V)
         self.assertLessEqual(max_abs_diff(new_V, self.V), 1e-4)
-
-    @attr("slow")
-    def test_bruteforce_bellman(self):
-        "jv: bellman_operator bruteforce option returns fp"
-        new_V = self.jv.bellman_operator(self.V, brute_force=True)
-        self.assertEqual(new_V.shape, self.V.shape)

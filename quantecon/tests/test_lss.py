@@ -42,7 +42,7 @@ class TestLinearStateSpace(unittest.TestCase):
 
         assert_allclose(xval, yval)
         self.assertEqual(xval.size, 5000)
-        self.assertLessEqual(abs(np.mean(xval)), .01)
+        self.assertLessEqual(abs(np.mean(xval)), .05)
 
     # def test_
 
