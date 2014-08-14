@@ -9,12 +9,13 @@ Base class for solving initial value problems (IVPs) of the form:
 
     \frac{dX}{dt} = f(t,X),\ X(t_0) = X_0
 
-using finite difference methods. The class uses various integrators from the
-``scipy.integrate.ode`` module to perform the integration (i.e., solve the ODE)
-and parametric B-spline interpolation from ``scipy.interpolate`` to approximate
-the value of the solution between grid points. The ivp module also provides a
-method for computing the residual of the solution which can be used for
-assessing the overall accuracy of the approximated solution.
+using finite difference methods. The `quantecon.ivp` class uses various
+integrators from the `scipy.integrate.ode` module to perform the integration
+(i.e., solve the ODE) and parametric B-spline interpolation from
+`scipy.interpolate` to approximate the value of the solution between grid
+points. The `quantecon.ivp` module also provides a method for computing the
+residual of the solution which can be used for assessing the overall accuracy
+of the approximated solution.
 
 """
 from __future__ import division
@@ -26,19 +27,19 @@ from scipy import integrate, interpolate
 
 class IVP(integrate.ode):
 
-    def __init__(self, f, jac=None, args=None):
+    def __init__(self, f, jac=None, f_params=None, jac_params=None):
         r"""
         Creates an instance of the IVP class.
 
         Parameters
         ----------
-        f : callable ``f(t, X, *args)``
+        f : callable ``f(t, X, *f_params)``
             Right hand side of the system of equations defining the ODE. The
             independent variable, `t`, is a ``scalar``; `X` is an ``ndarray``
             of dependent variables with ``X.shape == (n,)``. The function `f`
             should return a ``scalar``, ``ndarray`` or ``list`` (but not a
             ``tuple``).
-        jac : callable ``jac(t, X, *args)``, optional(default=None)
+        jac : callable ``jac(t, X, *jac_params)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
 
@@ -46,34 +47,63 @@ class IVP(integrate.ode):
 
                 \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]
 
-        args : tuple, optional(default=None)
-            Additional arguments that should be passed to both `f` and `jac`.
+        f_params : tuple, optional(default=None)
+            Additional arguments that should be passed to the function `f`.
+        jac_params : tuple, optional(default=None)
+            Additional arguments that should be passed to the function `jac`.
 
         """
         super(IVP, self).__init__(f, jac)
-        self.args = args
+        self.f_params = f_params
+        self.jac_params = jac_params
 
     @property
-    def args(self):
+    def f_params(self):
         """
-        Additional arguments that should be passed to both `f` and `jac`.
+        Additional arguments that should be passed to the function `f`.
 
-        :getter: Return the current args.
-        :setter: Set new values for args.
+        :getter: Return the current parameters.
+        :setter: Set new values for the parameters.
         :type: tuple
 
         """
-        return self.f_params
+        return self._f_params
 
-    @args.setter
-    def args(self, new_args):
-        """Set new values for args."""
-        if not isinstance(new_args, (tuple, types.NoneType)):
+    @property
+    def jac_params(self):
+        """
+        Additional arguments that should be passed to the function `jac`.
+
+        :getter: Return the current parameters.
+        :setter: Set new values for the parameters.
+        :type: tuple
+
+        """
+        return self._jac_params
+
+    @f_params.setter
+    def f_params(self, new_f_params):
+        """Set new values for the parameters."""
+        if not isinstance(new_f_params, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise ValueError(mesg.format(new_args.__class__))
+            raise ValueError(mesg.format(new_f_params.__class__))
+        elif new_f_params is not None:
+            self.set_f_params(*new_f_params)
+            self._f_params = new_f_params
         else:
-            self.set_f_params(*new_args)
-            self.set_jac_params(*new_args)
+            pass
+
+    @jac_params.setter
+    def jac_params(self, new_jac_params):
+        """Set new values for the parameters."""
+        if not isinstance(new_jac_params, (tuple, types.NoneType)):
+            mesg = "IVP.args must be a tuple, not a {}."
+            raise ValueError(mesg.format(new_jac_params.__class__))
+        elif new_jac_params is not None:
+            self.set_jac_params(*new_jac_params)
+            self._jac_params = new_jac_params
+        else:
+            pass
 
     def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
@@ -106,7 +136,7 @@ class IVP(integrate.ode):
             current_step = np.hstack((self.t, self.y))
             solution = np.vstack((solution, current_step))
 
-            if g(self.t, self.y, *self.args) < tol:
+            if g(self.t, self.y, *self.f_params) < tol:
                 break
             else:
                 continue
@@ -157,7 +187,7 @@ class IVP(integrate.ode):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.args) for i in range(T))
+        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_params) for i in range(T))
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
@@ -182,7 +212,7 @@ class IVP(integrate.ode):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable ``g(t, X, args)``, optional(default=None)
+        g : callable ``g(t, X, f_params)``, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
@@ -210,14 +240,14 @@ class IVP(integrate.ode):
         self._initialize_integrator(t0, y0, integrator, **kwargs)
 
         if (g is not None) and (tol is not None):
-            solution = self._integrate_variable_trajectory(h, g, tol, step, relax)
+            soln = self._integrate_variable_trajectory(h, g, tol, step, relax)
         elif T is not None:
-            solution = self._integrate_fixed_trajectory(h, T, step, relax)
+            soln = self._integrate_fixed_trajectory(h, T, step, relax)
         else:
             mesg = "Either both 'g' and 'tol', or 'T' must be specified."
             raise ValueError(mesg)
 
-        return solution
+        return soln
 
     def interpolate(self, traj, ti, k=3, der=0, ext=2):
         r"""
