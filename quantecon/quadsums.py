@@ -12,6 +12,7 @@ in the docstrings.
 import numpy as np
 from numpy import sqrt, dot
 import scipy.linalg
+from .matrix_eqn import solve_discrete_lyapunov
 
 
 def var_quadratic_sum(A, C, H, beta, x0):
@@ -72,15 +73,9 @@ def m_quadratic_sum(A, B, max_it=50):
 
         V = \sum_{j=0}^{\infty} A^j B A^{j'}
 
-    V is computed by using a doubling algorithm. In particular, we
-    iterate to convergence on V_j with the following recursions for j =
-    1, 2,... starting from V_0 = B, a_0 = A:
-
-    .. math::
-
-        a_j = a_{j-1} a_{j-1}
-
-        V_j = V_{j-1} + a_{j-1} V_{j-1} a_{j-1}'
+    V is computed by solving the corresponding discrete lyapunov
+    equation using the doubling algorithm.  See the documentation of
+    `util.solve_discrete_lyapunov` for more information.
 
     Parameters
     ----------
@@ -101,26 +96,7 @@ def m_quadratic_sum(A, B, max_it=50):
         Represents the value V
 
     """
-    A, B = list(map(np.atleast_2d, [A, B]))
-    alpha0 = A
-    gamma0 = B
 
-    diff = 5
-    n_its = 1
-
-    while diff > 1e-15:
-
-        alpha1 = alpha0.dot(alpha0)
-        gamma1 = gamma0 + np.dot(alpha0.dot(gamma0), alpha0.T)
-
-        diff = np.max(np.abs(gamma1 - gamma0))
-        alpha0 = alpha1
-        gamma0 = gamma1
-
-        n_its += 1
-
-        if n_its > max_it:
-            raise ValueError('Exceeded maximum iterations of %i.' % (max_it) +
-                             ' Check your input matrices')
+    gamma1 = solve_discrete_lyapunov(A, B, max_it)
 
     return gamma1
