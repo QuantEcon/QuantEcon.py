@@ -14,6 +14,7 @@ from __future__ import division
 import numpy as np
 import scipy.linalg as la
 import sympy.mpmath as mp
+import sys
 from .discrete_rv import DiscreteRV
 from warnings import warn
 
@@ -210,15 +211,6 @@ stationary_dists : np.ndarray : float
 
 """
 
-# mc_compute_stationary.__doc__ = _stationary_docstr.format(p_arg=
-# """P : array_like(float, ndim=2)
-#     A discrete Markov transition matrix
-
-# """)
-
-DMarkov.mc_compute_stationary.__func__.__doc__ = _stationary_docstr.format(p_arg="")
-
-
 # For drawing a sample path
 _sample_path_docstr = \
 """
@@ -242,12 +234,23 @@ X : array_like(int, ndim=1)
 
 """
 
-# set docstring for function
+# set docstring for functions
+mc_compute_stationary.__doc__ = _stationary_docstr.format(p_arg=
+"""P : array_like(float, ndim=2)
+    A discrete Markov transition matrix
+
+""")
 mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg=
 """P : array_like(float, ndim=2)
     A discrete Markov transition matrix
 
 """)
 
-# set docstring for method
-DMarkov.mc_sample_path.__func__.__doc__ = _sample_path_docstr.format(p_arg="")
+# set docstring for methods
+
+if sys.version_info[0] == 3:
+    DMarkov.mc_compute_stationary.__doc__ = _stationary_docstr.format(p_arg="")
+    DMarkov.mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="")
+elif sys.version_info[0] == 2:
+    DMarkov.mc_compute_stationary.__func__.__doc__ = _stationary_docstr.format(p_arg="")
+    DMarkov.mc_sample_path.__func__.__doc__ = _sample_path_docstr.format(p_arg="")

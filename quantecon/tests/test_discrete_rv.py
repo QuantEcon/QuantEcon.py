@@ -54,5 +54,5 @@ class TestDiscreteRV(unittest.TestCase):
         draws = self.drv.draw(1000000)
         counts = pd.Series(Counter(draws))
         counts = (counts / counts.sum()).values
-        assert max(np.abs(counts - self.drv.q)) < 1e-3
+        assert max(np.abs(counts - self.drv.q)) < 1e-2
 

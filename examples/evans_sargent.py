@@ -19,13 +19,13 @@ For more complete description of inputs and outputs see the website.
 
 import numpy as np
 from quantecon import LQ
-from scipy.linalg import solve_discrete_lyapunov
+from quantecon.matrix_eqn import solve_discrete_lyapunov
 from scipy.optimize import root
 
 def computeG(A0, A1, d, Q0, tau0, beta, mu):
     """
     Compute government income given mu and return tax revenues and
-    policy matrixes for the planner.  
+    policy matrixes for the planner.
 
     Parameters
     ----------
