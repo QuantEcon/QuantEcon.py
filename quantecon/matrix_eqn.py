@@ -1,5 +1,5 @@
 """
-Filename: util.py
+Filename: matrix_eqn.py
 
 This files holds several functions that are used to solve matrix
 equations.  Currently has functionality to solve:
