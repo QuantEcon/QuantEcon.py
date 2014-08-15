@@ -1,34 +1,88 @@
-"""
+r"""
 Author: David R. Pugh
 
-Solow (1956) model of economic growth focuses on the behavior of four variables:
-output, `Y`, capital, `K`, labor, `L`, and knowledge (or technology or the
-``effectiveness of labor''), `A`. At each point in time the economy has some
-amounts of capital, labor, and knowledge that can be combined to produce output
-according to some production function, `F`.
+The [solow1956] model of economic growth focuses on the behavior of four
+variables: output, `Y`, capital, `K`, labor, `L`, and knowledge (or technology
+or the ``effectiveness of labor''), `A`. At each point in time the economy has
+some amounts of capital, labor, and knowledge that can be combined to produce
+output according to some production function, `F`.
 
 .. math::
 
-    Y(t) = F(A(t), K(t), L(t))
+    Y(t) = F(K(t), A(t)L(t))
 
 where `t` denotes time.
+
+References
+----------
+.. [romer2011] D. Romer. *Advanced Macroeconomics, 4th edition*, MacGraw Hill,
+2011.
+.. [solow1956] R. Solow. *A contribution to the theory of economic growth*,
+Quarterly Journal of Economics, 70(1):64-95, 1956.
+
+TODO:
+
+1. Write a short demo notebook
+2. Have properties return callable funcs for plotting.
+3. Finish writing docs
 
 """
 import numpy as np
 import sympy as sp
 
+from .. import ivp
+
+
 # declare key variables for the model
-A, k, K, L, t = sp.var('A, k, K, L, t')
+t, X = sp.var('t'), sp.DeferredVector('X')
+A, k, K, L = sp.var('A, k, K, L')
 
 # declare required model parameters
 g, n, s, delta = sp.var('g, n, s, delta')
 
 
-class Model(object):
+class Model(ivp.IVP):
 
     def __init__(self, output, params):
+        """
+        Create an instance of the Solow growth model.
+
+        Parameters
+        ----------
+        output : sp.Basic
+            Symbolic expression defining the aggregate production function.
+        params : dict
+            Dictionary of model parameters.
+
+        """
         self.output = output
         self.params = params
+
+        # wrap the model system and jacobian (only need to do this once!)
+        self._wrapped_sys = sp.lambdify(self._symbolic_args,
+                                        self._symbolic_system,
+                                        modules=[{'ImmutableMatrix': np.array}, "numpy"])
+        self._wrapped_jac = sp.lambdify(self._symbolic_args,
+                                        self._symbolic_jacobian,
+                                        modules=[{'ImmutableMatrix': np.array}, "numpy"])
+
+        super(Model, self).__init__(self._numeric_system, self._numeric_jacobian)
+
+    @property
+    def _symbolic_args(self):
+        """Return list of symbolic arguments."""
+        return [t, X] + sp.var(self.params.keys())
+
+    @property
+    def _symbolic_jacobian(self):
+        """Symbolic Jacobian matrix of partial derivatives."""
+        return self._symbolic_system.jacobian([X[0]])
+
+    @property
+    def _symbolic_system(self):
+        """Symbolic system of ODE that define the model."""
+        change_of_vars = {'k': X[0]}
+        return sp.Matrix([self.k_dot]).subs(change_of_vars)
 
     @property
     def intensive_output(self):
@@ -49,20 +103,35 @@ class Model(object):
 
             y = f(k).
 
-        Tradionaly assumptions are that the function `f` satisfies :math:`f(0)=0`,
-        is concave (i.e., :math:`f'(k) > 0, f''(k) < 0`), and satisfies the
-        Inada (1964) conditions:
+        Additional assumptions are that `f` satisfies :math:`f(0)=0`, is
+        concave (i.e., :math:`f'(k) > 0, f''(k) < 0`), and satisfies the Inada
+        conditions:
 
         .. math::
 
             \lim_{k \rigtharrow 0} = \infty \\
             \lim_{k \rightarrow \infty} = 0
 
+        The Inada (1964) conditions are sufficient (but not necessary!) to
+        ensure that the time path of capital per effective worker does not
+        explode.
+
         :getter: Return the current intensive production function.
         :type: sp.Basic
 
         """
-        return self._intensive_output
+        return self._output.subs({'A': 1.0, 'K': k, 'L': 1.0})
+
+    @property
+    def k_dot(self):
+        """
+        Symbolic equation of motion for capital per effective worker.
+
+        :getter: Return the current intensive production function.
+        :type: sp.Basic
+
+        """
+        return s * self.intensive_output - (g + n + delta) * k
 
     @property
     def output(self):
@@ -105,7 +174,7 @@ class Model(object):
         n : float
             Growth rate of the labor force.
         s : float
-            Savings rate. Must satisfy ``0 < s < 1``.
+            Savings rate. Must satisfy `0 < s < 1`.
         delta : float
             Depreciation rate of physical capital. Must satisfy
             :math:`0 < \delta`.
@@ -125,13 +194,54 @@ class Model(object):
         """Set a new production function."""
         self._output = self._validate_output(value)
 
-        # set the intensive form
-        self._intensive_output = self._output.subs({'A': 1.0, 'K': k, 'L': 1.0})
-
     @params.setter
     def params(self, value):
         """Set a new parameter dictionary."""
         self._params = value
+
+    def _numeric_system(self, t, X):
+        """
+        Equation of motion for capital (per worker/effective worker) for a
+        Solow growth model.
+
+        Parameters
+        ----------
+        t : ndarray (float)
+            Time.
+        X : ndarray (float, shape=(1,))
+            Endogenous variables of the Solow model. Ordering is `X = [k]`
+            where `k` is capital (per worker/effective worker).
+
+        Returns
+        -------
+        X_dot : ndarray (float, shape=(1,))
+            Rate of change of capital (per worker/effective worker).
+
+        """
+        X_dot = self._wrapped_sys(t, X, **self.params).ravel()
+        return X_dot
+
+    def _numeric_jacobian(self, t, X):
+        """
+        Jacobian matrix of partial derivatives for the Solow model.
+
+        Parameters
+        ----------
+        t : float
+            Time.
+        X : ndarray (float, shape=(1,))
+            Endogenous variables of the Solow model. Ordering is `X = [k]`
+            where `k` is capital (per worker/effective worker).
+
+        Returns
+        -------
+        jac : array_like (float)
+            Derivative of the equation of motion for capital (per worker/
+            effective worker) with respect to `k`.
+
+        """
+        jac = self._wrapped_jac(t, X, **self.params)
+        return jac
 
     def _validate_output(self, output):
         """Validate the production function."""
@@ -158,114 +268,3 @@ class Model(object):
             raise ValueError("Sum of g, n, and delta must be positive.")
         else:
             return params
-
-
-# define symbolic model equations
-_k_dot = s * y - (g + n + delta) * k
-
-# define symbolic system and compute the jacobian
-X = sp.DeferredVector('X')
-change_of_vars = {'k': X[0]}
-
-_solow_system = sp.Matrix([_k_dot]).subs(change_of_vars)
-_solow_jacobian = _solow_system.jacobian([X[0]])
-
-# wrap the symbolic expressions as callable numpy funcs
-_args = (t, X, g, n, s, alpha, delta, sigma)
-_f = sp.lambdify(_args, _solow_system,
-                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
-_jac = sp.lambdify(_args, _solow_jacobian,
-                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
-
-
-def f(t, k, g, n, s, alpha, delta, sigma):
-    """
-    Equation of motion for capital (per worker/effective worker) for a
-    Solow growth model with constant elasticity of substitution (CES)
-    production function.
-
-    Parameters
-    ----------
-    t : array_like (float)
-        Time.
-    X : ndarray (float, shape=(1,))
-        Endogenous variables of the Solow model. Ordering is `X = [k]` where
-        `k` is capital (per worker/effective worker).
-    g : float
-        Growth rate of technology.
-    n : float
-        Growth rate of the labor force.
-    s : float
-        Savings rate. Must satisfy ``0 < s < 1``.
-    alpha : float
-        Importance of capital relative to effective labor in production. Must
-        satisfy :math:`0 < \alpha < 1`.
-    delta : float
-        Depreciation rate of physical capital. Must satisfy
-        :math:`0 < \delta`.
-    sigma : float
-        Elasticity of substitution between capital and effective labor in
-        production. Must satisfy :math:`0 \le \sigma`.
-
-    Returns
-    -------
-    k_dot : array_like (float)
-        Rate of change of capital (per worker/effective worker).
-
-    """
-    k_dot = _f(t, k, g, n, s, alpha, delta, sigma).ravel()
-    return k_dot
-
-
-def jacobian(t, X, g, n, s, alpha, delta, sigma):
-    """
-    Jacobian for the Solow model with constant elasticity of substitution (CES)
-    production.
-
-    Parameters
-    ----------
-    t : float
-        Time.
-    X : ndarray (float, shape=(1,))
-        Endogenous variables of the Solow model. Ordering is `X = [k]` where
-        `k` is capital (per worker/effective worker).
-    g : float
-        Growth rate of technology.
-    n : float
-        Growth rate of the labor force.
-    s : float
-        Savings rate. Must satisfy ``0 < s < 1``.
-    alpha : float
-        Importance of capital relative to effective labor in production. Must
-        satisfy :math:`0 < \alpha < 1`.
-    delta : float
-        Depreciation rate of physical capital. Must satisfy
-        :math:`0 < \delta`.
-    sigma : float
-        Elasticity of substitution between capital and effective labor in
-        production. Must satisfy :math:`0 \le \sigma`.
-
-    Returns
-    -------
-    jac : array_like (float)
-        Derivative of the equation of motion for capital (per worker/effective
-        worker) with respect to `k`.
-
-    """
-    jac = _jac(t, X, g, n, s, alpha, delta, sigma)
-    return jac
-
-
-def main():
-    """Simple test case."""
-    # define production function parameters
-    alpha, sigma = sp.var('alpha, sigma')
-
-    # define the the production function
-    rho = (sigma - 1) / sigma
-    Y = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
-
-    return Model(output=Y, params=None)
-
-if __name__ == '__main__':
-    model = main()
