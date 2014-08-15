@@ -16,7 +16,8 @@ The shocks {w_t} are iid and N(0, I)
 import numpy as np
 from numpy import dot
 from numpy.random import multivariate_normal
-from scipy.linalg import eig, solve, solve_discrete_lyapunov
+from scipy.linalg import eig, solve
+from .matrix_eqn import solve_discrete_lyapunov
 
 class LSS:
     """

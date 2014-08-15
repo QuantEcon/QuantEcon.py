@@ -1,22 +1,103 @@
 """
-Filename: riccati.py
+Filename: matrix_eqn.py
 
-Authors: Thomas Sargent, John Stachurski
+This files holds several functions that are used to solve matrix
+equations.  Currently has functionality to solve:
 
-Solves the discrete-time algebraic Riccati equation
+* Lyapunov Equations
+* Ricatti Equations
+
+TODO: See issue 47 on github repository, should add support for
+      Sylvester equations
 
 """
-
+from __future__ import division
 import numpy as np
+import warnings
 from numpy import dot
 from numpy.linalg import solve
-import warnings
+from scipy.linalg import solve_discrete_lyapunov as sp_solve_discrete_lyapunov
 
 # == Suppress warnings from checking conditioning of matrices == #
 warnings.simplefilter("ignore", RuntimeWarning)
 
 
-def dare(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
+def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
+    r"""
+    Computes the solution to the discrete lyapunov equation
+
+    .. math::
+
+        AXA' - X + B = 0
+
+    X is computed by using a doubling algorithm. In particular, we
+    iterate to convergence on X_j with the following recursions for j =
+    1, 2,... starting from X_0 = B, a_0 = A:
+
+    .. math::
+
+        a_j = a_{j-1} a_{j-1}
+
+        X_j = X_{j-1} + a_{j-1} X_{j-1} a_{j-1}'
+
+    Parameters
+    ----------
+    A : array_like(float, ndim=2)
+        An n x n matrix as described above.  We assume in order for
+        convergence that the eigenvalues of A have moduli bounded by
+        unity
+    B : array_like(float, ndim=2)
+        An n x n matrix as described above.  We assume in order for
+        convergence that the eigenvalues of A have moduli bounded by
+        unity
+    max_it : scalar(int), optional(default=50)
+        The maximum number of iterations
+    method : string, optional(default="doubling")
+        Describes the solution method to use.  If it is "doubling" then
+        uses the doubling algorithm to solve, if it is "bartels-stewart"
+        then it uses scipy's implementation of the Bartels-Stewart
+        approach.
+
+    Returns
+    ========
+    gamma1: array_like(float, ndim=2)
+        Represents the value V
+
+    """
+    if method=="doubling":
+        A, B = list(map(np.atleast_2d, [A, B]))
+        alpha0 = A
+        gamma0 = B
+
+        diff = 5
+        n_its = 1
+
+        while diff > 1e-15:
+
+            alpha1 = alpha0.dot(alpha0)
+            gamma1 = gamma0 + np.dot(alpha0.dot(gamma0), alpha0.T)
+
+            diff = np.max(np.abs(gamma1 - gamma0))
+            alpha0 = alpha1
+            gamma0 = gamma1
+
+            n_its += 1
+
+            if n_its > max_it:
+                msg = "Exceeded maximum iterations {}, check input matrics"
+                raise ValueError(msg.format(n_its))
+
+    elif method=="bartels-stewart":
+        gamma1 = sp_solve_discrete_lyapunov(A, B)
+
+    else:
+        msg = "Check your method input. Should be doubling or bartels-stewart"
+        raise ValueError(msg)
+
+    return gamma1
+
+
+def solve_discrete_riccati(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
     """
     Solves the discrete-time algebraic Riccati equation
 
