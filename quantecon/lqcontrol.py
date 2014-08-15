@@ -11,7 +11,7 @@ problems.
 import numpy as np
 from numpy import dot
 from scipy.linalg import solve
-from . import riccati
+from .matrix_eqn import solve_discrete_riccati
 
 class LQ:
     r"""
@@ -221,7 +221,7 @@ class LQ:
 
         # === solve Riccati equation, obtain P === #
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
-        P = riccati.dare(A0, B0, R, Q)
+        P = solve_discrete_riccati(A0, B0, R, Q)
 
         # == Compute F == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
