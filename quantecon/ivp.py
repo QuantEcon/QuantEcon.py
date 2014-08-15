@@ -27,19 +27,19 @@ from scipy import integrate, interpolate
 
 class IVP(integrate.ode):
 
-    def __init__(self, f, jac=None, f_params=None, jac_params=None):
+    def __init__(self, f, jac=None, f_args=None, jac_args=None):
         r"""
         Creates an instance of the IVP class.
 
         Parameters
         ----------
-        f : callable ``f(t, X, *f_params)``
+        f : callable ``f(t, X, *f_args)``
             Right hand side of the system of equations defining the ODE. The
             independent variable, `t`, is a ``scalar``; `X` is an ``ndarray``
             of dependent variables with ``X.shape == (n,)``. The function `f`
             should return a ``scalar``, ``ndarray`` or ``list`` (but not a
             ``tuple``).
-        jac : callable ``jac(t, X, *jac_params)``, optional(default=None)
+        jac : callable ``jac(t, X, *jac_args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
 
@@ -47,61 +47,61 @@ class IVP(integrate.ode):
 
                 \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]
 
-        f_params : tuple, optional(default=None)
+        f_args : tuple, optional(default=None)
             Additional arguments that should be passed to the function `f`.
-        jac_params : tuple, optional(default=None)
+        jac_args : tuple, optional(default=None)
             Additional arguments that should be passed to the function `jac`.
 
         """
         super(IVP, self).__init__(f, jac)
-        self.f_params = f_params
-        self.jac_params = jac_params
+        self.f_args = f_args
+        self.jac_args = jac_args
 
     @property
-    def f_params(self):
+    def f_args(self):
         """
-        Additional arguments that should be passed to the function `f`.
+        Additional arguments passed to the user-supplied function `f`.
 
-        :getter: Return the current parameters.
-        :setter: Set new values for the parameters.
+        :getter: Return the current arguments.
+        :setter: Set new values for the arguments.
         :type: tuple
 
         """
-        return self._f_params
+        return self._f_args
 
     @property
-    def jac_params(self):
+    def jac_args(self):
         """
-        Additional arguments that should be passed to the function `jac`.
+        Additional arguments passed to the user-supplied function `jac`.
 
-        :getter: Return the current parameters.
-        :setter: Set new values for the parameters.
+        :getter: Return the current arguments.
+        :setter: Set new values for the arguments.
         :type: tuple
 
         """
-        return self._jac_params
+        return self._jac_args
 
-    @f_params.setter
-    def f_params(self, new_f_params):
+    @f_args.setter
+    def f_args(self, new_f_args):
         """Set new values for the parameters."""
-        if not isinstance(new_f_params, (tuple, types.NoneType)):
+        if not isinstance(new_f_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise ValueError(mesg.format(new_f_params.__class__))
-        elif new_f_params is not None:
-            self.set_f_params(*new_f_params)
-            self._f_params = new_f_params
+            raise ValueError(mesg.format(new_f_args.__class__))
+        elif new_f_args is not None:
+            self.set_f_params(*new_f_args)
+            self._f_args = new_f_args
         else:
             pass
 
-    @jac_params.setter
-    def jac_params(self, new_jac_params):
+    @jac_args.setter
+    def jac_args(self, new_jac_args):
         """Set new values for the parameters."""
-        if not isinstance(new_jac_params, (tuple, types.NoneType)):
+        if not isinstance(new_jac_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise ValueError(mesg.format(new_jac_params.__class__))
-        elif new_jac_params is not None:
-            self.set_jac_params(*new_jac_params)
-            self._jac_params = new_jac_params
+            raise ValueError(mesg.format(new_jac_args.__class__))
+        elif new_jac_args is not None:
+            self.set_jac_params(*new_jac_args)
+            self._jac_args = new_jac_args
         else:
             pass
 
@@ -136,7 +136,7 @@ class IVP(integrate.ode):
             current_step = np.hstack((self.t, self.y))
             solution = np.vstack((solution, current_step))
 
-            if g(self.t, self.y, *self.f_params) < tol:
+            if g(self.t, self.y, *self.f_args) < tol:
                 break
             else:
                 continue
@@ -187,7 +187,7 @@ class IVP(integrate.ode):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_params) for i in range(T))
+        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_args) for i in range(T))
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
@@ -212,7 +212,7 @@ class IVP(integrate.ode):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable ``g(t, X, f_params)``, optional(default=None)
+        g : callable ``g(t, X, f_args)``, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
