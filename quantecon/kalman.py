@@ -10,7 +10,7 @@ Implements the Kalman filter for a linear Gaussian state space model.
 import numpy as np
 from numpy import dot
 from scipy.linalg import inv
-from . import riccati
+from .matrix_eqn import solve_discrete_riccati
 
 class Kalman:
     r"""
@@ -169,7 +169,8 @@ class Kalman:
         """
         Computes the limit of :math:`Sigma_t` as :math:`t \to \infty` by
         solving the associated Riccati equation.  Computation is via the
-        doubling algorithm (see the documentation in riccati.dare).
+        doubling algorithm (see the documentation in
+        `matrix_eqn.solve_discrete_riccati`).
 
         Returns
         -------
@@ -182,7 +183,7 @@ class Kalman:
         # === simplify notation === #
         A, Q, G, R = self.A, self.Q, self.G, self.R
         # === solve Riccati equation, obtain Kalman gain === #
-        Sigma_infinity = riccati.dare(A.T, G.T, Q, R)
+        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R)
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)
