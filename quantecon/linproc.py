@@ -255,7 +255,7 @@ class LinearProcess(object):
             fig, ax = plt.subplots()
         ax.set_title('Autocovariance')
         acov = self.autocovariance()
-        ax.stem(list(range(len(acov)), acov))
+        ax.stem(list(range(len(acov))), acov)
         ax.set_xlim(-0.5, len(acov) - 0.5)
         ax.set_xlabel('time')
         ax.set_ylabel('autocovariance')
