@@ -261,6 +261,25 @@ class Model(object):
         else:
             return params
 
+    def compute_actual_investment(self, k):
+        """
+        Amount of output (per worker/effective worker) invested in the
+        production of new capital.
+
+        Parameters
+        ----------
+        k : array_like (float)
+            Capital (per worker/effective worker)
+
+        Returns
+        -------
+        actual_inv : array_like (float)
+            Investment (per worker/effective worker)
+
+        """
+        actual_inv = self.params['s'] * self.compute_intensive_output(k)
+        return actual_inv
+
     def compute_intensive_output(self, k):
         """
         Parameters
