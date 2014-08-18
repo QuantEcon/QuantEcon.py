@@ -10,7 +10,7 @@ The Solow Growth Model
 Assumptions
 ===========
 
-Assumptions concerning the production function
+The production function
 ----------------------------------------------
 
 The [solow1956] model of economic growth focuses on the behavior of four
@@ -27,7 +27,31 @@ where `t` denotes time.
 
 The evolution of the inputs to production
 -----------------------------------------
-The initial levels of capital, labor, and technology are taken as given.
+The initial levels of capital, :math:`K_0`, labor, :math:`L_0`, and technology,
+:math:`A_0`, are taken as given. Labor and technology are assumed to grow at
+constant rates:
+
+.. math::
+
+    \dot{A}(t) = gA(t)
+    \dot{L}(t) = nL(t)
+
+where the rate of technological progrss, `g`, and the population growth rate,
+`n`, are exogenous parameters.
+
+Output is divided between consumption and investment. The fraction of output
+devoted to investment, :math:`0 < s < 1`, is exogenous and constant. One unit
+of output devoted to investment yields one unit of new capital. Capital is
+assumed to decpreciate at a rate :math:`0\le \delta`. Thus aggregate capital
+stock evolves according to
+
+.. math::
+
+    \dot{K}(t) = sY(t) - \delta K(t).
+
+Although no restrictions are placed on the rates of technological progress and
+population growth, the sum of `g`, `n`, and :math:`delta` is assumed to be
+positive.
 
 References
 ==========
@@ -57,7 +81,7 @@ A, k, K, L = sp.var('A, k, K, L')
 g, n, s, delta = sp.var('g, n, s, delta')
 
 
-class Model(ivp.IVP):
+class Model(object):
 
     def __init__(self, output, params):
         """
@@ -77,16 +101,6 @@ class Model(ivp.IVP):
         self.output = output
         self.params = params
 
-        # wrap the model system and jacobian (only need to do this once!)
-        self._wrapped_sys = sp.lambdify(self._symbolic_args,
-                                        self._symbolic_system,
-                                        modules=[{'ImmutableMatrix': np.array}, "numpy"])
-        self._wrapped_jac = sp.lambdify(self._symbolic_args,
-                                        self._symbolic_jacobian,
-                                        modules=[{'ImmutableMatrix': np.array}, "numpy"])
-
-        super(Model, self).__init__(self._numeric_system, self._numeric_jacobian)
-
     @property
     def _intensive_output(self):
         """
@@ -99,22 +113,6 @@ class Model(ivp.IVP):
             self.__intensive_output = sp.lambdify(args, self.intensive_output,
                                                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
         return self.__intensive_output
-
-    @property
-    def _symbolic_args(self):
-        """Return list of symbolic arguments."""
-        return [t, X] + sp.var(self.params.keys())
-
-    @property
-    def _symbolic_jacobian(self):
-        """Symbolic Jacobian matrix of partial derivatives."""
-        return self._symbolic_system.jacobian([X[0]])
-
-    @property
-    def _symbolic_system(self):
-        """Symbolic system of ODE that define the model."""
-        change_of_vars = {'k': X[0]}
-        return sp.Matrix([self.k_dot]).subs(change_of_vars)
 
     @property
     def intensive_output(self):
@@ -160,22 +158,6 @@ class Model(ivp.IVP):
 
         """
         return self.output.subs({'A': 1.0, 'K': k, 'L': 1.0})
-
-    @property
-    def k_dot(self):
-        """
-        Symbolic expression defining the equation of motion for capital (per
-        worker/effective worker).
-
-        :getter: Return the current equation of motion for capital (per worker/
-            effective worker)
-        :type: sp.Basic
-
-        Notes
-        -----
-
-        """
-        return s * self.intensive_output - (g + n + delta) * k
 
     @property
     def output(self):
@@ -245,54 +227,13 @@ class Model(ivp.IVP):
         """Set a new production function."""
         self._output = self._validate_output(value)
 
+        # clear the cache
+        self.__intensive_output = None
+
     @params.setter
     def params(self, value):
         """Set a new parameter dictionary."""
         self._params = value
-
-    def _numeric_system(self, t, X):
-        """
-        Equation of motion for capital (per worker/effective worker) for a
-        Solow growth model.
-
-        Parameters
-        ----------
-        t : ndarray (float)
-            Time.
-        X : ndarray (float, shape=(1,))
-            Endogenous variables of the Solow model. Ordering is `X = [k]`
-            where `k` is capital (per worker/effective worker).
-
-        Returns
-        -------
-        X_dot : ndarray (float, shape=(1,))
-            Rate of change of capital (per worker/effective worker).
-
-        """
-        X_dot = self._wrapped_sys(t, X, **self.params).ravel()
-        return X_dot
-
-    def _numeric_jacobian(self, t, X):
-        """
-        Jacobian matrix of partial derivatives for the Solow model.
-
-        Parameters
-        ----------
-        t : float
-            Time.
-        X : ndarray (float, shape=(1,))
-            Endogenous variables of the Solow model. Ordering is `X = [k]`
-            where `k` is capital (per worker/effective worker).
-
-        Returns
-        -------
-        jac : array_like (float)
-            Derivative of the equation of motion for capital (per worker/
-            effective worker) with respect to `k`.
-
-        """
-        jac = self._wrapped_jac(t, X, **self.params)
-        return jac
 
     def _validate_output(self, output):
         """Validate the production function."""
