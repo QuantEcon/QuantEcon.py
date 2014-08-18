@@ -116,6 +116,11 @@ class Model(object):
         self.params = params
 
     @property
+    def _effective_depreciation_rate(self):
+        """Effective depreciation rate for physical capital."""
+        return sum(self.params[key] for key in ['g', 'n', 'delta'])
+
+    @property
     def _intensive_output(self):
         """
         :getter: Return vectorized version of intensive aggregate production.
@@ -167,8 +172,7 @@ class Model(object):
         ensure that the time path of capital per effective worker does not
         explode.
 
-        .. [inada1964] K. Inda. *Some structural characteristics of Turnpike Theorems*,
-        Review of Economic Studies, 31(1):43-58, 1964.
+        .. [inada1964] K. Inda. *Some structural characteristics of Turnpike Theorems*, Review of Economic Studies, 31(1):43-58, 1964.
 
         """
         return self.output.subs({'A': 1.0, 'K': k, 'L': 1.0})
