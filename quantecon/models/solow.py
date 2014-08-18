@@ -3,8 +3,8 @@ r"""
 The Solow Growth Model
 ======================
 
-This summary of the [solow1956] model of economic growth largely follows the
-presentation found in [romer2011].
+The following summary of the [solow1956] model of economic growth largely
+follows [romer2011].
 
 Assumptions
 ===========
@@ -58,9 +58,9 @@ The dynamics of the model
 Because the economy is growing over time (due to exogenous technological
 progress and population growth) it is useful to focus on the behavior of
 capital stock per unit of effective labor, :math:`k\equiv K/AL`. Applying
-the chain rule to the equation of motion for capital stock yields (and a
-bit of algebra!) yields an equation of motion for capital stock per unit of
-effective labor.
+the chain rule to the equation of motion for capital stock yields (after a
+bit of algebra!) an equation of motion for capital stock per unit of effective
+labor.
 
 .. math::
 
@@ -149,11 +149,11 @@ class Model(object):
 
         ..math::
 
-            F\bigg(\frac{K}{AL}, 1) = \frac{1}{AL}F(A, K, L)
+            F\bigg(\frac{K}{AL}, 1\bigg) = \frac{1}{AL}F(A, K, L)
 
-        Defining :math:`k=K/AL` and :math:`y=Y/AL` to be capital per effective
-        worker and output per effective worker, respectively, the intensive
-        form of the production function can be written as
+        Defining :math:`k=K/AL` and :math:`y=Y/AL` to be capital per unit
+        effective labor and output per unit effective labor, respectively, the
+        intensive form of the production function can be written as
 
         .. math::
 
@@ -164,9 +164,10 @@ class Model(object):
         conditions:
 
         .. math::
+            :type: eqnarray
 
-            \lim_{k \rigtharrow 0} = \infty \\
-            \lim_{k \rightarrow \infty} = 0
+            \lim_{k \rightarrow 0} &=& \infty \\
+            \lim_{k \rightarrow \infty} &=& 0
 
         The [inada1964]_ conditions are sufficient (but not necessary!) to
         ensure that the time path of capital per effective worker does not
@@ -342,7 +343,7 @@ class Model(object):
 
     def compute_k_dot(self, k):
         """
-        Return the time derivative of capital stock (per unit of effective labor).
+        Return time derivative of capital stock (per unit of effective labor).
 
         Parameters
         ----------
