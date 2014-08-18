@@ -263,8 +263,8 @@ class Model(object):
 
     def compute_actual_investment(self, k):
         """
-        Amount of output (per worker/effective worker) invested in the
-        production of new capital.
+        Return the amount of output (per worker/effective worker) invested in
+        the production of new capital.
 
         Parameters
         ----------
@@ -282,6 +282,8 @@ class Model(object):
 
     def compute_intensive_output(self, k):
         """
+        Return the amount of output (per worker/effective worker).
+
         Parameters
         ----------
         k : ndarray (float)
