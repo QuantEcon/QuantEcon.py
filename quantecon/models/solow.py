@@ -390,9 +390,9 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
     fig, ax = plt.subplots(1, 1, figsize=(10, 8), squeeze=True)
     k_grid = np.linspace(0, k_upper, 1e3)
     ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
-    ax.set_xlabel('Capital (per unit effective labor), $k$', family='serif',
+    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
-    ax.set_ylabel('$f(k)$', family='serif', fontsize=25,
+    ax.set_ylabel('$f(k(t))$', family='serif', fontsize=25,
                   rotation='horizontal')
     ax.set_title('Output (per unit effective labor)',
                  family='serif', fontsize=20)
@@ -433,10 +433,10 @@ def plot_intensive_invesment(cls, k_upper=10, **new_params):
     fig, ax = plt.subplots(1, 1, figsize=(10, 8), squeeze=True)
     k_grid = np.linspace(0, k_upper, 1e3)
     ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
-            label='$sf(k)$')
+            label='$sf(k(t))$')
     ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
-            label='$(g + n + \delta)k$')
-    ax.set_xlabel('Capital (per unit effective labor), $k$', family='serif',
+            label='$(g + n + \delta)k(t)$')
+    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
     ax.set_ylabel('Investment (per unit effective labor)', family='serif',
                   fontsize=15)
@@ -444,6 +444,46 @@ def plot_intensive_invesment(cls, k_upper=10, **new_params):
                  family='serif', fontsize=20)
     ax.grid(True)
     ax.legend(loc=0, frameon=False, prop={'family': 'serif'})
+
+    return [fig, ax]
+
+
+def plot_phase_diagram(cls, k_upper=10, **new_params):
+    """
+    Plot the model's phase diagram.
+
+    Parameters
+    ----------
+    cls : object
+        An instance of :class:`quantecon.models.solow.Model`.
+    k_upper : float
+        Upper bound on capital stock (per unit of effective labor)
+    new_params : dict (optional)
+        Optional dictionary of parameter values to change.
+
+    Returns
+    -------
+    A list containing:
+
+    fig : object
+        An instance of :class:`matplotlib.figure.Figure`.
+    ax : object
+        An instance of :class:`matplotlib.axes.AxesSubplot`.
+
+    """
+    # update model parameters
+    cls.params.update(new_params)
+
+    # create the plot
+    fig, ax = plt.subplots(1, 1, figsize=(10, 8), squeeze=True)
+    k_grid = np.linspace(0, k_upper, 1e3)
+    ax.plot(k_grid, cls.compute_k_dot(k_grid), 'r-')
+    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
+                  fontsize=15)
+    ax.set_ylabel('$\dot{k}(t)$', family='serif', fontsize=25,
+                  rotation='horizontal')
+    ax.set_title('Phase diagram', family='serif', fontsize=20)
+    ax.grid(True)
 
     return [fig, ax]
 
