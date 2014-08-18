@@ -1,11 +1,10 @@
 r"""
-Filename: solow.py
-Author: David R. Pugh
-Date:
-
 ======================
 The Solow Growth Model
 ======================
+
+This summary of the [solow1956] model of economic growth largely follows the
+presentation found in [romer2011].
 
 Assumptions
 ===========
@@ -53,12 +52,27 @@ Although no restrictions are placed on the rates of technological progress and
 population growth, the sum of `g`, `n`, and :math:`delta` is assumed to be
 positive.
 
+The dynamics of the model
+=========================
+
+Because the economy is growing over time (due to exogenous technological
+progress and population growth) it is useful to focus on the behavior of
+capital stock per unit of effective labor, :math:`k\equiv K/AL`. Applying
+the chain rule to the equation of motion for capital stock yields (and a
+bit of algebra!) yields an equation of motion for capital stock per unit of
+effective labor.
+
+.. math::
+
+    \dot{k}(t) = s f(k) - (g + n + \delta)k(t)
+
 References
 ==========
-.. [romer2011] D. Romer. *Advanced Macroeconomics, 4th edition*, MacGraw Hill,
-2011.
-.. [solow1956] R. Solow. *A contribution to the theory of economic growth*,
-Quarterly Journal of Economics, 70(1):64-95, 1956.
+.. [romer2011] D. Romer. *Advanced Macroeconomics, 4th edition*, MacGraw Hill, 2011.
+.. [solow1956] R. Solow. *A contribution to the theory of economic growth*, Quarterly Journal of Economics, 70(1):64-95, 1956.
+
+@author : David R. Pugh
+@date : 2014-08-18
 
 TODO:
 
