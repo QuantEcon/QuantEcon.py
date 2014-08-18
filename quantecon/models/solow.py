@@ -373,7 +373,7 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(10, 8), squeeze=True)
-    k_grid = np.linspace(0, k_upper, 1e4)
+    k_grid = np.linspace(0, k_upper, 1e3)
     ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
     ax.set_xlabel('Capital (per unit effective labor), $k$', family='serif',
                   fontsize=15)
@@ -384,3 +384,120 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
     ax.grid(True)
 
     return [fig, ax]
+
+
+def plot_intensive_invesment(cls, k_upper=10, **new_params):
+    """
+    Plot actual investment (per unit effective labor) and effective
+    depreciation. The steady state value of capital stock (per unit effective
+    labor) balance acual investment and effective depreciation.
+
+    Parameters
+    ----------
+    cls : object
+        An instance of :class:`quantecon.models.solow.Model`.
+    k_upper : float
+        Upper bound on capital stock (per unit of effective labor)
+    new_params : dict (optional)
+        Optional dictionary of parameter values to change.
+
+    Returns
+    -------
+    A list containing:
+
+    fig : object
+        An instance of :class:`matplotlib.figure.Figure`.
+    ax : object
+        An instance of :class:`matplotlib.axes.AxesSubplot`.
+
+    """
+    # update the model parameters
+    cls.params.update(new_params)
+
+    # create the plot
+    fig, ax = plt.subplots(1, 1, figsize=(10, 8), squeeze=True)
+    k_grid = np.linspace(0, k_upper, 1e3)
+    ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
+            label='$sf(k)$')
+    ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
+            label='$(g + n + \delta)k$')
+    ax.set_xlabel('Capital (per unit effective labor), $k$', family='serif',
+                  fontsize=15)
+    ax.set_ylabel('Investment (per unit effective labor)', family='serif',
+                  fontsize=15)
+    ax.set_title('Output (per unit effective labor)',
+                 family='serif', fontsize=20)
+    ax.grid(True)
+    ax.legend(loc=0, frameon=False, prop={'family': 'serif'})
+
+    return [fig, ax]
+
+
+def _cobb_douglas_steady_state(g, n, s, alpha, delta):
+    """
+    Steady-state level of capital stock (per unit effective labor) for a
+    Solow growth model with Cobb-Douglas aggregate production.
+
+    """
+    k_star = (s / (n + g + delta))**(1 / (1 - alpha))
+    return k_star
+
+
+def _leontief_steady_state(g, n, s, alpha, delta):
+    """
+    Steady-state level of capital stock (per unit effective labor) for a
+    Solow growth model with leontief aggregate production.
+
+    """
+    raise NotImplementedError
+
+
+def _general_ces_steady_state(g, n, s, alpha, delta, sigma):
+    """
+    Steady-state level of capital stock (per unit effective labor) for a
+    Solow growth model with CES aggregate production.
+
+    """
+    rho = (sigma - 1) / sigma
+    k_star = ((1 / (1 - alpha)) * ((s / (g + n + delta))**-rho - alpha))**(-1 / rho)
+    return k_star
+
+
+def ces_steady_state(g, n, s, alpha, delta, sigma):
+    """
+    Steady-state level of capital stock (per unit effective labor) for a
+    Solow growth model with constant elasticity of substitution (CES) aggregate
+    production.
+
+    Parameters
+    ----------
+    g : float
+        Growth rate of technology.
+    n : float
+        Growth rate of the labor force.
+    s : float
+        Savings rate. Must satisfy `0 < s < 1`.
+    alpha : float
+        Importance of capital stock relative to effective labor in the
+        production of output. Constant returns to scale requires that
+        :math:`0 < alpha < 1`.
+    delta : float
+        Depreciation rate of physical capital. Must satisfy :math:`0 < \delta`.
+    sigma : float
+        Elasticity of substitution between capital stock and effective labor in
+        the production of output.
+
+    Returns
+    -------
+    k_star : float
+        Steady state value for capital stock (per unit of effective labor).
+
+    """
+    if np.isclose(sigma, 0.0):
+        k_star = _leontief_steady_state(g, n, s, alpha, delta)
+    elif np.isclose(sigma, 1.0):
+        k_star = _cobb_douglas_steady_state(g, n, s, alpha, delta)
+    else:
+        k_star = _general_ces_steady_state(g, n, s, alpha, delta, sigma)
+
+    return k_star
