@@ -81,8 +81,6 @@ TODO:
 3. Finish writing docs
 
 """
-from IPython.html.widgets import *
-
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
