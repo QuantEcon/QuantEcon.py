@@ -280,6 +280,26 @@ class Model(object):
         actual_inv = self.params['s'] * self.compute_intensive_output(k)
         return actual_inv
 
+    def compute_effective_depreciation(self, k):
+        """
+        Return amount of capital (per worker/effective worker) that depreciates
+        due to technological progress, population growth, and physical
+        depreciation.
+
+        Parameters
+        ----------
+        k : array_like (float)
+            Capital (per worker/effective worker)
+
+        Returns
+        -------
+        effective_dep : array_like (float)
+            Amount of depreciated capital (per worker/effective worker)
+
+        """
+        effective_dep = self._effective_dep_rate * k
+        return effective_dep
+
     def compute_intensive_output(self, k):
         """
         Return the amount of output (per worker/effective worker).
