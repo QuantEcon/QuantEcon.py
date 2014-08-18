@@ -221,6 +221,12 @@ class Model(object):
         """
         Dictionary of model parameters.
 
+        :getter: Return the current dictionary of model parameters.
+        :setter: Set a new dictionary of model parameters.
+        :type: dict
+
+        Notes
+        -----
         The following parameters are required:
 
         g : float
@@ -233,12 +239,10 @@ class Model(object):
             Depreciation rate of physical capital. Must satisfy
             :math:`0 < \delta`.
 
-        Note that there will likely be additional model parameters specific to
-        the specified production function.
-
-        :getter: Return the current dictionary of model parameters.
-        :setter: Set a new dictionary of model parameters.
-        :type: dict
+        Although no restrictions are placed on the rates of technological
+        progress and population growth, the sum of `g`, `n`, and :math:`delta`
+        is assumed to be positive. The user mus also specify any additional
+        model parameters specific to the chosen aggregate production function.
 
         """
         return self._params
