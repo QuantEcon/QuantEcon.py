@@ -1,8 +1,4 @@
 r"""
-Filename: ivp.py
-
-Authors: David R. Pugh
-
 Base class for solving initial value problems (IVPs) of the form:
 
 .. math::
@@ -16,6 +12,9 @@ integrators from the `scipy.integrate.ode` module to perform the integration
 points. The `quantecon.ivp` module also provides a method for computing the
 residual of the solution which can be used for assessing the overall accuracy
 of the approximated solution.
+
+@author : David R. Pugh
+@date : 2014-08-18
 
 """
 from __future__ import division
