@@ -81,6 +81,9 @@ TODO:
 3. Finish writing docs
 
 """
+from IPython.html.widgets import *
+
+import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 
@@ -251,7 +254,7 @@ class Model(object):
     @params.setter
     def params(self, value):
         """Set a new parameter dictionary."""
-        self._params = value
+        self._params = self._validate_params(value)
 
     def _validate_output(self, output):
         """Validate the production function."""
@@ -311,12 +314,12 @@ class Model(object):
 
         Returns
         -------
-        effective_dep : array_like (float)
+        effective_depreciation : array_like (float)
             Amount of depreciated capital (per worker/effective worker)
 
         """
-        effective_dep = self._effective_dep_rate * k
-        return effective_dep
+        effective_depreciation = self._effective_depreciation_rate * k
+        return effective_depreciation
 
     def compute_intensive_output(self, k):
         """
@@ -335,3 +338,45 @@ class Model(object):
         """
         y = self._intensive_output(k, **self.params)
         return y
+
+
+def plot_intensive_output(cls, k_upper=10, **new_params):
+    """
+    Plot intensive form of the aggregate production function.
+
+    Parameters
+    ----------
+    cls : object
+        An instance of :class:`quantecon.models.solow.Model`.
+    k_upper : float
+        Upper bound on capital stock (per unit of effective labor)
+    new_params : dict (optional)
+        Optional dictionary of parameter values to change.
+
+    Returns
+    -------
+    A list containing:
+
+    fig : object
+        An instance of :class:`matplotlib.figure.Figure`.
+    ax : object
+        An instance of :class:`matplotlib.axes.AxesSubplot`.
+
+    """
+
+    # update model parameters
+    cls.params.update(new_params)
+
+    # create the plot
+    fig, ax = plt.subplots(1, 1, figsize=(10, 8), squeeze=True)
+    k_grid = np.linspace(0, k_upper, 1e4)
+    ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
+    ax.set_xlabel('Capital (per unit effective labor), $k$', family='serif',
+                  fontsize=15)
+    ax.set_ylabel('$f(k)$', family='serif', fontsize=25,
+                  rotation='horizontal')
+    ax.set_title('Output (per unit effective labor)',
+                 family='serif', fontsize=20)
+    ax.grid(True)
+
+    return [fig, ax]
