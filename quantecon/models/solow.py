@@ -77,7 +77,6 @@ References
 TODO:
 
 1. Write a short demo notebook
-2. Have properties return callable funcs for plotting.
 3. Finish writing docs
 
 """
@@ -118,7 +117,7 @@ class Model(object):
 
     @property
     def _effective_depreciation_rate(self):
-        """Effective depreciation rate for physical capital."""
+        """Depreciation rate for capital stock (per unit effective labor)."""
         return sum(self.params[key] for key in ['g', 'n', 'delta'])
 
     @property
@@ -286,18 +285,18 @@ class Model(object):
 
     def compute_actual_investment(self, k):
         """
-        Return the amount of output (per worker/effective worker) invested in
+        Return the amount of output (per unit of effective labor) invested in
         the production of new capital.
 
         Parameters
         ----------
         k : array_like (float)
-            Capital (per worker/effective worker)
+            Capital stock (per unit of effective labor)
 
         Returns
         -------
         actual_inv : array_like (float)
-            Investment (per worker/effective worker)
+            Investment (per unit of effective labor)
 
         """
         actual_inv = self.params['s'] * self.compute_intensive_output(k)
@@ -305,19 +304,19 @@ class Model(object):
 
     def compute_effective_depreciation(self, k):
         """
-        Return amount of capital (per worker/effective worker) that depreciates
-        due to technological progress, population growth, and physical
-        depreciation.
+        Return amount of Capital stock (per unit of effective labor) that
+        depreciaties due to technological progress, population growth, and
+        physical depreciation.
 
         Parameters
         ----------
         k : array_like (float)
-            Capital (per worker/effective worker)
+            Capital stock (per unit of effective labor)
 
         Returns
         -------
         effective_depreciation : array_like (float)
-            Amount of depreciated capital (per worker/effective worker)
+            Amount of depreciated Capital stock (per unit of effective labor)
 
         """
         effective_depreciation = self._effective_depreciation_rate * k
@@ -325,21 +324,40 @@ class Model(object):
 
     def compute_intensive_output(self, k):
         """
-        Return the amount of output (per worker/effective worker).
+        Return the amount of output (per unit of effective labor).
 
         Parameters
         ----------
         k : ndarray (float)
-            Capital (per worker/effective worker)
+            Capital stock (per unit of effective labor)
 
         Returns
         -------
         y : ndarray (float)
-            Output (per worker/effective worker)
+            Output (per unit of effective labor)
 
         """
         y = self._intensive_output(k, **self.params)
         return y
+
+    def compute_k_dot(self, k):
+        """
+        Return the time derivative of capital stock (per unit of effective labor).
+
+        Parameters
+        ----------
+        k : ndarray (float)
+            Capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        k_dot : ndarray (float)
+            Time derivative of capital stock (per unit of effective labor).
+
+        """
+        k_dot = (self.compute_actual_investment(k) -
+                 self.compute_effective_depreciation(k))
+        return k_dot
 
 
 def plot_intensive_output(cls, k_upper=10, **new_params):
@@ -365,7 +383,6 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
         An instance of :class:`matplotlib.axes.AxesSubplot`.
 
     """
-
     # update model parameters
     cls.params.update(new_params)
 
