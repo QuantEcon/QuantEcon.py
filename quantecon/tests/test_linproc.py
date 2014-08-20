@@ -1,9 +1,9 @@
 """
-Filename: test_lss.py
+Filename: test_arma.py
 Authors: Chase Coleman
 Date: 07/24/2014
 
-Tests for linproc.py file.  Most of this testing can be considered
+Tests for arma.py file.  Most of this testing can be considered
 covered by the numpy tests since we rely on much of their code.
 
 """
@@ -12,10 +12,10 @@ import os
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.linproc import LinearProcess
+from quantecon.arma import ARMA
 
 
-class TestLinearProcess(unittest.TestCase):
+class TestARMA(unittest.TestCase):
 
     def setUp(self):
         # Initial Values
@@ -24,7 +24,7 @@ class TestLinearProcess(unittest.TestCase):
         sigma = .15
 
 
-        self.lp = LinearProcess(phi, theta, sigma)
+        self.lp = ARMA(phi, theta, sigma)
 
 
     def tearDown(self):
@@ -45,6 +45,6 @@ class TestLinearProcess(unittest.TestCase):
         self.assertTrue(imp_resp.size==75)
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearProcess)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestARMA)
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
 

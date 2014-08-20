@@ -1,9 +1,9 @@
 """
-Filename: linproc.py
+Filename: arma.py
 
 Authors: Thomas Sargent, John Stachurski
 
-Provides functions for visualizing scalar ARMA processes.
+Provides functions for working with and visualizing scalar ARMA processes.
 
 """
 import numpy as np
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 
 
-class LinearProcess(object):
+class ARMA(object):
     r"""
     This class represents scalar ARMA(p, q) processes.
 
