@@ -75,7 +75,7 @@ class CareerWorkerProblem(object):
         self.F_mean = np.sum(self.theta * self.F_probs)
         self.G_mean = np.sum(self.epsilon * self.G_probs)
 
-    def bellman(self, v):
+    def bellman_operator(self, v):
         """
         The Bellman operator for the career / job choice model of Neal.
 

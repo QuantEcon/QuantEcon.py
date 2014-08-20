@@ -17,7 +17,7 @@ class TestCareerWorkerProblem(unittest.TestCase):
     def setUpClass(cls):
         cls.cp = CareerWorkerProblem()
         cls.v_init = np.random.rand(cls.cp.N, cls.cp.N)
-        cls.v_prime = cls.cp.bellman(cls.v_init)
+        cls.v_prime = cls.cp.bellman_operator(cls.v_init)
         cls.greedy = cls.cp.get_greedy(cls.v_init)
 
     def test_bellman_shape(self):
