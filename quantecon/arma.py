@@ -1,7 +1,6 @@
 """
 Filename: arma.py
-
-Authors: Thomas Sargent, John Stachurski
+Authors: Doc-Jin Jang, Jerry Choi, Thomas Sargent, John Stachurski
 
 Provides functions for working with and visualizing scalar ARMA processes.
 
@@ -75,23 +74,24 @@ class ARMA(object):
         self._phi, self._theta = phi, theta
         self.sigma = sigma
         self.set_params()
-
-    def get_phi(self):
+    
+    @property
+    def phi(self):
         return self._phi
 
-    def get_theta(self):
-        return self._theta
-
-    def set_phi(self, new_value):
+    @phi.setter
+    def phi(self, new_value):
         self._phi = new_value
         self.set_params()
 
-    def set_theta(self, new_value):
+    @property
+    def theta(self):
+        return self._theta
+    
+    @theta.setter
+    def theta(self, new_value):
         self._theta = new_value
         self.set_params()
-
-    phi = property(get_phi, set_phi)
-    theta = property(get_theta, set_theta)
 
     def set_params(self):
         r"""
