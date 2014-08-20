@@ -10,6 +10,10 @@ from numpy import conj, pi, real
 import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 
+# == Ignore unnecessary warnings concerning casting complex variables back to
+# floats == #
+import warnings
+warnings.filterwarnings('ignore')
 
 class ARMA(object):
     r"""
@@ -187,8 +191,8 @@ class ARMA(object):
 
     def autocovariance(self, num_autocov=16) :
         """
-        Compute the autocovariance function over the integers
-        range(num_autocov) using the spectral density and the inverse
+        Compute the autocovariance function from the ARMA parameters over the
+        integers range(num_autocov) using the spectral density and the inverse
         Fourier transform.
 
         Parameters
@@ -205,7 +209,7 @@ class ARMA(object):
 
     def simulation(self, ts_length=90) :
         """
-        Compute a simulated sample path.
+        Compute a simulated sample path assuming Gaussian shocks.
 
         Parameters
         ----------
@@ -282,10 +286,12 @@ class ARMA(object):
         num_rows, num_cols = 2, 2
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
         plt.subplots_adjust(hspace=0.4)
-        self.plot_impulse_response(axes[0, 0], show=False)
-        self.plot_spectral_density(axes[0, 1], show=False)
-        self.plot_autocovariance(axes[1, 0], show=False)
-        self.plot_simulation(axes[1, 1], show=False)
+        plot_functions = [self.plot_impulse_response,
+                     self.plot_spectral_density,
+                     self.plot_autocovariance,
+                     self.plot_simulation]
+        for plot_func, ax in zip(plot_functions, axes.flatten()):
+            plot_func(ax, show=False)
         plt.show()
 
 
