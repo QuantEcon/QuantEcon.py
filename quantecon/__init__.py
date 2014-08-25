@@ -9,7 +9,7 @@ from .ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
 from .kalman import Kalman
 from .lae import LAE
-from .linproc import LinearProcess
+from .arma import ARMA
 from .lqcontrol import LQ
 from .lss import LSS
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
@@ -19,3 +19,6 @@ from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
 from . import quad as quad
+
+#Add Version Attribute
+from .version import version as __version__
