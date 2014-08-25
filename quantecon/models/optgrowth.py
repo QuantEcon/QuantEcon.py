@@ -9,7 +9,7 @@ Solving the optimal growth problem via value function iteration.
 
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
-from scipy.optimize import fminbound
+from scipy.optimize import bisect, fminbound
 from scipy import interp
 
 class GrowthModel(object):
@@ -73,7 +73,7 @@ class GrowthModel(object):
         Tw = np.empty(len(w))
         for i, k in enumerate(self.grid):
             objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
-            c_star = fminbound(objective, 1e-6, self.f(k))
+            c_star = bisect(objective, 1e-6, self.f(k))
             if compute_policy:
                 # sigma[i] = argmax_c { u(c) + beta w(f(k_i) - c)}
                 sigma[i] = c_star
