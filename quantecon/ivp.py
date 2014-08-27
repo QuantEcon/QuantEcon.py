@@ -18,7 +18,6 @@ of the approximated solution.
 
 """
 from __future__ import division
-import types
 
 import numpy as np
 from scipy import integrate, interpolate
@@ -83,7 +82,7 @@ class IVP(integrate.ode):
     @f_args.setter
     def f_args(self, new_f_args):
         """Set new values for the parameters."""
-        if not isinstance(new_f_args, (tuple, types.NoneType)):
+        if not isinstance(new_f_args, (tuple, type(None))):
             mesg = "IVP.args must be a tuple, not a {}."
             raise AttributeError(mesg.format(new_f_args.__class__))
         elif new_f_args is not None:
@@ -95,7 +94,7 @@ class IVP(integrate.ode):
     @jac_args.setter
     def jac_args(self, new_jac_args):
         """Set new values for the parameters."""
-        if not isinstance(new_jac_args, (tuple, types.NoneType)):
+        if not isinstance(new_jac_args, (tuple, type(None))):
             mesg = "IVP.args must be a tuple, not a {}."
             raise AttributeError(mesg.format(new_jac_args.__class__))
         elif new_jac_args is not None:
