@@ -234,6 +234,12 @@ class IVP(integrate.ode):
         solution: ndarray (float)
             Simulated solution trajectory.
 
+        Notes
+        -----
+        For details and references for the various integrators themselves and
+        their respective keyword arguments, see the documentation of the
+        `scipy.integrate.ode` module.
+
         """
         self._initialize_integrator(t0, y0, integrator, **kwargs)
 
