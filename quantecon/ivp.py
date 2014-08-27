@@ -14,7 +14,7 @@ residual of the solution which can be used for assessing the overall accuracy
 of the approximated solution.
 
 @author : David R. Pugh
-@date : 2014-08-18
+@date : 2014-08-26
 
 """
 from __future__ import division
@@ -32,13 +32,13 @@ class IVP(integrate.ode):
 
         Parameters
         ----------
-        f : callable ``f(t, X, *f_args)``
+        f : callable `f(t, X, *f_args)`
             Right hand side of the system of equations defining the ODE. The
-            independent variable, `t`, is a ``scalar``; `X` is an ``ndarray``
-            of dependent variables with ``X.shape == (n,)``. The function `f`
-            should return a ``scalar``, ``ndarray`` or ``list`` (but not a
-            ``tuple``).
-        jac : callable ``jac(t, X, *jac_args)``, optional(default=None)
+            independent variable, `t`, is a `scalar`; `X` is an `ndarray`
+            of dependent variables with `X.shape == (n,)`. The function `f`
+            should return a `scalar`, `ndarray` or `list` (but not a
+            `tuple`).
+        jac : callable `jac(t, X, *jac_args)`, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
 
@@ -211,7 +211,7 @@ class IVP(integrate.ode):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable ``g(t, X, f_args)``, optional(default=None)
+        g : callable `g(t, X, f_args)`, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
