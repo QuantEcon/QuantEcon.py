@@ -85,7 +85,7 @@ class IVP(integrate.ode):
         """Set new values for the parameters."""
         if not isinstance(new_f_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise ValueError(mesg.format(new_f_args.__class__))
+            raise AttributeError(mesg.format(new_f_args.__class__))
         elif new_f_args is not None:
             self.set_f_params(*new_f_args)
             self._f_args = new_f_args
@@ -97,7 +97,7 @@ class IVP(integrate.ode):
         """Set new values for the parameters."""
         if not isinstance(new_jac_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise ValueError(mesg.format(new_jac_args.__class__))
+            raise AttributeError(mesg.format(new_jac_args.__class__))
         elif new_jac_args is not None:
             self.set_jac_params(*new_jac_args)
             self._jac_args = new_jac_args
