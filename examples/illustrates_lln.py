@@ -42,8 +42,8 @@ for ax in axes:
 
     # == Compute sample mean at each n == #
     sample_mean = np.empty(n)
-    for i in range(1,n):
-        sample_mean[i] = np.mean(data[:i])
+    for i in range(n):
+        sample_mean[i] = np.mean(data[:i+1])
 
     # == Plot == #
     ax.plot(list(range(n)), data, 'o', color='grey', alpha=0.5)
@@ -55,6 +55,3 @@ for ax in axes:
     ax.legend(**legend_args)
 
 plt.show()
-
-
-
