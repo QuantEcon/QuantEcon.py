@@ -3,7 +3,7 @@ Base class for solving initial value problems (IVPs) of the form:
 
 .. math::
 
-    \frac{dX}{dt} = f(t,X),\ X(t_0) = X_0
+    \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
 
 using finite difference methods. The `quantecon.ivp` class uses various
 integrators from the `scipy.integrate.ode` module to perform the integration
@@ -14,10 +14,11 @@ residual of the solution which can be used for assessing the overall accuracy
 of the approximated solution.
 
 @author : David R. Pugh
-@date : 2014-08-26
+@date : 2014-08-18
 
 """
 from __future__ import division
+import types
 
 import numpy as np
 from scipy import integrate, interpolate
@@ -31,19 +32,19 @@ class IVP(integrate.ode):
 
         Parameters
         ----------
-        f : callable `f(t, X, *f_args)`
+        f : callable ``f(t, y, *f_args)``
             Right hand side of the system of equations defining the ODE. The
-            independent variable, `t`, is a `scalar`; `X` is an `ndarray`
-            of dependent variables with `X.shape == (n,)`. The function `f`
-            should return a `scalar`, `ndarray` or `list` (but not a
-            `tuple`).
-        jac : callable `jac(t, X, *jac_args)`, optional(default=None)
+            independent variable, `t`, is a ``scalar``; `y` is an ``ndarray``
+            of dependent variables with ``y.shape == (n,)``. The function `f`
+            should return a ``scalar``, ``ndarray`` or ``list`` (but not a
+            ``tuple``).
+        jac : callable ``jac(t, y, *jac_args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
 
             .. :math:
 
-                \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]
+                \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]
 
         f_args : tuple, optional(default=None)
             Additional arguments that should be passed to the function `f`.
@@ -82,9 +83,9 @@ class IVP(integrate.ode):
     @f_args.setter
     def f_args(self, new_f_args):
         """Set new values for the parameters."""
-        if not isinstance(new_f_args, (tuple, type(None))):
+        if not isinstance(new_f_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise AttributeError(mesg.format(new_f_args.__class__))
+            raise ValueError(mesg.format(new_f_args.__class__))
         elif new_f_args is not None:
             self.set_f_params(*new_f_args)
             self._f_args = new_f_args
@@ -94,9 +95,9 @@ class IVP(integrate.ode):
     @jac_args.setter
     def jac_args(self, new_jac_args):
         """Set new values for the parameters."""
-        if not isinstance(new_jac_args, (tuple, type(None))):
+        if not isinstance(new_jac_args, (tuple, types.NoneType)):
             mesg = "IVP.args must be a tuple, not a {}."
-            raise AttributeError(mesg.format(new_jac_args.__class__))
+            raise ValueError(mesg.format(new_jac_args.__class__))
         elif new_jac_args is not None:
             self.set_jac_params(*new_jac_args)
             self._jac_args = new_jac_args
@@ -210,7 +211,7 @@ class IVP(integrate.ode):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable `g(t, X, f_args)`, optional(default=None)
+        g : callable ``g(t, y, f_args)``, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
@@ -233,12 +234,6 @@ class IVP(integrate.ode):
         -------
         solution: ndarray (float)
             Simulated solution trajectory.
-
-        Notes
-        -----
-        For details and references for the various integrators themselves and
-        their respective keyword arguments, see the documentation of the
-        `scipy.integrate.ode` module.
 
         """
         self._initialize_integrator(t0, y0, integrator, **kwargs)

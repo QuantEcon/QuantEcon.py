@@ -40,6 +40,9 @@ quantecon/tests/test_lqcontrol.py
 quantecon/tests/test_lss.py
 quantecon/tests/test_lyapunov.py
 quantecon/tests/test_matrix_eqn.py
+quantecon/tests/test_linproc.py
+quantecon/tests/test_lqcontrol.py
+quantecon/tests/test_lss.py
 quantecon/tests/test_mc_tools.py
 quantecon/tests/test_quad.py
 quantecon/tests/test_quadsum.py
