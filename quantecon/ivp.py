@@ -3,7 +3,7 @@ Base class for solving initial value problems (IVPs) of the form:
 
 .. math::
 
-    \frac{dX}{dt} = f(t,X),\ X(t_0) = X_0
+    \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
 
 using finite difference methods. The `quantecon.ivp` class uses various
 integrators from the `scipy.integrate.ode` module to perform the integration
@@ -32,19 +32,19 @@ class IVP(integrate.ode):
 
         Parameters
         ----------
-        f : callable ``f(t, X, *f_args)``
+        f : callable ``f(t, y, *f_args)``
             Right hand side of the system of equations defining the ODE. The
-            independent variable, `t`, is a ``scalar``; `X` is an ``ndarray``
-            of dependent variables with ``X.shape == (n,)``. The function `f`
+            independent variable, `t`, is a ``scalar``; `y` is an ``ndarray``
+            of dependent variables with ``y.shape == (n,)``. The function `f`
             should return a ``scalar``, ``ndarray`` or ``list`` (but not a
             ``tuple``).
-        jac : callable ``jac(t, X, *jac_args)``, optional(default=None)
+        jac : callable ``jac(t, y, *jac_args)``, optional(default=None)
             Jacobian of the right hand side of the system of equations defining
             the ODE.
 
             .. :math:
 
-                \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial X_j}\bigg]
+                \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]
 
         f_args : tuple, optional(default=None)
             Additional arguments that should be passed to the function `f`.
@@ -211,7 +211,7 @@ class IVP(integrate.ode):
         T : int, optional(default=None)
             Terminal value for the independent variable. One of either `T`
             or `g` must be specified.
-        g : callable ``g(t, X, f_args)``, optional(default=None)
+        g : callable ``g(t, y, f_args)``, optional(default=None)
             Provides a stopping condition for the integration. If specified
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
