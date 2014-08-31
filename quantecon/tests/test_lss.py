@@ -35,14 +35,14 @@ class TestLinearStateSpace(unittest.TestCase):
         self.assertTrue(abs(ssmux - ssmuy) < 2e-8)
         self.assertTrue(abs(sssigx - sssigy) < 2e-8)
         self.assertTrue(abs(ssmux) < 2e-8)
-        self.assertTrue(abs(sssigx - self.ss.C/(1 - self.ss.A**2)))
+        self.assertTrue(abs(sssigx - self.ss.C**2/(1 - self.ss.A**2)) < 2e-8)
 
     def test_replicate(self):
         xval, yval = self.ss.replicate(T=100, num_reps=5000)
 
         assert_allclose(xval, yval)
         self.assertEqual(xval.size, 5000)
-        self.assertLessEqual(abs(np.mean(xval)), .01)
+        self.assertLessEqual(abs(np.mean(xval)), .05)
 
     # def test_
 

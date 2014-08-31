@@ -1,9 +1,8 @@
 """
-Filename: linproc.py
+Filename: arma.py
+Authors: Doc-Jin Jang, Jerry Choi, Thomas Sargent, John Stachurski
 
-Authors: Thomas Sargent, John Stachurski
-
-Provides functions for visualizing scalar ARMA processes.
+Provides functions for working with and visualizing scalar ARMA processes.
 
 """
 import numpy as np
@@ -11,8 +10,12 @@ from numpy import conj, pi, real
 import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 
+# == Ignore unnecessary warnings concerning casting complex variables back to
+# floats == #
+import warnings
+warnings.filterwarnings('ignore')
 
-class LinearProcess(object):
+class ARMA(object):
     r"""
     This class represents scalar ARMA(p, q) processes.
 
@@ -75,23 +78,24 @@ class LinearProcess(object):
         self._phi, self._theta = phi, theta
         self.sigma = sigma
         self.set_params()
-
-    def get_phi(self):
+    
+    @property
+    def phi(self):
         return self._phi
 
-    def get_theta(self):
-        return self._theta
-
-    def set_phi(self, new_value):
+    @phi.setter
+    def phi(self, new_value):
         self._phi = new_value
         self.set_params()
 
-    def set_theta(self, new_value):
+    @property
+    def theta(self):
+        return self._theta
+    
+    @theta.setter
+    def theta(self, new_value):
         self._theta = new_value
         self.set_params()
-
-    phi = property(get_phi, set_phi)
-    theta = property(get_theta, set_theta)
 
     def set_params(self):
         r"""
@@ -187,8 +191,8 @@ class LinearProcess(object):
 
     def autocovariance(self, num_autocov=16) :
         """
-        Compute the autocovariance function over the integers
-        range(num_autocov) using the spectral density and the inverse
+        Compute the autocovariance function from the ARMA parameters over the
+        integers range(num_autocov) using the spectral density and the inverse
         Fourier transform.
 
         Parameters
@@ -205,7 +209,7 @@ class LinearProcess(object):
 
     def simulation(self, ts_length=90) :
         """
-        Compute a simulated sample path.
+        Compute a simulated sample path assuming Gaussian shocks.
 
         Parameters
         ----------
@@ -255,7 +259,7 @@ class LinearProcess(object):
             fig, ax = plt.subplots()
         ax.set_title('Autocovariance')
         acov = self.autocovariance()
-        ax.stem(list(range(len(acov)), acov))
+        ax.stem(list(range(len(acov))), acov)
         ax.set_xlim(-0.5, len(acov) - 0.5)
         ax.set_xlabel('time')
         ax.set_ylabel('autocovariance')
@@ -282,10 +286,12 @@ class LinearProcess(object):
         num_rows, num_cols = 2, 2
         fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
         plt.subplots_adjust(hspace=0.4)
-        self.plot_impulse_response(axes[0, 0], show=False)
-        self.plot_spectral_density(axes[0, 1], show=False)
-        self.plot_autocovariance(axes[1, 0], show=False)
-        self.plot_simulation(axes[1, 1], show=False)
+        plot_functions = [self.plot_impulse_response,
+                     self.plot_spectral_density,
+                     self.plot_autocovariance,
+                     self.plot_simulation]
+        for plot_func, ax in zip(plot_functions, axes.flatten()):
+            plot_func(ax, show=False)
         plt.show()
 
 
