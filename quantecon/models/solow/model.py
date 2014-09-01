@@ -285,6 +285,10 @@ class Model(ivp.IVP):
         else:
             return params
 
+    def calibrate_model(self, *args, **kwargs):
+        """Calibrate the model using some data."""
+        raise NotImplementedError
+
     def compute_actual_investment(self, k):
         """
         Return the amount of output (per unit of effective labor) invested in
@@ -402,6 +406,7 @@ class Model(ivp.IVP):
             raise ValueError(mesg)
 
         return result
+
 
 def plot_intensive_output(cls, k_upper=10, **new_params):
     """
