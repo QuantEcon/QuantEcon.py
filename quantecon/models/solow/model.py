@@ -305,7 +305,7 @@ class Model(ivp.IVP):
 
     def compute_effective_depreciation(self, k):
         """
-        Return amount of Capital stock (per unit of effective labor) that
+        Return amount of capital stock (per unit of effective labor) that
         depreciaties due to technological progress, population growth, and
         physical depreciation.
 
@@ -368,7 +368,7 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
     Parameters
     ----------
     cls : object
-        An instance of :class:`quantecon.models.solow.Model`.
+        An instance of :class:`quantecon.models.solow.model.Model`.
     k_upper : float
         Upper bound on capital stock (per unit of effective labor)
     new_params : dict (optional)
@@ -411,7 +411,7 @@ def plot_intensive_invesment(cls, k_upper=10, **new_params):
     Parameters
     ----------
     cls : object
-        An instance of :class:`quantecon.models.solow.Model`.
+        An instance of :class:`quantecon.models.solow.model.Model`.
     k_upper : float
         Upper bound on capital stock (per unit of effective labor)
     new_params : dict (optional)
@@ -457,7 +457,7 @@ def plot_phase_diagram(cls, k_upper=10, **new_params):
     Parameters
     ----------
     cls : object
-        An instance of :class:`quantecon.models.solow.Model`.
+        An instance of :class:`quantecon.models.solow.model.Model`.
     k_upper : float
         Upper bound on capital stock (per unit of effective labor)
     new_params : dict (optional)
@@ -497,7 +497,7 @@ def plot_solow_diagram(cls, k_upper=10, **new_params):
     Parameters
     ----------
     cls : object
-        An instance of :class:`quantecon.models.solow.Model`.
+        An instance of :class:`quantecon.models.solow.model.Model`.
     k_upper : float
         Upper bound on capital stock (per unit of effective labor)
     new_params : dict (optional)
