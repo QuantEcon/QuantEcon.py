@@ -82,17 +82,18 @@ TODO:
 """
 import matplotlib.pyplot as plt
 import numpy as np
-import sympy as sp
+from scipy import optimize
+import sympy as sym
 
 from ... import ivp
 
 
 # declare key variables for the model
-t, X = sp.var('t'), sp.DeferredVector('X')
-A, k, K, L = sp.var('A, k, K, L')
+t, X = sym.var('t'), sym.DeferredVector('X')
+A, k, K, L = sym.var('A, k, K, L')
 
 # declare required model parameters
-g, n, s, delta = sp.var('g, n, s, delta')
+g, n, s, delta = sym.var('g, n, s, delta')
 
 
 class Model(ivp.IVP):
@@ -103,7 +104,7 @@ class Model(ivp.IVP):
 
         Parameters
         ----------
-        output : sp.Basic
+        output : sym.Basic
             Symbolic expression defining the aggregate production function.
         params : dict
             Dictionary of model parameters.
@@ -128,9 +129,9 @@ class Model(ivp.IVP):
 
         """
         if self.__intensive_output is None:
-            args = [k] + sp.var(self.params.keys())
-            self.__intensive_output = sp.lambdify(args, self.intensive_output,
-                                                  modules=[{'ImmutableMatrix': np.array}, "numpy"])
+            args = [k] + sym.var(self.params.keys())
+            self.__intensive_output = sym.lambdify(args, self.intensive_output,
+                                                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
         return self.__intensive_output
 
     @property
@@ -139,7 +140,7 @@ class Model(ivp.IVP):
         Symbolic expression for the intensive form of aggregate production.
 
         :getter: Return the current intensive production function.
-        :type: sp.Basic
+        :type: sym.Basic
 
         Notes
         -----
@@ -185,7 +186,7 @@ class Model(ivp.IVP):
 
         :getter: Return the current aggregate production function.
         :setter: Set a new aggregate production function
-        :type: sp.Basic
+        :type: sym.Basic
 
         Notes
         -----
@@ -260,8 +261,8 @@ class Model(ivp.IVP):
 
     def _validate_output(self, output):
         """Validate the production function."""
-        if not isinstance(output, sp.Basic):
-            mesg = ("Output must be an instance of {}.".format(sp.Basic))
+        if not isinstance(output, sym.Basic):
+            mesg = ("Output must be an instance of {}.".format(sym.Basic))
             raise ValueError(mesg)
         if not ({A, K, L} < output.atoms()):
             mesg = ("Output must be an expression of technology, 'A', " +
@@ -383,7 +384,7 @@ class Model(ivp.IVP):
         x0 : float
             Zero of `f` between `a` and `b`.
         r : RootResults (present if ``full_output = True``)
-            Object containing information about the convergence.  In particular,
+            Object containing information about the convergence. In particular,
             ``r.converged`` is True if the routine converged.
 
         """
