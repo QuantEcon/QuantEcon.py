@@ -76,3 +76,31 @@ def analytic_solution(t, k0, g, n, s, alpha, delta):
     analytic_traj = np.hstack((t[:, np.newaxis], k_t[:, np.newaxis]))
 
     return analytic_traj
+
+
+def analtyic_steady_state(g, n, s, alpha, delta):
+    """
+    Steady-state level of capital stock (per unit effective labor).
+
+    Parameters
+    ----------
+    g : float
+        Growth rate of technology.
+    n : float
+        Growth rate of the labor force.
+    s : float
+        Savings rate. Must satisfy `0 < s < 1`.
+    alpha : float
+        Elasticity of output with respect to capital stock. Must satisfy
+        :math:`0 < alpha < 1`.
+    delta : float
+        Depreciation rate of physical capital. Must satisfy :math:`0 < \delta`.
+
+    Returns
+    -------
+    kstar : float
+        Steady state value of capital stock (per unit effective labor).
+
+    """
+    k_star = (s / (n + g + delta))**(1 / (1 - alpha))
+    return k_star
