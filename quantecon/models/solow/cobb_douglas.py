@@ -1,4 +1,39 @@
+"""
+Solow growth model with Cobb-Douglas aggregate production.
+
+@author : David R. Pugh
+@date : 2014-09-01
+
+"""
 import numpy as np
+import sympy as sym
+
+import model
+
+# declare key variables for the model
+t, X = sym.var('t'), sym.DeferredVector('X')
+A, k, K, L = sym.var('A, k, K, L')
+
+# declare required model parameters
+g, n, s, alpha, delta = sym.var('g, n, s, alpha, delta')
+
+
+class CobbDouglasModel(model.Model):
+
+    def __init__(self, params):
+        """
+        Create an instance of the Solow growth model with Cobb-Douglas
+        aggregate production.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary of model parameters.
+
+        """
+        cobb_douglas_output = K**alpha * (A * L)**(1 - alpha)
+
+        super(CobbDouglasModel, self).__init__(cobb_douglas_output, params)
 
 
 def analytic_solution(t, k0, g, n, s, alpha, delta):
