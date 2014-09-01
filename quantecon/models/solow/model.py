@@ -360,6 +360,47 @@ class Model(ivp.IVP):
                  self.compute_effective_depreciation(k))
         return k_dot
 
+    def find_steady_state(self, a, b, method='brentq', **kwargs):
+        """
+        Compute the equilibrium value of capital (per unit effective labor).
+
+        Parameters
+        ----------
+        a : float
+            One end of the bracketing interval [a,b].
+        b : float
+            The other end of the bracketing interval [a,b]
+        method : str (default=`brentq`)
+            Method to use when computing the steady state. Supported methods
+            are `bisect`, `brenth`, `brentq`, and `ridder`. See `scipy.optimize`
+            for more details (including references).
+        kwargs : optional
+            Additional keyword arguments. Keyword arguments are method specific
+            see `scipy.optimize` for details.
+
+        Returns
+        -------
+        x0 : float
+            Zero of `f` between `a` and `b`.
+        r : RootResults (present if ``full_output = True``)
+            Object containing information about the convergence.  In particular,
+            ``r.converged`` is True if the routine converged.
+
+        """
+        if method == 'bisect':
+            result = optimize.bisect(self._k_dot, a, b, **kwargs)
+        elif method == 'brenth':
+            result = optimize.brenth(self._k_dot, a, b, **kwargs)
+        elif method == 'brentq':
+            result = optimize.brentq(self._k_dot, a, b, **kwargs)
+        elif method == 'ridder':
+            result = optimize.ridder(self._k_dot, a, b, **kwargs)
+        else:
+            mesg = ("Method must be one of : 'bisect', 'brenth', 'brentq', " +
+                    "or 'ridder'.")
+            raise ValueError(mesg)
+
+        return result
 
 def plot_intensive_output(cls, k_upper=10, **new_params):
     """
