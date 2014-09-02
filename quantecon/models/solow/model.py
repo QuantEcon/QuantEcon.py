@@ -408,7 +408,7 @@ class Model(ivp.IVP):
         return result
 
 
-def plot_intensive_output(cls, k_upper=10, **new_params):
+def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
     """
     Plot intensive form of the aggregate production function.
 
@@ -416,8 +416,12 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
     ----------
     cls : object
         An instance of :class:`quantecon.models.solow.model.Model`.
+    Nk : float
+        Number of capital stock (per unit of effective labor) grid points to
+        plot.
     k_upper : float
-        Upper bound on capital stock (per unit of effective labor)
+        Upper bound on capital stock (per unit of effective labor) for the
+        plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
 
@@ -436,12 +440,13 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, 1e3)
+    k_grid = np.linspace(0, k_upper, Nk)
     ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
     ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
-    ax.set_ylabel('$f(k(t))$', family='serif', fontsize=25,
+    ax.set_ylabel('$f(k(t))$', family='serif', fontsize=20,
                   rotation='horizontal')
+    ax.yaxis.set_label_coords(-0.1, 0.5)
     ax.set_title('Output (per unit effective labor)',
                  family='serif', fontsize=20)
     ax.grid(True)
@@ -449,7 +454,7 @@ def plot_intensive_output(cls, k_upper=10, **new_params):
     return [fig, ax]
 
 
-def plot_intensive_invesment(cls, k_upper=10, **new_params):
+def plot_intensive_invesment(cls, Nk=1e3, k_upper=10, **new_params):
     """
     Plot actual investment (per unit effective labor) and effective
     depreciation. The steady state value of capital stock (per unit effective
@@ -459,8 +464,12 @@ def plot_intensive_invesment(cls, k_upper=10, **new_params):
     ----------
     cls : object
         An instance of :class:`quantecon.models.solow.model.Model`.
+    Nk : float
+        Number of capital stock (per unit of effective labor) grid points to
+        plot.
     k_upper : float
-        Upper bound on capital stock (per unit of effective labor)
+        Upper bound on capital stock (per unit of effective labor) for the
+        plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
 
@@ -477,13 +486,19 @@ def plot_intensive_invesment(cls, k_upper=10, **new_params):
     # update the model parameters
     cls.params.update(new_params)
 
+    # solve for the steady state
+    eps = 1e-6
+    k_star = cls.find_steady_state(eps, k_upper)
+
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, 1e3)
+    k_grid = np.linspace(0, k_upper, Nk)
     ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
             label='$sf(k(t))$')
     ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
             label='$(g + n + \delta)k(t)$')
+    ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
+            label='$k^*={0:.4f}$'.format(k_star))
     ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
     ax.set_ylabel('Investment (per unit effective labor)', family='serif',
@@ -492,12 +507,12 @@ def plot_intensive_invesment(cls, k_upper=10, **new_params):
                  family='serif', fontsize=20)
     ax.grid(True)
     ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
-              bbox_to_anchor=(1, 1))
+              bbox_to_anchor=(1.0, 1.0))
 
     return [fig, ax]
 
 
-def plot_phase_diagram(cls, k_upper=10, **new_params):
+def plot_phase_diagram(cls, Nk=1e3, k_upper=10, **new_params):
     """
     Plot the model's phase diagram.
 
@@ -505,8 +520,12 @@ def plot_phase_diagram(cls, k_upper=10, **new_params):
     ----------
     cls : object
         An instance of :class:`quantecon.models.solow.model.Model`.
+    Nk : float
+        Number of capital stock (per unit of effective labor) grid points to
+        plot.
     k_upper : float
-        Upper bound on capital stock (per unit of effective labor)
+        Upper bound on capital stock (per unit of effective labor) for the
+        plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
 
@@ -523,21 +542,28 @@ def plot_phase_diagram(cls, k_upper=10, **new_params):
     # update model parameters
     cls.params.update(new_params)
 
+    # solve for the steady state
+    eps = 1e-6
+    k_star = cls.find_steady_state(eps, k_upper)
+
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, 1e3)
-    ax.plot(k_grid, cls.compute_k_dot(k_grid), 'r-')
+    k_grid = np.linspace(0, k_upper, Nk)
+    ax.plot(k_grid, cls.compute_k_dot(k_grid), color='orange')
+    ax.axhline(0, color='k')
+    ax.plot(k_star, 0.0, 'ko', label='$k^*={0:.4f}$'.format(k_star))
     ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
     ax.set_ylabel('$\dot{k}(t)$', family='serif', fontsize=25,
                   rotation='horizontal')
+    ax.yaxis.set_label_coords(-0.1, 0.5)
     ax.set_title('Phase diagram', family='serif', fontsize=20)
     ax.grid(True)
 
     return [fig, ax]
 
 
-def plot_solow_diagram(cls, k_upper=10, **new_params):
+def plot_solow_diagram(cls, Nk=1e3, k_upper=10, **new_params):
     """
     Plot the classic Solow diagram.
 
@@ -545,8 +571,12 @@ def plot_solow_diagram(cls, k_upper=10, **new_params):
     ----------
     cls : object
         An instance of :class:`quantecon.models.solow.model.Model`.
+    Nk : float
+        Number of capital stock (per unit of effective labor) grid points to
+        plot.
     k_upper : float
-        Upper bound on capital stock (per unit of effective labor)
+        Upper bound on capital stock (per unit of effective labor) for the
+        plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
 
@@ -563,20 +593,24 @@ def plot_solow_diagram(cls, k_upper=10, **new_params):
     # update the model parameters
     cls.params.update(new_params)
 
+    # solve for the steady state
+    eps = 1e-6
+    k_star = cls.find_steady_state(eps, k_upper)
+
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, 1e3)
+    k_grid = np.linspace(0, k_upper, Nk)
     ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-',
             label='$f(k(t)$')
     ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
             label='$sf(k(t))$')
     ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
             label='$(g + n + \delta)k(t)$')
+    ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
+            label='$k^*={0:.4f}$'.format(k_star))
     ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
-    ax.set_ylabel('Investment (per unit effective labor)', family='serif',
-                  fontsize=15)
-    ax.set_title('Output (per unit effective labor)',
+    ax.set_title('Solow diagram',
                  family='serif', fontsize=20)
     ax.grid(True)
     ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
