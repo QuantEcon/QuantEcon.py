@@ -32,7 +32,6 @@ class CobbDouglasModel(model.Model):
 
         """
         cobb_douglas_output = K**alpha * (A * L)**(1 - alpha)
-
         super(CobbDouglasModel, self).__init__(cobb_douglas_output, params)
 
 
