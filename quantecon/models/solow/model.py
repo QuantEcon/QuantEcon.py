@@ -283,6 +283,7 @@ class Model(ivp.IVP):
 
         # clear the cache
         self.__intensive_output = None
+        self.__k_dot = None
 
     @params.setter
     def params(self, value):
