@@ -112,6 +112,7 @@ class Model(ivp.IVP):
         """
         # cached values
         self.__intensive_output = None
+        self.__k_dot = None
 
         self.output = output
         self.params = params
@@ -133,6 +134,20 @@ class Model(ivp.IVP):
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
                                                    modules=[{'ImmutableMatrix': np.array}, "numpy"])
         return self.__intensive_output
+
+    @property
+    def _k_dot(self):
+        """
+        :getter: Return vectorized version of equation of motion for capital
+        (per unit effective labor).
+        :type: function
+
+        """
+        if self.__k_dot is None:
+            args = [k] + sym.var(self.params.keys())
+            self.__k_dot = sym.lambdify(args, self.k_dot,
+                                        modules=[{'ImmutableMatrix': np.array}, "numpy"])
+        return self.__k_dot
 
     @property
     def intensive_output(self):
@@ -178,6 +193,21 @@ class Model(ivp.IVP):
 
         """
         return self.output.subs({'A': 1.0, 'K': k, 'L': 1.0})
+
+    @property
+    def k_dot(self):
+        r"""
+        Symbolic expression for the equation of motion for capital (per unit
+        effective labor).
+
+        :getter: Return the current equation of motion.
+        :type: sym.Basic
+
+        Notes
+        -----
+
+        """
+        return s * self.intensive_output - (g + n + delta) * k
 
     @property
     def output(self):
