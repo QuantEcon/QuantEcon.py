@@ -263,11 +263,11 @@ class Model(ivp.IVP):
         """Validate the production function."""
         if not isinstance(output, sym.Basic):
             mesg = ("Output must be an instance of {}.".format(sym.Basic))
-            raise ValueError(mesg)
+            raise AttributeError(mesg)
         if not ({A, K, L} < output.atoms()):
             mesg = ("Output must be an expression of technology, 'A', " +
                     "capital, 'K', and labor, 'L'.")
-            raise ValueError(mesg)
+            raise AttributeError(mesg)
         else:
             return output
 
@@ -275,13 +275,13 @@ class Model(ivp.IVP):
         """Validate the model parameters."""
         if not isinstance(params, dict):
             mesg = "SolowModel.params must be a dict, not a {}."
-            raise ValueError(mesg.format(params.__class__))
+            raise AttributeError(mesg.format(params.__class__))
         if params['s'] <= 0.0 or params['s'] >= 1.0:
-            raise ValueError('Savings rate must be in (0, 1).')
+            raise AttributeError('Savings rate must be in (0, 1).')
         if params['delta'] <= 0.0 or params['delta'] >= 1.0:
-            raise ValueError('Depreciation rate must be in (0, 1).')
+            raise AttributeError('Depreciation rate must be in (0, 1).')
         if params['g'] + params['n'] + params['delta'] <= 0.0:
-            raise ValueError("Sum of g, n, and delta must be positive.")
+            raise AttributeError("Sum of g, n, and delta must be positive.")
         else:
             return params
 

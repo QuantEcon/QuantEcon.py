@@ -41,18 +41,18 @@ valid_params = {'g': 0.02, 'n': 0.02, 's': 0.15, 'alpha': 0.33, 'delta': 0.05}
 def test_validate_output():
     """Testing validation of output attribute."""
     with nose.tools.assert_raises(AttributeError):
-        solow.model.Model(output=invalid_output, params=valid_params)
+        solow.Model(output=invalid_output, params=valid_params)
 
-    mod = solow.model.Model(output=valid_output, params=valid_params)
+    mod = solow.Model(output=valid_output, params=valid_params)
     nose.tools.assert_equals(valid_output, mod.output)
 
 
 def test_validate_params():
     """Testing validation of output attribute."""
     with nose.tools.assert_raises(AttributeError):
-        solow.model.Model(output=valid_output, params=invalid_params)
+        solow.Model(output=valid_output, params=invalid_params)
 
-    mod = solow.model.Model(output=valid_output, params=valid_params)
+    mod = solow.Model(output=valid_output, params=valid_params)
     nose.tools.assert_equals(valid_params, mod.params)
 
 
@@ -65,7 +65,7 @@ def test_find_steady_state():
                     for delta in np.linspace(0.05, 1-1e-2, 4):
 
                         tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha, 'delta': delta}
-                        tmp_mod = solow.model.Model(output=valid_output,
+                        tmp_mod = solow.Model(output=valid_output,
                                                     params=tmp_params)
                         actual_steady_state = tmp_mod.find_steady_state(0, _k_upper(**tmp_params))
                         expected_steady_state = solow.cobb_douglas.analytic_steady_state(**tmp_params)
