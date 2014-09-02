@@ -4,6 +4,7 @@ models directory imports
 objects imported here will live in the `quantecon.models.solow` namespace
 
 """
-__all__ = ['Model']
+__all__ = ['Model', 'CobbDouglasModel']
 
 from . model import Model
+from . cobb_douglas import CobbDouglasModel
