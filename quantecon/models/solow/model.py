@@ -393,13 +393,13 @@ class Model(ivp.IVP):
 
         """
         if method == 'bisect':
-            result = optimize.bisect(self._k_dot, a, b, **kwargs)
+            result = optimize.bisect(self.compute_k_dot, a, b, **kwargs)
         elif method == 'brenth':
-            result = optimize.brenth(self._k_dot, a, b, **kwargs)
+            result = optimize.brenth(self.compute_k_dot, a, b, **kwargs)
         elif method == 'brentq':
-            result = optimize.brentq(self._k_dot, a, b, **kwargs)
+            result = optimize.brentq(self.compute_k_dot, a, b, **kwargs)
         elif method == 'ridder':
-            result = optimize.ridder(self._k_dot, a, b, **kwargs)
+            result = optimize.ridder(self.compute_k_dot, a, b, **kwargs)
         else:
             mesg = ("Method must be one of : 'bisect', 'brenth', 'brentq', " +
                     "or 'ridder'.")
