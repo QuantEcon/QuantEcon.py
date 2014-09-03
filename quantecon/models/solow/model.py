@@ -135,6 +135,19 @@ class Model(ivp.IVP):
         return self.__intensive_output
 
     @property
+    def _symbolic_args(self):
+        """
+        List of symbolic arguments used in constructing vectorized versions of
+        _symbolic_system and _symbolic_jacobian.
+
+        :getter: Return list of symbolic arguments.
+        :type: list
+
+        """
+        args = [t, X] + sym.var(self.params.keys())
+        return args
+
+    @property
     def _symbolic_system(self):
         """
         Symbolic expression for the system of ODEs.
