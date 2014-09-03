@@ -112,7 +112,6 @@ class Model(ivp.IVP):
         """
         # cached values
         self.__intensive_output = None
-        self.__k_dot = None
 
         self.output = output
         self.params = params
@@ -136,18 +135,15 @@ class Model(ivp.IVP):
         return self.__intensive_output
 
     @property
-    def _k_dot(self):
+    def _symbolic_system(self):
         """
-        :getter: Return vectorized version of equation of motion for capital
-        (per unit effective labor).
-        :type: function
+        Symbolic expression for the system of ODEs.
+
+        :getter: Return the system of ODEs.
+        :type: sym.ImmutableMatrix
 
         """
-        if self.__k_dot is None:
-            args = [k] + sym.var(self.params.keys())
-            self.__k_dot = sym.lambdify(args, self.k_dot,
-                                        modules=[{'ImmutableMatrix': np.array}, "numpy"])
-        return self.__k_dot
+        return sym.Matrix([self.k_dot])
 
     @property
     def intensive_output(self):
