@@ -196,7 +196,8 @@ class Model(ivp.IVP):
         Symbolic expression for the equation of motion for capital (per unit
         effective labor).
 
-        :getter: Return the current equation of motion.
+        :getter: Return the current equation of motion for capital (per unit
+        effective labor).
         :type: sym.Basic
 
         Notes
