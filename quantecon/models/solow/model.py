@@ -75,9 +75,13 @@ References
 @date : 2014-08-18
 
 TODO:
-1. Write tests!
-2. Write a short demo notebook
-3. Finish writing docs
+1. Incorporate _numeric_* methods.
+2. Write tests!
+3. Finish __init__method (i.e, incorporate super())
+4. Finish section on computing the steady state in demo notebook.
+5. Finish section on solving Solow model in demo notebook.
+6. Finish section on calibrating the Solow model in the demo notebook.
+7. Finish writing docs (include some basic usage examples in the module docs).
 
 """
 import matplotlib.pyplot as plt
@@ -129,7 +133,7 @@ class Model(ivp.IVP):
 
         """
         if self.__intensive_output is None:
-            args = [k] + sym.var(self.params.keys())
+            args = [k] + sym.var(list(self.params.keys()))
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
                                                    modules=[{'ImmutableMatrix': np.array}, "numpy"])
         return self.__intensive_output
@@ -150,9 +154,9 @@ class Model(ivp.IVP):
     @property
     def _symbolic_system(self):
         """
-        Symbolic expression for the system of ODEs.
+        Symbolic matrix defining the system of ODEs.
 
-        :getter: Return the system of ODEs.
+        :getter: Return the matrix defining the system of ODEs.
         :type: sym.MutableDenseMatrix
 
         """
@@ -162,9 +166,9 @@ class Model(ivp.IVP):
     @property
     def _symbolic_jacobian(self):
         """
-        Symbolic expression for the Jacobian matrix for the system of ODEs.
+        Symbolic Jacobian matrix for the system of ODEs.
 
-        :getter: Return the Jacobian matrix.
+        :getter: Return the symbolic Jacobian matrix.
         :type: sym.MutableDenseMatrix
 
         """
