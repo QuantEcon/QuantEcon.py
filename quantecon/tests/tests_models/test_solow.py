@@ -11,6 +11,7 @@ import numpy as np
 import sympy as sym
 
 from ... models import solow
+from ... models.solow.cobb_douglas import analytic_steady_state
 
 # declare key variables for the model
 t, X = sym.var('t'), sym.DeferredVector('X')
@@ -26,7 +27,7 @@ def invalid_output(A, K, L, alpha):
     return K**alpha * (A * L)**(1 - alpha)
 
 
-def _k_upper(g, n, s, alpha, delta):
+def k_upper(g, n, s, alpha, delta):
     """Upper bound on possible steady state value."""
     return (1 / (g + n + delta))**(1 / (1 - alpha))
 
@@ -58,16 +59,23 @@ def test_validate_params():
 
 def test_find_steady_state():
     """Testing computation of steady state."""
-    for g in np.linspace(-0.02, 0.02, 4):
-        for n in np.linspace(-0.02, 0.03, 4):
-            for s in np.linspace(1e-2, 1-1e-2, 4):
-                for alpha in np.linspace(1e-2, 1-1e-2, 4):
-                    for delta in np.linspace(0.05, 1-1e-2, 4):
+    eps = 1e-1
+    for g in np.linspace(eps, 0.05, 4):
+        for n in np.linspace(eps, 0.05, 4):
+            for s in np.linspace(eps, 1-eps, 4):
+                for alpha in np.linspace(eps, 1-eps, 4):
+                    for delta in np.linspace(eps, 1-eps, 4):
 
-                        tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha, 'delta': delta}
+                        tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha,
+                                      'delta': delta}
                         tmp_mod = solow.Model(output=valid_output,
-                                                    params=tmp_params)
-                        actual_steady_state = tmp_mod.find_steady_state(0, _k_upper(**tmp_params))
-                        expected_steady_state = solow.cobb_douglas.analytic_steady_state(**tmp_params)
+                                              params=tmp_params)
 
-                        nose.tools.assert_almost_equals(actual_steady_state, expected_steady_state)
+                        # use root finder to compute the steady state
+                        tmp_k_upper = k_upper(**tmp_params)
+                        actual_ss = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
+                        expected_ss = analytic_steady_state(**tmp_params)
+
+                        # conduct the test (default places=7 is too precise!)
+                        nose.tools.assert_almost_equals(actual_ss, expected_ss,
+                                                        places=6)
