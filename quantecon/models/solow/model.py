@@ -140,10 +140,23 @@ class Model(ivp.IVP):
         Symbolic expression for the system of ODEs.
 
         :getter: Return the system of ODEs.
-        :type: sym.ImmutableMatrix
+        :type: sym.MutableDenseMatrix
 
         """
-        return sym.Matrix([self.k_dot])
+        change_of_vars = {k: X[0]}
+        return sym.Matrix([self.k_dot]).subs(change_of_vars)
+
+    @property
+    def _symbolic_jacobian(self):
+        """
+        Symbolic expression for the Jacobian matrix for the system of ODEs.
+
+        :getter: Return the Jacobian matrix.
+        :type: sym.MutableDenseMatrix
+
+        """
+        N = self._symbolic_system.shape[0]
+        return self._symbolic_system.jacobian([X[i] for i in range(N)])
 
     @property
     def intensive_output(self):
