@@ -8,7 +8,7 @@ Solow growth model with Cobb-Douglas aggregate production.
 import numpy as np
 import sympy as sym
 
-import model
+from . import model
 
 # declare key variables for the model
 t, X = sym.var('t'), sym.DeferredVector('X')
@@ -77,7 +77,7 @@ def analytic_solution(t, k0, g, n, s, alpha, delta):
     return analytic_traj
 
 
-def analtyic_steady_state(g, n, s, alpha, delta):
+def analytic_steady_state(g, n, s, alpha, delta):
     """
     Steady-state level of capital stock (per unit effective labor).
 
