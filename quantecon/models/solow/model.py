@@ -76,12 +76,14 @@ References
 
 TODO:
 1. Incorporate _numeric_* methods.
-2. Write tests!
+2. Write more tests!
 3. Finish __init__method (i.e, incorporate super())
 4. Finish section on computing the steady state in demo notebook.
 5. Finish section on solving Solow model in demo notebook.
-6. Finish section on calibrating the Solow model in the demo notebook.
-7. Finish writing docs (include some basic usage examples in the module docs).
+6. Write code for computing impulse response functions.
+7. Write code for plotting impulse response functions.
+8. Finish section on calibrating the Solow model in the demo notebook.
+9. Finish writing docs (include some basic usage examples in the module docs).
 
 """
 import matplotlib.pyplot as plt
@@ -512,7 +514,7 @@ def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
     return [fig, ax]
 
 
-def plot_intensive_invesment(cls, Nk=1e3, k_upper=10, **new_params):
+def plot_intensive_investment(cls, Nk=1e3, k_upper=10, **new_params):
     """
     Plot actual investment (per unit effective labor) and effective
     depreciation. The steady state value of capital stock (per unit effective

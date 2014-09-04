@@ -7,6 +7,7 @@ Test suite for solow module.
 """
 import nose
 
+import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
 
@@ -119,3 +120,51 @@ def test_valid_methods():
         tmp_mod = solow.Model(output=valid_output, params=valid_params)
         tmp_mod.find_steady_state(1e-12, k_upper(**valid_params),
                                   method='invalid_method')
+
+
+def test_plot_intensive_output():
+    """Testing return type for plot_intensive_output."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    tmp_plot = solow.plot_intensive_output(tmp_mod)
+
+    # test the return types
+    fig, ax = tmp_plot
+    nose.tools.assert_is_instance(tmp_plot, list)
+    nose.tools.assert_is_instance(fig, plt.Figure)
+    nose.tools.assert_is_instance(ax, plt.Axes)
+
+
+def test_plot_intensive_investment():
+    """Testing return type for plot_intensive_investment."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    tmp_plot = solow.plot_intensive_investment(tmp_mod)
+
+    # test the return types
+    fig, ax = tmp_plot
+    nose.tools.assert_is_instance(tmp_plot, list)
+    nose.tools.assert_is_instance(fig, plt.Figure)
+    nose.tools.assert_is_instance(ax, plt.Axes)
+
+
+def test_plot_phase_diagram():
+    """Testing return type for plot_phase_diagram."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    tmp_plot = solow.plot_phase_diagram(tmp_mod)
+
+    # test the return types
+    fig, ax = tmp_plot
+    nose.tools.assert_is_instance(tmp_plot, list)
+    nose.tools.assert_is_instance(fig, plt.Figure)
+    nose.tools.assert_is_instance(ax, plt.Axes)
+
+
+def test_plot_solow_diagram():
+    """Testing return type for plot_solow_diagram."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    tmp_plot = solow.plot_solow_diagram(tmp_mod)
+
+    # test the return types
+    fig, ax = tmp_plot
+    nose.tools.assert_is_instance(tmp_plot, list)
+    nose.tools.assert_is_instance(fig, plt.Figure)
+    nose.tools.assert_is_instance(ax, plt.Axes)
