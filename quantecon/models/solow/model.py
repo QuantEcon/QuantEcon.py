@@ -125,11 +125,6 @@ class Model(object):
         self.ivp = ivp.IVP(self.__numeric_system, self.__numeric_jacobian)
 
     @property
-    def _effective_depreciation_rate(self):
-        """Depreciation rate for capital stock (per unit effective labor)."""
-        return sum(self.params[key] for key in ['g', 'n', 'delta'])
-
-    @property
     def _intensive_output(self):
         """
         :getter: Return vectorized symbolic intensive aggregate production.
@@ -204,6 +199,22 @@ class Model(object):
         """
         N = self._symbolic_system.shape[0]
         return self._symbolic_system.jacobian([X[i] for i in range(N)])
+
+    @property
+    def effective_depreciation_rate(self):
+        """
+        Effective depreciation rate for capital stock (per unit effective labor).
+
+        :getter: Return the current effective depreciation rate.
+
+        Notes
+        -----
+        The effective depreciation rate of physical capital takes into account
+        both technological progress and population growth, as well as physical
+        depreciation.
+
+        """
+        return sum(self.params[key] for key in ['g', 'n', 'delta'])
 
     @property
     def intensive_output(self):
@@ -414,7 +425,7 @@ class Model(object):
             Amount of depreciated Capital stock (per unit of effective labor)
 
         """
-        effective_depreciation = self._effective_depreciation_rate * k
+        effective_depreciation = self.effective_depreciation_rate * k
         return effective_depreciation
 
     def compute_intensive_output(self, k):
