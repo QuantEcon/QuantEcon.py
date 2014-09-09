@@ -289,7 +289,7 @@ class Model(object):
             :type: eqnarray
 
             \dot{k}(t) &=& \frac{\dot{K}(t)}{A(t)L(t)} - \frac{K(t)}{[A(t)L(t)]^2}\bigg[\dot{A}(t)L(t) + \dot{L}(t)A(t)\bigg] \\
-            &=& \frac{\dot{K}(t)}{A(t)L(t)}  - \bigg(\frac{\dot{A}(t)}{A(t)} + \dot{L}(t)}{L(t)}\bigg)\frac{K(t)}{A(t)L(t)}
+            &=& \frac{\dot{K}(t)}{A(t)L(t)} - \bigg(\frac{\dot{A}(t)}{A(t)} + \dot{L}(t)}{L(t)}\bigg)\frac{K(t)}{A(t)L(t)}
 
         By definition, math:`k=K/AL`, and by assumption :math:`\dot{A}/A` and
         :math:`\dot{L}/L` are `g` and `n` respectively. Aggregate capital stock
@@ -306,8 +306,8 @@ class Model(object):
 
             :type: eqnarray
 
-            \dot{k}(t) &=& \frac{sF(K(t), A(t)L(t)) - \delta K(t)}{A(t)L(t)}  - (g + n)k(t) \\
-            &=& \frac{sY(t)}{A(t)L(t)}  - (g + n + \delta)k(t) \\
+            \dot{k}(t) &=& \frac{sF(K(t), A(t)L(t)) - \delta K(t)}{A(t)L(t)} - (g + n)k(t) \\
+            &=& \frac{sY(t)}{A(t)L(t)} - (g + n + \delta)k(t) \\
             &=& sf(k(t)) - (g + n + \delta)k(t)
 
         """
@@ -503,7 +503,8 @@ class Model(object):
 
     def find_steady_state(self, a, b, method='brentq', **kwargs):
         """
-        Compute the equilibrium value of capital (per unit effective labor).
+        Compute the equilibrium value of capital stock (per unit effective
+        labor).
 
         Parameters
         ----------
@@ -513,7 +514,7 @@ class Model(object):
             The other end of the bracketing interval [a,b]
         method : str (default=`brentq`)
             Method to use when computing the steady state. Supported methods
-            are `bisect`, `brenth`, `brentq`, and `ridder`. See `scipy.optimize`
+            are `bisect`, `brenth`, `brentq`, `ridder`. See `scipy.optimize`
             for more details (including references).
         kwargs : optional
             Additional keyword arguments. Keyword arguments are method specific

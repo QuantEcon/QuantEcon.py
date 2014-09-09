@@ -77,7 +77,7 @@ def analytic_solution(t, k0, g, n, s, alpha, delta):
     return analytic_traj
 
 
-def analytic_steady_state(g, n, s, alpha, delta):
+def analytic_steady_state(cls):
     """
     Steady-state level of capital stock (per unit effective labor).
 
@@ -101,5 +101,9 @@ def analytic_steady_state(g, n, s, alpha, delta):
         Steady state value of capital stock (per unit effective labor).
 
     """
-    k_star = (s / (n + g + delta))**(1 / (1 - alpha))
+    s = cls.params['s']
+    alpha = cls.params['alpha']
+
+    k_star = (s / cls.effective_depreciation_rate)**(1 / (1 - alpha))
+
     return k_star
