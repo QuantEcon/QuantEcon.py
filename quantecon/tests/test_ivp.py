@@ -2,7 +2,7 @@
 Tests for ivp.py
 
 @author : David R. Pugh
-@date : 2014-08-26
+@date : 2014-09-09
 
 """
 import nose
@@ -11,11 +11,8 @@ import numpy as np
 
 from .. import ivp
 
+
 # use the Solow Model with Cobb-Douglas production as test case
-valid_params = (0.02, 0.02, 0.15, 0.33, 0.05)
-invalid_params = {'g': 0.02, 'n': 0.02, 's': 0.15, 'alpha': 0.33, 'delta': 0.05}
-
-
 def solow_model(t, k, g, n, s, alpha, delta):
     """
     Equation of motion for capital stock (per unit effective labor).
@@ -148,6 +145,14 @@ def solow_analytic_solution(t, k0, g, n, s, alpha, delta):
 
     return analytic_traj
 
+# create an instance of the IVP class
+valid_params = (0.02, 0.02, 0.15, 0.33, 0.05)
+model = ivp.IVP(f=solow_model,
+                jac=solow_jacobian)
+
+model.f_params = valid_params
+model.jac_params = valid_params
+
 
 # helper functions for conducting tests
 def _compute_fixed_length_solns(model, t0, k0):
@@ -195,27 +200,16 @@ def _compute_variable_length_solns(model, t0, k0, g, tol):
 
 
 # testing functions
-def test_validate_f_args():
-    """Testing validation of f_args attribute."""
-    with nose.tools.assert_raises(AttributeError):
-        model = ivp.IVP(f=solow_model,
-                        f_args=invalid_params)
-
-
-def test_validate_jac_args():
-    """Testing validation of jac_args attribute."""
-    with nose.tools.assert_raises(AttributeError):
-        model = ivp.IVP(f=solow_model,
-                        jac=solow_jacobian,
-                        jac_args=invalid_params)
+def test_solve_args():
+    """Testing arguments passed to the IVP.solve method."""
+    # g and tol must be passed together!
+    with nose.tools.assert_raises(ValueError):
+        t0, k0 = 0, np.array([5.0])
+        model.solve(t0, k0, g=_termination_condition)
 
 
 def test_solve_fixed_trajectory():
     """Testing computation of fixed length solution trajectory."""
-    model = ivp.IVP(f=solow_model,
-                    jac=solow_jacobian,
-                    f_args=valid_params,
-                    jac_args=valid_params)
 
     # compute some fixed length trajectories
     t0, k0 = 0, np.array([5.0])
@@ -230,10 +224,6 @@ def test_solve_fixed_trajectory():
 
 def test_solve_variable_trajectory():
     """Testing computation of variable length solution trajectory."""
-    model = ivp.IVP(f=solow_model,
-                    jac=solow_jacobian,
-                    f_args=valid_params,
-                    jac_args=valid_params)
 
     # compute some variable length trajectories
     t0, k0, tol = 0, np.array([5.0]), 1e-3
@@ -255,10 +245,6 @@ def test_solve_variable_trajectory():
 
 def test_interpolation():
     """Testing parameteric B-spline interpolation methods."""
-    model = ivp.IVP(f=solow_model,
-                    jac=solow_jacobian,
-                    f_args=valid_params,
-                    jac_args=valid_params)
 
     # compute some fixed length trajectories
     t0, k0 = 0, np.array([5.0])
@@ -280,10 +266,6 @@ def test_interpolation():
 
 def test_compute_residual():
     """Testing computation of solution residual."""
-    model = ivp.IVP(f=solow_model,
-                    jac=solow_jacobian,
-                    f_args=valid_params,
-                    jac_args=valid_params)
 
     # compute some fixed length trajectories
     t0, k0 = 0, np.array([5.0])
