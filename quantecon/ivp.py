@@ -14,7 +14,7 @@ residual of the solution which can be used for assessing the overall accuracy
 of the approximated solution.
 
 @author : David R. Pugh
-@date : 2014-08-18
+@date : 2014-09-09
 
 """
 from __future__ import division
@@ -25,7 +25,7 @@ from scipy import integrate, interpolate
 
 class IVP(integrate.ode):
 
-    def __init__(self, f, jac=None, f_args=None, jac_args=None):
+    def __init__(self, f, jac=None):
         r"""
         Creates an instance of the IVP class.
 
@@ -33,7 +33,7 @@ class IVP(integrate.ode):
         ----------
         f : callable ``f(t, y, *f_args)``
             Right hand side of the system of equations defining the ODE. The
-            independent variable, `t`, is a ``scalar``; `y` is an ``ndarray``
+            independent variable, ``t``, is a ``scalar``; ``y`` is an ``ndarray``
             of dependent variables with ``y.shape == (n,)``. The function `f`
             should return a ``scalar``, ``ndarray`` or ``list`` (but not a
             ``tuple``).
@@ -45,63 +45,8 @@ class IVP(integrate.ode):
 
                 \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]
 
-        f_args : tuple, optional(default=None)
-            Additional arguments that should be passed to the function `f`.
-        jac_args : tuple, optional(default=None)
-            Additional arguments that should be passed to the function `jac`.
-
         """
         super(IVP, self).__init__(f, jac)
-        self.f_args = f_args
-        self.jac_args = jac_args
-
-    @property
-    def f_args(self):
-        """
-        Additional arguments passed to the user-supplied function `f`.
-
-        :getter: Return the current arguments.
-        :setter: Set new values for the arguments.
-        :type: tuple
-
-        """
-        return self._f_args
-
-    @property
-    def jac_args(self):
-        """
-        Additional arguments passed to the user-supplied function `jac`.
-
-        :getter: Return the current arguments.
-        :setter: Set new values for the arguments.
-        :type: tuple
-
-        """
-        return self._jac_args
-
-    @f_args.setter
-    def f_args(self, new_f_args):
-        """Set new values for the parameters."""
-        if not isinstance(new_f_args, (tuple, type(None))):
-            mesg = "IVP.args must be a tuple, not a {}."
-            raise AttributeError(mesg.format(new_f_args.__class__))
-        elif new_f_args is not None:
-            self.set_f_params(*new_f_args)
-            self._f_args = new_f_args
-        else:
-            pass
-
-    @jac_args.setter
-    def jac_args(self, new_jac_args):
-        """Set new values for the parameters."""
-        if not isinstance(new_jac_args, (tuple, type(None))):
-            mesg = "IVP.args must be a tuple, not a {}."
-            raise AttributeError(mesg.format(new_jac_args.__class__))
-        elif new_jac_args is not None:
-            self.set_jac_params(*new_jac_args)
-            self._jac_args = new_jac_args
-        else:
-            pass
 
     def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
@@ -134,7 +79,7 @@ class IVP(integrate.ode):
             current_step = np.hstack((self.t, self.y))
             solution = np.vstack((solution, current_step))
 
-            if g(self.t, self.y, *self.f_args) < tol:
+            if g(self.t, self.y, *self.f_params) < tol:
                 break
             else:
                 continue
@@ -185,7 +130,7 @@ class IVP(integrate.ode):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_args) for i in range(T))
+        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_params) for i in range(T))
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
