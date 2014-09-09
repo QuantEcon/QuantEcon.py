@@ -35,28 +35,19 @@ class CobbDouglasModel(model.Model):
         super(CobbDouglasModel, self).__init__(cobb_douglas_output, params)
 
 
-def analytic_solution(t, k0, g, n, s, alpha, delta):
+def analytic_solution(cls, t, k0):
     """
     Compute the analytic solution for the Solow model with Cobb-Douglas
     production technology.
 
     Parameters
     ----------
+    cls : object
+        Instance of the `solow.CobbDouglasModel` class.
     t : ndarray (shape=(T,))
         Array of points at which the solution is desired.
     k0 : (float)
         Initial condition for capital stock (per unit of effective labor)
-    g : float
-        Growth rate of technology.
-    n : float
-        Growth rate of the labor force.
-    s : float
-        Savings rate. Must satisfy `0 < s < 1`.
-    alpha : float
-        Elasticity of output with respect to capital stock.
-    delta : float
-        Depreciation rate of physical capital. Must satisfy
-        :math:`0 < \delta`.
 
     Returns
     -------
@@ -64,11 +55,14 @@ def analytic_solution(t, k0, g, n, s, alpha, delta):
         Array representing the analytic solution trajectory.
 
     """
+    s = cls.params['s']
+    alpha = cls.params['alpha']
+
     # lambda governs the speed of convergence
-    lmbda = (n + g + delta) * (1 - alpha)
+    lmbda = cls.effective_depreciation_rate * (1 - alpha)
 
     # analytic solution for Solow model at time t
-    k_t = (((s / (n + g + delta)) * (1 - np.exp(-lmbda * t)) +
+    k_t = (((s / (cls.effective_depreciation_rate)) * (1 - np.exp(-lmbda * t)) +
             k0**(1 - alpha) * np.exp(-lmbda * t))**(1 / (1 - alpha)))
 
     # combine into a (T, 2) array
@@ -83,17 +77,8 @@ def analytic_steady_state(cls):
 
     Parameters
     ----------
-    g : float
-        Growth rate of technology.
-    n : float
-        Growth rate of the labor force.
-    s : float
-        Savings rate. Must satisfy `0 < s < 1`.
-    alpha : float
-        Elasticity of output with respect to capital stock. Must satisfy
-        :math:`0 < alpha < 1`.
-    delta : float
-        Depreciation rate of physical capital. Must satisfy :math:`0 < \delta`.
+    cls : object
+        Instance of the `solow.CobbDouglasModel` class.
 
     Returns
     -------
