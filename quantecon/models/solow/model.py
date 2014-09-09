@@ -77,7 +77,7 @@ References
 TODO:
 1. Incorporate _numeric_* methods.
 2. Write more tests!
-3. Finish __init__method (i.e, incorporate super())
+3. Finish __init__ method (i.e, incorporate super())
 4. Finish section on computing the steady state in demo notebook.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
@@ -118,9 +118,17 @@ class Model(ivp.IVP):
         """
         # cached values
         self.__intensive_output = None
+        self.__numeric_system = None
+        self.__numeric_jacobian = None
 
         self.output = output
         self.params = params
+
+        super(Model, self).__init__(f=self.__numeric_system,
+                                    jac=self.__numeric_jacobian,
+                                    f_args=None,
+                                    jac_args=None,
+                                    )
 
     @property
     def _effective_depreciation_rate(self):
@@ -130,7 +138,7 @@ class Model(ivp.IVP):
     @property
     def _intensive_output(self):
         """
-        :getter: Return vectorized version of intensive aggregate production.
+        :getter: Return vectorized symbolic intensive aggregate production.
         :type: function
 
         """
@@ -139,6 +147,32 @@ class Model(ivp.IVP):
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
                                                    modules=[{'ImmutableMatrix': np.array}, "numpy"])
         return self.__intensive_output
+
+    @property
+    def _numeric_system(self):
+        """
+        :getter: Return vectorized symbolic system of ODEs.
+        :type: function
+
+        """
+        if self.__numeric_system is None:
+            self.__numeric_system = sym.lambdify(self._symbolic_args,
+                                                 self._symbolic_system,
+                                                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
+        return self.__numeric_system
+
+    @property
+    def _numeric_jacobian(self):
+        """
+        :getter: Return vectorized Jacobian matrix of partial derivatives.
+        :type: function
+
+        """
+        if self.__numeric_jacobian is None:
+            self.__numeric_jacobian = sym.lambdify(self._symbolic_args,
+                                                   self._symbolic_jacobian,
+                                                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
+        return self.__numeric_jacobian
 
     @property
     def _symbolic_args(self):
@@ -312,7 +346,8 @@ class Model(ivp.IVP):
 
         # clear the cache
         self.__intensive_output = None
-        self.__k_dot = None
+        self.__numeric_system = None
+        self.__numeric_jacobian = None
 
     @params.setter
     def params(self, value):
