@@ -75,9 +75,7 @@ References
 @date : 2014-08-18
 
 TODO:
-1. Incorporate _numeric_* methods.
 2. Write more tests!
-3. Finish __init__ method (i.e, incorporate super())
 4. Finish section on computing the steady state in demo notebook.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
@@ -102,7 +100,7 @@ A, k, K, L = sym.var('A, k, K, L')
 g, n, s, delta = sym.var('g, n, s, delta')
 
 
-class Model(ivp.IVP):
+class Model(object):
 
     def __init__(self, output, params):
         """
@@ -124,11 +122,7 @@ class Model(ivp.IVP):
         self.output = output
         self.params = params
 
-        super(Model, self).__init__(f=self.__numeric_system,
-                                    jac=self.__numeric_jacobian,
-                                    f_args=None,
-                                    jac_args=None,
-                                    )
+        self.ivp = ivp.IVP(self.__numeric_system, self.__numeric_jacobian)
 
     @property
     def _effective_depreciation_rate(self):
