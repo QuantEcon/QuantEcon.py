@@ -140,6 +140,8 @@ class Model(object):
     @property
     def _numeric_system(self):
         """
+        Vectorized, numpy-aware function defining the system of ODEs.
+
         :getter: Return vectorized symbolic system of ODEs.
         :type: function
 
@@ -153,6 +155,9 @@ class Model(object):
     @property
     def _numeric_jacobian(self):
         """
+        Vectorized, numpy-aware function defining the Jacobian matrix of
+        partial derivatives.
+
         :getter: Return vectorized Jacobian matrix of partial derivatives.
         :type: function
 
@@ -206,6 +211,7 @@ class Model(object):
         Effective depreciation rate for capital stock (per unit effective labor).
 
         :getter: Return the current effective depreciation rate.
+        :type: float
 
         Notes
         -----
@@ -273,6 +279,36 @@ class Model(object):
 
         Notes
         -----
+        Because the economy is growing over time due to technological progress,
+        `g`, and population growth, `n`, it makes sense to focus on the capital
+        stock per unit effective labor, `k`, rather than aggregate physical
+        capital, `K`. Since, by definition, :math:`k=K/AL`, we can apply the
+        chain rule to the time derative of `k`.
+
+        .. math::
+            :type: eqnarray
+
+            \dot{k}(t) &=& \frac{\dot{K}(t)}{A(t)L(t)} - \frac{K(t)}{[A(t)L(t)]^2}\bigg[\dot{A}(t)L(t) + \dot{L}(t)A(t)\bigg] \\
+            &=& \frac{\dot{K}(t)}{A(t)L(t)}  - \bigg(\frac{\dot{A}(t)}{A(t)} + \dot{L}(t)}{L(t)}\bigg)\frac{K(t)}{A(t)L(t)}
+
+        By definition, math:`k=K/AL`, and by assumption :math:`\dot{A}/A` and
+        :math:`\dot{L}/L` are `g` and `n` respectively. Aggregate capital stock
+        evolves according to
+
+        .. math::
+
+            \dot{K}(t) = sF(K(t), A(t)L(t)) - \delta K(t).
+
+        Substituting these facts into the above equation yields the equation of
+        motion for capital stock (per unit effective labor).
+
+        .. math::
+
+            :type: eqnarray
+
+            \dot{k}(t) &=& \frac{sF(K(t), A(t)L(t)) - \delta K(t)}{A(t)L(t)}  - (g + n)k(t) \\
+            &=& \frac{sY(t)}{A(t)L(t)}  - (g + n + \delta)k(t) \\
+            &=& sf(k(t)) - (g + n + \delta)k(t)
 
         """
         return s * self.intensive_output - (g + n + delta) * k
