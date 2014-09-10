@@ -239,3 +239,15 @@ def test_plot_solow_diagram():
     nose.tools.assert_is_instance(tmp_plot, list)
     nose.tools.assert_is_instance(fig, plt.Figure)
     nose.tools.assert_is_instance(ax, plt.Axes)
+
+
+def test_plot_factor_shares():
+    """Testing return type for plot_factor_shares."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    tmp_plot = solow.model.plot_factor_shares(tmp_mod)
+
+    # test the return types
+    fig, ax = tmp_plot
+    nose.tools.assert_is_instance(tmp_plot, list)
+    nose.tools.assert_is_instance(fig, plt.Figure)
+    nose.tools.assert_is_instance(ax, plt.Axes)

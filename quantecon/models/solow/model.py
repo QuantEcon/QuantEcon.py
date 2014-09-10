@@ -75,9 +75,6 @@ References
 @date : 2014-08-18
 
 TODO:
-2. Add code for computing capital share
-3. Add plotting method for capital share.
-4. Write some tests!
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
 7. Write code for plotting impulse response functions.
@@ -696,6 +693,54 @@ def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
     ax.set_title('Output (per unit effective labor)',
                  family='serif', fontsize=20)
     ax.grid(True)
+
+    return [fig, ax]
+
+
+def plot_factor_shares(cls, Nk=1e3, k_upper=10, **new_params):
+    """
+    Plot income/output shares of capital and labor inputs to production.
+
+    Parameters
+    ----------
+    cls : object
+        An instance of :class:`quantecon.models.solow.model.Model`.
+    Nk : float
+        Number of capital stock (per unit of effective labor) grid points to
+        plot.
+    k_upper : float
+        Upper bound on capital stock (per unit of effective labor) for the
+        plot.
+    new_params : dict (optional)
+        Optional dictionary of parameter values to change.
+
+    Returns
+    -------
+    A list containing:
+
+    fig : object
+        An instance of :class:`matplotlib.figure.Figure`.
+    ax : object
+        An instance of :class:`matplotlib.axes.AxesSubplot`.
+
+    """
+    # update the model parameters
+    cls.params.update(new_params)
+
+    # create the plot
+    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
+    k_grid = np.linspace(0, k_upper, Nk)
+    capitals_share = cls.compute_output_elasticity(k_grid)
+    labors_share = 1 - capitals_share
+
+    ax.plot(k_grid, capitals_share, 'r-', label='$\alpha_K(t)$')
+    ax.plot(k_grid, labors_share, 'b-', label='$1 - \alpha_K(t)$')
+    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
+                  fontsize=15)
+    ax.set_title('Factor shares', family='serif', fontsize=20)
+    ax.grid(True)
+    ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
+              bbox_to_anchor=(1.0, 1.0))
 
     return [fig, ax]
 
