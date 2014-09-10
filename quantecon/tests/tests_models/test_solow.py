@@ -63,22 +63,34 @@ def test_validate_output():
 
 
 def test_validate_params():
-    """Testing validation of output attribute."""
+    """Testing validation of params attribute."""
     # params must be a dict
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_0)
+
+    with nose.tools.assert_raises(AttributeError):
+        solow.CobbDouglasModel(params=invalid_params_0)
 
     # effective depreciation rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_1)
 
+    with nose.tools.assert_raises(AttributeError):
+        solow.CobbDouglasModel(params=invalid_params_1)
+
     # physical depreciation rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_2)
 
+    with nose.tools.assert_raises(AttributeError):
+        solow.CobbDouglasModel(params=invalid_params_2)
+
     # savings rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_3)
+
+    with nose.tools.assert_raises(AttributeError):
+        solow.CobbDouglasModel(params=invalid_params_3)
 
 
 def test_find_steady_state():
@@ -96,7 +108,7 @@ def test_find_steady_state():
                                               params=tmp_params)
 
                         # use root finder to compute the steady state
-                        tmp_k_upper = k_upper(**tmp_params)
+                        tmp_k_upper = k_upper(tmp_mod)
                         actual_ss = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
                         expected_ss = cobb_douglas.analytic_steady_state(tmp_mod)
 
@@ -120,7 +132,7 @@ def test_ivp_solve():
                                               params=tmp_params)
 
                         # use root finder to compute the steady state
-                        tmp_k_upper = k_upper(**tmp_params)
+                        tmp_k_upper = k_upper(tmp_mod)
                         tmp_k_star = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
 
                         # solve the initial value problem
@@ -141,7 +153,7 @@ def test_root_finders():
     valid_methods = ['brenth', 'brentq', 'ridder', 'bisect']
 
     for method in valid_methods:
-        tmp_k_upper = k_upper(**valid_params)
+        tmp_k_upper = k_upper(tmp_mod)
         actual_ss = tmp_mod.find_steady_state(1e-12, tmp_k_upper, method=method)
         expected_ss = cobb_douglas.analytic_steady_state(tmp_mod)
         nose.tools.assert_almost_equals(actual_ss, expected_ss)
@@ -151,7 +163,7 @@ def test_valid_methods():
     """Testing raise exception if invalid method passed to find_steady_state."""
     with nose.tools.assert_raises(ValueError):
         tmp_mod = solow.Model(output=valid_output, params=valid_params)
-        tmp_mod.find_steady_state(1e-12, k_upper(**valid_params),
+        tmp_mod.find_steady_state(1e-12, k_upper(tmp_mod),
                                   method='invalid_method')
 
 
