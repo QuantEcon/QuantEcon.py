@@ -75,9 +75,9 @@ References
 @date : 2014-08-18
 
 TODO:
-1. Add code for computing the marginal product of capital.
 2. Add code for computing capital share
 3. Add plotting method for capital share.
+4. Write some tests!
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
 7. Write code for plotting impulse response functions.
@@ -117,6 +117,7 @@ class Model(object):
         """
         # cached values
         self.__intensive_output = None
+        self.__mpk = None
         self.__numeric_system = None
         self.__numeric_jacobian = None
 
@@ -135,6 +136,19 @@ class Model(object):
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
                                                    modules=[{'ImmutableMatrix': np.array}, "numpy"])
         return self.__intensive_output
+
+    @property
+    def _mpk(self):
+        """
+        :getter: Return vectorized symbolic marginal product capital.
+        :type: function
+
+        """
+        if self.__mpk is None:
+            args = [k] + sym.var(list(self.params.keys()))
+            self.__mpk = sym.lambdify(args, self.marginal_product_capital,
+                                      modules=[{'ImmutableMatrix': np.array}, "numpy"])
+        return self.__mpk
 
     @property
     def _numeric_system(self):
@@ -342,9 +356,11 @@ class Model(object):
     @property
     def marginal_product_capital(self):
         r"""
-        Symbolic expression for the marginal product of capital.
+        Symbolic expression for the marginal product of capital (per unit
+        effective labor).
 
-        :getter: Return the current marginal product of capital.
+        :getter: Return the current marginal product of capital (per unit
+        effective labor).
         :type: sym.Basic
 
         Notes
@@ -358,7 +374,7 @@ class Model(object):
         where :math:`k=K/AL` is capital stock (per unit effective labor).
 
         """
-        return sym.diff(self.output, K)
+        return sym.diff(self.intensive_output, k)
 
     @property
     def output(self):
@@ -491,6 +507,34 @@ class Model(object):
         actual_inv = self.params['s'] * self.compute_intensive_output(k)
         return actual_inv
 
+    def compute_output_elasticity(self, k):
+        """
+        Return elasticity of output with respect to capital stock (per unit
+        effective labor).
+
+        Parameters
+        ----------
+        k : array_like (float)
+            Capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        alpha_k : array_like (float)
+            Elasticity of output with respect to capital stock (per unit
+            effective labor).
+
+        Notes
+        -----
+        Under the additional assumption that markets are perfectly competitive,
+        the elasticity of output with respect to capital stock is equivalent to
+        capital's share of income. Since, under perfect competition, firms earn
+        zero profits it must be true capital's share and labor's share must sum
+        to one.
+
+        """
+        alpha_k = (k * self.compute_mpk(k)) / self.compute_intensive_output(k)
+        return alpha_k
+
     def compute_effective_depreciation(self, k):
         """
         Return amount of Capital stock (per unit of effective labor) that
@@ -547,6 +591,24 @@ class Model(object):
         k_dot = (self.compute_actual_investment(k) -
                  self.compute_effective_depreciation(k))
         return k_dot
+
+    def compute_mpk(self, k):
+        """
+        Return marginal product of capital stock (per unit of effective labor).
+
+        Parameters
+        ----------
+        k : ndarray (float)
+            Capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        mpk : ndarray (float)
+            Marginal product of capital stock (per unit of effective labor).
+
+        """
+        mpk = self._mpk(k, **self.params)
+        return mpk
 
     def find_steady_state(self, a, b, method='brentq', **kwargs):
         """
