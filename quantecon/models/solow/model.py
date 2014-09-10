@@ -76,7 +76,6 @@ References
 
 TODO:
 2. Write more tests!
-4. Finish section on computing the steady state in demo notebook.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
 7. Write code for plotting impulse response functions.
@@ -121,8 +120,6 @@ class Model(object):
 
         self.output = output
         self.params = params
-
-        self.ivp = ivp.IVP(self.__numeric_system, self.__numeric_jacobian)
 
     @property
     def _intensive_output(self):
@@ -268,6 +265,33 @@ class Model(object):
         return self.output.subs({'A': 1.0, 'K': k, 'L': 1.0})
 
     @property
+    def ivp(self):
+        r"""
+        Initial value problem
+
+        :getter: Return an instance of the ivp.IVP class representing the Solow
+        model.
+        :type: ivp.IVP
+
+        Notes
+        -----
+        The Solow model with can be formulated as an initial value problem
+        (IVP) as follows.
+
+        .. math::
+
+            \dot{k}(t) = sf(k(t)) - (g + n + \delta)k(t),\ t\ge t_0,\ k(t_0) = k_0
+
+        The solution to this IVP is a function :math:`k(t)` describing the time
+        path of capital stock (per unit effective labor).
+
+        """
+        tmp_ivp = ivp.IVP(self._numeric_system, self._numeric_jacobian)
+        tmp_ivp.f_params = tuple(self.params.values())
+        tmp_ivp.jac_params = tuple(self.params.values())
+        return tmp_ivp
+
+    @property
     def k_dot(self):
         r"""
         Symbolic expression for the equation of motion for capital (per unit
@@ -394,6 +418,8 @@ class Model(object):
     def params(self, value):
         """Set a new parameter dictionary."""
         self._params = self._validate_params(value)
+        #self.ivp.f_params = self._params.values()
+        #self.ivp.jac_params = self._params.values()
 
     def _validate_output(self, output):
         """Validate the production function."""
