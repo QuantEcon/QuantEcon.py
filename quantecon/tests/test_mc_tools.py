@@ -3,7 +3,6 @@ Tests for mc_tools.py
 
 Functions
 ---------
-    mc_compute_stationary   [Status: 1 x Simple Test Written]
     mc_sample_path          [Status: TBD]
 
 """
@@ -14,7 +13,8 @@ import numpy as np
 import unittest
 from numpy.testing import assert_allclose
 
-from quantecon.mc_tools import DMarkov, mc_compute_stationary, mc_sample_path
+from quantecon.mc_tools import DMarkov
+
 
 # KMR Function
 # Useful because it seems to have 1 unit eigvalue, but a second one that
@@ -47,37 +47,50 @@ def KMR_Markov_matrix_sequential(N, p, epsilon):
     P[N, N-1], P[N, N] = epsilon * (1/2), 1 - epsilon * (1/2)
     return P
 
-### Tests: mc_compute_stationary ###
 
-def test_mc_compute_stationary_pmatrices():
+# Tests: methods of DMarkov #
+
+def test_dmarkov_pmatrices():
     """
-        Test mc_compute_stationary with P Matrix and Known Solutions
+    Test the methods of DMarkov with P matrix and known solutions
     """
+    testset = [
+        {'P': np.array([[0.4, 0.6], [0.2, 0.8]]),  # P matrix
+         'stationary_dists': np.array([[0.25, 0.75]]),  # Known solution
+         'comm_classes': [list(range(2))],
+         'rec_classes': [list(range(2))],
+         'is_irreducible': True,
+         },
+        {'P': np.eye(2),
+         'stationary_dists': np.eye(2),
+         'comm_classes': [[i] for i in range(2)],
+         'rec_classes': [[i] for i in range(2)],
+         'is_irreducible': False,
+         }
+    ]
 
-                    #-P Matrix-#                        , #-Known Solution-#
-    testset =   [
-                    ( np.array([[0.4,0.6], [0.2,0.8]]), np.array([0.25, 0.75]) ),
-                    ( np.eye(2), np.eye(2) )
-                ]
+    # Loop Through TestSet #
+    for test_dict in testset:
+        mc = DMarkov(test_dict['P'])
+        computed = mc.compute_stationary()
+        assert_allclose(computed, test_dict['stationary_dists'])
 
-    #-Loop Through TestSet-#
-    for (P, known) in testset:
-        computed = mc_compute_stationary(P)
-        assert_allclose(computed, known)
-
-
-
+        assert(sorted(mc.comm_classes) == sorted(test_dict['comm_classes']))
+        assert(mc.num_comm_classes == len(test_dict['comm_classes']))
+        assert(mc.is_irreducible == test_dict['is_irreducible'])
+        assert(sorted(mc.rec_classes) == sorted(test_dict['rec_classes']))
+        assert(mc.num_rec_classes == len(test_dict['rec_classes']))
 
 
 # Basic Class Structure with Setup #
 ####################################
 
-class Test_mc_compute_stationary_KMRMarkovMatrix2():
+class Test_dmarkov_compute_stationary_KMRMarkovMatrix2():
     """
     Test Suite for mc_compute_stationary using KMR Markov Matrix [suitable for nose]
     """
 
-    #-Starting Values-#
+    # Starting Values #
 
     N = 27
     epsilon = 1e-2
@@ -88,14 +101,13 @@ class Test_mc_compute_stationary_KMRMarkovMatrix2():
         """ Setup a KMRMarkovMatrix and Compute Stationary Values """
         self.P = KMR_Markov_matrix_sequential(self.N, self.p, self.epsilon)
         self.mc = DMarkov(self.P)
-        self.stationary = self.mc.mc_compute_stationary()
+        self.stationary = self.mc.compute_stationary()
         stat_shape = self.stationary.shape
 
-        if len(stat_shape) is 1:
+        if len(stat_shape) == 1:
             self.n_stat_dists = 1
         else:
-            self.n_stat_dists = stat_shape[1]
-
+            self.n_stat_dists = stat_shape[0]
 
     def test_markov_matrix(self):
         "Check that each row of matrix sums to 1"
@@ -105,7 +117,7 @@ class Test_mc_compute_stationary_KMRMarkovMatrix2():
     def test_sum_one(self):
         "Check each stationary distribution sums to 1"
         stationary_distributions = self.stationary
-        assert_allclose(np.sum(stationary_distributions, axis=0),
+        assert_allclose(np.sum(stationary_distributions, axis=1),
                         np.ones(self.n_stat_dists))
 
     def test_nonnegative(self):
@@ -116,13 +128,12 @@ class Test_mc_compute_stationary_KMRMarkovMatrix2():
     def test_left_eigen_vec(self):
         "Check that vP = v for all stationary distributions"
         mc = self.mc
-        stationary = self.stationary
+        stationary_distributions = self.stationary
 
-        if self.n_stat_dists is 1:
-            assert_allclose(np.dot(stationary, mc.P), stationary, atol=self.TOL)
+        if self.n_stat_dists == 1:
+            assert_allclose(np.dot(stationary_distributions, mc.P),
+                            stationary_distributions, atol=self.TOL)
         else:
             for i in range(self.n_stat_dists):
-                curr_v = stationary_distributions[:, i]
+                curr_v = stationary_distributions[i, :]
                 assert_allclose(np.dot(curr_v, mc.P), curr_v, atol=self.TOL)
-
-

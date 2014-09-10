@@ -16,6 +16,7 @@ import scipy.linalg as la
 import sympy.mpmath as mp
 import sys
 from .discrete_rv import DiscreteRV
+from .stochmatrix import StochMatrix, stationary_dists
 from warnings import warn
 
 
@@ -31,6 +32,7 @@ class DMarkov(object):
     ----------
     P : array_like(float, ndim=2)
         The transition matrix.  Must be of shape n x n.
+
     pi_0 : array_like(float, ndim=1), optional(default=None)
         The initial probability distribution.  If no intial distribution
         is specified, then it will be a distribution with equally
@@ -41,24 +43,39 @@ class DMarkov(object):
     ----------
     P : array_like(float, ndim=2)
         The transition matrix.  Must be of shape n x n.
+
     pi_0 : array_like(float, ndim=1)
         The initial probability distribution.
-    stationary_dists : array_like(float, ndim=2)
-        An array with invariant distributions as columns
 
+    stationary_dists : array_like(float, ndim=2)
+        An array with stationary distributions as rows.
+
+    is_irreducible : bool
+        Indicate whether the array is an irreducible matrix.
+
+    num_comm_classes : int
+        Number of communication classes.
+
+    comm_classes : list(list(int))
+        List of lists containing the communication classes.
+
+    num_rec_classes : int
+        Number of recurrent classes.
+
+    rec_classes : list(list(int))
+        List of lists containing the recurrent classes.
 
     Methods
     -------
-    mc_compute_stationary : This method finds stationary
-                                    distributions
+    compute_stationary : Finds stationary distributions
 
-    mc_sample_path : Simulates the markov chain for a given
-                      initial distribution
+    simulate : Simulates the markov chain for a given initial
+        distribution
     """
 
     def __init__(self, P, pi_0=None):
-        self.P = P
-        n, m = P.shape
+        self.P = StochMatrix(P)
+        n, m = self.P.shape
         self.n = n
 
         if pi_0 is None:
@@ -75,84 +92,63 @@ class DMarkov(object):
             raise ValueError('The transition matrix must be square!')
 
         # Double check that the rows of P sum to one
-        if np.all(np.sum(P, axis=1) != np.ones(P.shape[0])):
+        if np.any(np.sum(self.P, axis=1) != np.ones(self.P.shape[0])):
             raise ValueError('The rows must sum to 1. P is a trans matrix')
 
     def __repr__(self):
-        msg = "Markov process with transition matrix \n P = \n {0}"
+        msg = "Markov process with transition matrix \nP = \n{0}"
 
         if self.stationary_dists is None:
             return msg.format(self.P)
         else:
-            msg = msg + "\nand stationary distributions \n {1}"
+            msg = msg + "\nand stationary distributions \n{1}"
             return msg.format(self.P, self.stationary_dists)
 
     def __str__(self):
         return str(self.__repr__)
 
-    def mc_compute_stationary(self, precision=None, tol=None):
-        P = self.P
+    def compute_stationary(self):
+        """
+        Computes the stationary distributions of P. These are the left
+        eigenvectors that correspond to the unit eigen-values of the
+        matrix P' (They satisfy pi_{{t+1}}' = pi_{{t}}' P). It simply
+        calls the outer function stationary_dists.
 
-        stationary_dists = mc_compute_stationary(P, precision=precision, tol=tol)
-        self.stationary_dists = stationary_dists
+        Returns
+        -------
+        stationary_dists : array_like(float, ndim=2)
+            This is an array that has the stationary distributions as
+            its rows.
 
-        return stationary_dists
+        """
+        self.stationary_dists = stationary_dists(self.P)
 
-    def mc_sample_path(self, init=0, sample_size=1000):
+        return self.stationary_dists
+
+    def simulate(self, init=0, sample_size=1000):
         sim = mc_sample_path(self.P, init, sample_size)
 
         return sim
 
+    @property
+    def is_irreducible(self):
+        return self.P.is_irreducible
 
-def mc_compute_stationary(P, precision=None, tol=None):
-    n = P.shape[0]
+    @property
+    def num_comm_classes(self):
+        return self.P.num_comm_classes
 
-    if precision is None:
-        # Compute eigenvalues and eigenvectors
-        eigvals, eigvecs = la.eig(P, left=True, right=False)
+    @property
+    def comm_classes(self):
+        return self.P.comm_classes()
 
-        # Find the index for unit eigenvalues
-        index = np.where(abs(eigvals - 1.) < 1e-12)[0]
+    @property
+    def num_rec_classes(self):
+        return self.P.num_rec_classes
 
-        # Pull out the eigenvectors that correspond to unit eig-vals
-        uniteigvecs = eigvecs[:, index]
-
-        stationary_dists = uniteigvecs/np.sum(uniteigvecs, axis=0)
-
-    else:
-        # Create a list to store eigvals
-        stationary_dists_list = []
-        if tol is None:
-            # If tolerance isn't specified then use 2*precision
-            tol = mp.mpf(2 * 10**(-precision + 1))
-
-        with mp.workdps(precision):
-            eigvals, eigvecs = mp.eig(mp.matrix(P), left=True, right=False)
-
-            for ind, el in enumerate(eigvals):
-                if el>=(mp.mpf(1)-mp.mpf(tol)) and el<=(mp.mpf(1)+mp.mpf(tol)):
-                    stationary_dists_list.append(eigvecs[ind, :])
-
-            stationary_dists = np.asarray(stationary_dists_list).T
-            stationary_dists = (stationary_dists/sum(stationary_dists)).astype(np.float)
-
-
-    # Check to make sure all of the elements of invar_dist are positive
-    if np.any(stationary_dists < -1e-16):
-        warn("Elements of your invariant distribution were negative; " +
-              "Re-trying with additional precision")
-
-        if precision is None:
-            stationary_dists = mc_compute_stationary(P, precision=18, tol=tol)
-
-        elif precision is not None:
-            raise ValueError("Elements of your stationary distribution were" +
-                             "negative.  Try computing with higher precision")
-
-    # Since we will be accessing the columns of this matrix, we
-    # might consider adding .astype(np.float, order='F') to make it
-    # column major at beginning
-    return stationary_dists.squeeze()
+    @property
+    def rec_classes(self):
+        return self.P.rec_classes()
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
@@ -180,37 +176,6 @@ def mc_sample_path(P, init=0, sample_size=1000):
 # Set up the docstrings for the functions
 #---------------------------------------------------------------------#
 
-# For computing stationary dist
-_stationary_docstr = \
-"""
-This method computes the stationary distributions of P.
-These are the eigenvectors that correspond to the unit eigen-
-values of the matrix P' (They satisfy pi_{{t+1}}' = pi_{{t}}' P).  It
-simply calls the outer function mc_compute_stationary
-
-Parameters
-----------
-{p_arg}init : array_like(float, ndim=2)
-    The discrete Markov transition matrix P
-precision : scalar(int), optional(default=None)
-    Specifies the precision(number of digits of precision) with
-    which to calculate the eigenvalues.  Unless your matrix has
-    multiple eigenvalues that are near unity then no need to
-    worry about this.
-tol : scalar(float), optional(default=None)
-    Specifies the bandwith of eigenvalues to consider equivalent
-    to unity.  It will consider all eigenvalues in [1-tol,
-    1+tol] to be 1.  If tol is None then will use 2*1e-
-    precision.  Only used if precision is defined
-
-Returns
--------
-stationary_dists : np.ndarray : float
-    This is an array that has the stationary distributions as
-    its columns.
-
-"""
-
 # For drawing a sample path
 _sample_path_docstr = \
 """
@@ -235,11 +200,6 @@ X : array_like(int, ndim=1)
 """
 
 # set docstring for functions
-mc_compute_stationary.__doc__ = _stationary_docstr.format(p_arg=
-"""P : array_like(float, ndim=2)
-    A discrete Markov transition matrix
-
-""")
 mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg=
 """P : array_like(float, ndim=2)
     A discrete Markov transition matrix
@@ -249,8 +209,6 @@ mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg=
 # set docstring for methods
 
 if sys.version_info[0] == 3:
-    DMarkov.mc_compute_stationary.__doc__ = _stationary_docstr.format(p_arg="")
-    DMarkov.mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="")
+    DMarkov.simulate.__doc__ = _sample_path_docstr.format(p_arg="")
 elif sys.version_info[0] == 2:
-    DMarkov.mc_compute_stationary.__func__.__doc__ = _stationary_docstr.format(p_arg="")
-    DMarkov.mc_sample_path.__func__.__doc__ = _sample_path_docstr.format(p_arg="")
+    DMarkov.simulate.__func__.__doc__ = _sample_path_docstr.format(p_arg="")

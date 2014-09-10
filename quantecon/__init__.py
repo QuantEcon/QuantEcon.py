@@ -13,10 +13,11 @@ from .arma import ARMA
 from .lqcontrol import LQ
 from .lss import LSS
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
-from .mc_tools import DMarkov, mc_sample_path, mc_compute_stationary
+from .mc_tools import DMarkov, mc_sample_path
 from .quadsums import var_quadratic_sum, m_quadratic_sum
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
+from .stochmatrix import StochMatrix, stationary_dists, gth_solve
 from .tauchen import approx_markov
 from . import quad as quad
 
