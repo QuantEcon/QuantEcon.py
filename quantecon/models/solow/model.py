@@ -75,6 +75,9 @@ References
 @date : 2014-08-18
 
 TODO:
+1. Add code for computing the marginal product of capital.
+2. Add code for computing capital share
+3. Add plotting method for capital share.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
 7. Write code for plotting impulse response functions.
@@ -335,6 +338,27 @@ class Model(object):
 
         """
         return s * self.intensive_output - (g + n + delta) * k
+
+    @property
+    def marginal_product_capital(self):
+        r"""
+        Symbolic expression for the marginal product of capital.
+
+        :getter: Return the current marginal product of capital.
+        :type: sym.Basic
+
+        Notes
+        -----
+        The marginal product of capital is defined as follows:
+
+        .. math::
+
+            \frac{\partial F(K, AL)}{\partial K} \equiv f'(k)
+
+        where :math:`k=K/AL` is capital stock (per unit effective labor).
+
+        """
+        return sym.diff(self.output, K)
 
     @property
     def output(self):
