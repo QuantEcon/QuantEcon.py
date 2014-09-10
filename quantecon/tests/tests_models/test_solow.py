@@ -117,6 +117,32 @@ def test_find_steady_state():
                                                         places=6)
 
 
+def test_compute_output_elsticity():
+    """Testing computation of elasticity of output with respect to capital."""
+    eps = 1e-1
+    for g in np.linspace(eps, 0.05, 4):
+        for n in np.linspace(eps, 0.05, 4):
+            for s in np.linspace(eps, 1-eps, 4):
+                for alpha in np.linspace(eps, 1-eps, 4):
+                    for delta in np.linspace(eps, 1-eps, 4):
+
+                        tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha,
+                                      'delta': delta}
+                        tmp_mod = solow.Model(output=valid_output,
+                                              params=tmp_params)
+
+                        # use root finder to compute the steady state
+                        tmp_k_upper = k_upper(tmp_mod)
+                        tmp_k_star = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
+
+                        actual_elasticity = tmp_mod.compute_output_elasticity(tmp_k_star)
+                        expected_elasticity = tmp_params['alpha']
+
+                        # conduct the test
+                        nose.tools.assert_almost_equals(actual_elasticity,
+                                                        expected_elasticity)
+
+
 def test_ivp_solve():
     """Testing computation of solution to the initial value problem."""
     eps = 1e-1
