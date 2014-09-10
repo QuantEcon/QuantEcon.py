@@ -82,24 +82,24 @@ class Matrices:
 
         matrix_dict = {
             'P': np.array([[0.4, 0.6], [0.2, 0.8]]),
-            'comm_classes': [range(2)],
-            'rec_classes': [range(2)],
+            'comm_classes': [list(range(2))],
+            'rec_classes': [list(range(2))],
             'is_irreducible': True,
             }
         self.irreducible_matrix_dicts.append(matrix_dict)
 
         matrix_dict = {
             'P': KMR_Markov_matrix_sequential(N=27, p=1./3, epsilon=1e-2),
-            'comm_classes': [range(27+1)],
-            'rec_classes': [range(27+1)],
+            'comm_classes': [list(range(27+1))],
+            'rec_classes': [list(range(27+1))],
             'is_irreducible': True,
             }
         self.irreducible_matrix_dicts.append(matrix_dict)
 
         matrix_dict = {
             'P': KMR_Markov_matrix_sequential(N=3, p=1./3, epsilon=1e-14),
-            'comm_classes': [range(3+1)],
-            'rec_classes': [range(3+1)],
+            'comm_classes': [list(range(3+1))],
+            'rec_classes': [list(range(3+1))],
             'is_irreducible': True,
             }
         self.irreducible_matrix_dicts.append(matrix_dict)
