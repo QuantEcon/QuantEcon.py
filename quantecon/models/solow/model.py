@@ -447,6 +447,7 @@ class Model(object):
 
         # clear the cache
         self.__intensive_output = None
+        self.__mpk = None
         self.__numeric_system = None
         self.__numeric_jacobian = None
 
