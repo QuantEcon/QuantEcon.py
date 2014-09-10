@@ -75,7 +75,6 @@ References
 @date : 2014-08-18
 
 TODO:
-2. Write more tests!
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
 7. Write code for plotting impulse response functions.
