@@ -417,8 +417,6 @@ class Model(object):
     def params(self, value):
         """Set a new parameter dictionary."""
         self._params = self._validate_params(value)
-        #self.ivp.f_params = self._params.values()
-        #self.ivp.jac_params = self._params.values()
 
     def _validate_output(self, output):
         """Validate the production function."""
