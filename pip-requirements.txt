@@ -1,6 +1,6 @@
 # These are the required packages for the quant-econ package to build
 
-Sphinx=1.2.2
+Sphinx
 
 ipython
 
