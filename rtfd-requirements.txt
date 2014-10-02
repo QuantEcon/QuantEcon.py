@@ -1,0 +1,8 @@
+# Requirements to build the rtfd page
+ipython
+
+numpy
+
+numpydoc
+
+matplotlib
