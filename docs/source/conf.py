@@ -14,7 +14,20 @@
 
 import sys
 import os
+from mock import Mock as MagicMock
 
+# ------------------------------------------------------------------- #
+# MOCK MODULES
+# ------------------------------------------------------------------- #
+on_rtd = os.environ.get('READTHEDOCS', none) == 'True'
+
+if on_rtd:
+    class Mock(MagicMock):
+        @classmethod
+        def __getattr__(cls, name):
+            return Mock()
+
+    MOCK_MODULES = ['pandas', 'statsmodels']
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
