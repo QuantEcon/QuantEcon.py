@@ -829,6 +829,18 @@ class Model(object):
 class ImpulseResponse(object):
     """Base class representing an impulse response function for a Model."""
 
+    def __init__(self, model):
+        """
+        Create an instance of the ImpulseResponse class.
+
+        Parameters
+        ----------
+        model : model.Model
+            Instance of the model.Model class representing a Solow model.
+
+        """
+        self.model = model
+
     @property
     def kind(self):
         """
