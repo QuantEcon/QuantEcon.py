@@ -827,15 +827,15 @@ def plot_impulse_response(self, variables, param, shock, T, year=2013,
 
     """
     # first need to generate and irf
-    irf = self.get_impulse_response(param, shock, T, year, kind, reset)
-    
+    irf = self.compute_impulse_response(param, shock, T, year, kind, reset)
+
     # create mapping from variables to column indices
-    irf_dict = {'k':irf[:,[0,1]], 'y':irf[:,[0,2]], 'c':irf[:,[0,3]]}
-    
+    irf_dict = {'k': irf[:, [0, 1]], 'y': irf[:, [0, 2]], 'c': irf[:, [0, 3]]}
+
     # necessary for pretty latex printing
     if param in ['alpha', 'delta', 'sigma', 'theta', 'rho']:
         param = '\\' + param
-        
+
     # title depends on whether shock was positive or negative
     if shock > 1.0:
         tit = 'Impulse response following + shock to $%s$' % param
@@ -846,55 +846,50 @@ def plot_impulse_response(self, variables, param, shock, T, year=2013,
 
     if variables == 'all':
         variables = irf_dict.keys()
-        
+
     fig, axes = plt.subplots(len(variables), 1, squeeze=False, **fig_kw)
-      
-    for i, var in enumerate(variables): 
-            
+
+    for i, var in enumerate(variables):
+
         # extract the time series
         traj = irf_dict[var]
-            
+
         # plot the irf
-        self.plot_trajectory(traj, color, axes[i,0])
-            
+        self.plot_trajectory(traj, color, axes[i, 0])
+
         # adjust axis limits
-        axes[i,0].set_ylim(0.95 * traj[:,1].min(), 1.05 * traj[:,1].max())
-        axes[i,0].set_xlim(year - 10, year + T)
-            
+        axes[i, 0].set_ylim(0.95 * traj[:, 1].min(), 1.05 * traj[:, 1].max())
+        axes[i, 0].set_xlim(year - 10, year + T)
+
         # y axis labels depend on kind of irfs
         if kind == 'per_capita':
-              
-            ti = traj[:,0] - self.data.index[0].year
+            ti = traj[:, 0] - self.data.index[0].year
             gr = self.params['g']
-                
-            axes[i,0].plot(traj[:,0], traj[0,1] * np.exp(gr * ti), 'k--')
-            axes[i,0].set_ylabel(r'$\frac{%s}{L}(t)$' %var.upper(), 
-                                 rotation='horizontal', fontsize=15, 
-                                 family='serif')
-                                           
+            axes[i, 0].plot(traj[:, 0], traj[0, 1] * np.exp(gr * ti), 'k--')
+            axes[i, 0].set_ylabel(r'$\frac{%s}{L}(t)$' % var.upper(),
+                                  rotation='horizontal', fontsize=15,
+                                  family='serif')
         elif kind == 'levels':
-            ti = traj[:,0] - self.data.index[0].year
+            ti = traj[:, 0] - self.data.index[0].year
             gr = self.params['n'] + self.params['g']
-                
-            axes[i,0].plot(traj[:,0], traj[0,1] * np.exp(gr * ti), 'k--')
-            axes[i,0].set_ylabel('$%s(t)$' %var.upper(), 
-                                 rotation='horizontal', fontsize=15, 
-                                 family='serif')
-                                           
+            axes[i, 0].plot(traj[:, 0], traj[0, 1] * np.exp(gr * ti), 'k--')
+            axes[i, 0].set_ylabel('$%s(t)$' % var.upper(),
+                                  rotation='horizontal', fontsize=15,
+                                  family='serif')
         else:
-            axes[i,0].set_ylabel('$%s(t)$' %var, rotation='horizontal', 
-                                 fontsize=15, family='serif')
-                                   
+            axes[i, 0].set_ylabel('$%s(t)$' % var, rotation='horizontal',
+                                  fontsize=15, family='serif')
+
         # adjust location of y-axis label
-        axes[i,0].yaxis.set_label_coords(-0.1, 0.45)
+        axes[i, 0].yaxis.set_label_coords(-0.1, 0.45)
 
         # log the y-scale for the plots
-        if log == True:
-            axes[i,0].set_yscale('log')
-                
-    axes[0,0].set_title(tit, family='serif', fontsize=20)
-    axes[-1,0].set_xlabel('Year, $t$,', fontsize=15, family='serif')
-    
+        if log is True:
+            axes[i, 0].set_yscale('log')
+
+    axes[0, 0].set_title(tit, family='serif', fontsize=20)
+    axes[-1, 0].set_xlabel('Year, $t$,', fontsize=15, family='serif')
+
     return [fig, axes]
 
 
