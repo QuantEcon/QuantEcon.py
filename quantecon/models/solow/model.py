@@ -786,44 +786,45 @@ class Model(object):
 
 
 def plot_impulse_response(self, variables, param, shock, T, year=2013,
-                          color='b', kind='efficiency_units', log=False, 
+                          color='b', kind='efficiency_units', log=False,
                           reset=True, **fig_kw):
     """
     Plots an impulse response function.
-    
-    Arguments:
-        
-        variables: (list) List of variables whose impulse response functions
-                   you wish to plot. Alternatively, you can plot irfs for 
-                   all variables by setting variables = 'all'.
-                
-        param:     (string) Model parameter you wish to shock.
-        
-        shock:     (float) Multiplicative shock to the parameter. Values < 1 
-                   correspond to a reduction in the current value of the 
-                   parameter; values > 1 correspond to an increase in the 
-                   current value of the parameter.
-               
-        T:         (float) Length of the impulse response. Default is 40.
-        
-        year:      (int) Year in which you want the shock to take place.
-                   Default is 2013.
-                   
-        kind:      (str) Whether you want impulse response functions in 
-                   'levels', 'per_capita', or 'efficiency_units'. Default is
-                   for irfs to be in 'efficiency_units'.
-               
-        log:       (boolean) Whether or not to have logarithmic scales on
-                   the vertical axes. Default is False.
-               
-        reset:     (boolean) Whether or not to reset the original parameters
-                   to their pre-shock values. Default is True.
-        
-    Returns: A list containing...
-    
-        fig:  (object) Instance of the matplotlib Figure class
-        axes: (list) List of matplotlib AxesSubplot instances.
-    
+
+    Parameters
+    ----------
+    variables : list
+        List of variables whose impulse response functions you wish to plot.
+        Alternatively, you can plot irfs for all variables by setting variables
+        to 'all'.
+    param : str
+        Model parameter you wish to shock.
+    shock : float
+        Multiplicative shock to the parameter. Values < 1 correspond to a
+        reduction in the current value of the parameter; values > 1 correspond
+        to an increase in the current value of the parameter.
+    T : float (default=100)
+        Length of the impulse response.
+    year : int
+        Year in which you want the shock to take place. Default is 2013.
+    kind : str (default='efficiency_units')
+        Whether you want impulse response functions in 'levels', 'per_capita',
+        or 'efficiency_units'.
+    log : boolean (default=False)
+        Whether or not to have logarithmic scales on the vertical axes.
+    reset : boolean (default=True)
+        Whether or not to reset the original parameters to their pre-shock
+        values.
+
+    Returns
+    -------
+    A list containing:
+
+    fig : object
+        An instance of :class:`matplotlib.figure.Figure`.
+    ax : object
+        An instance of :class:`matplotlib.axes.AxesSubplot`.
+
     """
     # first need to generate and irf
     irf = self.get_impulse_response(param, shock, T, year, kind, reset)
