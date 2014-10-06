@@ -75,6 +75,9 @@ References
 @date : 2014-08-18
 
 TODO:
+1. Parameter dict needs to include values for A0 and L0.
+2. Initial condition for simulation should require K0 and not k0.
+4. Eliminate k_upper parameter from the plot functions.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
 7. Write code for plotting impulse response functions.
@@ -188,7 +191,7 @@ class Model(object):
         :type: list
 
         """
-        args = [t, X] + sym.var(self.params.keys())
+        args = [t, X] + sym.var(list(self.params.keys()))
         return args
 
     @property
@@ -552,6 +555,122 @@ class Model(object):
         """
         effective_depreciation = self.effective_depreciation_rate * k
         return effective_depreciation
+
+    def compute_impulse_response(self, param, shock, T=100,
+                                 kind='efficiency_units', reset=True):
+        """
+        Generates an impulse response function for k(t) following a shock to
+        one of the model parameters.
+
+        Parameters
+        ----------
+        param : str
+            Model parameter
+        shock : float
+            Multiplicative shock to the parameter. Values < 1 correspond to a
+            reduction in the current value of the parameter; values > 1
+            correspond to increasing the current value of the parameter.
+        T : float
+            Length of the impulse response. Default is 100.
+        kind : str
+            Whether you want impulse response functions in 'levels',
+            'per_capita', or 'efficiency_units'. Default is for irfs to be in
+            'efficiency_units'.
+        reset : boolean
+            Whether or not to reset the original parameters to their pre-shock
+            values. Default is True.
+
+        Returns:
+
+        irf : nparray
+            Impulse response function.
+
+        """
+        # copy the original params
+        orig_params = self.params.copy()
+
+        # economy is initial in steady state
+        eps = 1e-6
+        k0 = self.find_steady_state(eps, 1e6)
+        y0 = self.compute_intensive_output(k0)
+        c0 = (1 - orig_params['s']) * y0
+
+        # initial padding
+        N = 10
+        time_padding = np.arange(-N, 0, 1.0)
+
+        # transform irfs into per capita or levels, depending
+        if kind == 'per_capita':
+            A0 = self.params['A0']
+            g = self.params['g']
+            factor = A0 * np.exp(g * time_padding)
+
+        elif kind == 'levels':
+            A0 = self.params['A0']
+            g = self.params['g']
+            L0 = self.params['L0']
+            n = self.params['n']
+            factor = A0 * L0 * np.exp((n + g) * time_padding)
+
+        elif kind == 'efficiency_units':
+            factor = np.ones(N)
+
+        else:
+            raise ValueError
+
+        # start with N periods of steady state values
+        padding_k = np.repeat(k0, N)
+        padding = np.hstack((time_padding[:, np.newaxis],
+                            (factor * padding_k)[:, np.newaxis]))
+        # padding for y
+        padding_y = np.repeat(y0, N)
+        padding = np.hstack((padding, (factor * padding_y)[:, np.newaxis]))
+
+        # padding for c
+        padding_c = np.repeat(c0, N)
+        padding = np.hstack((padding, (factor * padding_c)[:, np.newaxis]))
+
+        # shock the parameter
+        self.params[param] = shock * self.params[param]
+
+        # generate post-shock trajectory
+        irf = self.ivp.solve(0.0, k0, 1.0, T, integrator='dopri')
+
+        # transform irfs into per capita or levels, depending
+        if kind == 'per_capita':
+            g = self.params['g']
+            factor = factor[-1] * np.exp(g * irf[:, 0])
+
+        elif kind == 'levels':
+            g = self.params['g']
+            n = self.params['n']
+            factor = factor[-1] * np.exp((n + g) * irf[:, 0])
+
+        elif kind == 'efficiency_units':
+            factor = np.ones(T + 1)
+
+        else:
+            raise ValueError
+
+        # compute the irf for y
+        irf_y = self.compute_intensive_output(irf[:, 1])
+        irf = np.hstack((irf, (factor * irf_y)[:, np.newaxis]))
+
+        # compute the irf for c
+        irf_c = (1 - self.params['s']) * irf_y
+        irf = np.hstack((irf, (factor * irf_c)[:, np.newaxis]))
+
+        # compute the irf for k (after computing irfs for y and c!)
+        irf[:, 1] = (factor * irf[:, 1])
+
+        # add the padding
+        irf = np.vstack((padding, irf))
+
+        # reset the original params and recompute steady state?
+        if reset is True:
+            self.params.update(orig_params)
+
+        return irf
 
     def compute_intensive_output(self, k):
         """
