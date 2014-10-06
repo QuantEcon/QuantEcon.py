@@ -588,34 +588,30 @@ class Model(object):
         effective_depreciation = self.effective_depreciation_rate * k
         return effective_depreciation
 
-    def compute_impulse_response(self, param, shock, T=100,
+    def compute_impulse_response(self, new_params, T=100,
                                  kind='efficiency_units', reset=True):
         """
-        Generates an impulse response function for k(t) following a shock to
-        one of the model parameters.
+        Generates a impulse response functions following changes to the
+        model parameters.
 
         Parameters
         ----------
-        param : str
-            Model parameter
-        shock : float
-            Multiplicative shock to the parameter. Values < 1 correspond to a
-            reduction in the current value of the parameter; values > 1
-            correspond to increasing the current value of the parameter.
+        new_params : str
+            Dictionary of new parameter values representing the desired
+            "shocks."
         T : float
             Length of the impulse response. Default is 100.
-        kind : str
+        kind : str (default='efficiency_units')
             Whether you want impulse response functions in 'levels',
-            'per_capita', or 'efficiency_units'. Default is for irfs to be in
-            'efficiency_units'.
-        reset : boolean
+            'per_capita', or 'efficiency_units'.
+        reset : boolean (default=True)
             Whether or not to reset the original parameters to their pre-shock
-            values. Default is True.
+            values.
 
-        Returns:
-
-        irf : nparray
-            Impulse response function.
+        Returns
+        -------
+        irf : numpy.ndarray
+            Array whose columns represent the impulse response functions.
 
         """
         # copy the original params
@@ -661,8 +657,8 @@ class Model(object):
         padding_c = np.repeat(c0, N)
         padding = np.hstack((padding, (factor * padding_c)[:, np.newaxis]))
 
-        # shock the parameter
-        self.params[param] = shock * self.params[param]
+        # shock the parameters
+        self.params.update(new_params)
 
         # generate post-shock trajectory
         irf = self.ivp.solve(0.0, k0, 1.0, T, integrator='dopri')
@@ -830,6 +826,12 @@ class Model(object):
         return result
 
 
+class ImpulseResponse(object):
+    """Base class representing an impulse response function for a Model."""
+
+    pass
+
+
 def plot_impulse_response(self, variables, param, shock, T, year=2013,
                           color='b', kind='efficiency_units', log=False,
                           reset=True, **fig_kw):
@@ -877,18 +879,6 @@ def plot_impulse_response(self, variables, param, shock, T, year=2013,
     # create mapping from variables to column indices
     irf_dict = {'k': irf[:, [0, 1]], 'y': irf[:, [0, 2]], 'c': irf[:, [0, 3]]}
 
-    # necessary for pretty latex printing
-    if param in ['alpha', 'delta', 'sigma', 'theta', 'rho']:
-        param = '\\' + param
-
-    # title depends on whether shock was positive or negative
-    if shock > 1.0:
-        tit = 'Impulse response following + shock to $%s$' % param
-    elif shock < 1.0:
-        tit = 'Impulse response following - shock to $%s$' % param
-    else:
-        tit = 'Impulse response following NO shock to $%s$' % param
-
     if variables == 'all':
         variables = irf_dict.keys()
 
@@ -932,7 +922,6 @@ def plot_impulse_response(self, variables, param, shock, T, year=2013,
         if log is True:
             axes[i, 0].set_yscale('log')
 
-    axes[0, 0].set_title(tit, family='serif', fontsize=20)
     axes[-1, 0].set_xlabel('Year, $t$,', fontsize=15, family='serif')
 
     return [fig, axes]
