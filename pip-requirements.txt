@@ -1,5 +1,7 @@
 # These are the required packages for the quant-econ package to build
 
+Sphinx
+
 ipython
 
 numpy
