@@ -75,7 +75,6 @@ References
 @date : 2014-08-18
 
 TODO:
-1. Parameter dict needs to include values for A0 and L0.
 2. Initial condition for simulation should require K0 and not k0.
 4. Eliminate k_upper parameter from the plot functions.
 5. Finish section on solving Solow model in demo notebook.
@@ -425,6 +424,10 @@ class Model(object):
         -----
         The following parameters are required:
 
+        A0: float
+            Initial level of technology. Must satisfy :math:`A_0 > 0 `.
+        L0: float
+            Initial amount of available labor. Must satisfy :math:`L_0 > 0 `.
         g : float
             Growth rate of technology.
         n : float
@@ -473,15 +476,26 @@ class Model(object):
 
     def _validate_params(self, params):
         """Validate the model parameters."""
+        required_params = ['g', 'n', 's', 'delta', 'A0', 'L0']
+
         if not isinstance(params, dict):
             mesg = "SolowModel.params must be a dict, not a {}."
             raise AttributeError(mesg.format(params.__class__))
+        if not set(required_params) < set(params.keys()):
+            mesg = "One of the required params in {} has not been specified."
+            raise AttributeError(mesg.format(required_params))
         if params['s'] <= 0.0 or params['s'] >= 1.0:
             raise AttributeError('Savings rate must be in (0, 1).')
         if params['delta'] <= 0.0 or params['delta'] >= 1.0:
             raise AttributeError('Depreciation rate must be in (0, 1).')
         if params['g'] + params['n'] + params['delta'] <= 0.0:
             raise AttributeError("Sum of g, n, and delta must be positive.")
+        if params['A0'] <= 0.0:
+            mesg = "Initial value for technology must be strictly positive."
+            raise AttributeError(mesg)
+        if params['L0'] <= 0.0:
+            mesg = "Initial value for labor supply must be strictly positive."
+            raise AttributeError(mesg)
         else:
             return params
 
