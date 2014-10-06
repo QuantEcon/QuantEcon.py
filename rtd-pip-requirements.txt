@@ -8,6 +8,8 @@ numpy
 
 numpydoc
 
+autodoc
+
 scipy
 
 matplotlib
