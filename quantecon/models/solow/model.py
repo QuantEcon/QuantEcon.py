@@ -76,6 +76,7 @@ References
 
 TODO:
 2. Initial condition for simulation should require K0 and not k0.
+3. Add a steady_state property that can be over written with anayltic result.
 4. Eliminate k_upper parameter from the plot functions.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
@@ -101,6 +102,8 @@ g, n, s, delta = sym.var('g, n, s, delta')
 
 
 class Model(object):
+
+    modules = [{'ImmutableMatrix': np.array}, "numpy"]
 
     def __init__(self, output, params):
         """
@@ -133,7 +136,7 @@ class Model(object):
         if self.__intensive_output is None:
             args = [k] + sym.var(list(self.params.keys()))
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
-                                                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
+                                                   self.modules)
         return self.__intensive_output
 
     @property
@@ -146,7 +149,7 @@ class Model(object):
         if self.__mpk is None:
             args = [k] + sym.var(list(self.params.keys()))
             self.__mpk = sym.lambdify(args, self.marginal_product_capital,
-                                      modules=[{'ImmutableMatrix': np.array}, "numpy"])
+                                      self.modules)
         return self.__mpk
 
     @property
@@ -161,7 +164,7 @@ class Model(object):
         if self.__numeric_system is None:
             self.__numeric_system = sym.lambdify(self._symbolic_args,
                                                  self._symbolic_system,
-                                                 modules=[{'ImmutableMatrix': np.array}, "numpy"])
+                                                 self.modules)
         return self.__numeric_system
 
     @property
@@ -177,7 +180,7 @@ class Model(object):
         if self.__numeric_jacobian is None:
             self.__numeric_jacobian = sym.lambdify(self._symbolic_args,
                                                    self._symbolic_jacobian,
-                                                   modules=[{'ImmutableMatrix': np.array}, "numpy"])
+                                                   self.modules)
         return self.__numeric_jacobian
 
     @property
@@ -598,7 +601,7 @@ class Model(object):
         eps = 1e-6
         k0 = self.find_steady_state(eps, 1e6)
         y0 = self.compute_intensive_output(k0)
-        c0 = (1 - orig_params['s']) * y0
+        c0 = self.compute_consumption(k0)
 
         # initial padding
         N = 10
