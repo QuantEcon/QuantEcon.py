@@ -76,7 +76,6 @@ References
 
 TODO:
 2. Initial condition for simulation should require K0 and not k0.
-3. Add a steady_state property that can be over written with anayltic result.
 4. Eliminate k_upper parameter from the plot functions.
 5. Finish section on solving Solow model in demo notebook.
 6. Write code for computing impulse response functions.
@@ -223,7 +222,8 @@ class Model(object):
     @property
     def effective_depreciation_rate(self):
         """
-        Effective depreciation rate for capital stock (per unit effective labor).
+        Effective depreciation rate for capital stock (per unit effective
+        labor).
 
         :getter: Return the current effective depreciation rate.
         :type: float
@@ -449,6 +449,30 @@ class Model(object):
         """
         return self._params
 
+    @property
+    def steady_state(self):
+        r"""
+        Steady state value of capital stock (per unit effective labor).
+
+        :getter: Return the current steady state value.
+        :type: float
+
+        Notes
+        -----
+        The steady state value of capital stock (per unit effective labor),
+        `k`, is defined as the value of `k` that solves
+
+        .. math::
+
+            0 = sf(k) - (g + n + \delta)k
+
+        where `s` is the savings rate, `f(k)` is intensive output, and
+        :math:`g + n + \delta` is the effective depreciation rate.
+
+        """
+        lower, upper = 1e-6, 1e6
+        return self.find_steady_state(lower, upper)
+
     @output.setter
     def output(self, value):
         """Set a new production function."""
@@ -598,8 +622,7 @@ class Model(object):
         orig_params = self.params.copy()
 
         # economy is initial in steady state
-        eps = 1e-6
-        k0 = self.find_steady_state(eps, 1e6)
+        k0 = self.steady_state
         y0 = self.compute_intensive_output(k0)
         c0 = self.compute_consumption(k0)
 
@@ -1042,8 +1065,7 @@ def plot_intensive_investment(cls, Nk=1e3, k_upper=10, **new_params):
     cls.params.update(new_params)
 
     # solve for the steady state
-    eps = 1e-6
-    k_star = cls.find_steady_state(eps, k_upper)
+    k_star = cls.steady_state
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
@@ -1098,8 +1120,7 @@ def plot_phase_diagram(cls, Nk=1e3, k_upper=10, **new_params):
     cls.params.update(new_params)
 
     # solve for the steady state
-    eps = 1e-6
-    k_star = cls.find_steady_state(eps, k_upper)
+    k_star = cls.steady_state
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
@@ -1149,8 +1170,7 @@ def plot_solow_diagram(cls, Nk=1e3, k_upper=10, **new_params):
     cls.params.update(new_params)
 
     # solve for the steady state
-    eps = 1e-6
-    k_star = cls.find_steady_state(eps, k_upper)
+    k_star = cls.steady_state
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
