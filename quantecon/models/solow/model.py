@@ -522,6 +522,25 @@ class Model(object):
         actual_inv = self.params['s'] * self.compute_intensive_output(k)
         return actual_inv
 
+    def compute_consumption(self, k):
+        """
+        Return the amount of consumption (per unit of effective labor).
+
+        Parameters
+        ----------
+        k : ndarray (float)
+            Capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        c : ndarray (float)
+            Consumption (per unit of effective labor)
+
+        """
+        c = (self._intensive_output(k, **self.params) -
+             self.compute_actual_investment(k, **self.params))
+        return c
+
     def compute_effective_depreciation(self, k):
         """
         Return amount of Capital stock (per unit of effective labor) that
