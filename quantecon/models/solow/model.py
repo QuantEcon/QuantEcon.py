@@ -522,34 +522,6 @@ class Model(object):
         actual_inv = self.params['s'] * self.compute_intensive_output(k)
         return actual_inv
 
-    def compute_output_elasticity(self, k):
-        """
-        Return elasticity of output with respect to capital stock (per unit
-        effective labor).
-
-        Parameters
-        ----------
-        k : array_like (float)
-            Capital stock (per unit of effective labor)
-
-        Returns
-        -------
-        alpha_k : array_like (float)
-            Elasticity of output with respect to capital stock (per unit
-            effective labor).
-
-        Notes
-        -----
-        Under the additional assumption that markets are perfectly competitive,
-        the elasticity of output with respect to capital stock is equivalent to
-        capital's share of income. Since, under perfect competition, firms earn
-        zero profits it must be true capital's share and labor's share must sum
-        to one.
-
-        """
-        alpha_k = (k * self.compute_mpk(k)) / self.compute_intensive_output(k)
-        return alpha_k
-
     def compute_effective_depreciation(self, k):
         """
         Return amount of Capital stock (per unit of effective labor) that
@@ -741,6 +713,34 @@ class Model(object):
         mpk = self._mpk(k, **self.params)
         return mpk
 
+    def compute_output_elasticity(self, k):
+        """
+        Return elasticity of output with respect to capital stock (per unit
+        effective labor).
+
+        Parameters
+        ----------
+        k : array_like (float)
+            Capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        alpha_k : array_like (float)
+            Elasticity of output with respect to capital stock (per unit
+            effective labor).
+
+        Notes
+        -----
+        Under the additional assumption that markets are perfectly competitive,
+        the elasticity of output with respect to capital stock is equivalent to
+        capital's share of income. Since, under perfect competition, firms earn
+        zero profits it must be true capital's share and labor's share must sum
+        to one.
+
+        """
+        alpha_k = (k * self.compute_mpk(k)) / self.compute_intensive_output(k)
+        return alpha_k
+
     def find_steady_state(self, a, b, method='brentq', **kwargs):
         """
         Compute the equilibrium value of capital stock (per unit effective
@@ -822,8 +822,8 @@ def plot_impulse_response(self, variables, param, shock, T, year=2013,
 
     fig : object
         An instance of :class:`matplotlib.figure.Figure`.
-    ax : object
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
+    axes : list
+        A list of instances of :class:`matplotlib.axes.AxesSubplot`.
 
     """
     # first need to generate and irf
