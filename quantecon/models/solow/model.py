@@ -90,7 +90,7 @@ from scipy import optimize
 import sympy as sym
 
 from ... import ivp
-
+from . import impulse_response
 
 # declare key variables for the model
 t, X = sym.var('t'), sym.DeferredVector('X')
@@ -122,6 +122,7 @@ class Model(object):
         self.__numeric_system = None
         self.__numeric_jacobian = None
 
+        self.irf = impulse_response.ImpulseResponse(self, N=10)
         self.output = output
         self.params = params
 
@@ -564,8 +565,8 @@ class Model(object):
             Consumption (per unit of effective labor)
 
         """
-        c = (self._intensive_output(k, **self.params) -
-             self.compute_actual_investment(k, **self.params))
+        c = (self.compute_intensive_output(k) -
+             self.compute_actual_investment(k))
         return c
 
     def compute_effective_depreciation(self, k):
@@ -616,46 +617,6 @@ class Model(object):
         """
         # copy the original params
         orig_params = self.params.copy()
-
-        # economy is initial in steady state
-        k0 = self.steady_state
-        y0 = self.compute_intensive_output(k0)
-        c0 = self.compute_consumption(k0)
-
-        # initial padding
-        N = 10
-        time_padding = np.arange(-N, 0, 1.0)
-
-        # transform irfs into per capita or levels, depending
-        if kind == 'per_capita':
-            A0 = self.params['A0']
-            g = self.params['g']
-            factor = A0 * np.exp(g * time_padding)
-
-        elif kind == 'levels':
-            A0 = self.params['A0']
-            g = self.params['g']
-            L0 = self.params['L0']
-            n = self.params['n']
-            factor = A0 * L0 * np.exp((n + g) * time_padding)
-
-        elif kind == 'efficiency_units':
-            factor = np.ones(N)
-
-        else:
-            raise ValueError
-
-        # start with N periods of steady state values
-        padding_k = np.repeat(k0, N)
-        padding = np.hstack((time_padding[:, np.newaxis],
-                            (factor * padding_k)[:, np.newaxis]))
-        # padding for y
-        padding_y = np.repeat(y0, N)
-        padding = np.hstack((padding, (factor * padding_y)[:, np.newaxis]))
-
-        # padding for c
-        padding_c = np.repeat(c0, N)
-        padding = np.hstack((padding, (factor * padding_c)[:, np.newaxis]))
 
         # shock the parameters
         self.params.update(new_params)
@@ -824,151 +785,6 @@ class Model(object):
             raise ValueError(mesg)
 
         return result
-
-
-class ImpulseResponse(object):
-    """Base class representing an impulse response function for a Model."""
-
-    def __init__(self, model):
-        """
-        Create an instance of the ImpulseResponse class.
-
-        Parameters
-        ----------
-        model : model.Model
-            Instance of the model.Model class representing a Solow model.
-
-        """
-        self.model = model
-
-    @property
-    def kind(self):
-        """
-        The kind of impulse response function to generate. Must be one of:
-
-        * 'levels'
-        * 'per_capita'
-        * 'efficiency_units'
-
-        :getter: Return the current kind of impulse responses.
-        :setter: Set a new value for the kind of impulse responses.
-        :type: str
-
-        """
-        return self._kind
-
-    @kind.setter
-    def kind(self, value):
-        """Set a new value for the kind attribute."""
-        self._kind = self._validate_kind(value)
-
-    def _validate_kind(value):
-        """Validates the kind attribute."""
-        valid_kinds = ['levels', 'per_capita', 'efficiency_units']
-
-        if not isinstance(value, dict):
-            mesg = "ImpulseResponse.kind must be a string, not a {}."
-            raise AttributeError(mesg.format(value.__class__))
-        elif value not in valid_kinds:
-            mesg = "The 'kind' attribute must be in {}."
-            raise AttributeError(mesg.format(valid_kinds))
-        else:
-            return value
-
-
-def plot_impulse_response(self, variables, param, shock, T, year=2013,
-                          color='b', kind='efficiency_units', log=False,
-                          reset=True, **fig_kw):
-    """
-    Plots an impulse response function.
-
-    Parameters
-    ----------
-    variables : list
-        List of variables whose impulse response functions you wish to plot.
-        Alternatively, you can plot irfs for all variables by setting variables
-        to 'all'.
-    param : str
-        Model parameter you wish to shock.
-    shock : float
-        Multiplicative shock to the parameter. Values < 1 correspond to a
-        reduction in the current value of the parameter; values > 1 correspond
-        to an increase in the current value of the parameter.
-    T : float (default=100)
-        Length of the impulse response.
-    year : int
-        Year in which you want the shock to take place. Default is 2013.
-    kind : str (default='efficiency_units')
-        Whether you want impulse response functions in 'levels', 'per_capita',
-        or 'efficiency_units'.
-    log : boolean (default=False)
-        Whether or not to have logarithmic scales on the vertical axes.
-    reset : boolean (default=True)
-        Whether or not to reset the original parameters to their pre-shock
-        values.
-
-    Returns
-    -------
-    A list containing:
-
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    axes : list
-        A list of instances of :class:`matplotlib.axes.AxesSubplot`.
-
-    """
-    # first need to generate and irf
-    irf = self.compute_impulse_response(param, shock, T, year, kind, reset)
-
-    # create mapping from variables to column indices
-    irf_dict = {'k': irf[:, [0, 1]], 'y': irf[:, [0, 2]], 'c': irf[:, [0, 3]]}
-
-    if variables == 'all':
-        variables = irf_dict.keys()
-
-    fig, axes = plt.subplots(len(variables), 1, squeeze=False, **fig_kw)
-
-    for i, var in enumerate(variables):
-
-        # extract the time series
-        traj = irf_dict[var]
-
-        # plot the irf
-        self.plot_trajectory(traj, color, axes[i, 0])
-
-        # adjust axis limits
-        axes[i, 0].set_ylim(0.95 * traj[:, 1].min(), 1.05 * traj[:, 1].max())
-        axes[i, 0].set_xlim(year - 10, year + T)
-
-        # y axis labels depend on kind of irfs
-        if kind == 'per_capita':
-            ti = traj[:, 0] - self.data.index[0].year
-            gr = self.params['g']
-            axes[i, 0].plot(traj[:, 0], traj[0, 1] * np.exp(gr * ti), 'k--')
-            axes[i, 0].set_ylabel(r'$\frac{%s}{L}(t)$' % var.upper(),
-                                  rotation='horizontal', fontsize=15,
-                                  family='serif')
-        elif kind == 'levels':
-            ti = traj[:, 0] - self.data.index[0].year
-            gr = self.params['n'] + self.params['g']
-            axes[i, 0].plot(traj[:, 0], traj[0, 1] * np.exp(gr * ti), 'k--')
-            axes[i, 0].set_ylabel('$%s(t)$' % var.upper(),
-                                  rotation='horizontal', fontsize=15,
-                                  family='serif')
-        else:
-            axes[i, 0].set_ylabel('$%s(t)$' % var, rotation='horizontal',
-                                  fontsize=15, family='serif')
-
-        # adjust location of y-axis label
-        axes[i, 0].yaxis.set_label_coords(-0.1, 0.45)
-
-        # log the y-scale for the plots
-        if log is True:
-            axes[i, 0].set_yscale('log')
-
-    axes[-1, 0].set_xlabel('Year, $t$,', fontsize=15, family='serif')
-
-    return [fig, axes]
 
 
 def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
