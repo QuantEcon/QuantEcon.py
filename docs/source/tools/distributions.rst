@@ -1,7 +1,7 @@
-asset_pricing
+distributions
 =============
 
-.. automodule:: quantecon.models.asset_pricing
+.. automodule:: quantecon.distributions
     :members:
     :undoc-members:
     :show-inheritance:

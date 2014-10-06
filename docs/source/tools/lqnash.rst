@@ -1,7 +1,7 @@
-linproc
-=======
+lqnash
+======
 
-.. automodule:: quantecon.linproc
+.. automodule:: quantecon.lqnash
     :members:
     :undoc-members:
     :show-inheritance:

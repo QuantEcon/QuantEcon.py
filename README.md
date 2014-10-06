@@ -37,8 +37,8 @@ Assuming you have [pip](https://pypi.python.org/pypi/pip) on your computer --- a
 at a terminal prompt
 
 #### Current Build and Coverage Status:
-[![Build Status](https://travis-ci.org/jstac/quant-econ.svg?branch=master)](https://travis-ci.org/jstac/quant-econ)
-[![Coverage Status](https://coveralls.io/repos/jstac/quant-econ/badge.png)](https://coveralls.io/r/jstac/quant-econ)
+[![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master)](https://travis-ci.org/QuantEcon/QuantEcon.py)
+[![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 
 
 ### About Git / GitHub

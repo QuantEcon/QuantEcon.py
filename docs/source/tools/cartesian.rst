@@ -1,7 +1,7 @@
-riccati
-=======
+cartesian
+=========
 
-.. automodule:: quantecon.riccati
+.. automodule:: quantecon.cartesian
     :members:
     :undoc-members:
     :show-inheritance:
