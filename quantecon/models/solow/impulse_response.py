@@ -11,7 +11,7 @@ import numpy as np
 class ImpulseResponse(object):
     """Base class representing an impulse response function for a Model."""
 
-    def __init__(self, model, N=10):
+    def __init__(self, model, N=10, T=100):
         """
         Create an instance of the ImpulseResponse class.
 
@@ -19,12 +19,62 @@ class ImpulseResponse(object):
         ----------
         model : model.Model
             Instance of the model.Model class representing a Solow model.
-        N : int
+        N : int (default=10)
             Number of points to use for "padding".
+        T : int (default=100)
+            Length of desired impulse response.
 
         """
         self.model = model
         self.N = N
+        self.T = T
+
+    @property
+    def _raw_irf(self):
+        """
+        Raw model impulse response functions.
+
+        :getter: Return the current raw impulse response functions.
+        :type: numpy.ndarray
+
+        """
+        # economy is initial in steady state
+        k0 = self.model.steady_state
+
+        # generate post-shock trajectory
+        soln = self.model.ivp.solve(t0=0.0, y0=k0, h=1.0, T=self.T,
+                                    integrator='dop853')
+
+        # compute the irf
+        k = soln[:, 1]
+        y = self.model.compute_intensive_output(k)[:, np.newaxis]
+        c = self.model.compute_consumption(k)[:, np.newaxis]
+        i = self.model.compute_actual_investment(k)[:, np.newaxis]
+
+        return np.hstack((soln[:, :2], y, c, i))
+
+    @property
+    def _irf_scaling_factor(self):
+        """
+        Scaling factor used in constructing the impulse response functions.
+
+        :getter: Return the current scaling factor.
+        :type: numpy.ndarray
+
+        """
+        # extract the relevant parameters
+        g = self.model.params['g']
+        n = self.model.params['n']
+        time = np.linspace(0, self.T, self.T + 1)
+
+        if self.kind == 'per_capita':
+            factor = self._padding_scaling_factor[-1] * np.exp(g * time)
+        elif self.kind == 'levels':
+            factor = self._padding_scaling_factor[-1] * np.exp((n + g) * time)
+        else:
+            factor = np.ones(self.T + 1)
+
+        return factor.reshape((self.T + 1, 1))
 
     @property
     def _padding(self):
@@ -40,7 +90,8 @@ class ImpulseResponse(object):
     @property
     def _padding_scaling_factor(self):
         """
-        Scaling factor used in constructing the IRF "padding".
+        Scaling factor used in constructing the impulse response function
+        "padding".
 
         :getter: Return the current scaling factor.
         :type: numpy.ndarray
@@ -57,9 +108,9 @@ class ImpulseResponse(object):
         elif self.kind == 'levels':
             factor = A0 * L0 * np.exp((g + n) * self._padding_time)
         else:
-            factor = np.ones(self.N + 1)
+            factor = np.ones(self.N)
 
-        return factor.reshape((self.N + 1, 1))
+        return factor.reshape((self.N, 1))
 
     @property
     def _padding_time(self):
@@ -70,7 +121,7 @@ class ImpulseResponse(object):
         :type: numpy.ndarray
 
         """
-        return np.linspace(-self.N, 0, self.N + 1).reshape((self.N + 1, 1))
+        return np.linspace(-self.N, -1, self.N).reshape((self.N, 1))
 
     @property
     def _padding_variables(self):
