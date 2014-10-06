@@ -1,7 +1,7 @@
-ifp
-===
+models.ifp
+==========
 
-.. automodule:: quantecon.ifp
+.. automodule:: quantecon.models.ifp
     :members:
     :undoc-members:
     :show-inheritance:

@@ -179,9 +179,10 @@ def model_tool():
 
     # Write file for each model
     for mod in models:
+        model_mod = "models." + mod
         new_path = os.path.join("source", "models", mod + ".rst")
         with open(new_path, "w") as f:
-            gen_module(mod, f)
+            gen_module(model_mod, f)
 
     # Write file for each tool
     for mod in tools:
