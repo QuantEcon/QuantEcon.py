@@ -36,7 +36,7 @@ if on_rtd:
         def __getattr__(cls, name):
             return Mock()
 
-    MOCK_MODULES = ['pandas', 'statsmodels']
+    MOCK_MODULES = ['pandas', 'statsmodels', 'sympy', 'numba']
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
