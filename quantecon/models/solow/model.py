@@ -785,6 +785,118 @@ class Model(object):
         return result
 
 
+def plot_impulse_response(self, variables, param, shock, T, year=2013,
+                          color='b', kind='efficiency_units', log=False, 
+                          reset=True, **fig_kw):
+    """
+    Plots an impulse response function.
+    
+    Arguments:
+        
+        variables: (list) List of variables whose impulse response functions
+                   you wish to plot. Alternatively, you can plot irfs for 
+                   all variables by setting variables = 'all'.
+                
+        param:     (string) Model parameter you wish to shock.
+        
+        shock:     (float) Multiplicative shock to the parameter. Values < 1 
+                   correspond to a reduction in the current value of the 
+                   parameter; values > 1 correspond to an increase in the 
+                   current value of the parameter.
+               
+        T:         (float) Length of the impulse response. Default is 40.
+        
+        year:      (int) Year in which you want the shock to take place.
+                   Default is 2013.
+                   
+        kind:      (str) Whether you want impulse response functions in 
+                   'levels', 'per_capita', or 'efficiency_units'. Default is
+                   for irfs to be in 'efficiency_units'.
+               
+        log:       (boolean) Whether or not to have logarithmic scales on
+                   the vertical axes. Default is False.
+               
+        reset:     (boolean) Whether or not to reset the original parameters
+                   to their pre-shock values. Default is True.
+        
+    Returns: A list containing...
+    
+        fig:  (object) Instance of the matplotlib Figure class
+        axes: (list) List of matplotlib AxesSubplot instances.
+    
+    """
+    # first need to generate and irf
+    irf = self.get_impulse_response(param, shock, T, year, kind, reset)
+    
+    # create mapping from variables to column indices
+    irf_dict = {'k':irf[:,[0,1]], 'y':irf[:,[0,2]], 'c':irf[:,[0,3]]}
+    
+    # necessary for pretty latex printing
+    if param in ['alpha', 'delta', 'sigma', 'theta', 'rho']:
+        param = '\\' + param
+        
+    # title depends on whether shock was positive or negative
+    if shock > 1.0:
+        tit = 'Impulse response following + shock to $%s$' % param
+    elif shock < 1.0:
+        tit = 'Impulse response following - shock to $%s$' % param
+    else:
+        tit = 'Impulse response following NO shock to $%s$' % param
+
+    if variables == 'all':
+        variables = irf_dict.keys()
+        
+    fig, axes = plt.subplots(len(variables), 1, squeeze=False, **fig_kw)
+      
+    for i, var in enumerate(variables): 
+            
+        # extract the time series
+        traj = irf_dict[var]
+            
+        # plot the irf
+        self.plot_trajectory(traj, color, axes[i,0])
+            
+        # adjust axis limits
+        axes[i,0].set_ylim(0.95 * traj[:,1].min(), 1.05 * traj[:,1].max())
+        axes[i,0].set_xlim(year - 10, year + T)
+            
+        # y axis labels depend on kind of irfs
+        if kind == 'per_capita':
+              
+            ti = traj[:,0] - self.data.index[0].year
+            gr = self.params['g']
+                
+            axes[i,0].plot(traj[:,0], traj[0,1] * np.exp(gr * ti), 'k--')
+            axes[i,0].set_ylabel(r'$\frac{%s}{L}(t)$' %var.upper(), 
+                                 rotation='horizontal', fontsize=15, 
+                                 family='serif')
+                                           
+        elif kind == 'levels':
+            ti = traj[:,0] - self.data.index[0].year
+            gr = self.params['n'] + self.params['g']
+                
+            axes[i,0].plot(traj[:,0], traj[0,1] * np.exp(gr * ti), 'k--')
+            axes[i,0].set_ylabel('$%s(t)$' %var.upper(), 
+                                 rotation='horizontal', fontsize=15, 
+                                 family='serif')
+                                           
+        else:
+            axes[i,0].set_ylabel('$%s(t)$' %var, rotation='horizontal', 
+                                 fontsize=15, family='serif')
+                                   
+        # adjust location of y-axis label
+        axes[i,0].yaxis.set_label_coords(-0.1, 0.45)
+
+        # log the y-scale for the plots
+        if log == True:
+            axes[i,0].set_yscale('log')
+                
+    axes[0,0].set_title(tit, family='serif', fontsize=20)
+    axes[-1,0].set_xlabel('Year, $t$,', fontsize=15, family='serif')
+    
+    return [fig, axes]
+
+
 def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
     """
     Plot intensive form of the aggregate production function.
