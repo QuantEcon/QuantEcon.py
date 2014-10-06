@@ -14,7 +14,16 @@
 
 import sys
 import os
-from mock import Mock as MagicMock
+import pip
+
+try:
+    from mock import Mock as MagicMock
+except ImportError:
+    def install(package):
+        pip.main(['install', package])
+
+    install('mock')
+    from mock import Mock as MagicMock
 
 # ------------------------------------------------------------------- #
 # MOCK MODULES
