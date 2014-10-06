@@ -28,7 +28,7 @@ except ImportError:
 # ------------------------------------------------------------------- #
 # MOCK MODULES
 # ------------------------------------------------------------------- #
-on_rtd = os.environ.get('READTHEDOCS', none) == 'True'
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if on_rtd:
     class Mock(MagicMock):
