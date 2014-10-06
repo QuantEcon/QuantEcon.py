@@ -29,9 +29,9 @@ class ImpulseResponse(object):
     @property
     def _padding(self):
         """
-        Scaling factor used in constructing the IRF "padding".
+        Impulse response functions are "padded" for pretty plotting.
 
-        :getter: Return the current scaling factor.
+        :getter: Return the current "padding" values.
         :type: numpy.ndarray
 
         """
@@ -64,9 +64,9 @@ class ImpulseResponse(object):
     @property
     def _padding_time(self):
         """
-        Time values used in IRF "padding" run from -N to 0.
+        The independent variable, time, is "padded" using values from -N to 0.
 
-        :getter: Return the current time padding values.
+        :getter: Return the current "padding" values.
         :type: numpy.ndarray
 
         """
@@ -75,10 +75,10 @@ class ImpulseResponse(object):
     @property
     def _padding_variables(self):
         """
-        Impulse response functions are "padded" with N periods of steady state
-        values.
+        Impulse response functions for endogenous variables are "padded" with
+        N periods of steady state values.
 
-        :getter: Return current padding values.
+        :getter: Return current "padding" values.
         :kind: numpy.ndarray
 
         """
