@@ -494,7 +494,7 @@ class Model(object):
         if not isinstance(output, sym.Basic):
             mesg = ("Output must be an instance of {}.".format(sym.Basic))
             raise AttributeError(mesg)
-        if not ({A, K, L} < output.atoms()):
+        elif not ({A, K, L} < output.atoms()):
             mesg = ("Output must be an expression of technology, 'A', " +
                     "capital, 'K', and labor, 'L'.")
             raise AttributeError(mesg)
@@ -508,19 +508,19 @@ class Model(object):
         if not isinstance(params, dict):
             mesg = "SolowModel.params must be a dict, not a {}."
             raise AttributeError(mesg.format(params.__class__))
-        if not set(required_params) < set(params.keys()):
+        elif not set(required_params) < set(params.keys()):
             mesg = "One of the required params in {} has not been specified."
             raise AttributeError(mesg.format(required_params))
-        if params['s'] <= 0.0 or params['s'] >= 1.0:
+        elif params['s'] <= 0.0 or params['s'] >= 1.0:
             raise AttributeError('Savings rate must be in (0, 1).')
-        if params['delta'] <= 0.0 or params['delta'] >= 1.0:
+        elif params['delta'] <= 0.0 or params['delta'] >= 1.0:
             raise AttributeError('Depreciation rate must be in (0, 1).')
-        if params['g'] + params['n'] + params['delta'] <= 0.0:
+        elif params['g'] + params['n'] + params['delta'] <= 0.0:
             raise AttributeError("Sum of g, n, and delta must be positive.")
-        if params['A0'] <= 0.0:
+        elif params['A0'] <= 0.0:
             mesg = "Initial value for technology must be strictly positive."
             raise AttributeError(mesg)
-        if params['L0'] <= 0.0:
+        elif params['L0'] <= 0.0:
             mesg = "Initial value for labor supply must be strictly positive."
             raise AttributeError(mesg)
         else:
@@ -829,7 +829,39 @@ class Model(object):
 class ImpulseResponse(object):
     """Base class representing an impulse response function for a Model."""
 
-    pass
+    @property
+    def kind(self):
+        """
+        The kind of impulse response function to generate. Must be one of:
+
+        * 'levels'
+        * 'per_capita'
+        * 'efficiency_units'
+
+        :getter: Return the current kind of impulse responses.
+        :setter: Set a new value for the kind of impulse responses.
+        :type: str
+
+        """
+        return self._kind
+
+    @kind.setter
+    def kind(self, value):
+        """Set a new value for the kind attribute."""
+        self._kind = self._validate_kind(value)
+
+    def _validate_kind(value):
+        """Validates the kind attribute."""
+        valid_kinds = ['levels', 'per_capita', 'efficiency_units']
+
+        if not isinstance(value, dict):
+            mesg = "ImpulseResponse.kind must be a string, not a {}."
+            raise AttributeError(mesg.format(value.__class__))
+        elif value not in valid_kinds:
+            mesg = "The 'kind' attribute must be in {}."
+            raise AttributeError(mesg.format(valid_kinds))
+        else:
+            return value
 
 
 def plot_impulse_response(self, variables, param, shock, T, year=2013,
