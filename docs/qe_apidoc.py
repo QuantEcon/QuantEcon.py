@@ -164,10 +164,14 @@ def model_tool():
     # list file names with models
     mod_files = glob("../quantecon/models/[a-z0-9]*.py")
     models = map(lambda x: x.split('/')[-1][:-3], mod_files)
+    # Alphabetize
+    models.sort()
 
     # list file names of tools
     tool_files = glob("../quantecon/[a-z0-9]*.py")
     tools = map(lambda x: x.split('/')[-1][:-3], tool_files)
+    # Alphabetize
+    tools.sort()
 
     for folder in ["models", "tools"]:
         if not os.path.exists(source_join(folder)):
