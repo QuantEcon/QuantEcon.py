@@ -78,8 +78,6 @@ TODO:
 2. Initial condition for simulation should require K0 and not k0.
 4. Eliminate k_upper parameter from the plot functions.
 5. Finish section on solving Solow model in demo notebook.
-6. Write code for computing impulse response functions.
-7. Write code for plotting impulse response functions.
 8. Finish section on calibrating the Solow model in the demo notebook.
 9. Finish writing docs (include some basic usage examples in the module docs).
 
