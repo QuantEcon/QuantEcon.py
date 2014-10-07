@@ -144,6 +144,18 @@ class ImpulseResponse(object):
         return self._padding_scaling_factor * intitial_condition
 
     @property
+    def impulse(self):
+        """
+        Dictionary of new parameter values representing an impulse.
+
+        :getter: Return the current impulse dictionary.
+        :setter: Set a new impulse dictionary.
+        :type: dictionary
+
+        """
+        return self._impulse
+
+    @property
     def kind(self):
         """
         The kind of impulse response function to generate. Must be one of:
@@ -159,10 +171,26 @@ class ImpulseResponse(object):
         """
         return self._kind
 
+    @impulse.setter
+    def impulse(self, params):
+        """Set a new impulse dictionary."""
+        self._impulse = self._validate_impulse(params)
+
     @kind.setter
     def kind(self, value):
         """Set a new value for the kind attribute."""
         self._kind = self._validate_kind(value)
+
+    def _validate_impulse(self, params):
+        """Validates the impulse attribute."""
+        if not isinstance(params, dict):
+            mesg = "ImpulseResponse.impulse must have type dict, not {}."
+            raise AttributeError(mesg.format(params.__class__))
+        elif not set(params.keys()) < set(self.model.params.keys()):
+            mesg = "Invalid parameter included in the impulse dictionary."""
+            raise AttributeError(mesg)
+        else:
+            return params
 
     @staticmethod
     def _validate_kind(value):
