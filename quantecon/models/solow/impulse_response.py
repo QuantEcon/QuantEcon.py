@@ -12,7 +12,13 @@ import numpy as np
 class ImpulseResponse(object):
     """Base class representing an impulse response function for a Model."""
 
-    def __init__(self, model, N=10, T=100):
+    # number of points to use for "padding"
+    N = 10
+
+    # length of impulse response
+    T = 100
+
+    def __init__(self, model):
         """
         Create an instance of the ImpulseResponse class.
 
@@ -20,15 +26,9 @@ class ImpulseResponse(object):
         ----------
         model : model.Model
             Instance of the model.Model class representing a Solow model.
-        N : int (default=10)
-            Number of points to use for "padding".
-        T : int (default=100)
-            Length of desired impulse response.
 
         """
         self.model = model
-        self.N = N
-        self.T = T
 
     @property
     def _padding(self):
@@ -321,6 +321,7 @@ def plot_impulse_response(cls, variable, impulse, kind='efficiency_units',
     if log is True:
         ax.set_yscale('log')
 
+    ax.set_title('Impulse response function', fontsize=20, family='serif')
     ax.grid('on')
     ax.legend(loc=0, frameon=False, bbox_to_anchor=(1.0, 1.0),
               prop={'family': 'serif'})
