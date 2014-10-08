@@ -75,7 +75,9 @@ References
 @date : 2014-08-18
 
 TODO:
-2. Initial condition for simulation should require K0 and not k0.
+2. Initial condition for simulation should require K0 and not k0. This requires
+a change to the IVP class!
+4. Prior to calibration need to fix PWT import statements!
 5. Finish section on solving Solow model in demo notebook.
 8. Finish section on calibrating the Solow model in the demo notebook.
 9. Finish writing docs (include some basic usage examples in the module docs).
