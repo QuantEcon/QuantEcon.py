@@ -76,7 +76,6 @@ References
 
 TODO:
 2. Initial condition for simulation should require K0 and not k0.
-4. Eliminate k_upper parameter from the plot functions.
 5. Finish section on solving Solow model in demo notebook.
 8. Finish section on calibrating the Solow model in the demo notebook.
 9. Finish writing docs (include some basic usage examples in the module docs).
@@ -714,7 +713,7 @@ class Model(object):
         return result
 
 
-def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
+def plot_intensive_output(cls, Nk=1e3, **new_params):
     """
     Plot intensive form of the aggregate production function.
 
@@ -724,9 +723,6 @@ def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
         An instance of :class:`quantecon.models.solow.model.Model`.
     Nk : float
         Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    k_upper : float
-        Upper bound on capital stock (per unit of effective labor) for the
         plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
@@ -746,7 +742,7 @@ def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, Nk)
+    k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
     ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
     ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
                   fontsize=15)
@@ -760,7 +756,7 @@ def plot_intensive_output(cls, Nk=1e3, k_upper=10, **new_params):
     return [fig, ax]
 
 
-def plot_factor_shares(cls, Nk=1e3, k_upper=10, **new_params):
+def plot_factor_shares(cls, Nk=1e3, **new_params):
     """
     Plot income/output shares of capital and labor inputs to production.
 
@@ -770,9 +766,6 @@ def plot_factor_shares(cls, Nk=1e3, k_upper=10, **new_params):
         An instance of :class:`quantecon.models.solow.model.Model`.
     Nk : float
         Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    k_upper : float
-        Upper bound on capital stock (per unit of effective labor) for the
         plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
@@ -792,7 +785,7 @@ def plot_factor_shares(cls, Nk=1e3, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, Nk)
+    k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
     capitals_share = cls.compute_output_elasticity(k_grid)
     labors_share = 1 - capitals_share
 
@@ -808,7 +801,7 @@ def plot_factor_shares(cls, Nk=1e3, k_upper=10, **new_params):
     return [fig, ax]
 
 
-def plot_intensive_investment(cls, Nk=1e3, k_upper=10, **new_params):
+def plot_intensive_investment(cls, Nk=1e3, **new_params):
     """
     Plot actual investment (per unit effective labor) and effective
     depreciation. The steady state value of capital stock (per unit effective
@@ -820,9 +813,6 @@ def plot_intensive_investment(cls, Nk=1e3, k_upper=10, **new_params):
         An instance of :class:`quantecon.models.solow.model.Model`.
     Nk : float
         Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    k_upper : float
-        Upper bound on capital stock (per unit of effective labor) for the
         plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
@@ -845,7 +835,7 @@ def plot_intensive_investment(cls, Nk=1e3, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, Nk)
+    k_grid = np.linspace(0, 2 * k_star, Nk)
     ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
             label='$sf(k(t))$')
     ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
@@ -865,7 +855,7 @@ def plot_intensive_investment(cls, Nk=1e3, k_upper=10, **new_params):
     return [fig, ax]
 
 
-def plot_phase_diagram(cls, Nk=1e3, k_upper=10, **new_params):
+def plot_phase_diagram(cls, Nk=1e3, **new_params):
     """
     Plot the model's phase diagram.
 
@@ -875,9 +865,6 @@ def plot_phase_diagram(cls, Nk=1e3, k_upper=10, **new_params):
         An instance of :class:`quantecon.models.solow.model.Model`.
     Nk : float
         Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    k_upper : float
-        Upper bound on capital stock (per unit of effective labor) for the
         plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
@@ -900,7 +887,7 @@ def plot_phase_diagram(cls, Nk=1e3, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, Nk)
+    k_grid = np.linspace(0, 2 * k_star, Nk)
     ax.plot(k_grid, cls.compute_k_dot(k_grid), color='orange')
     ax.axhline(0, color='k')
     ax.plot(k_star, 0.0, 'ko', label='$k^*={0:.4f}$'.format(k_star))
@@ -915,7 +902,7 @@ def plot_phase_diagram(cls, Nk=1e3, k_upper=10, **new_params):
     return [fig, ax]
 
 
-def plot_solow_diagram(cls, Nk=1e3, k_upper=10, **new_params):
+def plot_solow_diagram(cls, Nk=1e3, **new_params):
     """
     Plot the classic Solow diagram.
 
@@ -925,9 +912,6 @@ def plot_solow_diagram(cls, Nk=1e3, k_upper=10, **new_params):
         An instance of :class:`quantecon.models.solow.model.Model`.
     Nk : float
         Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    k_upper : float
-        Upper bound on capital stock (per unit of effective labor) for the
         plot.
     new_params : dict (optional)
         Optional dictionary of parameter values to change.
@@ -950,7 +934,7 @@ def plot_solow_diagram(cls, Nk=1e3, k_upper=10, **new_params):
 
     # create the plot
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, k_upper, Nk)
+    k_grid = np.linspace(0, 2 * k_star, Nk)
     ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-',
             label='$f(k(t)$')
     ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
