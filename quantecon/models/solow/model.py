@@ -120,7 +120,7 @@ class Model(object):
         self.__numeric_system = None
         self.__numeric_jacobian = None
 
-        self.irf = impulse_response.ImpulseResponse(self, N=10)
+        self.irf = impulse_response.ImpulseResponse(self)
         self.output = output
         self.params = params
 
