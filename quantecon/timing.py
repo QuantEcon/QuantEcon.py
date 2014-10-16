@@ -7,10 +7,16 @@ Provides Matlab-like tic, tac and toc functions.
 
 class __Timer__:
     '''Computes elapsed time, between tic, tac, and toc.
-    - tic(): resets timer
-    - toc(): returns and prints time elapsed since last tic()
-    - tac(): returns and prints time elapsed since last
-             tic(), tac() or toc() whichever occured last
+
+    Methods
+    -------
+    tic :
+        Resets timer.
+    toc :
+        Returns and prints time elapsed since last tic().
+    tac :
+        Returns and prints time elapsed since last
+             tic(), tac() or toc() whichever occured last.
     '''
 
     start = None
@@ -67,9 +73,9 @@ def tic():
     return __timer__.tic()
 
 def tac():
-    """Prints and return elapsed time since last tic, tac or toc."""
+    """Prints and returns elapsed time since last tic, tac or toc."""
     return __timer__.tac()
 
 def toc():
-    """Prints and return elapsed time since last tic, tac or toc."""
+    """Prints and returns elapsed time since last tic, tac or toc."""
     return __timer__.toc()
