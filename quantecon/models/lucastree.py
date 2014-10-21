@@ -202,7 +202,7 @@ class LucasTree(object):
             and should be flat NumPy array with len(f) = len(grid)
 
         Tf : array_like(float)
-            storage array for Tf
+            Optional storage array for Tf
 
         Returns
         -------

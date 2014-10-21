@@ -51,8 +51,8 @@ class Kalman:
     n : scalar(int)
         The value of n (Number of columns of G)
     current_Sigma : array_like or scalar(float)
-        The nxn covariance matrix
-    current_xhat : array_like or scalar(float)
+        The n x n covariance matrix
+    current_x_hat : array_like or scalar(float)
         The mean of the state
 
     References
