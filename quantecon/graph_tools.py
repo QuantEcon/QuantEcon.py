@@ -12,7 +12,7 @@ from scipy.sparse import csgraph
 from fractions import gcd
 
 
-class DiGraph:
+class DiGraph(object):
     r"""
     Class for a directed graph. It stores useful information about the
     graph structure such as strong connectivity [1]_ and periodicity
