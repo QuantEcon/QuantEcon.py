@@ -7,7 +7,7 @@ Filename: mc_tools.py
 This file contains some useful objects for handling a finite-state
 discrete-time Markov chain.
 
-Definitions and Some Known Facts about Markov Chains
+Definitions and Some Basic Facts about Markov Chains
 ----------------------------------------------------
 
 Let :math:`\{X_t\}` be a Markov chain represented by an :math:`n \times

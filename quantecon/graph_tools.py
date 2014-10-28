@@ -59,10 +59,6 @@ class DiGraph:
     cyclic_components : list(ndarray(int))
         List of numpy arrays containing the cyclic components.
 
-    Notes
-    -----
-    For the definitions, see the Wikipedia entries [1]_, [2]_.
-
     References
     ----------
     .. [1] `Strongly connected component
