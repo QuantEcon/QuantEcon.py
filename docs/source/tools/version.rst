@@ -1,7 +1,7 @@
-jv
-==
+version
+=======
 
-.. automodule:: quantecon.models.jv
+.. automodule:: quantecon.version
     :members:
     :undoc-members:
     :show-inheritance:

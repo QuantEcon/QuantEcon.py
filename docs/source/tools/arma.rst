@@ -1,7 +1,7 @@
-jv
-==
+arma
+====
 
-.. automodule:: quantecon.models.jv
+.. automodule:: quantecon.arma
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
-jv
-==
+ivp
+===
 
-.. automodule:: quantecon.models.jv
+.. automodule:: quantecon.ivp
     :members:
     :undoc-members:
     :show-inheritance:
