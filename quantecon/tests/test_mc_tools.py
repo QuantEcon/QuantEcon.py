@@ -18,6 +18,16 @@ from nose.tools import raises
 from quantecon.mc_tools import MarkovChain, mc_compute_stationary
 
 
+def list_of_array_equal(s, t):
+    """
+    Compare two lists of ndarrays
+
+    s, t: lists of numpy.ndarrays
+
+    """
+    all(assert_array_equal(x, y) for x, y in zip(s, t))
+
+
 # KMR Function
 # Useful because it seems to have 1 unit eigvalue, but a second one that
 # approaches unity.  Good test of accuracy.
@@ -93,10 +103,14 @@ def test_markovchain_pmatrices():
         assert(mc.num_communication_classes == len(test_dict['comm_classes']))
         assert(mc.is_irreducible == test_dict['is_irreducible'])
         assert(mc.num_recurrent_classes == len(test_dict['rec_classes']))
-        assert_array_equal(sorted(mc.communication_classes),
-                           sorted(test_dict['comm_classes']))
-        assert_array_equal(sorted(mc.recurrent_classes),
-                           sorted(test_dict['rec_classes']))
+        list_of_array_equal(
+            sorted(mc.communication_classes, key=lambda x: x[0]),
+            sorted(test_dict['comm_classes'], key=lambda x: x[0])
+        )
+        list_of_array_equal(
+            sorted(mc.recurrent_classes, key=lambda x: x[0]),
+            sorted(test_dict['rec_classes'], key=lambda x: x[0])
+        )
         try:
             assert(mc.period == test_dict['period'])
         except NotImplementedError:
@@ -106,8 +120,10 @@ def test_markovchain_pmatrices():
         except NotImplementedError:
             assert(mc.is_irreducible is False)
         try:
-            assert_array_equal(sorted(mc.cyclic_classes),
-                               sorted(test_dict['cyclic_classes']))
+            list_of_array_equal(
+                sorted(mc.cyclic_classes, key=lambda x: x[0]),
+                sorted(test_dict['cyclic_classes'], key=lambda x: x[0])
+            )
         except NotImplementedError:
             assert(mc.is_irreducible is False)
 

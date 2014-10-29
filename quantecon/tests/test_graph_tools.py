@@ -14,6 +14,16 @@ from nose.tools import eq_, ok_, raises
 from quantecon.graph_tools import DiGraph
 
 
+def list_of_array_equal(s, t):
+    """
+    Compare two lists of ndarrays
+
+    s, t: lists of numpy.ndarrays
+
+    """
+    all(assert_array_equal(x, y) for x, y in zip(s, t))
+
+
 class Graphs:
     """Setup graphs for the tests"""
 
@@ -134,9 +144,12 @@ class TestDiGraph:
 
     def test_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
-            assert_array_equal(
-                sorted(graph_dict['g'].strongly_connected_components),
-                sorted(graph_dict['strongly_connected_components']))
+            list_of_array_equal(
+                sorted(graph_dict['g'].strongly_connected_components,
+                       key=lambda x: x[0]),
+                sorted(graph_dict['strongly_connected_components'],
+                       key=lambda x: x[0])
+            )
 
     def test_num_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
@@ -145,9 +158,12 @@ class TestDiGraph:
 
     def test_sink_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
-            assert_array_equal(
-                sorted(graph_dict['g'].sink_strongly_connected_components),
-                sorted(graph_dict['sink_strongly_connected_components']))
+            list_of_array_equal(
+                sorted(graph_dict['g'].sink_strongly_connected_components,
+                       key=lambda x: x[0]),
+                sorted(graph_dict['sink_strongly_connected_components'],
+                       key=lambda x: x[0])
+            )
 
     def test_num_sink_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
@@ -177,9 +193,12 @@ class TestDiGraph:
     def test_cyclic_components(self):
         for graph_dict in self.graphs.graph_dicts:
             try:
-                assert_array_equal(
-                    sorted(graph_dict['g'].cyclic_components),
-                    sorted(graph_dict['cyclic_components']))
+                list_of_array_equal(
+                    sorted(graph_dict['g'].cyclic_components,
+                           key=lambda x: x[0]),
+                    sorted(graph_dict['cyclic_components'],
+                           key=lambda x: x[0])
+                )
             except NotImplementedError:
                 eq_(graph_dict['g'].is_strongly_connected, False)
 
