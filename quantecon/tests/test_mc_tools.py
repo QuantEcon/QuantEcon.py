@@ -67,6 +67,15 @@ def test_markovchain_pmatrices():
     Test the methods of MarkovChain, as well as mc_compute_stationary,
     with P matrix and known solutions
     """
+    # Matrix with two recurrent classes [0, 1] and [3, 4, 5],
+    # which have periods 2 and 3, respectively
+    Q = np.zeros((6, 6))
+    Q[0, 1], Q[1, 0] = 1, 1
+    Q[2, [0, 3]] = 1/2
+    Q[3, 4], Q[4, 5], Q[5, 3] = 1, 1, 1
+    Q_stationary_dists = \
+        np.array([[1/2, 1/2, 0, 0, 0, 0], [0, 0, 0, 1/3, 1/3, 1/3]])
+
     testset = [
         {'P': np.array([[0.4, 0.6], [0.2, 0.8]]),  # P matrix
          'stationary_dists': np.array([[0.25, 0.75]]),  # Known solution
@@ -91,6 +100,16 @@ def test_markovchain_pmatrices():
          'comm_classes': [np.array([0]), np.array([1])],
          'rec_classes': [np.array([0]), np.array([1])],
          'is_irreducible': False,
+         'period': 1,
+         'is_aperiodic': True,
+         },
+        {'P': Q,
+         'stationary_dists': Q_stationary_dists,
+         'comm_classes': [np.array([0, 1]), np.array([2]), np.array([3, 4, 5])],
+         'rec_classes': [np.array([0, 1]), np.array([3, 4, 5])],
+         'is_irreducible': False,
+         'period': 6,
+         'is_aperiodic': False,
          }
     ]
 
@@ -111,14 +130,8 @@ def test_markovchain_pmatrices():
             sorted(mc.recurrent_classes, key=lambda x: x[0]),
             sorted(test_dict['rec_classes'], key=lambda x: x[0])
         )
-        try:
-            assert(mc.period == test_dict['period'])
-        except NotImplementedError:
-            assert(mc.is_irreducible is False)
-        try:
-            assert(mc.is_aperiodic == test_dict['is_aperiodic'])
-        except NotImplementedError:
-            assert(mc.is_irreducible is False)
+        assert(mc.period == test_dict['period'])
+        assert(mc.is_aperiodic == test_dict['is_aperiodic'])
         try:
             list_of_array_equal(
                 sorted(mc.cyclic_classes, key=lambda x: x[0]),

@@ -66,7 +66,10 @@ i] > 0`; equivalently, it is the GCD of the lengths of the cycles in
 contained in a communication class, :math:`i` has period :math:`d` if
 and only if :math:`j` has period :math:`d`. The *period* of an
 irreducible Markov chain (or of an irreducible stochastic matrix) is the
-period of any state. An irreducible Markov chain is *aperiodic* if its
+period of any state. We define the period of a general (not necessarily
+irreducible) Markov chain to be the least common multiple of the periods
+of its recurrent classes, where the period of a recurrent class is the
+period of any state in that class. A Markov chain is *aperiodic* if its
 period is one. A Markov chain is irreducible and aperiodic if and only
 if it is *uniformly ergodic*, i.e., there exists some :math:`m` such
 that :math:`P^m[i, j] > 0` for all :math:`i, j` (in this case, :math:`P`
@@ -83,6 +86,7 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 """
 from __future__ import division
 import numpy as np
+from fractions import gcd
 import sys
 from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
@@ -127,12 +131,10 @@ class MarkovChain(object):
         List of numpy arrays containing the recurrent classes.
 
     is_aperiodic : bool
-        Indicate whether the Markov chain is aperiodic. Defined only
-        when the Markov chain is irreducible.
+        Indicate whether the Markov chain is aperiodic.
 
     period : int
-        The period of the Markov chain. Defined only when the Markov
-        chain is irreducible.
+        The period of the Markov chain.
 
     cyclic_classes : list(ndarray(int))
         List of numpy arrays containing the cyclic classes. Defined only
@@ -203,21 +205,25 @@ class MarkovChain(object):
 
     @property
     def is_aperiodic(self):
-        if not self.is_irreducible:
-            raise NotImplementedError(
-                'Not defined for a reducible Markov chain'
-            )
-        else:
+        if self.is_irreducible:
             return self.digraph.is_aperiodic
+        else:
+            return self.period == 1
 
     @property
     def period(self):
-        if not self.is_irreducible:
-            raise NotImplementedError(
-                'Not defined for a reducible Markov chain'
-            )
-        else:
+        if self.is_irreducible:
             return self.digraph.period
+        else:
+            rec_classes = self.recurrent_classes
+
+            # Determine the prioed of the LCM of the periods of rec_classes
+            d = 1
+            for rec_class in rec_classes:
+                period = DiGraph(self.P[rec_class, :][:, rec_class]).period
+                d = (d * period) // gcd(d, period)
+
+            return d
 
     @property
     def cyclic_classes(self):
