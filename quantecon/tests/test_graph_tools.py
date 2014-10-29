@@ -21,6 +21,7 @@ def list_of_array_equal(s, t):
     s, t: lists of numpy.ndarrays
 
     """
+    eq_(len(s), len(t))
     all(assert_array_equal(x, y) for x, y in zip(s, t))
 
 
