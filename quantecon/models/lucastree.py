@@ -108,7 +108,7 @@ class LucasTree(object):
         # == set up distribution for shocks == #
         self.phi = lognorm(sigma)
 
-        # == set up integration bounds. 3 Standard deviations. Make them
+        # == set up integration bounds. 4 Standard deviations. Make them
         # private attributes b/c users don't need to see them, but we
         # only want to compute them once. == #
         self._int_min = np.exp(-4.0 * sigma)
@@ -141,7 +141,7 @@ class LucasTree(object):
         Construct the default grid for the problem
 
         This is defined to be np.linspace(0, 10, 100) when alpha > 1
-        and 100 evenly spaced points covering 3 standard deviations
+        and 100 evenly spaced points covering 4 standard deviations
         when alpha < 1
         """
         grid_size = 100
@@ -169,7 +169,7 @@ class LucasTree(object):
 
         int_min, int_max : scalar(float), optional
             The bounds of integration. If either of these parameters are
-            `None` (the default), they will be set to 3 standard
+            `None` (the default), they will be set to 4 standard
             deviations above and below the mean.
 
         Returns
