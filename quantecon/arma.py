@@ -57,14 +57,7 @@ class ARMA(object):
 
     Attributes
     ----------
-    phi : scalar or iterable or array_like(float)
-        Autocorrelation values for the the autocorrelated variable.
-        See above for explanation.
-    theta : scalar or iterable or array_like(float)
-        Autocorrelation values for the white noise of the model.
-        See above for explanation
-    sigma : scalar(float)
-        The standard deviation of the white noise
+    phi, theta, sigma : see Parmeters
     ar_poly : array_like(float)
         The polynomial form that is needed by scipy.signal to do the
         processing we desire.  Corresponds with the phi values

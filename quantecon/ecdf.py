@@ -22,8 +22,7 @@ class ECDF(object):
 
     Attributes
     ----------
-    observations : array_like
-        An array of observations
+    observations : see Parameters
 
     """
 

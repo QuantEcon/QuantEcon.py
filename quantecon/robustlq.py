@@ -56,25 +56,7 @@ class RBLQ:
 
     Attributes
     ----------
-    Q : array_like(float, ndim=2)
-        The cost(payoff) matrix for the controls.  See above for more.
-        Q should be k x k and symmetric and positive definite
-    R : array_like(float, ndim=2)
-        The cost(payoff) matrix for the state.  See above for more. R
-        should be n x n and symmetric and non-negative definite
-    A : array_like(float, ndim=2)
-        The matrix that corresponds with the state in the state space
-        system.  A should be n x n
-    B : array_like(float, ndim=2)
-        The matrix that corresponds with the control in the state space
-        system.  B should be n x k
-    C : array_like(float, ndim=2)
-        The matrix that corresponds with the random process in the
-        state space system.  C should be n x j
-    beta : scalar(float)
-        The discount factor in the robust control problem
-    theta : scalar(float)
-        The robustness factor in the robust control problem
+    Q, R, A, B, C, beta, theta : see Parameters
     k, n, j : scalar(int)
         The dimensions of the matrices
 

@@ -56,20 +56,7 @@ class LSS:
 
     Attributes
     ----------
-    A : array_like or scalar(float)
-        This is part of the state transition equation.  It should be
-        `n x n`
-    C : array_like or scalar(float)
-        This is part of the state transition equation.  It should be
-        `n x m`
-    G : array_like or scalar(float)
-        This describes the relation between y_t and x_t and should
-        be `k x n`
-    mu_0 : array_like or scalar(float)
-        This is the mean of initial draw and is `n x 1`
-    Sigma_0 : array_like or scalar(float)
-        This is the variance of the initial draw and is `n x n` and
-        also should be positive definite and symmetric
+    A, C, G, mu_0, Sigma_0 : see Parameters
     k, n, m : scalar(int)
         The matrix dimensions
 

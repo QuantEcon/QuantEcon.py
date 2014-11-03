@@ -108,8 +108,7 @@ class MarkovChain(object):
 
     Attributes
     ----------
-    P : array_like(float, ndim=2)
-        The transition matrix.
+    P : see Parameters
 
     stationary_distributions : array_like(float, ndim=2)
         Array containing stationary distributions, one for each

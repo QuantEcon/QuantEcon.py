@@ -38,18 +38,11 @@ class Kalman:
 
     Attributes
     ----------
-    A : array_like or scalar(float)
-        The n x n matrix A
-    Q : array_like or scalar(float)
-        Q is n x n, symmetric and nonnegative definite
-    G : array_like or scalar(float)
-        G is k x n
-    R : array_like or scalar(float)
-        R is k x k, symmetric and nonnegative definite
+    A, Q, G, R : see Parameters
     k : scalar(int)
-        The value of k (Number of rows of G)
+        Number of rows of G
     n : scalar(int)
-        The value of n (Number of columns of G)
+        Number of columns of G
     current_Sigma : array_like or scalar(float)
         The n x n covariance matrix
     current_x_hat : array_like or scalar(float)

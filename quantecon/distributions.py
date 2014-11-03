@@ -29,12 +29,7 @@ class BetaBinomial(object):
 
     Attributes
     ----------
-    n : scalar(int)
-        First parameter to the Beta-binomial distribution
-    a : scalar(float)
-        Second parameter to the Beta-binomial distribution
-    b : scalar(float)
-        Third parameter to the Beta-binomial distribution
+    n, a, b : see Parameters
 
     """
 

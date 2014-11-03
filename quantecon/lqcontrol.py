@@ -94,6 +94,7 @@ class LQ:
 
     Attributes
     ----------
+    Q, R, N, A, B, C, beta, T, Rf : see Parameters
     P : array_like(float)
         P is part of the value function representation of V(x) = x'Px + d
     d : array_like(float)

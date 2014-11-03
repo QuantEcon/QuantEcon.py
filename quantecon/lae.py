@@ -37,11 +37,7 @@ class LAE:
 
     Attributes
     ----------
-    p : function
-        The stochastic kernel.  A function p(x, y) that is vectorized in
-        both x and y
-    X : array_like(float)
-        A vector containing observations
+    p, X : see Parameters
 
     Examples
     --------
