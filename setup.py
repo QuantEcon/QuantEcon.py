@@ -26,7 +26,7 @@ write_version_py()
 setup(name='quantecon',
       package_dir={'quantecon' : 'src'},
       packages=['quantecon', 'quantecon.models', 'quantecon.tests'],
-      package_data={'quantecon' : ['tests/data/matlab_quad.mat', 'tests/data/testing_data.h5']},
+      package_data={'quantecon.tests' : ['data/matlab_quad.mat', 'data/testing_data.h5']},
       version=VERSION,
       description='Core package of the QuantEcon library',
       author='Thomas J. Sargent and John Stachurski (Project coordinators)',
