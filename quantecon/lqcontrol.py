@@ -26,7 +26,7 @@ class LQ:
 
     .. math::
 
-        r(x_t, u_t) := x_t' R x_t + u_t' Q u_t
+        r(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t
 
     or the finite horizon form
 
@@ -69,12 +69,15 @@ class LQ:
         R is the payoff(or cost) matrix that corresponds with the
         state variable x and is `n x n`. Should be symetric and
         non-negative definite
+    N : array_like(float)
+        N is the cross product term in the payoff, as above.  It should 
+        be `k x n`.
     A : array_like(float)
-        A is part of the state transition as described above and
-        corresponds to the state variable today. It should be `n x n`.
+        A is part of the state transition as described above. It should 
+        be `n x n`
     B : array_like(float)
-        B is part of the state transition as described above and
-        corresponds to the control variable today. It should be `n x k`.
+        B is part of the state transition as described above. It should 
+        be `n x k`
     C : array_like(float), optional(default=None)
         C is part of the state transition as described above and
         corresponds to the random variable today.  If the model is
@@ -91,37 +94,10 @@ class LQ:
 
     Attributes
     ----------
-    Q : array_like(float)
-        Q is the payoff(or cost) matrix that corresponds with the
-        control variable u and is `k x k`. Should be symmetric and
-        non-negative definite
-    R : array_like(float)
-        R is the payoff(or cost) matrix that corresponds with the
-        state variable x and is `n x n`. Should be symetric and
-        non-negative definite
-    A : array_like(float)
-        A is part of the state transition as described above and
-        corresponds to the state variable today. It should be `n x n`.
-    B : array_like(float)
-        B is part of the state transition as described above and
-        corresponds to the control variable today. It should be `n x k`.
-    C : array_like(float)
-        C is part of the state transition as described above and
-        corresponds to the random variable today.  If the model is
-        deterministic then C should take default value of `None`
-    beta : scalar(float)
-        beta is the discount parameter
-    T : scalar(int)
-        T is the number of periods in a finite horizon problem.  If no
-        T is supplied then assumed to be infinite horizon problem.
-    Rf : array_like(float)
-        Rf is the final (in a finite horizon model) payoff(or cost)
-        matrix that corresponds with the control variable u and is `n x
-        n`.  Should be symetric and non-negative definite
     P : array_like(float)
-        P is part of the value function representation of V(x) = xPx + d
+        P is part of the value function representation of V(x) = x'Px + d
     d : array_like(float)
-        d is part of the value function representation of V(x) = xPx + d
+        d is part of the value function representation of V(x) = x'Px + d
     F : array_like(float)
         F is the policy rule that determines the choice of control in
         each period.
@@ -130,10 +106,11 @@ class LQ:
 
     """
 
-    def __init__(self, Q, R, A, B, C=None, beta=1, T=None, Rf=None):
+    def __init__(self, Q, R, A, B, C=None, N=None, beta=1, T=None, Rf=None):
         # == Make sure all matrices can be treated as 2D arrays == #
         converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
-        self.A, self.B, self.Q, self.R = list(map(converter, (A, B, Q, R)))
+        self.A, self.B, self.Q, self.R, self.N = \
+                list(map(converter, (A, B, Q, R, N)))
         # == Record dimensions == #
         self.k, self.n = self.Q.shape[0], self.R.shape[0]
 
@@ -146,6 +123,10 @@ class LQ:
         else:
             self.C = converter(C)
             self.j = self.C.shape[1]
+
+        if N == None:
+            # == No cross product term in payoff. Set N=0. == #
+            self.N = np.zeros((self.k, self.n))
 
         if T:
             # == Model is finite horizon == #
@@ -176,13 +157,13 @@ class LQ:
 
         """
         # === Simplify notation === #
-        Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+        Q, R, A, B, N, C = self.Q, self.R, self.A, self.B, self.N, self.C
         P, d = self.P, self.d
         # == Some useful matrices == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
-        S2 = self.beta * dot(B.T, dot(P, A))
+        S2 = self.beta * dot(B.T, dot(P, A)) + N
         S3 = self.beta * dot(A.T, dot(P, A))
-        # == Compute F as (Q + B'PB)^{-1} (beta B'PA) == #
+        # == Compute F as (Q + B'PB)^{-1} (beta B'PA + N) == #
         self.F = solve(S1, S2)
         # === Shift P back in time one step == #
         new_P = R - dot(S2.T, self.F) + S3
@@ -217,15 +198,15 @@ class LQ:
 
         """
         # === simplify notation === #
-        Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+        Q, R, A, B, N, C = self.Q, self.R, self.A, self.B, self.N, self.C
 
         # === solve Riccati equation, obtain P === #
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
-        P = solve_discrete_riccati(A0, B0, R, Q)
+        P = solve_discrete_riccati(A0, B0, R, Q, N)
 
         # == Compute F == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
-        S2 = self.beta * dot(B.T, dot(P, A))
+        S2 = self.beta * dot(B.T, dot(P, A)) + N
         F = solve(S1, S2)
 
         # == Compute d == #
@@ -264,7 +245,7 @@ class LQ:
         """
 
         # === Simplify notation === #
-        Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+        A, B, C = self.A, self.B, self.C
 
         # == Preliminaries, finite horizon case == #
         if self.T:
@@ -275,6 +256,7 @@ class LQ:
         else:
             T = ts_length if ts_length else 100
             self.stationary_values()
+
 
         # == Set up initial condition and arrays to store paths == #
         x0 = np.asarray(x0)

@@ -97,11 +97,11 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
     return gamma1
 
 
-def solve_discrete_riccati(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
+def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     """
     Solves the discrete-time algebraic Riccati equation
 
-        X = A'XA - (C + B'XA)'(B'XB + R)^{-1}(C + B'XA) + Q
+        X = A'XA - (N + B'XA)'(B'XB + R)^{-1}(N + B'XA) + Q
 
     via a modified structured doubling algorithm.  An explanation of the
     algorithm can be found in the reference below.
@@ -112,7 +112,7 @@ def solve_discrete_riccati(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
         k x k array.
     B : array_like(float, ndim=2)
         k x n array
-    C : array_like(float, ndim=2)
+    N : array_like(float, ndim=2)
         n x k array
     R : array_like(float, ndim=2)
         n x n, should be symmetric and positive definite
@@ -145,10 +145,10 @@ def solve_discrete_riccati(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
     A, B, Q, R = np.atleast_2d(A, B, Q, R)
     n, k = R.shape[0], Q.shape[0]
     I = np.identity(k)
-    if C == None:
-        C = np.zeros((n, k))
+    if N == None:
+        N = np.zeros((n, k))
     else:
-        C = np.atleast_2d(C)
+        N = np.atleast_2d(N)
 
     # == Choose optimal value of gamma in R_hat = R + gamma B'B == #
     current_min = np.inf
@@ -159,9 +159,9 @@ def solve_discrete_riccati(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
         Z = R + gamma * BB
         cn = np.linalg.cond(Z)
         if np.isfinite(cn):
-            Q_tilde = - Q + dot(C.T, solve(Z, C + gamma * BTA)) + gamma * I
+            Q_tilde = - Q + dot(N.T, solve(Z, N + gamma * BTA)) + gamma * I
             G0 = dot(B, solve(Z, B.T))
-            A0 = dot(I - gamma * G0, A) - dot(B, solve(Z, C))
+            A0 = dot(I - gamma * G0, A) - dot(B, solve(Z, N))
             H0 = gamma * dot(A.T, A0) - Q_tilde
             f1 = np.linalg.cond(Z, np.inf)
             f2 = gamma * f1
@@ -182,9 +182,9 @@ def solve_discrete_riccati(A, B, Q, R, C=None, tolerance=1e-10, max_iter=500):
 
 
     # == Initial conditions == #
-    Q_tilde = - Q + dot(C.T, solve(R_hat, C + gamma * BTA)) + gamma * I
+    Q_tilde = - Q + dot(N.T, solve(R_hat, N + gamma * BTA)) + gamma * I
     G0 = dot(B, solve(R_hat, B.T))
-    A0 = dot(I - gamma * G0, A) - dot(B, solve(R_hat, C))
+    A0 = dot(I - gamma * G0, A) - dot(B, solve(R_hat, N))
     H0 = gamma * dot(A.T, A0) - Q_tilde
     i = 1
 

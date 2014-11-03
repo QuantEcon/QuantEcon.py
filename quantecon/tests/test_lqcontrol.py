@@ -27,7 +27,7 @@ class TestLQControl(unittest.TestCase):
         beta = .95
         T = 1
 
-        self.lq_scalar = LQ(q, r, a, b, c, beta, T, rf)
+        self.lq_scalar = LQ(q, r, a, b, C=c, beta=beta, T=T, Rf=rf)
 
 
         Q = np.array([[0., 0.], [0., 1]])
