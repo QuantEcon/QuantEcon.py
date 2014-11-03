@@ -167,7 +167,7 @@ class MarkovChain(object):
         self.n = self.P.shape[0]
 
         # To analyze the structure of P as a directed graph
-        self.digraph = DiGraph(P)
+        self.digraph = DiGraph(self.P)
 
         self._stationary_dists = None
 
@@ -217,7 +217,7 @@ class MarkovChain(object):
         else:
             rec_classes = self.recurrent_classes
 
-            # Determine the prioed of the LCM of the periods of rec_classes
+            # Determine the period, the LCM of the periods of rec_classes
             d = 1
             for rec_class in rec_classes:
                 period = DiGraph(self.P[rec_class, :][:, rec_class]).period
