@@ -3,7 +3,7 @@ import os
 
 #-Write a versions.py file for class attribute-#
 
-VERSION = '0.1.5'
+VERSION = '0.1.6'
 
 def write_version_py(filename=None):
     doc = "\"\"\"\nThis is a VERSION file and should NOT be manually altered\n\"\"\""
