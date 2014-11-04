@@ -44,24 +44,25 @@ class SearchProblem:
 
     Attributes
     ----------
-    beta : scalar(float)
-        The discount parameter
-    c : scalar(float)
-        The unemployment compensation
-    F_a : scalar(float)
-        First parameter of beta distribution on F
-    F_b : scalar(float)
-        Second parameter of beta distribution on F
-    G_a : scalar(float)
-        First parameter of beta distribution on G
-    G_b : scalar(float)
-        Second parameter of beta distribution on G
-    w_max : scalar(float)
-        Maximum wage possible
-    grid_points : array_like(floats, ndim=2)
-        The grid over both wage and probability.  Each row represents
-        a single (w, pi) pair
-
+    beta, c, w_max : see Parameters
+    w_grid : np.ndarray
+        Grid points over wages, ndim=1
+    pi_grid : np.ndarray
+        Grid points over pi, ndim=1
+    grid_points : np.ndarray
+        Combined grid points, ndim=2
+    F : scipy.stats._distn_infrastructure.rv_frozen
+        Beta distribution with params (F_a, F_b), scaled by w_max
+    G : scipy.stats._distn_infrastructure.rv_frozen
+        Beta distribution with params (G_a, G_b), scaled by w_max
+    f : function
+        Density of F
+    g : function
+        Density of G
+    pi_min : scalar(float)
+        Minimum of grid over pi
+    pi_max : scalar(float)
+        Maximum of grid over pi
     """
 
     def __init__(self, beta=0.95, c=0.6, F_a=1, F_b=1, G_a=3, G_b=1.2,

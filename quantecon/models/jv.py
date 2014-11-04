@@ -68,12 +68,7 @@ class JvWorker(object):
 
     Attributes
     ----------
-    A : scalar(float)
-        Parameter in human capital transition function
-    alpha : scalar(float)
-        Parameter in human capital transition function
-    beta : scalar(float)
-        Discount factor
+    A, alpha, beta : see Parameters
     x_grid : array_like(float)
         The grid over the human capital
 

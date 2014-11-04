@@ -38,14 +38,7 @@ class AssetPrices(object):
 
     Attributes
     ----------
-    beta : scalar(float)
-        Discount factor
-    P : array_like(float)
-        Transition matrix
-    s : array_like(float)
-        Growth rate of consumption
-    gamma : scalar(float)
-        Coefficient of risk aversion
+    beta, P, s, gamma : see Parameters
     n : scalar(int)
         The number of rows in P
 

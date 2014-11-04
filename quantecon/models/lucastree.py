@@ -65,18 +65,7 @@ class LucasTree(object):
 
     Attributes
     ----------
-    gamma : scalar(float)
-        The coefficient of risk aversion in the household's CRRA utility
-        function
-    beta : scalar(float)
-        The household's discount factor
-    alpha : scalar(float)
-        The correlation coefficient in the shock process
-    sigma : scalar(float)
-        The volatility of the shock process
-    grid : array_like(float)
-        The grid points on which to evaluate the asset prices. Grid
-        points should be nonnegative.
+    gamma, beta, alpha, sigma, grid : see Parameters
     grid_min, grid_max, grid_size : scalar(int)
         Properties for grid upon which prices are evaluated
     phi : scipy.stats.lognorm

@@ -44,12 +44,7 @@ class CareerWorkerProblem(object):
 
     Attributes
     ----------
-    beta : scalar(float)
-        Discount factor
-    B : scalar(float)
-        Upper bound of for both epsilon and theta
-    N : scalar(int)
-        Number of possible realizations for both epsilon and theta
+    beta, B, N : see Parameters
     theta : array_like(float, ndim=1)
         A grid of values from 0 to B
     epsilon : array_like(float, ndim=1)

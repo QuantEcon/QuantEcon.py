@@ -33,12 +33,7 @@ class GrowthModel(object):
 
     Attributes
     ----------
-    f : function
-        The production function
-    beta : scalar(int)
-        The utility discounting parameter
-    u : function
-        The utility function.
+    f, beta, u  : see Parameters
     grid : array_like(float, ndim=1)
         The grid over savings.
 

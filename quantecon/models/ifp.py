@@ -52,20 +52,9 @@ class ConsumerProblem:
 
     Attributes
     ----------
-    r : scalar(float)
-        A strictly positive scalar giving the interest rate
-    beta : scalar(float)
-        The discount factor, must satisfy (1 + r) * beta < 1
-    Pi : array_like(float)
-        A 2D NumPy array giving the Markov matrix for {z_t}
-    z_vals : array_like(float)
-        The state space of {z_t}
-    b : scalar(float)
-        The borrowing constraint
-    u : callable
-        The utility function
-    du : callable
-        The derivative of u
+    r, beta, Pi, z_vals, b, u, du : see Parameters
+    asset_grid : np.ndarray
+        One dimensional grid for assets
 
     """
 
