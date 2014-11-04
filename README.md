@@ -2,21 +2,19 @@
 ## Quantitative Economics
 
 This repository collects code for quantitative economic modeling
-
-Comprehensive documentation is currently being prepared
-
-At present, the majority of the code is described at [quant-econ.net](http://quant-econ.net), in an on-line course authored by [Thomas J. Sargent](https://files.nyu.edu/ts43/public/) and [John Stachurski](http://johnstachurski.net)
-
-However this code repository is a separate project from [quant-econ.net](http://quant-econ.net), and we welcome contributions and pull requests
+The majority of the code is described at [quant-econ.net](http://quant-econ.net).  However this code repository is a separate project from [quant-econ.net](http://quant-econ.net), and we welcome contributions and pull requests
 
 At present, the lead developers of this repository (in alphabetical order) are
 
 * [Chase Coleman](https://github.com/cc7768)
 * [Spencer Lyon](https://github.com/spencerlyon2)
 * [Matthew McKay](https://github.com/sanguineturtle)
+* [Daisuke Oyama](http://www.oyama.e.u-tokyo.ac.jp/)
+
+Project coordinators are
+
 * [Thomas J. Sargent](https://files.nyu.edu/ts43/public/)
 * [John Stachurski](http://johnstachurski.net)
-* [Pablo Winant](http://www.mosphere.fr/)
 
 
 ### Downloading the Repository
@@ -41,11 +39,6 @@ at a terminal prompt
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 
 
-### About Git / GitHub
-
-This code repository is hosted by [GitHub](http://github.com).  The primary function of GitHub is to host open source code repositories in a manner that facilitates sharing and collaboration.
-
-If you wand to learn a bit more about Git and GitHub, you'll find it's an excellent investment. A good place to start is the [GitHub help page](https://help.github.com/).
 
 ### License
 
