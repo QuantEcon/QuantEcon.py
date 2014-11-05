@@ -16,7 +16,7 @@ from quantecon.models import CareerWorkerProblem
 # === solve for the value function === #
 wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
-v = qe.compute_fixed_point(wp.bellman, v_init)
+v = qe.compute_fixed_point(wp.bellman_operator, v_init)
 
 # === plot value function === #
 fig = plt.figure(figsize=(8,6))
