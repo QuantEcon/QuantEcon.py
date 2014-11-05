@@ -1,26 +1,28 @@
+
 from __future__ import division, print_function
-from numbers import Number
-from math import sqrt
 import numpy as np
 from numpy import dot, eye
-from scipy.linalg import solve, eig
+from scipy.linalg import solve
 
 
-def nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2,
-          tol=1e-8, max_iter=1000):
-    """
+def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
+          beta=1.0, tol=1e-8, max_iter=1000):
+    r"""
     Compute the limit of a Nash linear quadratic dynamic game. In this
-    problem, player i maximizes
+    problem, player i minimizes
 
     .. math::
-        - \\sum_{t=0}^{\\infty} \\left\\{x_t' r_i x_t + 2 x_t' w_i
-        u_{it} +u_{it}' q_i u_{it} + u_{jt}' s_i u_{jt} + 2 u_{jt}'
-        m_i u_{it} \\right\\}
+        \sum_{t=0}^{\infty} 
+        \left\{
+            x_t' r_i x_t + 2 x_t' w_i
+            u_{it} +u_{it}' q_i u_{it} + u_{jt}' s_i u_{jt} + 2 u_{jt}'
+            m_i u_{it} 
+        \right\}
 
     subject to the law of motion
 
     .. math::
-        x_{t+1} = a x_t + b_1 u_{1t} + b_2 u_{2t}
+        x_{t+1} = A x_t + b_1 u_{1t} + b_2 u_{2t}
 
     and a perceived control law :math:`u_j(t) = - f_j x_t` for the other
     player.
@@ -31,45 +33,34 @@ def nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2,
 
     Parameters
     ----------
-    a : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, n)
-    b1 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, k_1)
-    b2 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, k_2)
-    r1 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, n)
-    r2 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, n)
-    q1 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (k_1, k_1)
-    q2 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (k_2, k_2)
-    s1 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (k_1, k_1)
-    s2 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (k_2, k_2)
-    w1 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, k_1)
-    w2 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (n, k_2)
-    m1 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (k_2, k_1)
-    m2 : scalar(float) or array_like(float)
-        This is a matrix that corresponds to the above equation and
-        should be of size (k_1, k_2)
+    A : scalar(float) or array_like(float)
+        Corresponds to the above equation, should be of size (n, n)
+    B1 : scalar(float) or array_like(float)
+        As above, size (n, k_1)
+    B2 : scalar(float) or array_like(float)
+        As above, size (n, k_2)
+    R1 : scalar(float) or array_like(float)
+        As above, size (n, n)
+    R2 : scalar(float) or array_like(float)
+        As above, size (n, n)
+    Q1 : scalar(float) or array_like(float)
+        As above, size (k_1, k_1)
+    Q2 : scalar(float) or array_like(float)
+        As above, size (k_2, k_2)
+    S1 : scalar(float) or array_like(float)
+        As above, size (k_1, k_1)
+    S2 : scalar(float) or array_like(float)
+        As above, size (k_2, k_2)
+    W1 : scalar(float) or array_like(float)
+        As above, size (n, k_1)
+    W2 : scalar(float) or array_like(float)
+        As above, size (n, k_2)
+    M1 : scalar(float) or array_like(float)
+        As above, size (k_2, k_1)
+    M2 : scalar(float) or array_like(float)
+        As above, size (k_1, k_2)
+    beta : scalar(float), optional(default=1.0)
+        Discount rate
     tol : scalar(float), optional(default=1e-8)
         This is the tolerance level for convergence
     max_iter : scalar(int), optional(default=1000)
@@ -77,72 +68,76 @@ def nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2,
 
     Returns
     -------
-    f_1 : array_like, dtype=float, shape=(k_1, n)
+    F1 : array_like, dtype=float, shape=(k_1, n)
         Feedback law for agent 1
-    f_2 : array_like, dtype=float, shape=(k_2, n)
+    F2 : array_like, dtype=float, shape=(k_2, n)
         Feedback law for agent 2
-    p_1 : array_like, dtype=float, shape=(n, n)
+    P1 : array_like, dtype=float, shape=(n, n)
         The steady-state solution to the associated discrete matrix
         Riccati equation for agent 1
-    p_2 : array_like, dtype=float, shape=(n, n)
+    P2 : array_like, dtype=float, shape=(n, n)
         The steady-state solution to the associated discrete matrix
         Riccati equation for agent 2
 
     """
-    # Unload parameters and make sure everything is an array
-    a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2 = map(np.asarray,
-                                                            [a, b1, b2, r1, r2,
-                                                             q1, q2, s1, s2,
-                                                             w1, w2, m1, m2])
+    # == Unload parameters and make sure everything is an array == #
+    params = A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2 
+    params = map(np.asarray, params)
+    A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2 = params
 
-    n = a.shape[0]
+    # == Multiply A, B1, B2 by sqrt(beta) to enforce discounting == #
+    A, B1, B2 = [np.sqrt(beta) * x for x in A, B1, B2]
 
-    if b1.ndim == 1:
+    n = A.shape[0]
+
+    if B1.ndim == 1:
         k_1 = 1
-        b1 = np.reshape(b1, (n, 1))
+        B1 = np.reshape(B1, (n, 1))
     else:
-        k_1 = b1.shape[1]
+        k_1 = B1.shape[1]
 
-    if b2.ndim == 1:
+    if B2.ndim == 1:
         k_2 = 1
-        b2 = np.reshape(b2, (n, 1))
+        B2 = np.reshape(B2, (n, 1))
     else:
-        k_2 = b2.shape[1]
+        k_2 = B2.shape[1]
 
     v1 = eye(k_1)
     v2 = eye(k_2)
-    p1 = np.zeros((n, n))
-    p2 = np.zeros((n, n))
-    f1 = np.random.randn(k_1, n)
-    f2 = np.random.randn(k_2, n)
+    P1 = np.zeros((n, n))
+    P2 = np.zeros((n, n))
+    F1 = np.random.randn(k_1, n)
+    F2 = np.random.randn(k_2, n)
 
     for it in range(max_iter):
         # update
-        f10 = f1
-        f20 = f2
+        F10 = F1
+        F20 = F2
 
-        g2 = solve(dot(b2.T, p2.dot(b2))+q2, v2)
-        g1 = solve(dot(b1.T, p1.dot(b1))+q1, v1)
-        h2 = dot(g2, b2.T.dot(p2))
-        h1 = dot(g1, b1.T.dot(p1))
+        G2 = solve(dot(B2.T, P2.dot(B2))+Q2, v2)
+        G1 = solve(dot(B1.T, P1.dot(B1))+Q1, v1)
+        H2 = dot(G2, B2.T.dot(P2))
+        H1 = dot(G1, B1.T.dot(P1))
 
-        # break up the computation of f1, f2
-        f_1_left = v1 - dot(h1.dot(b2)+g1.dot(m1.T),
-                            h2.dot(b1)+g2.dot(m2.T))
-        f_1_right = h1.dot(a)+g1.dot(w1.T) - dot(h1.dot(b2)+g1.dot(m1.T),
-                                                 h2.dot(a)+g2.dot(w2.T))
-        f1 = solve(f_1_left, f_1_right)
-        f2 = h2.dot(a)+g2.dot(w2.T) - dot(h2.dot(b1)+g2.dot(m2.T), f1)
+        # break up the computation of F1, F2
+        F1_left = v1 - dot(H1.dot(B2)+G1.dot(M1.T),
+                            H2.dot(B1)+G2.dot(M2.T))
+        F1_right = H1.dot(A)+G1.dot(W1.T) - dot(H1.dot(B2)+G1.dot(M1.T),
+                                                 H2.dot(A)+G2.dot(W2.T))
+        F1 = solve(F1_left, F1_right)
+        F2 = H2.dot(A)+G2.dot(W2.T) - dot(H2.dot(B1)+G2.dot(M2.T), F1)
 
-        a2 = a - b2.dot(f2)
-        a1 = a - b1.dot(f1)
+        Lambda1 = A - B2.dot(F2)
+        Lambda2 = A - B1.dot(F1)
+        Pi1 = R1 + dot(F2.T, S1.dot(F2))
+        Pi2 = R2 + dot(F1.T, S2.dot(F1))
 
-        p1 = (dot(a2.T, p1.dot(a2)) + r1 + dot(f2.T, s1.dot(f2)) -
-              dot(dot(a2.T, p1.dot(b1)) + w1 - f2.T.dot(m1), f1))
-        p2 = (dot(a1.T, p2.dot(a1)) + r2 + dot(f1.T, s2.dot(f1)) -
-              dot(dot(a1.T, p2.dot(b2)) + w2 - f1.T.dot(m2), f2))
+        P1 = dot(Lambda1.T, P1.dot(Lambda1)) + Pi1 - \
+              dot(dot(Lambda1.T, P1.dot(B1)) + W1 - F2.T.dot(M1), F1)
+        P2 = dot(Lambda2.T, P2.dot(Lambda2)) + Pi2 - \
+              dot(dot(Lambda2.T, P2.dot(B2)) + W2 - F1.T.dot(M2), F2)
 
-        dd = np.max(np.abs(f10 - f1)) + np.max(np.abs(f20 - f2))
+        dd = np.max(np.abs(F10 - F1)) + np.max(np.abs(F20 - F2))
 
         if dd < tol:  # success!
             break
@@ -151,4 +146,5 @@ def nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, m2,
         msg = 'No convergence: Iteration limit of {0} reached in nnash'
         raise ValueError(msg.format(max_iter))
 
-    return f1, f2, p1, p2
+    return F1, F2, P1, P2
+

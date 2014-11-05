@@ -13,6 +13,7 @@ from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
 from .lqcontrol import LQ
+from .lqnash import nnash
 from .lss import LSS
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .mc_tools import MarkovChain, mc_compute_stationary, mc_sample_path
