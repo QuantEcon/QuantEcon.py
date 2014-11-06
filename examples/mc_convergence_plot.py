@@ -34,7 +34,7 @@ for t in range(20):
 
 ax.scatter(x_vals, y_vals, z_vals, c='r', s=60)
 
-psi_star = mc_compute_stationary(P)
+psi_star = mc_compute_stationary(P)[0]
 ax.scatter(psi_star[0], psi_star[1], psi_star[2], c='k', s=60)
 
 plt.show()
