@@ -106,6 +106,10 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     via a modified structured doubling algorithm.  An explanation of the
     algorithm can be found in the reference below.
 
+    Note that SciPy also has a discrete riccati equation solver.  However it
+    cannot handle the case where R is not invertible, or when N is nonzero.
+    Both of these cases can be handled in the algorithm implemented below.
+
     Parameters
     ----------
     A : array_like(float, ndim=2)
