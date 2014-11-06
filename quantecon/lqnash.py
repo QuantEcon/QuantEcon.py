@@ -86,7 +86,7 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
     A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2 = params
 
     # == Multiply A, B1, B2 by sqrt(beta) to enforce discounting == #
-    A, B1, B2 = [np.sqrt(beta) * x for x in A, B1, B2]
+    A, B1, B2 = [np.sqrt(beta) * x for x in (A, B1, B2)]
 
     n = A.shape[0]
 
