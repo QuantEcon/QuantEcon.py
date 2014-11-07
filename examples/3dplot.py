@@ -8,11 +8,10 @@ def f(x, y):
 
 xgrid = np.linspace(-3, 3, 50)
 ygrid = xgrid
+x, y = np.meshgrid(xgrid, ygrid)  
 
-# === plot value function === #
 fig = plt.figure(figsize=(8,6))
 ax = fig.add_subplot(111, projection='3d')
-x, y = np.meshgrid(xgrid, ygrid)
 ax.plot_surface(x,
                 y,
                 f(x, y),

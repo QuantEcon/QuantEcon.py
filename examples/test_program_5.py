@@ -1,5 +1,5 @@
-import pylab
 from random import normalvariate, uniform
+import matplotlib.pyplot as plt
 
 def generate_data(n, generator_type):
     epsilon_values = []   
@@ -9,5 +9,5 @@ def generate_data(n, generator_type):
     return epsilon_values
 
 data = generate_data(100, 'U')
-pylab.plot(data, 'b-')
-pylab.show()
+plt.plot(data, 'b-')
+plt.show()
