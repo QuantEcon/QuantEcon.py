@@ -222,7 +222,7 @@ class LucasTree(object):
 
         return Tf
 
-    def compute_lt_price(self, error_tol=1e-3, max_iter=50, verbose=1):
+    def compute_lt_price(self, error_tol=1e-3, max_iter=50, verbose=0):
         """
         Compute the equilibrium price function associated with Lucas
         tree lt
