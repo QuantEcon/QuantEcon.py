@@ -22,7 +22,7 @@ class RBLQ:
 
     .. math::
 
-        min_{u_t}  sum_t beta^t {x_t' R x_t + u'_t Q u_t }
+        min_{u_t}  sum_t beta^t {x_t' R x_t + u_t' Q u_t }
 
     subject to
 
@@ -156,7 +156,7 @@ class RBLQ:
         F : array_like(float, ndim=2)
             The optimal control matrix from above
         P : array_like(float, ndim=2)
-            The psoitive semi-definite matrix defining the value
+            The positive semi-definite matrix defining the value
             function
         K : array_like(float, ndim=2)
             the worst-case shock matrix K, where
@@ -205,7 +205,7 @@ class RBLQ:
         F : array_like(float, ndim=2)
             The optimal control matrix from above
         P : array_like(float, ndim=2)
-            The psoitive semi-definite matrix defining the value
+            The positive semi-definite matrix defining the value
             function
         K : array_like(float, ndim=2)
             the worst-case shock matrix K, where

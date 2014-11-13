@@ -76,7 +76,7 @@ class ConsumerProblem:
         Parameters
         ----------
         V : array_like(float)
-            A NumPy array of dim len(cp.asset_grid) x len(cp.z_vals)
+            A NumPy array of dim len(cp.asset_grid) times len(cp.z_vals)
         return_policy : bool, optional(default=False)
             Indicates whether to return the greed policy given V or the
             updated value function TV.  Default is TV.
@@ -125,7 +125,7 @@ class ConsumerProblem:
         Parameters
         ----------
         c : array_like(float)
-            A NumPy array of dim len(cp.asset_grid) x len(cp.z_vals)
+            A NumPy array of dim len(cp.asset_grid) times len(cp.z_vals)
 
         Returns
         -------

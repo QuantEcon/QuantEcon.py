@@ -44,9 +44,9 @@ ac    = (a_0 - c) / 2.0
 
 # == Define LQ matrices == #
 
-R = np.array([[0,  ac,    0], 
+R = np.array([[0.,  ac,  0.], 
               [ac, -a_1, 0.5], 
-              [0., 0.5,  0]])
+              [0., 0.5,  0.]])
 
 R = -R  # For minimization
 Q = gamma / 2

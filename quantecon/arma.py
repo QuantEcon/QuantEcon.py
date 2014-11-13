@@ -47,7 +47,7 @@ class ARMA(object):
     Parameters
     ----------
     phi : scalar or iterable or array_like(float)
-        Autocorrelation values for the the autocorrelated variable.
+        Autocorrelation values for the autocorrelated variable.
         See above for explanation.
     theta : scalar or iterable or array_like(float)
         Autocorrelation values for the white noise of the model.
@@ -158,15 +158,15 @@ class ARMA(object):
 
         Parameters
         ----------
-        two_pi : Boolean, optional)
+        two_pi : Boolean, optional
             Compute the spectral density function over [0, pi] if
             two_pi is False and [0, 2 pi] otherwise.  Default value is
             True
         res : scalar or array_like(int), optional(default=1200)
             If res is a scalar then the spectral density is computed at
             `res` frequencies evenly spaced around the unit circle, but
-            if an array the computes the response at the frequencies
-            given by the array
+            if res is an array then the function computes the response at the
+            frequencies given by the array
 
         Returns
         -------
