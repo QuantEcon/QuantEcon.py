@@ -22,6 +22,18 @@ def test_cartesian_C_order():
 
     assert(correct)
 
+def test_cartesian_C_order_int_float():
+
+    from numpy import arange, linspace
+
+    x_int = arange(10)
+    x_float = linspace(0,9,10)
+    prod_int = cartesian([x_int]*3)
+    prod_float = cartesian([x_float]*3)
+    assert(prod_int.dtype==x_int.dtype)
+    assert(prod_float.dtype==x_float.dtype)
+    assert( abs(prod_int-prod_float).max()==0)
+
 def test_cartesian_F_order():
 
     from numpy import linspace

@@ -25,9 +25,11 @@ def cartesian(nodes, order='C'):
     nodes = [numpy.array(e) for e in nodes]
     shapes = [e.shape[0] for e in nodes]
 
+    dtype = nodes[0].dtype
+
     n = len(nodes)
     l = numpy.prod(shapes)
-    out = numpy.zeros((l, n))
+    out = numpy.zeros((l, n), dtype=dtype)
 
 
     if order == 'C':
