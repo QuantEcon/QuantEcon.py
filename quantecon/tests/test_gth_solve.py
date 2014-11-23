@@ -161,8 +161,8 @@ def test_raises_value_error_non_2dim():
 
 
 @raises(ValueError)
-def test_raises_value_error_non_sym():
-    """Test with non symmetric input"""
+def test_raises_value_error_non_square():
+    """Test with non square input"""
     gth_solve(np.array([[0.4, 0.6]]))
 
 

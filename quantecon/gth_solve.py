@@ -85,7 +85,7 @@ def gth_solve(A, overwrite=False):
     # === Backward substitution === #
     x[n-1] = 1
     for i in xrange(n-2, -1, -1):
-        x[i] = np.sum((x[j] * A1[j, i] for j in xrange(i+1, n)))
+        x[i] = np.dot(x[i+1:n], A1[i+1:n, i])
 
     # === Normalization === #
     x /= np.sum(x)
