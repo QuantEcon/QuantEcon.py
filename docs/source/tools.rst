@@ -12,6 +12,8 @@ Tools
    tools/distributions
    tools/ecdf
    tools/estspec
+   tools/graph_tools
+   tools/gth_solve
    tools/ivp
    tools/kalman
    tools/lae
