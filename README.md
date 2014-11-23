@@ -10,6 +10,7 @@ At present, the lead developers of this repository (in alphabetical order) are
 * [Spencer Lyon](https://github.com/spencerlyon2)
 * [Matthew McKay](https://github.com/sanguineturtle)
 * [Daisuke Oyama](http://www.oyama.e.u-tokyo.ac.jp/)
+* [Pablo Winant](http://www.mosphere.fr/)
 
 Project coordinators are
 
