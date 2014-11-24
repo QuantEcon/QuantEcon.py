@@ -67,7 +67,7 @@ class Matrices:
 
         matrix_dict = {
             'A': np.array([[0.4, 0.6], [0.2, 0.8]]),
-            'stationary_dist': np.array([[0.25, 0.75]]),
+            'stationary_dist': np.array([0.25, 0.75]),
         }
         self.stoch_matrix_dicts.append(matrix_dict)
 
@@ -75,7 +75,7 @@ class Matrices:
             # Reducible matrix
             'A': np.array([[1, 0], [0, 1]]),
             # Stationary dist whose support contains index 0
-            'stationary_dist': np.array([[1, 0]]),
+            'stationary_dist': np.array([1, 0]),
         }
         self.stoch_matrix_dicts.append(matrix_dict)
 
@@ -90,8 +90,8 @@ class Matrices:
         self.kmr_matrix_dicts.append(matrix_dict)
 
         matrix_dict = {
-            'A': np.array([[-1, 1], [4, -4]]),
-            'stationary_dist': np.array([[0.8, 0.2]]),
+            'A': np.array([[-3, 3], [4, -4]]),
+            'stationary_dist': np.array([4/7, 3/7]),
         }
         self.gen_matrix_dicts.append(matrix_dict)
 
