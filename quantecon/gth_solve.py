@@ -60,7 +60,7 @@ def gth_solve(A, overwrite=False):
        Simulation, Princeton University Press, 2009.
 
     """
-    A1 = np.array(A, copy=not overwrite)
+    A1 = np.array(A, dtype=float, copy=not overwrite)
 
     if len(A1.shape) != 2 or A1.shape[0] != A1.shape[1]:
         raise ValueError('matrix must be square')
