@@ -72,7 +72,7 @@ References
 .. [solow1956] R. Solow. *A contribution to the theory of economic growth*, Quarterly Journal of Economics, 70(1):64-95, 1956.
 
 @author : David R. Pugh
-@date : 2014-08-18
+@date : 2014-11-27
 
 TODO:
 2. Initial condition for simulation should require K0 and not k0. This requires
@@ -470,7 +470,7 @@ class Model(object):
         :math:`g + n + \delta` is the effective depreciation rate.
 
         """
-        lower, upper = 1e-6, 1e6
+        lower, upper = 1e-12, 1e12
         return self.find_steady_state(lower, upper)
 
     @output.setter
@@ -888,7 +888,6 @@ class Model(object):
         k_star = cls.steady_state
 
         # create the plot
-        fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
         k_grid = np.linspace(0, 2 * k_star, Nk)
         ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-',
                 label='$f(k(t)$')

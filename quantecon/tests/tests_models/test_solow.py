@@ -7,8 +7,8 @@ Test suite for solow module.
 """
 import nose
 
-import matplotlib
-matplotlib.use('Agg')
+#import matplotlib
+#matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,23 +34,8 @@ invalid_output_2 = K**alpha * (A * E)**(1 - alpha)
 
 valid_output = K**alpha * (A * L)**(1 - alpha)
 
-# four different ways in which params can fail
-invalid_params_0 = (0.02, 0.02, 0.15, 0.33, 0.03)
-invalid_params_1 = {'g': -0.02, 'n': -0.02, 's': 0.15, 'alpha': 0.33,
-                    'delta': 0.03}
-invalid_params_2 = {'g': 0.02, 'n': 0.02, 's': 0.15, 'alpha': 0.33,
-                    'delta': -0.03}
-invalid_params_3 = {'g': 0.02, 'n': 0.02, 's': -0.15, 'alpha': 0.33,
-                    'delta': 0.03}
-
-valid_params = {'g': 0.02, 'n': 0.02, 's': 0.15, 'alpha': 0.33, 'delta': 0.05}
-
-
-# helper functions
-def k_upper(model):
-    """Upper bound on steady state value for model with Cobb Douglas production."""
-    alpha = model.params['alpha']
-    return (1 / model.effective_depreciation_rate)**(1 / (1 - alpha))
+valid_params = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
+                'alpha': 0.33, 'delta': 0.05}
 
 
 # testing functions
@@ -67,6 +52,15 @@ def test_validate_output():
 
 def test_validate_params():
     """Testing validation of params attribute."""
+    # four different ways in which params can fail
+    invalid_params_0 = (1.0, 1.0, 0.02, 0.02, 0.15, 0.33, 0.03)
+    invalid_params_1 = {'A0': 1.0, 'g': -0.02, 'L0': 1.0, 'n': -0.02, 's': 0.15,
+                        'alpha': 0.33, 'delta': 0.03}
+    invalid_params_2 = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
+                        'alpha': 0.33, 'delta': -0.03}
+    invalid_params_3 = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': -0.15,
+                        'alpha': 0.33, 'delta': 0.03}
+
     # params must be a dict
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_0)
@@ -105,14 +99,13 @@ def test_find_steady_state():
                 for alpha in np.linspace(eps, 1-eps, 4):
                     for delta in np.linspace(eps, 1-eps, 4):
 
-                        tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha,
-                                      'delta': delta}
+                        tmp_params = {'A0': 1.0, 'g': g, 'L0': 1.0, 'n': n,
+                                      's': s, 'alpha': alpha, 'delta': delta}
                         tmp_mod = solow.Model(output=valid_output,
                                               params=tmp_params)
 
                         # use root finder to compute the steady state
-                        tmp_k_upper = k_upper(tmp_mod)
-                        actual_ss = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
+                        actual_ss = tmp_mod.steady_state
                         expected_ss = cobb_douglas.analytic_steady_state(tmp_mod)
 
                         # conduct the test (default places=7 is too precise!)
@@ -129,14 +122,13 @@ def test_compute_output_elsticity():
                 for alpha in np.linspace(eps, 1-eps, 4):
                     for delta in np.linspace(eps, 1-eps, 4):
 
-                        tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha,
-                                      'delta': delta}
+                        tmp_params = {'A0': 1.0, 'g': g, 'L0': 1.0, 'n': n,
+                                      's': s, 'alpha': alpha, 'delta': delta}
                         tmp_mod = solow.Model(output=valid_output,
                                               params=tmp_params)
 
                         # use root finder to compute the steady state
-                        tmp_k_upper = k_upper(tmp_mod)
-                        tmp_k_star = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
+                        tmp_k_star = tmp_mod.steady_state
 
                         actual_elasticity = tmp_mod.compute_output_elasticity(tmp_k_star)
                         expected_elasticity = tmp_params['alpha']
@@ -155,14 +147,13 @@ def test_ivp_solve():
                 for alpha in np.linspace(eps, 1-eps, 4):
                     for delta in np.linspace(eps, 1-eps, 4):
 
-                        tmp_params = {'g': g, 'n': n, 's': s, 'alpha': alpha,
-                                      'delta': delta}
+                        tmp_params = {'A0': 1.0, 'g': g, 'L0': 1.0, 'n': n,
+                                      's': s, 'alpha': alpha, 'delta': delta}
                         tmp_mod = solow.Model(output=valid_output,
                                               params=tmp_params)
 
                         # use root finder to compute the steady state
-                        tmp_k_upper = k_upper(tmp_mod)
-                        tmp_k_star = tmp_mod.find_steady_state(1e-12, tmp_k_upper)
+                        tmp_k_star = tmp_mod.steady_state
 
                         # solve the initial value problem
                         t0, k0 = 0, 0.5 * tmp_k_star
@@ -182,8 +173,7 @@ def test_root_finders():
     valid_methods = ['brenth', 'brentq', 'ridder', 'bisect']
 
     for method in valid_methods:
-        tmp_k_upper = k_upper(tmp_mod)
-        actual_ss = tmp_mod.find_steady_state(1e-12, tmp_k_upper, method=method)
+        actual_ss = tmp_mod.find_steady_state(1e-6, 1e6, method=method)
         expected_ss = cobb_douglas.analytic_steady_state(tmp_mod)
         nose.tools.assert_almost_equals(actual_ss, expected_ss)
 
@@ -192,65 +182,4 @@ def test_valid_methods():
     """Testing raise exception if invalid method passed to find_steady_state."""
     with nose.tools.assert_raises(ValueError):
         tmp_mod = solow.Model(output=valid_output, params=valid_params)
-        tmp_mod.find_steady_state(1e-12, k_upper(tmp_mod),
-                                  method='invalid_method')
-
-
-def test_plot_intensive_output():
-    """Testing return type for plot_intensive_output."""
-    tmp_mod = solow.Model(output=valid_output, params=valid_params)
-    tmp_plot = solow.model.plot_intensive_output(tmp_mod)
-
-    # test the return types
-    fig, ax = tmp_plot
-    nose.tools.assert_is_instance(tmp_plot, list)
-    nose.tools.assert_is_instance(fig, plt.Figure)
-    nose.tools.assert_is_instance(ax, plt.Axes)
-
-
-def test_plot_intensive_investment():
-    """Testing return type for plot_intensive_investment."""
-    tmp_mod = solow.Model(output=valid_output, params=valid_params)
-    tmp_plot = solow.model.plot_intensive_investment(tmp_mod)
-
-    # test the return types
-    fig, ax = tmp_plot
-    nose.tools.assert_is_instance(tmp_plot, list)
-    nose.tools.assert_is_instance(fig, plt.Figure)
-    nose.tools.assert_is_instance(ax, plt.Axes)
-
-
-def test_plot_phase_diagram():
-    """Testing return type for plot_phase_diagram."""
-    tmp_mod = solow.Model(output=valid_output, params=valid_params)
-    tmp_plot = solow.model.plot_phase_diagram(tmp_mod)
-
-    # test the return types
-    fig, ax = tmp_plot
-    nose.tools.assert_is_instance(tmp_plot, list)
-    nose.tools.assert_is_instance(fig, plt.Figure)
-    nose.tools.assert_is_instance(ax, plt.Axes)
-
-
-def test_plot_solow_diagram():
-    """Testing return type for plot_solow_diagram."""
-    tmp_mod = solow.Model(output=valid_output, params=valid_params)
-    tmp_plot = solow.model.plot_solow_diagram(tmp_mod)
-
-    # test the return types
-    fig, ax = tmp_plot
-    nose.tools.assert_is_instance(tmp_plot, list)
-    nose.tools.assert_is_instance(fig, plt.Figure)
-    nose.tools.assert_is_instance(ax, plt.Axes)
-
-
-def test_plot_factor_shares():
-    """Testing return type for plot_factor_shares."""
-    tmp_mod = solow.Model(output=valid_output, params=valid_params)
-    tmp_plot = solow.model.plot_factor_shares(tmp_mod)
-
-    # test the return types
-    fig, ax = tmp_plot
-    nose.tools.assert_is_instance(tmp_plot, list)
-    nose.tools.assert_is_instance(fig, plt.Figure)
-    nose.tools.assert_is_instance(ax, plt.Axes)
+        tmp_mod.find_steady_state(1e-12, 1e12, method='invalid_method')
