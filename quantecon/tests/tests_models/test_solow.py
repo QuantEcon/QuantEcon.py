@@ -2,7 +2,7 @@
 Test suite for solow module.
 
 @author : David R. Pugh
-@date : 2014-09-01
+@date : 2014-11-27
 
 """
 import nose
@@ -10,7 +10,7 @@ import nose
 #import matplotlib
 #matplotlib.use('Agg')
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
 

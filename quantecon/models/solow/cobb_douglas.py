@@ -2,7 +2,7 @@
 Solow growth model with Cobb-Douglas aggregate production.
 
 @author : David R. Pugh
-@date : 2014-10-07
+@date : 2014-11-27
 
 """
 import numpy as np
