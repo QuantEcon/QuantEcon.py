@@ -714,243 +714,194 @@ class Model(object):
 
         return result
 
+    @classmethod
+    def plot_intensive_output(cls, ax, Nk=1e3, **new_params):
+        """
+        Plot intensive form of the aggregate production function.
 
-def plot_intensive_output(cls, Nk=1e3, **new_params):
-    """
-    Plot intensive form of the aggregate production function.
+        Parameters
+        ----------
+        cls : object
+            An instance of :class:`quantecon.models.solow.model.Model`.
+        ax : object
+            An instance of :class:`matplotlib.axes.AxesSubplot`.
+        Nk : float
+            Number of capital stock (per unit of effective labor) grid points
+            to plot.
+        new_params : dict (optional)
+            Optional dictionary of parameter values to change.
 
-    Parameters
-    ----------
-    cls : object
-        An instance of :class:`quantecon.models.solow.model.Model`.
-    Nk : float
-        Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    new_params : dict (optional)
-        Optional dictionary of parameter values to change.
+        """
+        # update model parameters
+        cls.params.update(new_params)
 
-    Returns
-    -------
-    A list containing:
+        # create the plot
+        k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
+        ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
+        ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
+                      family='serif', fontsize=15)
+        ax.set_ylabel('$f(k(t))$', family='serif', fontsize=20,
+                      rotation='horizontal')
+        ax.yaxis.set_label_coords(-0.1, 0.5)
+        ax.set_title('Output (per unit effective labor)',
+                     family='serif', fontsize=20)
+        ax.grid(True)
 
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    ax : object
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
+    @classmethod
+    def plot_factor_shares(cls, ax, Nk=1e3, **new_params):
+        """
+        Plot income/output shares of capital and labor inputs to production.
 
-    """
-    # update model parameters
-    cls.params.update(new_params)
+        Parameters
+        ----------
+        cls : object
+            An instance of :class:`quantecon.models.solow.model.Model`.
+        ax : object
+            An instance of :class:`matplotlib.axes.AxesSubplot`.
+        Nk : float
+            Number of capital stock (per unit of effective labor) grid points
+            to plot.
+        new_params : dict (optional)
+            Optional dictionary of parameter values to change.
 
-    # create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
-    ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
-    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
-                  fontsize=15)
-    ax.set_ylabel('$f(k(t))$', family='serif', fontsize=20,
-                  rotation='horizontal')
-    ax.yaxis.set_label_coords(-0.1, 0.5)
-    ax.set_title('Output (per unit effective labor)',
-                 family='serif', fontsize=20)
-    ax.grid(True)
+        """
+        # update the model parameters
+        cls.params.update(new_params)
 
-    return [fig, ax]
+        # create the plot
+        k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
+        capitals_share = cls.compute_output_elasticity(k_grid)
+        labors_share = 1 - capitals_share
 
+        ax.plot(k_grid, capitals_share, 'r-', label='$\alpha_K(t)$')
+        ax.plot(k_grid, labors_share, 'b-', label='$1 - \alpha_K(t)$')
+        ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
+                      family='serif', fontsize=15)
+        ax.set_title('Factor shares', family='serif', fontsize=20)
+        ax.grid(True)
+        ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
+                  bbox_to_anchor=(1.0, 1.0))
 
-def plot_factor_shares(cls, Nk=1e3, **new_params):
-    """
-    Plot income/output shares of capital and labor inputs to production.
+    @classmethod
+    def plot_intensive_investment(cls, ax, Nk=1e3, **new_params):
+        """
+        Plot actual investment (per unit effective labor) and effective
+        depreciation. The steady state value of capital stock (per unit
+        effective labor) balance acual investment and effective depreciation.
 
-    Parameters
-    ----------
-    cls : object
-        An instance of :class:`quantecon.models.solow.model.Model`.
-    Nk : float
-        Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    new_params : dict (optional)
-        Optional dictionary of parameter values to change.
+        Parameters
+        ----------
+        cls : object
+            An instance of :class:`quantecon.models.solow.model.Model`.
+        ax : object
+            An instance of :class:`matplotlib.axes.AxesSubplot`.
+        Nk : float
+            Number of capital stock (per unit of effective labor) grid points
+            to plot.
+        new_params : dict (optional)
+            Optional dictionary of parameter values to change.
 
-    Returns
-    -------
-    A list containing:
+        """
+        # update the model parameters
+        cls.params.update(new_params)
 
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    ax : object
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
+        # solve for the steady state
+        k_star = cls.steady_state
 
-    """
-    # update the model parameters
-    cls.params.update(new_params)
+        # create the plot
+        k_grid = np.linspace(0, 2 * k_star, Nk)
+        ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
+                label='$sf(k(t))$')
+        ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
+                label='$(g + n + \delta)k(t)$')
+        ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
+                label='$k^*={0:.4f}$'.format(k_star))
+        ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
+                      family='serif', fontsize=15)
+        ax.set_ylabel('Investment (per unit effective labor)', family='serif',
+                      fontsize=15)
+        ax.set_title('Output (per unit effective labor)',
+                     family='serif', fontsize=20)
+        ax.grid(True)
+        ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
+                  bbox_to_anchor=(1.0, 1.0))
 
-    # create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
-    capitals_share = cls.compute_output_elasticity(k_grid)
-    labors_share = 1 - capitals_share
+    @classmethod
+    def plot_phase_diagram(cls, ax, Nk=1e3, **new_params):
+        """
+        Plot the model's phase diagram.
 
-    ax.plot(k_grid, capitals_share, 'r-', label='$\alpha_K(t)$')
-    ax.plot(k_grid, labors_share, 'b-', label='$1 - \alpha_K(t)$')
-    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
-                  fontsize=15)
-    ax.set_title('Factor shares', family='serif', fontsize=20)
-    ax.grid(True)
-    ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
-              bbox_to_anchor=(1.0, 1.0))
+        Parameters
+        ----------
+        cls : object
+            An instance of :class:`quantecon.models.solow.model.Model`.
+        ax : object
+            An instance of :class:`matplotlib.axes.AxesSubplot`.
+        Nk : float
+            Number of capital stock (per unit of effective labor) grid points
+            to plot.
+        new_params : dict (optional)
+            Optional dictionary of parameter values to change.
 
-    return [fig, ax]
+        """
+        # update model parameters
+        cls.params.update(new_params)
 
+        # solve for the steady state
+        k_star = cls.steady_state
 
-def plot_intensive_investment(cls, Nk=1e3, **new_params):
-    """
-    Plot actual investment (per unit effective labor) and effective
-    depreciation. The steady state value of capital stock (per unit effective
-    labor) balance acual investment and effective depreciation.
+        # create the plot
+        k_grid = np.linspace(0, 2 * k_star, Nk)
+        ax.plot(k_grid, cls.compute_k_dot(k_grid), color='orange')
+        ax.axhline(0, color='k')
+        ax.plot(k_star, 0.0, 'ko', label='$k^*={0:.4f}$'.format(k_star))
+        ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
+                      family='serif', fontsize=15)
+        ax.set_ylabel('$\dot{k}(t)$', family='serif', fontsize=25,
+                      rotation='horizontal')
+        ax.yaxis.set_label_coords(-0.1, 0.5)
+        ax.set_title('Phase diagram', family='serif', fontsize=20)
+        ax.grid(True)
 
-    Parameters
-    ----------
-    cls : object
-        An instance of :class:`quantecon.models.solow.model.Model`.
-    Nk : float
-        Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    new_params : dict (optional)
-        Optional dictionary of parameter values to change.
+    @classmethod
+    def plot_solow_diagram(cls, ax, Nk=1e3, **new_params):
+        """
+        Plot the classic Solow diagram.
 
-    Returns
-    -------
-    A list containing:
+        Parameters
+        ----------
+        cls : object
+            An instance of :class:`quantecon.models.solow.model.Model`.
+        ax : object
+            An instance of :class:`matplotlib.axes.AxesSubplot`.
+        Nk : float
+            Number of capital stock (per unit of effective labor) grid points
+            to plot.
+        new_params : dict (optional)
+            Optional dictionary of parameter values to change.
 
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    ax : object
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
+        """
+        # update the model parameters
+        cls.params.update(new_params)
 
-    """
-    # update the model parameters
-    cls.params.update(new_params)
+        # solve for the steady state
+        k_star = cls.steady_state
 
-    # solve for the steady state
-    k_star = cls.steady_state
-
-    # create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, 2 * k_star, Nk)
-    ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
-            label='$sf(k(t))$')
-    ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
-            label='$(g + n + \delta)k(t)$')
-    ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
-            label='$k^*={0:.4f}$'.format(k_star))
-    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
-                  fontsize=15)
-    ax.set_ylabel('Investment (per unit effective labor)', family='serif',
-                  fontsize=15)
-    ax.set_title('Output (per unit effective labor)',
-                 family='serif', fontsize=20)
-    ax.grid(True)
-    ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
-              bbox_to_anchor=(1.0, 1.0))
-
-    return [fig, ax]
-
-
-def plot_phase_diagram(cls, Nk=1e3, **new_params):
-    """
-    Plot the model's phase diagram.
-
-    Parameters
-    ----------
-    cls : object
-        An instance of :class:`quantecon.models.solow.model.Model`.
-    Nk : float
-        Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    new_params : dict (optional)
-        Optional dictionary of parameter values to change.
-
-    Returns
-    -------
-    A list containing:
-
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    ax : object
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
-
-    """
-    # update model parameters
-    cls.params.update(new_params)
-
-    # solve for the steady state
-    k_star = cls.steady_state
-
-    # create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, 2 * k_star, Nk)
-    ax.plot(k_grid, cls.compute_k_dot(k_grid), color='orange')
-    ax.axhline(0, color='k')
-    ax.plot(k_star, 0.0, 'ko', label='$k^*={0:.4f}$'.format(k_star))
-    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
-                  fontsize=15)
-    ax.set_ylabel('$\dot{k}(t)$', family='serif', fontsize=25,
-                  rotation='horizontal')
-    ax.yaxis.set_label_coords(-0.1, 0.5)
-    ax.set_title('Phase diagram', family='serif', fontsize=20)
-    ax.grid(True)
-
-    return [fig, ax]
-
-
-def plot_solow_diagram(cls, Nk=1e3, **new_params):
-    """
-    Plot the classic Solow diagram.
-
-    Parameters
-    ----------
-    cls : object
-        An instance of :class:`quantecon.models.solow.model.Model`.
-    Nk : float
-        Number of capital stock (per unit of effective labor) grid points to
-        plot.
-    new_params : dict (optional)
-        Optional dictionary of parameter values to change.
-
-    Returns
-    -------
-    A list containing:
-
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    ax : object
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
-
-    """
-    # update the model parameters
-    cls.params.update(new_params)
-
-    # solve for the steady state
-    k_star = cls.steady_state
-
-    # create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    k_grid = np.linspace(0, 2 * k_star, Nk)
-    ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-',
-            label='$f(k(t)$')
-    ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
-            label='$sf(k(t))$')
-    ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
-            label='$(g + n + \delta)k(t)$')
-    ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
-            label='$k^*={0:.4f}$'.format(k_star))
-    ax.set_xlabel('Capital (per unit effective labor), $k(t)$', family='serif',
-                  fontsize=15)
-    ax.set_title('Solow diagram',
-                 family='serif', fontsize=20)
-    ax.grid(True)
-    ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
-              bbox_to_anchor=(1, 1))
-
-    return [fig, ax]
+        # create the plot
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
+        k_grid = np.linspace(0, 2 * k_star, Nk)
+        ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-',
+                label='$f(k(t)$')
+        ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
+                label='$sf(k(t))$')
+        ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
+                label='$(g + n + \delta)k(t)$')
+        ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
+                label='$k^*={0:.4f}$'.format(k_star))
+        ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
+                      family='serif', fontsize=15)
+        ax.set_title('Solow diagram',
+                     family='serif', fontsize=20)
+        ax.grid(True)
+        ax.legend(loc=0, frameon=False, prop={'family': 'serif'},
+                  bbox_to_anchor=(1, 1))
