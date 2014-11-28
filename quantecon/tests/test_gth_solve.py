@@ -118,9 +118,9 @@ def test_kmr_matrix():
         yield StationaryDistLeftEigenVec(), matrix_dict['A'], x
 
 
-def test_gen_solve():
+def test_gen_matrix():
     """Test with generator matrices"""
-    print(__name__ + '.' + test_gen_solve.__name__)
+    print(__name__ + '.' + test_gen_matrix.__name__)
     matrices = Matrices()
     for matrix_dict in matrices.gen_matrix_dicts:
         x = gth_solve(matrix_dict['A'])
