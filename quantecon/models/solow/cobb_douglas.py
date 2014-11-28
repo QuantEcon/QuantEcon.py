@@ -95,23 +95,31 @@ def analytic_steady_state(cls):
     return k_star
 
 
-def calibrate(cls, data, iso3_code, bounds=None):
+def calibrate(model, data, iso3_code, bounds=None):
     r"""
-    Calibrates a Solow model with Cobb-Douglas production using data from the
-    Penn World Tables (PWT).
+    Simple calibration scheme for a Solow model with Cobb-Douglas production
+    based on data from the Penn World Tables (PWT).
 
     Parameters
     ----------
 
     model : solow.Model
-        An instance of the SolowModel class that you wish to calibrate.
+        An instance of the Model class that you wish to calibrate.
     iso3_code : str
         A valid ISO3 country code. For example, to calibrate the model using
         data for the United States, one would set iso3_code='USA'; to calibrate
         a model using data for Zimbabwe, one would set iso3_code='ZWE'. For a
         complete listing of ISO3 country codes see `wikipedia`_.
-    bounds:    (tuple) Start and end years for the subset of the PWT data
-               to use for calibration.
+    bounds : tuple (default=None)
+        Start and end years for the subset of the PWT data to use for
+        calibration. Note that start and end years should be specified as
+        strings. For example, to calibrate a model using data from 1983 to 2003
+        one would set
+
+            bounds=('1983', '2003')
+
+        By default calibration will make use of all available data for the
+        specified country.
 
     .. `wikipedia`: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
 
@@ -127,38 +135,46 @@ def calibrate(cls, data, iso3_code, bounds=None):
         start = bounds[0]
         end = bounds[1]
 
+    # define the data used in the calibration
+    output = tmp_data['rgdpna'].loc[start:end]
+    capital = tmp_data['rkna'].loc[start:end]
+    labor = tmp_data['emp'].loc[start:end]
+    labor_share = tmp_data['labsh'].loc[start:end]
+    savings_rate = tmp_data['csh_i'].loc[start:end]
+    depreciation_rate = tmp_data['delta_k'].loc[start:end]
+
+    # define a time trend variable
+    N = tmp_data.index.size
+    linear_trend = pd.Series(np.linspace(0, N - 1, N), index=tmp_data.index)
+    time_trend = linear_trend.loc[start:end]
+
     # estimate capital's share of income/output
-    alpha = (1 - tmp_data.labsh.loc[start:end]).mean()
+    capital_share = 1 - labor_share
+    alpha = capital_share.mean()
+
+    # compute solow residual (note dependence on alpha!)
+    solow_residual = model.compute_solow_residual(output, capital, labor, alpha)
+    technology = solow_residual.loc[start:end]
 
     # estimate the fraction of output saved
-    s = tmp_data.csh_i.loc[start:end].mean()
+    s = savings_rate.mean()
 
     # regress log employed persons on linear time trend
-    N = tmp_data.index.size
-    trend = pd.Series(np.linspace(0, N - 1, N), index=tmp_data.index)
-    res = pd.ols(y=np.log(tmp_data.emp.loc[start:end]),
-                 x=trend.loc[start:end])
+    res = pd.ols(y=np.log(labor), x=time_trend)
     n = res.beta[0]
     L0 = np.exp(res.beta[1])
 
-    # estimate the technology growth rate
-
-    # adjust measure of TFP
-    model.data['atfpna'] = (tmp_data.rtfpna**(1 / tmp_data.labsh) *
-                            tmp_data.hc)
-
     # regress log TFP on linear time trend
-    res = pd.ols(y=np.log(tmp_data.atfpna.loc[start:end]),
-                 x=trend.loc[start:end])
+    res = pd.ols(y=np.log(technology), x=time_trend)
     g = res.beta[0]
     A0 = np.exp(res.beta[1])
 
     # estimate the depreciation rate for total capital
-    delta = tmp_data.delta_k.loc[start:end].mean()
+    delta = depreciation_rate.mean()
 
     # create a dictionary of model parameters
     tmp_params = {'s': s, 'alpha': alpha, 'delta': delta, 'n': n, 'L0': L0,
                   'g': g, 'A0': A0}
 
     # update the model's parameters
-    model.params.update(tmp_params)
+    model.params = tmp_params
