@@ -8,14 +8,10 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 
 """
 import numpy as np
-
-try:
-    xrange
-except:  # python3
-    xrange = range
+from numba import jit
 
 
-def gth_solve(A, overwrite=False):
+def gth_solve(A):
     r"""
     This routine computes the stationary distribution of an irreducible
     Markov transition matrix (stochastic matrix) or transition rate
@@ -42,8 +38,6 @@ def gth_solve(A, overwrite=False):
     ----------
     A : array_like(float, ndim=2)
         Stochastic matrix or generator matrix. Must be of shape n x n.
-    overwrite : bool, optional(default=False)
-        Whether to overwrite `A`; may improve performance.
 
     Returns
     -------
@@ -60,34 +54,59 @@ def gth_solve(A, overwrite=False):
        Simulation, Princeton University Press, 2009.
 
     """
-    A1 = np.array(A, dtype=float, copy=not overwrite)
+    A1 = np.array(A, dtype=np.float64)
 
     if len(A1.shape) != 2 or A1.shape[0] != A1.shape[1]:
         raise ValueError('matrix must be square')
 
     n = A1.shape[0]
+    x = np.zeros(n, dtype=np.float64)
 
-    x = np.zeros(n)
-
-    # === Reduction === #
-    for i in xrange(n-1):
-        scale = np.sum(A1[i, i+1:n])
-        if scale <= 0:
-            # There is one (and only one) recurrent class contained in
-            # {0, ..., i};
-            # compute the solution associated with that recurrent class.
-            n = i+1
-            break
-        A1[i+1:n, i] /= scale
-
-        A1[i+1:n, i+1:n] += np.dot(A1[i+1:n, i:i+1], A1[i:i+1, i+1:n])
-
-    # === Backward substitution === #
-    x[n-1] = 1
-    for i in xrange(n-2, -1, -1):
-        x[i] = np.dot(x[i+1:n], A1[i+1:n, i])
-
-    # === Normalization === #
-    x /= np.sum(x)
+    _gth_solve_jit(A1, n, x)
 
     return x
+
+
+@jit('void(float64[:,:], int64, float64[:])', nopython=True)
+def _gth_solve_jit(A, n, out):
+    """
+    Main body of gth_solve.
+
+    Parameters
+    ----------
+    A : numpy.ndarray(float, ndim=2)
+        Stochastic matrix or generator matrix. Must be of shape n x n.
+        Data will be overwritten.
+
+    n : int
+        Value of A.shape[0].
+
+    out : numpy.ndarray(float, ndim=1)
+        Output array in which to place the stationary distribution of A.
+
+    """
+    # === Reduction === #
+    for k in range(n-1):
+        scale = np.sum(A[k, k+1:n])
+        if scale <= 0:
+            # There is one (and only one) recurrent class contained in
+            # {0, ..., k};
+            # compute the solution associated with that recurrent class.
+            n = k+1
+            break
+        for i in range(k+1, n):
+            A[i, k] /= scale
+
+            for j in range(k+1, n):
+                A[i, j] += A[i, k] * A[k, j]
+
+    # === Backward substitution === #
+    out[n-1] = 1
+    for k in range(n-2, -1, -1):
+        for i in range(k+1, n):
+            out[k] += out[i] * A[i, k]
+
+    # === Normalization === #
+    norm = np.sum(out)
+    for k in range(n):
+        out[k] /= norm
