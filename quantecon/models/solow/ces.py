@@ -1,8 +1,10 @@
 """
 Solow model with constant elasticity of substitution (CES) production.
 
+@author : David R. Pugh
+@date : 2014-11-29
+
 """
-import numpy as np
 import sympy as sym
 
 from . import model
@@ -32,72 +34,43 @@ class CESModel(model.Model):
         ces_output = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
         super(CESModel, self).__init__(ces_output, params)
 
+    @property
+    def steady_state(self):
+        r"""
+        Steady state value of capital stock (per unit effective labor).
 
-def _cobb_douglas_steady_state(g, n, s, alpha, delta):
-    """
-    Steady-state level of capital stock (per unit effective labor) for a
-    Solow growth model with Cobb-Douglas aggregate production.
+        :getter: Return the current steady state value.
+        :type: float
 
-    """
-    k_star = (s / (n + g + delta))**(1 / (1 - alpha))
-    return k_star
+        Notes
+        -----
+        The steady state value of capital stock (per unit effective labor)
+        with CES production is defined as
 
+        .. math::
 
-def _leontief_steady_state(g, n, s, alpha, delta):
-    """
-    Steady-state level of capital stock (per unit effective labor) for a
-    Solow growth model with leontief aggregate production.
+            k^* = \bigg[\bigg(\frac{1}{1 - alpha}\bigg)\bigg(\frac{s}{g + n + delta}\bigg)^{-rho} - alpha\bigg)\bigg]^{-\frac{1}{rho}}
 
-    """
-    raise NotImplementedError
+        where `s` is the savings rate, :math:`g + n + \delta` is the effective
+        depreciation rate, and :math:`\alpha` controls the importance of
+        capital stock relative to effective labor in the production of output.
+        Finally,
 
+        ..math::
 
-def _general_ces_steady_state(g, n, s, alpha, delta, sigma):
-    """
-    Steady-state level of capital stock (per unit effective labor) for a
-    Solow growth model with CES aggregate production.
+            \rho=\frac{\sigma -1}{\sigma}
 
-    """
-    rho = (sigma - 1) / sigma
-    k_star = ((1 / (1 - alpha)) * ((s / (g + n + delta))**-rho - alpha))**(-1 / rho)
-    return k_star
+        where `:math:`sigma` is the elasticity of substitution between capital
+        and effective labor in production.
 
+        """
+        g = self.params['g']
+        n = self.params['n']
+        s = self.params['s']
+        alpha = self.params['alpha']
+        delta = self.params['delta']
+        sigma = self.params['sigma']
 
-def ces_steady_state(g, n, s, alpha, delta, sigma):
-    """
-    Steady-state level of capital stock (per unit effective labor) for a
-    Solow growth model with constant elasticity of substitution (CES) aggregate
-    production.
-
-    Parameters
-    ----------
-    g : float
-        Growth rate of technology.
-    n : float
-        Growth rate of the labor force.
-    s : float
-        Savings rate. Must satisfy `0 < s < 1`.
-    alpha : float
-        Importance of capital stock relative to effective labor in the
-        production of output. Constant returns to scale requires that
-        :math:`0 < alpha < 1`.
-    delta : float
-        Depreciation rate of physical capital. Must satisfy :math:`0 < \delta`.
-    sigma : float
-        Elasticity of substitution between capital stock and effective labor in
-        the production of output.
-
-    Returns
-    -------
-    k_star : float
-        Steady state value for capital stock (per unit of effective labor).
-
-    """
-    if np.isclose(sigma, 0.0):
-        k_star = _leontief_steady_state(g, n, s, alpha, delta)
-    elif np.isclose(sigma, 1.0):
-        k_star = _cobb_douglas_steady_state(g, n, s, alpha, delta)
-    else:
-        k_star = _general_ces_steady_state(g, n, s, alpha, delta, sigma)
-
-    return k_star
+        rho = (sigma - 1) / sigma
+        k_star = ((1 / (1 - alpha)) * ((s / (g + n + delta))**-rho - alpha))**(-1 / rho)
+        return k_star
