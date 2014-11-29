@@ -8,11 +8,11 @@ import sympy as sym
 from . import model
 
 # declare key variables for the model
-t, X = sym.var('t'), sym.DeferredVector('X')
-A, k, K, L = sym.var('A, k, K, L')
+t, X = sym.symbols('t'), sym.DeferredVector('X')
+A, k, K, L = sym.symbols('A, k, K, L')
 
 # declare required model parameters
-g, n, s, alpha, delta, sigma = sym.var('g, n, s, alpha, delta, sigma')
+g, n, s, alpha, delta, sigma = sym.symbols('g, n, s, alpha, delta, sigma')
 
 
 class CESModel(model.Model):

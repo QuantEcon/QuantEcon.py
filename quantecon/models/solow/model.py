@@ -92,11 +92,11 @@ from ... import ivp
 from . import impulse_response
 
 # declare key variables for the model
-t, X = sym.var('t'), sym.DeferredVector('X')
-A, k, K, L = sym.var('A, k, K, L')
+t, X = sym.symbols('t'), sym.DeferredVector('X')
+A, k, K, L, Y = sym.symbols('A, k, K, L, Y')
 
 # declare required model parameters
-g, n, s, delta = sym.var('g, n, s, delta')
+g, n, s, delta = sym.symbols('g, n, s, delta')
 
 
 class Model(object):
@@ -118,8 +118,9 @@ class Model(object):
         # cached values
         self.__intensive_output = None
         self.__mpk = None
-        self.__numeric_system = None
         self.__numeric_jacobian = None
+        self.__numeric_solow_residual = None
+        self.__numeric_system = None
 
         self.irf = impulse_response.ImpulseResponse(self)
         self.output = output
@@ -133,7 +134,7 @@ class Model(object):
 
         """
         if self.__intensive_output is None:
-            args = [k] + sym.var(list(self.params.keys()))
+            args = [k] + sym.symbols(list(self.params.keys()))
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
                                                    self.modules)
         return self.__intensive_output
@@ -146,25 +147,10 @@ class Model(object):
 
         """
         if self.__mpk is None:
-            args = [k] + sym.var(list(self.params.keys()))
+            args = [k] + sym.symbols(list(self.params.keys()))
             self.__mpk = sym.lambdify(args, self.marginal_product_capital,
                                       self.modules)
         return self.__mpk
-
-    @property
-    def _numeric_system(self):
-        """
-        Vectorized, numpy-aware function defining the system of ODEs.
-
-        :getter: Return vectorized symbolic system of ODEs.
-        :type: function
-
-        """
-        if self.__numeric_system is None:
-            self.__numeric_system = sym.lambdify(self._symbolic_args,
-                                                 self._symbolic_system,
-                                                 self.modules)
-        return self.__numeric_system
 
     @property
     def _numeric_jacobian(self):
@@ -183,6 +169,37 @@ class Model(object):
         return self.__numeric_jacobian
 
     @property
+    def _numeric_solow_residual(self):
+        """
+        Vectorized, numpy-aware function defining the Solow residual.
+
+        :getter: Return vectorized symbolic Solow residual.
+        :type: function
+
+        """
+        if self.__numeric_solow_residual is None:
+            tmp_args = [Y, K, L] + sym.symbols(list(self.params.keys()))
+            self.__numeric_solow_residual = sym.lambdify(tmp_args,
+                                                         self._symbolic_solow_residual,
+                                                         self.modules)
+        return self.__numeric_solow_residual
+
+    @property
+    def _numeric_system(self):
+        """
+        Vectorized, numpy-aware function defining the system of ODEs.
+
+        :getter: Return vectorized symbolic system of ODEs.
+        :type: function
+
+        """
+        if self.__numeric_system is None:
+            self.__numeric_system = sym.lambdify(self._symbolic_args,
+                                                 self._symbolic_system,
+                                                 self.modules)
+        return self.__numeric_system
+
+    @property
     def _symbolic_args(self):
         """
         List of symbolic arguments used in constructing vectorized versions of
@@ -192,20 +209,8 @@ class Model(object):
         :type: list
 
         """
-        args = [t, X] + sym.var(list(self.params.keys()))
+        args = [t, X] + sym.symbols(list(self.params.keys()))
         return args
-
-    @property
-    def _symbolic_system(self):
-        """
-        Symbolic matrix defining the system of ODEs.
-
-        :getter: Return the matrix defining the system of ODEs.
-        :type: sym.MutableDenseMatrix
-
-        """
-        change_of_vars = {k: X[0]}
-        return sym.Matrix([self.k_dot]).subs(change_of_vars)
 
     @property
     def _symbolic_jacobian(self):
@@ -218,6 +223,30 @@ class Model(object):
         """
         N = self._symbolic_system.shape[0]
         return self._symbolic_system.jacobian([X[i] for i in range(N)])
+
+    @property
+    def _symbolic_solow_residual(self):
+        """
+        Symbolic expression for the Solow residual which is used as a measure
+        of technology.
+
+        :getter: Return the symbolic expression.
+        :type: sym.Basic
+
+        """
+        return sym.solve(Y - self.output, A)[0]
+
+    @property
+    def _symbolic_system(self):
+        """
+        Symbolic matrix defining the system of ODEs.
+
+        :getter: Return the matrix defining the system of ODEs.
+        :type: sym.MutableDenseMatrix
+
+        """
+        change_of_vars = {k: X[0]}
+        return sym.Matrix([self.k_dot]).subs(change_of_vars)
 
     @property
     def effective_depreciation_rate(self):
@@ -477,17 +506,20 @@ class Model(object):
     def output(self, value):
         """Set a new production function."""
         self._output = self._validate_output(value)
-
-        # clear the cache
-        self.__intensive_output = None
-        self.__mpk = None
-        self.__numeric_system = None
-        self.__numeric_jacobian = None
+        self._clear_cache()
 
     @params.setter
     def params(self, value):
         """Set a new parameter dictionary."""
         self._params = self._validate_params(value)
+
+    def _clear_cache(self):
+        """Clear cached values."""
+        self.__intensive_output = None
+        self.__mpk = None
+        self.__numeric_jacobian = None
+        self.__numeric_solow_residual = None
+        self.__numeric_system = None
 
     def _validate_output(self, output):
         """Validate the production function."""
@@ -530,7 +562,7 @@ class Model(object):
         """Calibrate the model using some data."""
         raise NotImplementedError
 
-    def compute_actual_investment(self, k):
+    def evaluate_actual_investment(self, k):
         """
         Return the amount of output (per unit of effective labor) invested in
         the production of new capital.
@@ -546,10 +578,10 @@ class Model(object):
             Investment (per unit of effective labor)
 
         """
-        actual_inv = self.params['s'] * self.compute_intensive_output(k)
+        actual_inv = self.params['s'] * self.evaluate_intensive_output(k)
         return actual_inv
 
-    def compute_consumption(self, k):
+    def evaluate_consumption(self, k):
         """
         Return the amount of consumption (per unit of effective labor).
 
@@ -564,11 +596,11 @@ class Model(object):
             Consumption (per unit of effective labor)
 
         """
-        c = (self.compute_intensive_output(k) -
-             self.compute_actual_investment(k))
+        c = (self.evaluate_intensive_output(k) -
+             self.evaluate_actual_investment(k))
         return c
 
-    def compute_effective_depreciation(self, k):
+    def evaluate_effective_depreciation(self, k):
         """
         Return amount of Capital stock (per unit of effective labor) that
         depreciaties due to technological progress, population growth, and
@@ -588,7 +620,7 @@ class Model(object):
         effective_depreciation = self.effective_depreciation_rate * k
         return effective_depreciation
 
-    def compute_intensive_output(self, k):
+    def evaluate_intensive_output(self, k):
         """
         Return the amount of output (per unit of effective labor).
 
@@ -603,10 +635,10 @@ class Model(object):
             Output (per unit of effective labor)
 
         """
-        y = self._intensive_output(k, **self.params)
+        y = self._intensive_output(k, *self.params.values())
         return y
 
-    def compute_k_dot(self, k):
+    def evaluate_k_dot(self, k):
         """
         Return time derivative of capital stock (per unit of effective labor).
 
@@ -621,11 +653,11 @@ class Model(object):
             Time derivative of capital stock (per unit of effective labor).
 
         """
-        k_dot = (self.compute_actual_investment(k) -
-                 self.compute_effective_depreciation(k))
+        k_dot = (self.evaluate_actual_investment(k) -
+                 self.evaluate_effective_depreciation(k))
         return k_dot
 
-    def compute_mpk(self, k):
+    def evaluate_mpk(self, k):
         """
         Return marginal product of capital stock (per unit of effective labor).
 
@@ -640,10 +672,10 @@ class Model(object):
             Marginal product of capital stock (per unit of effective labor).
 
         """
-        mpk = self._mpk(k, **self.params)
+        mpk = self._mpk(k, *self.params.values())
         return mpk
 
-    def compute_output_elasticity(self, k):
+    def evaluate_output_elasticity(self, k):
         """
         Return elasticity of output with respect to capital stock (per unit
         effective labor).
@@ -668,8 +700,11 @@ class Model(object):
         to one.
 
         """
-        alpha_k = (k * self.compute_mpk(k)) / self.compute_intensive_output(k)
+        alpha_k = (k * self.evaluate_mpk(k)) / self.evaluate_intensive_output(k)
         return alpha_k
+
+    def evaluate_solow_residual(self, Y, K, L, ):
+        return self._numeric_solow_residual(Y, K, L, *self.params.values())
 
     def find_steady_state(self, a, b, method='brentq', **kwargs):
         """
@@ -700,13 +735,13 @@ class Model(object):
 
         """
         if method == 'bisect':
-            result = optimize.bisect(self.compute_k_dot, a, b, **kwargs)
+            result = optimize.bisect(self.evaluate_k_dot, a, b, **kwargs)
         elif method == 'brenth':
-            result = optimize.brenth(self.compute_k_dot, a, b, **kwargs)
+            result = optimize.brenth(self.evaluate_k_dot, a, b, **kwargs)
         elif method == 'brentq':
-            result = optimize.brentq(self.compute_k_dot, a, b, **kwargs)
+            result = optimize.brentq(self.evaluate_k_dot, a, b, **kwargs)
         elif method == 'ridder':
-            result = optimize.ridder(self.compute_k_dot, a, b, **kwargs)
+            result = optimize.ridder(self.evaluate_k_dot, a, b, **kwargs)
         else:
             mesg = ("Method must be one of : 'bisect', 'brenth', 'brentq', " +
                     "or 'ridder'.")
@@ -737,7 +772,7 @@ class Model(object):
 
         # create the plot
         k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
-        ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-')
+        ax.plot(k_grid, cls.evaluate_intensive_output(k_grid), 'r-')
         ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
                       family='serif', fontsize=15)
         ax.set_ylabel('$f(k(t))$', family='serif', fontsize=20,
@@ -770,7 +805,7 @@ class Model(object):
 
         # create the plot
         k_grid = np.linspace(0, 2 * cls.steady_state, Nk)
-        capitals_share = cls.compute_output_elasticity(k_grid)
+        capitals_share = cls.evaluate_output_elasticity(k_grid)
         labors_share = 1 - capitals_share
 
         ax.plot(k_grid, capitals_share, 'r-', label='$\alpha_K(t)$')
@@ -810,11 +845,11 @@ class Model(object):
 
         # create the plot
         k_grid = np.linspace(0, 2 * k_star, Nk)
-        ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
+        ax.plot(k_grid, cls.evaluate_actual_investment(k_grid), 'g-',
                 label='$sf(k(t))$')
-        ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
+        ax.plot(k_grid, cls.evaluate_effective_depreciation(k_grid), 'b-',
                 label='$(g + n + \delta)k(t)$')
-        ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
+        ax.plot(k_star, cls.evaluate_actual_investment(k_star), 'ko',
                 label='$k^*={0:.4f}$'.format(k_star))
         ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
                       family='serif', fontsize=15)
@@ -852,7 +887,7 @@ class Model(object):
 
         # create the plot
         k_grid = np.linspace(0, 2 * k_star, Nk)
-        ax.plot(k_grid, cls.compute_k_dot(k_grid), color='orange')
+        ax.plot(k_grid, cls.evaluate_k_dot(k_grid), color='orange')
         ax.axhline(0, color='k')
         ax.plot(k_star, 0.0, 'ko', label='$k^*={0:.4f}$'.format(k_star))
         ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
@@ -889,13 +924,13 @@ class Model(object):
 
         # create the plot
         k_grid = np.linspace(0, 2 * k_star, Nk)
-        ax.plot(k_grid, cls.compute_intensive_output(k_grid), 'r-',
+        ax.plot(k_grid, cls.evaluate_intensive_output(k_grid), 'r-',
                 label='$f(k(t)$')
-        ax.plot(k_grid, cls.compute_actual_investment(k_grid), 'g-',
+        ax.plot(k_grid, cls.evaluate_actual_investment(k_grid), 'g-',
                 label='$sf(k(t))$')
-        ax.plot(k_grid, cls.compute_effective_depreciation(k_grid), 'b-',
+        ax.plot(k_grid, cls.evaluate_effective_depreciation(k_grid), 'b-',
                 label='$(g + n + \delta)k(t)$')
-        ax.plot(k_star, cls.compute_actual_investment(k_star), 'ko',
+        ax.plot(k_star, cls.evaluate_actual_investment(k_star), 'ko',
                 label='$k^*={0:.4f}$'.format(k_star))
         ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
                       family='serif', fontsize=15)

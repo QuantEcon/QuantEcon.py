@@ -18,11 +18,11 @@ from ... models import solow
 from ... models.solow import cobb_douglas
 
 # declare key variables for the model
-t, X = sym.var('t'), sym.DeferredVector('X')
-A, E, k, K, L = sym.var('A, E, k, K, L')
+t, X = sym.symbols('t'), sym.DeferredVector('X')
+A, E, k, K, L = sym.symbols('A, E, k, K, L')
 
 # declare required model parameters
-g, n, s, alpha, delta = sym.var('g, n, s, alpha, delta')
+g, n, s, alpha, delta = sym.symbols('g, n, s, alpha, delta')
 
 
 # two different ways in which output can fail
@@ -108,12 +108,11 @@ def test_find_steady_state():
                         actual_ss = tmp_mod.steady_state
                         expected_ss = cobb_douglas.analytic_steady_state(tmp_mod)
 
-                        # conduct the test (default places=7 is too precise!)
-                        nose.tools.assert_almost_equals(actual_ss, expected_ss,
-                                                        places=6)
+                        # conduct the test
+                        nose.tools.assert_almost_equals(actual_ss, expected_ss)
 
 
-def test_compute_output_elsticity():
+def test_evaluate_output_elsticity():
     """Testing computation of elasticity of output with respect to capital."""
     eps = 1e-1
     for g in np.linspace(eps, 0.05, 4):
@@ -130,7 +129,7 @@ def test_compute_output_elsticity():
                         # use root finder to compute the steady state
                         tmp_k_star = tmp_mod.steady_state
 
-                        actual_elasticity = tmp_mod.compute_output_elasticity(tmp_k_star)
+                        actual_elasticity = tmp_mod.evaluate_output_elasticity(tmp_k_star)
                         expected_elasticity = tmp_params['alpha']
 
                         # conduct the test

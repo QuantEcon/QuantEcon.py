@@ -12,11 +12,11 @@ import pandas as pd
 from . import model
 
 # declare key variables for the model
-t, X = sym.var('t'), sym.DeferredVector('X')
-A, k, K, L = sym.var('A, k, K, L')
+t, X = sym.symbols('t'), sym.DeferredVector('X')
+A, k, K, L = sym.symbols('A, k, K, L')
 
 # declare required model parameters
-g, n, s, alpha, delta = sym.var('g, n, s, alpha, delta')
+g, n, s, alpha, delta = sym.symbols('g, n, s, alpha, delta')
 
 
 class CobbDouglasModel(model.Model):
@@ -153,7 +153,7 @@ def calibrate(model, data, iso3_code, bounds=None):
     alpha = capital_share.mean()
 
     # compute solow residual (note dependence on alpha!)
-    solow_residual = model.compute_solow_residual(output, capital, labor, alpha)
+    solow_residual = model.evaluate_solow_residual(output, capital, labor, alpha)
     technology = solow_residual.loc[start:end]
 
     # estimate the fraction of output saved
