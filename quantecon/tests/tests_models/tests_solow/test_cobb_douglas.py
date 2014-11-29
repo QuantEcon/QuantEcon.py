@@ -11,7 +11,7 @@ import numpy as np
 
 import pypwt
 
-from ... models.solow import cobb_douglas
+from .... models.solow import cobb_douglas
 
 params = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
           'alpha': 0.33, 'delta': 0.05}
@@ -29,7 +29,7 @@ def test_match_moments():
         # compare steady states
         actual_ss = model.steady_state
         expected_ss = model.find_steady_state(1e-12, 1e12)
-        nose.tools.assert_almost_equals(actual_ss, expected_ss)
+        nose.tools.assert_almost_equals(actual_ss, expected_ss, msg="ctry: {}, params: {}".format(ctry, model.params))
 
 
 def test_ivp_solve():
@@ -57,6 +57,15 @@ def test_ivp_solve():
                         np.testing.assert_allclose(numeric_soln, analytic_soln)
 
 
+def test_root_finders():
+    """Testing conditional logic in find_steady_state."""
+    valid_methods = ['brenth', 'brentq', 'ridder', 'bisect']
+    for method in valid_methods:
+        actual_ss = model.find_steady_state(1e-6, 1e6, method=method)
+        expected_ss = model.steady_state
+        nose.tools.assert_almost_equals(actual_ss, expected_ss)
+
+
 def test_steady_state():
     """Compare analytic steady state with numerical steady state."""
     eps = 1e-1
@@ -76,3 +85,9 @@ def test_steady_state():
 
                         # conduct the test
                         nose.tools.assert_almost_equals(actual_ss, expected_ss)
+
+
+def test_valid_methods():
+    """Testing invalid method passed to find_steady_state."""
+    with nose.tools.assert_raises(ValueError):
+        model.find_steady_state(1e-12, 1e12, method='invalid_method')

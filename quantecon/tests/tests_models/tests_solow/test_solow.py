@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
 
-from ... models import solow
-from ... models.solow import cobb_douglas
+from .... models import solow
+from .... models.solow import cobb_douglas
 
 # declare key variables for the model
 t, X = sym.symbols('t'), sym.DeferredVector('X')
@@ -153,22 +153,3 @@ def test_evaluate_output_elasticity():
                         # conduct the test
                         nose.tools.assert_almost_equals(actual_elasticity,
                                                         expected_elasticity)
-
-
-def test_root_finders():
-    """Testing conditional logic in find_steady_state."""
-    # loop over solvers
-    tmp_mod = solow.Model(output=valid_output, params=valid_params)
-    valid_methods = ['brenth', 'brentq', 'ridder', 'bisect']
-
-    for method in valid_methods:
-        actual_ss = tmp_mod.find_steady_state(1e-6, 1e6, method=method)
-        expected_ss = cobb_douglas.analytic_steady_state(tmp_mod)
-        nose.tools.assert_almost_equals(actual_ss, expected_ss)
-
-
-def test_valid_methods():
-    """Testing raise exception if invalid method passed to find_steady_state."""
-    with nose.tools.assert_raises(ValueError):
-        tmp_mod = solow.Model(output=valid_output, params=valid_params)
-        tmp_mod.find_steady_state(1e-12, 1e12, method='invalid_method')

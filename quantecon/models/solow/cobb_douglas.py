@@ -153,7 +153,7 @@ def match_moments(model, data, iso3_code, bounds=None):
     alpha = capital_share.mean()
 
     # compute solow residual (note dependence on alpha!)
-    solow_residual = model.evaluate_solow_residual(output, capital, labor, alpha)
+    solow_residual = model.evaluate_solow_residual(output, capital, labor)
     technology = solow_residual.loc[start:end]
 
     # estimate the fraction of output saved
