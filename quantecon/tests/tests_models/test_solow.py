@@ -10,7 +10,7 @@ import nose
 #import matplotlib
 #matplotlib.use('Agg')
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
 
@@ -39,6 +39,46 @@ valid_params = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
 
 
 # testing functions
+def test_plot_factor_shares():
+    """Testing return type for plot_factor_shares."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    fig, ax = plt.subplots(1, 1)
+    tmp_lines = tmp_mod.plot_factor_shares(ax)
+    nose.tools.assert_is_instance(tmp_lines, list)
+
+
+def test_plot_intensive_investment():
+    """Testing return type for plot_intensive_investment."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    fig, ax = plt.subplots(1, 1)
+    tmp_lines = tmp_mod.plot_intensive_investment(ax)
+    nose.tools.assert_is_instance(tmp_lines, list)
+
+
+def test_plot_intensive_output():
+    """Testing return type for plot_intensive_output."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    fig, ax = plt.subplots(1, 1)
+    tmp_lines = tmp_mod.plot_intensive_output(ax)
+    nose.tools.assert_is_instance(tmp_lines, list)
+
+
+def test_plot_phase_diagram():
+    """Testing return type for plot_phase_diagram."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    fig, ax = plt.subplots(1, 1)
+    tmp_lines = tmp_mod.plot_phase_diagram(ax)
+    nose.tools.assert_is_instance(tmp_lines, list)
+
+
+def test_plot_solow_diagram():
+    """Testing return type for plot_solow_diagram."""
+    tmp_mod = solow.Model(output=valid_output, params=valid_params)
+    fig, ax = plt.subplots(1, 1)
+    tmp_lines = tmp_mod.plot_solow_diagram(ax)
+    nose.tools.assert_is_instance(tmp_lines, list)
+
+
 def test_validate_output():
     """Testing validation of output attribute."""
     # output must have type sym.Basic
@@ -161,7 +201,7 @@ def test_ivp_solve():
                         tmp_ti = numeric_soln[:, 0]
                         analytic_soln = cobb_douglas.analytic_solution(tmp_mod, tmp_ti, k0)
 
-                        # conduct the test (default places=7 is too precise!)
+                        # conduct the test
                         np.testing.assert_allclose(numeric_soln, analytic_soln)
 
 
