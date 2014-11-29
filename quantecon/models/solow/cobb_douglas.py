@@ -35,67 +35,67 @@ class CobbDouglasModel(model.Model):
         cobb_douglas_output = K**alpha * (A * L)**(1 - alpha)
         super(CobbDouglasModel, self).__init__(cobb_douglas_output, params)
 
-
-def analytic_solution(cls, t, k0):
-    """
-    Compute the analytic solution for the Solow model with Cobb-Douglas
-    production technology.
-
-    Parameters
-    ----------
-    cls : object
-        Instance of the `solow.CobbDouglasModel` class.
-    t : ndarray (shape=(T,))
-        Array of points at which the solution is desired.
-    k0 : (float)
-        Initial condition for capital stock (per unit of effective labor)
-
-    Returns
-    -------
-    analytic_traj : ndarray (shape=t.size, 2)
-        Array representing the analytic solution trajectory.
-
-    """
-    s = cls.params['s']
-    alpha = cls.params['alpha']
-
-    # lambda governs the speed of convergence
-    lmbda = cls.effective_depreciation_rate * (1 - alpha)
-
-    # analytic solution for Solow model at time t
-    k_t = (((s / (cls.effective_depreciation_rate)) * (1 - np.exp(-lmbda * t)) +
-            k0**(1 - alpha) * np.exp(-lmbda * t))**(1 / (1 - alpha)))
-
-    # combine into a (T, 2) array
-    analytic_traj = np.hstack((t[:, np.newaxis], k_t[:, np.newaxis]))
-
-    return analytic_traj
-
-
-def analytic_steady_state(cls):
-    """
-    Steady-state level of capital stock (per unit effective labor).
-
-    Parameters
-    ----------
-    cls : object
-        Instance of the `solow.CobbDouglasModel` class.
-
-    Returns
-    -------
-    kstar : float
+    @property
+    def steady_state(self):
+        r"""
         Steady state value of capital stock (per unit effective labor).
 
-    """
-    s = cls.params['s']
-    alpha = cls.params['alpha']
+        :getter: Return the current steady state value.
+        :type: float
 
-    k_star = (s / cls.effective_depreciation_rate)**(1 / (1 - alpha))
+        Notes
+        -----
+        The steady state value of capital stock (per unit effective labor)
+        with Cobb-Douglas production is defined as
 
-    return k_star
+        .. math::
+
+            k^* = \bigg(\frac{s}{g + n + \delta}\bigg)^\frac{1}{1-\alpha}
+
+        where `s` is the savings rate, :math:`g + n + \delta` is the effective
+        depreciation rate, and :math:`\alpha` is the elasticity of output with
+        respect to capital (i.e., capital's share).
+
+        """
+        s = self.params['s']
+        alpha = self.params['alpha']
+        return (s / self.effective_depreciation_rate)**(1 / (1 - alpha))
+
+    def analytic_solution(self, t, k0):
+        """
+        Compute the analytic solution for the Solow model with Cobb-Douglas
+        production technology.
+
+        Parameters
+        ----------
+        t : ndarray (shape=(T,))
+            Array of points at which the solution is desired.
+        k0 : (float)
+            Initial condition for capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        analytic_traj : ndarray (shape=t.size, 2)
+            Array representing the analytic solution trajectory.
+
+        """
+        s = self.params['s']
+        alpha = self.params['alpha']
+
+        # lambda governs the speed of convergence
+        lmbda = self.effective_depreciation_rate * (1 - alpha)
+
+        # analytic solution for Solow model at time t
+        k_t = (((s / (self.effective_depreciation_rate)) * (1 - np.exp(-lmbda * t)) +
+                k0**(1 - alpha) * np.exp(-lmbda * t))**(1 / (1 - alpha)))
+
+        # combine into a (T, 2) array
+        analytic_traj = np.hstack((t[:, np.newaxis], k_t[:, np.newaxis]))
+
+        return analytic_traj
 
 
-def calibrate(model, data, iso3_code, bounds=None):
+def match_moments(model, data, iso3_code, bounds=None):
     r"""
     Simple calibration scheme for a Solow model with Cobb-Douglas production
     based on data from the Penn World Tables (PWT).
@@ -103,8 +103,8 @@ def calibrate(model, data, iso3_code, bounds=None):
     Parameters
     ----------
 
-    model : solow.Model
-        An instance of the Model class that you wish to calibrate.
+    model : solow.CobbDouglasModel
+        An instance of the CobbDouglasModel class that you wish to calibrate.
     iso3_code : str
         A valid ISO3 country code. For example, to calibrate the model using
         data for the United States, one would set iso3_code='USA'; to calibrate
