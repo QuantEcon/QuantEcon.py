@@ -1,22 +1,9 @@
 
-## Quantitative Economics
+## Quantitative Economics (Python)
 
-This repository collects code for quantitative economic modeling
-The majority of the code is described at [quant-econ.net](http://quant-econ.net).  However this code repository is a separate project from [quant-econ.net](http://quant-econ.net), and we welcome contributions and pull requests
+This repository collects code for quantitative economic modeling in Python
 
-At present, the lead developers of this repository (in alphabetical order) are
-
-* [Chase Coleman](https://github.com/cc7768)
-* [Spencer Lyon](https://github.com/spencerlyon2)
-* [Matthew McKay](https://github.com/sanguineturtle)
-* [Daisuke Oyama](http://www.oyama.e.u-tokyo.ac.jp/)
-* [Pablo Winant](http://www.mosphere.fr/)
-
-Project coordinators are
-
-* [Thomas J. Sargent](https://files.nyu.edu/ts43/public/)
-* [John Stachurski](http://johnstachurski.net)
-
+Libary Website: [http://quantecon.org](http://quantecon.org)
 
 ### Downloading the Repository
 
@@ -39,7 +26,11 @@ at a terminal prompt
 [![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master)](https://travis-ci.org/QuantEcon/QuantEcon.py)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 
+## Additional Links
 
+1. [Project Coordinators](https://github.com/QuantEcon/QuantEcon.site/blob/master/README.md)
+2. [Lead Developers](https://github.com/QuantEcon/QuantEcon.site/blob/master/README.md)
+3. [QuantEcon Course Website](http://quant-econ.net)
 
 ### License
 
