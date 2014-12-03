@@ -28,8 +28,8 @@ at a terminal prompt
 
 ## Additional Links
 
-1. [Project Coordinators](https://github.com/QuantEcon/QuantEcon.site/blob/master/README.md)
-2. [Lead Developers](https://github.com/QuantEcon/QuantEcon.site/blob/master/README.md)
+1. [Project Coordinators](http://quantecon.org/about/#people)
+2. [Lead Developers](http://quantecon.org/about/#people)
 3. [QuantEcon Course Website](http://quant-econ.net)
 
 ### License
