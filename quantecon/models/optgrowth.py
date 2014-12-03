@@ -20,7 +20,7 @@ class GrowthModel(object):
     Parameters
     ----------
     f : function, optional(default=k**.65)
-        The production function; they default is the Cobb-Douglas
+        The production function; the default is the Cobb-Douglas
         production function with power of .65
     beta : scalar(int), optional(default=.95)
         The utility discounting parameter
