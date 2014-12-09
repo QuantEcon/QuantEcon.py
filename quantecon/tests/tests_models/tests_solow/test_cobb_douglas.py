@@ -22,14 +22,19 @@ def test_match_moments():
     """Testing the moment matching calibration routine."""
     pwt = pypwt.load_pwt_data()
 
-    for ctry in pwt.major_axis:
-        # calibrate the model
-        cobb_douglas.match_moments(model, data=pwt, iso3_code=ctry)
+    # calibrate the model to random country
+    ctry, = np.random.choice(pwt.major_axis, 1)
+    cobb_douglas.match_moments(model, data=pwt, iso3_code=ctry)
+    actual_ss = model.steady_state
+    expected_ss = model.find_steady_state(1e-12, 1e12)
+    nose.tools.assert_almost_equals(actual_ss, expected_ss)
 
-        # compare steady states
-        actual_ss = model.steady_state
-        expected_ss = model.find_steady_state(1e-12, 1e12)
-        nose.tools.assert_almost_equals(actual_ss, expected_ss, msg="ctry: {}, params: {}".format(ctry, model.params))
+    # calibrate the model to specific country
+    cobb_douglas.match_moments(model, data=pwt, iso3_code='USA',
+                               bounds=('1967', '1983'))
+    actual_ss = model.steady_state
+    expected_ss = model.find_steady_state(1e-12, 1e12)
+    nose.tools.assert_almost_equals(actual_ss, expected_ss)
 
 
 def test_ivp_solve():

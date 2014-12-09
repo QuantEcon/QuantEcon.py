@@ -101,7 +101,19 @@ g, n, s, delta = sym.symbols('g, n, s, delta')
 
 class Model(object):
 
-    modules = [{'ImmutableMatrix': np.array}, "numpy"]
+    __intensive_output = None
+
+    _modules = [{'ImmutableMatrix': np.array}, "numpy"]
+
+    __mpk = None
+
+    __numeric_jacobian = None
+
+    __numeric_solow_residual = None
+
+    __numeric_system = None
+
+    _required_params = ['g', 'n', 's', 'delta', 'A0', 'L0']
 
     def __init__(self, output, params):
         """
@@ -115,13 +127,6 @@ class Model(object):
             Dictionary of model parameters.
 
         """
-        # cached values
-        self.__intensive_output = None
-        self.__mpk = None
-        self.__numeric_jacobian = None
-        self.__numeric_solow_residual = None
-        self.__numeric_system = None
-
         self.irf = impulse_response.ImpulseResponse(self)
         self.output = output
         self.params = params
@@ -136,7 +141,7 @@ class Model(object):
         if self.__intensive_output is None:
             args = [k] + sym.symbols(list(self.params.keys()))
             self.__intensive_output = sym.lambdify(args, self.intensive_output,
-                                                   self.modules)
+                                                   self._modules)
         return self.__intensive_output
 
     @property
@@ -149,7 +154,7 @@ class Model(object):
         if self.__mpk is None:
             args = [k] + sym.symbols(list(self.params.keys()))
             self.__mpk = sym.lambdify(args, self.marginal_product_capital,
-                                      self.modules)
+                                      self._modules)
         return self.__mpk
 
     @property
@@ -165,7 +170,7 @@ class Model(object):
         if self.__numeric_jacobian is None:
             self.__numeric_jacobian = sym.lambdify(self._symbolic_args,
                                                    self._symbolic_jacobian,
-                                                   self.modules)
+                                                   self._modules)
         return self.__numeric_jacobian
 
     @property
@@ -181,7 +186,7 @@ class Model(object):
             tmp_args = [Y, K, L] + sym.symbols(list(self.params.keys()))
             self.__numeric_solow_residual = sym.lambdify(tmp_args,
                                                          self._symbolic_solow_residual,
-                                                         self.modules)
+                                                         self._modules)
         return self.__numeric_solow_residual
 
     @property
@@ -196,7 +201,7 @@ class Model(object):
         if self.__numeric_system is None:
             self.__numeric_system = sym.lambdify(self._symbolic_args,
                                                  self._symbolic_system,
-                                                 self.modules)
+                                                 self._modules)
         return self.__numeric_system
 
     @property
@@ -535,14 +540,12 @@ class Model(object):
 
     def _validate_params(self, params):
         """Validate the model parameters."""
-        required_params = ['g', 'n', 's', 'delta', 'A0', 'L0']
-
         if not isinstance(params, dict):
             mesg = "SolowModel.params must be a dict, not a {}."
             raise AttributeError(mesg.format(params.__class__))
-        elif not set(required_params) < set(params.keys()):
+        elif not set(self._required_params) <= set(params.keys()):
             mesg = "One of the required params in {} has not been specified."
-            raise AttributeError(mesg.format(required_params))
+            raise AttributeError(mesg.format(self._required_params))
         elif params['s'] <= 0.0 or params['s'] >= 1.0:
             raise AttributeError('Savings rate must be in (0, 1).')
         elif params['delta'] <= 0.0 or params['delta'] >= 1.0:
@@ -703,7 +706,7 @@ class Model(object):
         alpha_k = (k * self.evaluate_mpk(k)) / self.evaluate_intensive_output(k)
         return alpha_k
 
-    def evaluate_solow_residual(self, Y, K, L, ):
+    def evaluate_solow_residual(self, Y, K, L):
         return self._numeric_solow_residual(Y, K, L, *self.params.values())
 
     def find_steady_state(self, a, b, method='brentq', **kwargs):

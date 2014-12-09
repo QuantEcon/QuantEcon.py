@@ -4,6 +4,10 @@ Solow model with constant elasticity of substitution (CES) production.
 @author : David R. Pugh
 @date : 2014-11-29
 
+TODO:
+
+Implement additional check on parameters that insures a non-infinite steady state.
+
 """
 import sympy as sym
 
@@ -18,6 +22,8 @@ g, n, s, alpha, delta, sigma = sym.symbols('g, n, s, alpha, delta, sigma')
 
 
 class CESModel(model.Model):
+
+    _required_params = ['g', 'n', 's', 'alpha', 'delta', 'sigma', 'A0', 'L0']
 
     def __init__(self, params):
         """
@@ -49,7 +55,7 @@ class CESModel(model.Model):
 
         .. math::
 
-            k^* = \bigg[\bigg(\frac{1}{1 - alpha}\bigg)\bigg(\frac{s}{g + n + delta}\bigg)^{-rho} - alpha\bigg)\bigg]^{-\frac{1}{rho}}
+            k^* = \left[\frac{1-\alpha}{\bigg(\frac{g+n+\delta}{s}\bigg)^{\rho}-\alpha}\right]^{\frac{1}{rho}}
 
         where `s` is the savings rate, :math:`g + n + \delta` is the effective
         depreciation rate, and :math:`\alpha` controls the importance of
@@ -58,7 +64,7 @@ class CESModel(model.Model):
 
         ..math::
 
-            \rho=\frac{\sigma -1}{\sigma}
+            \rho=\frac{\sigma-1}{\sigma}
 
         where `:math:`sigma` is the elasticity of substitution between capital
         and effective labor in production.
@@ -71,6 +77,36 @@ class CESModel(model.Model):
         delta = self.params['delta']
         sigma = self.params['sigma']
 
+        ratio_investment_rates = (g + n + delta) / s
         rho = (sigma - 1) / sigma
-        k_star = ((1 / (1 - alpha)) * ((s / (g + n + delta))**-rho - alpha))**(-1 / rho)
+        k_star = ((1 - alpha) / (ratio_investment_rates**rho - alpha))**(1 / rho)
+
         return k_star
+
+    def _isfinite_steady_state(self, params):
+        """Check whether parameters are consistent with finite steady state."""
+        g = params['g']
+        n = params['n']
+        s = params['s']
+        alpha = params['alpha']
+        delta = params['delta']
+        sigma = params['sigma']
+
+        ratio_investment_rates = (g + n + delta) / s
+        rho = (sigma - 1) / sigma
+
+        return ratio_investment_rates**rho - alpha > 0
+
+    def _validate_params(self, params):
+        """Validate the model parameters."""
+        params = super(CESModel, self)._validate_params(params)
+        if params['alpha'] <= 0.0 or params['alpha'] >= 1.0:
+            raise AttributeError('Output elasticity must be in (0, 1).')
+        elif params['alpha'] <= 0.0:
+            mesg = 'Elasticity of substitution must be strictly positive.'
+            raise AttributeError(mesg)
+        elif not self._isfinite_steady_state(params):
+            mesg = 'Parameters are inconsistent with finite steady state.'
+            raise AttributeError(mesg)
+        else:
+            return params

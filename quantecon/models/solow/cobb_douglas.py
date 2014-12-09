@@ -21,6 +21,8 @@ g, n, s, alpha, delta = sym.symbols('g, n, s, alpha, delta')
 
 class CobbDouglasModel(model.Model):
 
+    _required_params = ['g', 'n', 's', 'alpha', 'delta', 'A0', 'L0']
+
     def __init__(self, params):
         """
         Create an instance of the Solow growth model with Cobb-Douglas
@@ -60,6 +62,14 @@ class CobbDouglasModel(model.Model):
         s = self.params['s']
         alpha = self.params['alpha']
         return (s / self.effective_depreciation_rate)**(1 / (1 - alpha))
+
+    def _validate_params(self, params):
+        """Validate the model parameters."""
+        params = super(CobbDouglasModel, self)._validate_params(params)
+        if params['alpha'] <= 0.0 or params['alpha'] >= 1.0:
+            raise AttributeError('Output elasticity must be in (0, 1).')
+        else:
+            return params
 
     def analytic_solution(self, t, k0):
         """
@@ -142,6 +152,10 @@ def match_moments(model, data, iso3_code, bounds=None):
     labor_share = tmp_data['labsh'].loc[start:end]
     savings_rate = tmp_data['csh_i'].loc[start:end]
     depreciation_rate = tmp_data['delta_k'].loc[start:end]
+
+    # handles countries for with no data on labor share
+    if labor_share.isnull().all():
+        labor_share = data.labsh.mean().loc[start:end]
 
     # define a time trend variable
     N = tmp_data.index.size
