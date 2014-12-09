@@ -2,11 +2,7 @@
 Solow model with constant elasticity of substitution (CES) production.
 
 @author : David R. Pugh
-@date : 2014-11-29
-
-TODO:
-
-Implement additional check on parameters that insures a non-infinite steady state.
+@date : 2014-12-08
 
 """
 import sympy as sym
