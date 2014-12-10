@@ -15,7 +15,6 @@ import numpy as np
 import sympy as sym
 
 from .... models import solow
-from .... models.solow import cobb_douglas
 
 # declare key variables for the model
 t, X = sym.symbols('t'), sym.DeferredVector('X')
@@ -105,29 +104,17 @@ def test_validate_params():
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_0)
 
-    with nose.tools.assert_raises(AttributeError):
-        solow.CobbDouglasModel(params=invalid_params_0)
-
     # effective depreciation rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_1)
-
-    with nose.tools.assert_raises(AttributeError):
-        solow.CobbDouglasModel(params=invalid_params_1)
 
     # physical depreciation rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_2)
 
-    with nose.tools.assert_raises(AttributeError):
-        solow.CobbDouglasModel(params=invalid_params_2)
-
     # savings rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_3)
-
-    with nose.tools.assert_raises(AttributeError):
-        solow.CobbDouglasModel(params=invalid_params_3)
 
 
 def test_evaluate_output_elasticity():

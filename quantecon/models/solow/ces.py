@@ -10,7 +10,6 @@ import sympy as sym
 from . import model
 
 # declare key variables for the model
-t, X = sym.symbols('t'), sym.DeferredVector('X')
 A, k, K, L = sym.symbols('A, k, K, L')
 
 # declare required model parameters
@@ -96,9 +95,9 @@ class CESModel(model.Model):
     def _validate_params(self, params):
         """Validate the model parameters."""
         params = super(CESModel, self)._validate_params(params)
-        if params['alpha'] <= 0.0 or params['alpha'] >= 1.0:
+        if params['alpha'] < 0.0 or params['alpha'] > 1.0:
             raise AttributeError('Output elasticity must be in (0, 1).')
-        elif params['alpha'] <= 0.0:
+        elif params['sigma'] <= 0.0:
             mesg = 'Elasticity of substitution must be strictly positive.'
             raise AttributeError(mesg)
         elif not self._isfinite_steady_state(params):

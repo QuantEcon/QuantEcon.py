@@ -44,3 +44,25 @@ def test_steady_state():
                             # handles params with non finite steady state
                             except AttributeError:
                                 continue
+
+
+def test_validate_params():
+    """Testing validation of params attribute."""
+    invalid_params_0 = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
+                        'alpha': 1.33, 'delta': 0.03, 'sigma': 1.2}
+    invalid_params_1 = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
+                        'alpha': 0.33, 'delta': 0.03, 'sigma': 0.0}
+    invalid_params_2 = {'A0': 1.0, 'g': 0.01, 'L0': 1.0, 'n': 0.01, 's': 0.12,
+                        'alpha': 0.75, 'delta': 0.01, 'sigma': 2.0}
+
+    # alpha must be in (0, 1)
+    with nose.tools.assert_raises(AttributeError):
+        ces.CESModel(invalid_params_0)
+
+    # sigma must be strictly positive
+    with nose.tools.assert_raises(AttributeError):
+        ces.CESModel(invalid_params_1)
+
+    # parameters inconsistent with finite steady state
+    with nose.tools.assert_raises(AttributeError):
+        ces.CESModel(invalid_params_2)

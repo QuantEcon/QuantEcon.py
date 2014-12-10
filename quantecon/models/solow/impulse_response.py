@@ -89,9 +89,9 @@ class ImpulseResponse(object):
         """
         # economy is initial in steady state
         k0 = self.model.steady_state
-        y0 = self.model.compute_intensive_output(k0)
-        c0 = self.model.compute_consumption(k0)
-        i0 = self.model.compute_actual_investment(k0)
+        y0 = self.model.evaluate_intensive_output(k0)
+        c0 = self.model.evaluate_consumption(k0)
+        i0 = self.model.evaluate_actual_investment(k0)
         intitial_condition = np.array([[k0, y0, c0, i0]])
 
         return self._padding_scaling_factor * intitial_condition
@@ -139,9 +139,9 @@ class ImpulseResponse(object):
 
         # gather the results
         k = soln[:, 1][:, np.newaxis]
-        y = self.model.compute_intensive_output(k)
-        c = self.model.compute_consumption(k)
-        i = self.model.compute_actual_investment(k)
+        y = self.model.evaluate_intensive_output(k)
+        c = self.model.evaluate_consumption(k)
+        i = self.model.evaluate_actual_investment(k)
 
         return self._response_scaling_factor * np.hstack((k, y, c, i))
 
@@ -227,7 +227,7 @@ class ImpulseResponse(object):
         if not isinstance(params, dict):
             mesg = "ImpulseResponse.impulse must have type dict, not {}."
             raise AttributeError(mesg.format(params.__class__))
-        elif not set(params.keys()) < set(self.model.params.keys()):
+        elif not set(params.keys()) <= set(self.model.params.keys()):
             mesg = "Invalid parameter included in the impulse dictionary."""
             raise AttributeError(mesg)
         else:
@@ -282,9 +282,9 @@ class ImpulseResponse(object):
 
         """
         # generate and irf
-        self.irf.kind = kind
-        self.irf.impulse = impulse
-        irf = self.irf.impulse_response
+        self.kind = kind
+        self.impulse = impulse
+        irf = self.impulse_response
 
         # create a mapping from variables to column indices
         irf_dict = {'capital': irf[:, [0, 1]],
@@ -298,9 +298,9 @@ class ImpulseResponse(object):
         irf_line = ax.plot(traj[:, 0], traj[:, 1])
 
         # add the old balanced growth path
-        g = self.params['g']
-        n = self.params['n']
-        t = self.irf.N + traj[:, 0]
+        g = self.model.params['g']
+        n = self.model.params['n']
+        t = self.N + traj[:, 0]
 
         if kind == 'per_capita':
             bgp_line = ax.plot(traj[:, 0], traj[0, 1] * np.exp(g * t), 'k--',
