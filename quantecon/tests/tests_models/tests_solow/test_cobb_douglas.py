@@ -1,40 +1,18 @@
 """
-Test suite for solow module.
+Test suite for solow.cobb_douglas.py module.
 
 @author : David R. Pugh
-@date : 2014-11-27
 
 """
 import nose
 
 import numpy as np
 
-import pypwt
-
 from .... models.solow import cobb_douglas
 
 params = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
           'alpha': 0.33, 'delta': 0.05}
 model = cobb_douglas.CobbDouglasModel(params)
-
-
-def test_match_moments():
-    """Testing the moment matching calibration routine."""
-    pwt = pypwt.load_pwt_data()
-
-    # calibrate the model to random country
-    ctry, = np.random.choice(pwt.major_axis, 1)
-    cobb_douglas.match_moments(model, data=pwt, iso3_code=ctry)
-    actual_ss = model.steady_state
-    expected_ss = model.find_steady_state(1e-12, 1e12)
-    nose.tools.assert_almost_equals(actual_ss, expected_ss)
-
-    # calibrate the model to specific country
-    cobb_douglas.match_moments(model, data=pwt, iso3_code='USA',
-                               bounds=('1967', '1983'))
-    actual_ss = model.steady_state
-    expected_ss = model.find_steady_state(1e-12, 1e12)
-    nose.tools.assert_almost_equals(actual_ss, expected_ss)
 
 
 def test_ivp_solve():
@@ -96,3 +74,11 @@ def test_valid_methods():
     """Testing invalid method passed to find_steady_state."""
     with nose.tools.assert_raises(ValueError):
         model.find_steady_state(1e-12, 1e12, method='invalid_method')
+
+
+def test_valid_parameters():
+    """Testing invalid value for output elasticity."""
+    with nose.tools.assert_raises(AttributeError):
+        invalid_params = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02,
+                          's': 0.15, 'alpha': 1.1, 'delta': 0.03}
+        cobb_douglas.CobbDouglasModel(invalid_params)
