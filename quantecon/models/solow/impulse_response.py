@@ -184,10 +184,7 @@ class ImpulseResponse(object):
     def kind(self):
         """
         The kind of impulse response function to generate. Must be one of:
-
-        * 'levels'
-        * 'per_capita'
-        * 'efficiency_units'
+        'levels', 'per_capita', 'efficiency_units'.
 
         :getter: Return the current kind of impulse responses.
         :setter: Set a new value for the kind of impulse responses.
@@ -250,80 +247,82 @@ class ImpulseResponse(object):
         else:
             return value
 
+    def plot_impulse_response(self, ax, variable, impulse,
+                              kind='efficiency_units', log=False):
+        """
+        Plot an impulse response function.
 
-def plot_impulse_response(cls, variable, impulse, kind='efficiency_units',
-                          log=False):
-    """
-    Plots an impulse response function.
+        Parameters
+        ----------
+        ax : `matplotlib.axes.AxesSubplot`
+            An instance of `matplotlib.axes.AxesSubplot`.
+        variable : str
+            Variable whose impulse response functions you wish to plot.
+        impulse : dict
+            Dictionary of new parameter values representing the impulse whose
+            model response you wish to plot.
+        kind : str (default='efficiency_units')
+            Whether you want impulse response functions in 'levels',
+            'per_capita', or 'efficiency_units'.
+        log : boolean (default=False)
+            Whether or not to have logarithmic scales on the vertical axes.
+            Useful when plotting impulse response functions with
+            kind='per_capita' or kind='levels'.
 
-    Parameters
-    ----------
-    variable : str
-        Variable whose impulse response functions you wish to plot.
-    impulse : dict
-        Dictionary of new parameter values representing the impulse whose model
-        response you wish to plot.
-    kind : str (default='efficiency_units')
-        Whether you want impulse response functions in 'levels', 'per_capita',
-        or 'efficiency_units'.
-    log : boolean (default=False)
-        Whether or not to have logarithmic scales on the vertical axes. Useful
-        when plotting impulse response functions with kind='per_capita' or
-        kind='levels'.
+        Returns
+        -------
+        A list containing:
 
-    Returns
-    -------
-    A list containing:
+        irf_line : maplotlib.lines.Line2D
+            A Line2D object representing the impulse response for the requested
+            variable.
+        bgp_line : maplotlib.lines.Line2D
+            A Line2D object representing the pre-impulse balanced growth path
+            for the model.
 
-    fig : object
-        An instance of :class:`matplotlib.figure.Figure`.
-    ax : list
-        An instance of :class:`matplotlib.axes.AxesSubplot`.
+        """
+        # generate and irf
+        self.irf.kind = kind
+        self.irf.impulse = impulse
+        irf = self.irf.impulse_response
 
-    """
-    # generate and irf
-    cls.irf.kind = kind
-    cls.irf.impulse = impulse
-    irf = cls.irf.impulse_response
+        # create a mapping from variables to column indices
+        irf_dict = {'capital': irf[:, [0, 1]],
+                    'output': irf[:, [0, 2]],
+                    'consumption': irf[:, [0, 3]],
+                    'investment': irf[:, [0, 4]],
+                    }
 
-    # create a mapping from variables to column indices
-    irf_dict = {'capital': irf[:, [0, 1]],
-                'output': irf[:, [0, 2]],
-                'consumption': irf[:, [0, 3]],
-                'investment': irf[:, [0, 4]],
-                }
+        # create the plot
+        traj = irf_dict[variable]
+        irf_line = ax.plot(traj[:, 0], traj[:, 1])
 
-    # create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 6), squeeze=True)
-    traj = irf_dict[variable]
-    ax.plot(traj[:, 0], traj[:, 1])
+        # add the old balanced growth path
+        g = self.params['g']
+        n = self.params['n']
+        t = self.irf.N + traj[:, 0]
 
-    # add the old balanced growth path
-    g = cls.params['g']
-    n = cls.params['n']
-    t = cls.irf.N + traj[:, 0]
+        if kind == 'per_capita':
+            bgp_line = ax.plot(traj[:, 0], traj[0, 1] * np.exp(g * t), 'k--',
+                               label='Original BGP')
+        elif kind == 'levels':
+            bgp_line = ax.plot(traj[:, 0], traj[0, 1] * np.exp((g + n) * t),
+                               'k--', label='Original BGP')
+        else:
+            bgp_line = ax.axhline(traj[0, 1], linestyle='dashed', color='k',
+                                  label='Original BGP')
 
-    if kind == 'per_capita':
-        ax.plot(traj[:, 0], traj[0, 1] * np.exp(g * t), 'k--',
-                label='Original BGP')
-    elif kind == 'levels':
-        ax.plot(traj[:, 0], traj[0, 1] * np.exp((g + n) * t), 'k--',
-                label='Original BGP')
-    else:
-        ax.axhline(traj[0, 1], linestyle='dashed', color='k',
-                   label='Original BGP')
+        # format axes, labels, title, legend, etc
+        ax.set_xlabel('Time', fontsize=15, family='serif')
+        ax.set_ylabel(variable.title(), fontsize=15, family='serif')
+        ax.set_ylim(0.95 * traj[:, 1].min(), 1.05 * traj[:, 1].max())
 
-    # format axes, labels, title, legend, etc
-    ax.set_xlabel('Time', fontsize=15, family='serif')
-    ax.set_ylabel(variable.title(), fontsize=15, family='serif')
-    ax.set_ylim(0.95 * traj[:, 1].min(), 1.05 * traj[:, 1].max())
+        if log is True:
+            ax.set_yscale('log')
 
-    if log is True:
-        ax.set_yscale('log')
+        ax.set_title('Impulse response function', fontsize=20, family='serif')
+        ax.grid('on')
+        ax.legend(loc=0, frameon=False, bbox_to_anchor=(1.0, 1.0),
+                  prop={'family': 'serif'})
 
-    ax.set_title('Impulse response function', fontsize=20, family='serif')
-    ax.grid('on')
-    ax.legend(loc=0, frameon=False, bbox_to_anchor=(1.0, 1.0),
-              prop={'family': 'serif'})
-
-    return [fig, ax]
+        return [irf_line, bgp_line]
