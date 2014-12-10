@@ -17,7 +17,6 @@ import sympy as sym
 from .... models import solow
 
 # declare key variables for the model
-t, X = sym.symbols('t'), sym.DeferredVector('X')
 A, E, k, K, L = sym.symbols('A, E, k, K, L')
 
 # declare required model parameters
@@ -99,6 +98,10 @@ def test_validate_params():
                         'alpha': 0.33, 'delta': -0.03}
     invalid_params_3 = {'A0': 1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': -0.15,
                         'alpha': 0.33, 'delta': 0.03}
+    invalid_params_4 = {'A0': -1.0, 'g': 0.02, 'L0': 1.0, 'n': 0.02, 's': 0.15,
+                        'alpha': 0.33, 'delta': 0.03}
+    invalid_params_3 = {'A0': 1.0, 'g': 0.02, 'L0': -1.0, 'n': 0.02, 's': 0.15,
+                        'alpha': 0.33, 'delta': 0.03}
 
     # params must be a dict
     with nose.tools.assert_raises(AttributeError):
@@ -115,6 +118,10 @@ def test_validate_params():
     # savings rate must be positive
     with nose.tools.assert_raises(AttributeError):
         solow.Model(output=valid_output, params=invalid_params_3)
+
+    # initial condition for A must be positive
+    with nose.tools.assert_raises(AttributeError):
+        solow.Model(output=valid_output, params=invalid_params_4)
 
 
 def test_evaluate_output_elasticity():

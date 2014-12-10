@@ -561,10 +561,6 @@ class Model(object):
         else:
             return params
 
-    def calibrate_model(self, *args, **kwargs):
-        """Calibrate the model using some data."""
-        raise NotImplementedError
-
     def evaluate_actual_investment(self, k):
         """
         Return the amount of output (per unit of effective labor) invested in
