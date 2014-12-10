@@ -748,6 +748,32 @@ class Model(object):
 
         return result
 
+    def linearized_solution(self, t, k0):
+        """
+        Compute the linearized solution for the Solow model.
+
+        Parameters
+        ----------
+        t : ndarray (shape=(T,))
+            Array of points at which the solution is desired.
+        k0 : (float)
+            Initial condition for capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        linearized_traj : ndarray (shape=t.size, 2)
+            Array representing the linearized solution trajectory.
+
+        """
+        # speed of convergence
+        lmbda = self.ivp.jac(0, self.steady_state, self.params)
+        kt = self.steady_state + np.exp(lmbda * t) * (k0 - self.steady_state)
+
+        # construct the linearized trajectory
+        linearized_traj = np.hstack((t[:, np.newaxis], kt[:, np.newaxis]))
+
+        return linearized_traj
+
     def plot_factor_shares(self, ax, Nk=1e3, **new_params):
         """
         Plot income/output shares of capital and labor inputs to production.
