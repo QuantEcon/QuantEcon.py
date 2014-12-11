@@ -810,9 +810,9 @@ class Model(object):
         labors_share = 1 - capitals_share
 
         capitals_share_line, = ax.plot(k_grid, capitals_share, 'r-',
-                                       label='$\alpha_K(t)$')
+                                       label=r'$\alpha_K(t)$')
         labors_share_line, = ax.plot(k_grid, labors_share, 'b-',
-                                     label='$1 - \alpha_K(t)$')
+                                     label=r'$1 - \alpha_K(t)$')
         ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
                       family='serif', fontsize=15)
         ax.set_title('Factor shares', family='serif', fontsize=20)
