@@ -799,8 +799,10 @@ class Model(object):
             income.
 
         """
-        # update the model parameters
-        self.params.update(new_params)
+        # create tmp_params dict to force check for valid params
+        tmp_params = self.params.copy()
+        tmp_params.update(new_params)
+        self.params = tmp_params  # forces check for valid params!
 
         # create the plot
         k_grid = np.linspace(0, 2 * self.steady_state, Nk)
@@ -842,8 +844,10 @@ class Model(object):
             capital stock (per unit effective labor).
 
         """
-        # update model parameters
-        self.params.update(new_params)
+        # create tmp_params dict to force check for valid params
+        tmp_params = self.params.copy()
+        tmp_params.update(new_params)
+        self.params = tmp_params  # forces check for valid params!
 
         # create the plot
         k_grid = np.linspace(0, 2 * self.steady_state, Nk)
@@ -889,8 +893,10 @@ class Model(object):
             A Line2D object representing the steady state level of investment.
 
         """
-        # update the model parameters
-        self.params.update(new_params)
+        # create tmp_params dict to force check for valid params
+        tmp_params = self.params.copy()
+        tmp_params.update(new_params)
+        self.params = tmp_params  # forces check for valid params!
 
         # create the plot
         k_grid = np.linspace(0, 2 * self.steady_state, Nk)
@@ -944,8 +950,10 @@ class Model(object):
             stock (per unit effective labor).
 
         """
-        # update model parameters
-        self.params.update(new_params)
+        # create tmp_params dict to force check for valid params
+        tmp_params = self.params.copy()
+        tmp_params.update(new_params)
+        self.params = tmp_params  # forces check for valid params!
 
         # create the plot
         k_grid = np.linspace(0, 2 * self.steady_state, Nk)
@@ -991,8 +999,10 @@ class Model(object):
             A Line2D object representing the steady state level of investment.
 
         """
-        # update the model parameters
-        self.params.update(new_params)
+        # create tmp_params dict to force check for valid params
+        tmp_params = self.params.copy()
+        tmp_params.update(new_params)
+        self.params = tmp_params  # forces check for valid params!
 
         # create the plot
         k_grid = np.linspace(0, 2 * self.steady_state, Nk)
