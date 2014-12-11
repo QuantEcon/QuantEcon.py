@@ -10,7 +10,7 @@ import sympy as sym
 from . import model
 
 # declare key variables for the model
-A, k, K, L = sym.symbols('A, k, K, L')
+A, k, K, L, Y = sym.symbols('A, k, K, L, Y')
 
 # declare required model parameters
 g, n, s, alpha, delta, sigma = sym.symbols('g, n, s, alpha, delta, sigma')
@@ -34,6 +34,21 @@ class CESModel(model.Model):
         rho = (sigma - 1) / sigma
         ces_output = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
         super(CESModel, self).__init__(ces_output, params)
+
+    @property
+    def _symbolic_solow_residual(self):
+        """
+        Symbolic expression for the Solow residual which is used as a measure
+        of technology.
+
+        :getter: Return the symbolic expression.
+        :type: sym.Basic
+
+        """
+        rho = (sigma - 1) / sigma
+        residual = (((1 / (1 - alpha)) * (Y / L)**rho -
+                     (alpha / (1 - alpha)) * (K / L)**rho)**(1 / rho))
+        return residual
 
     @property
     def steady_state(self):
@@ -78,8 +93,8 @@ class CESModel(model.Model):
 
         return k_star
 
-    def _isfinite_steady_state(self, params):
-        """Check whether parameters are consistent with finite steady state."""
+    def _isdeterminate_steady_state(self, params):
+        """Check that parameters are consistent with determinate steady state."""
         g = params['g']
         n = params['n']
         s = params['s']
@@ -100,7 +115,7 @@ class CESModel(model.Model):
         elif params['sigma'] <= 0.0:
             mesg = 'Elasticity of substitution must be strictly positive.'
             raise AttributeError(mesg)
-        elif not self._isfinite_steady_state(params):
+        elif not self._isdeterminate_steady_state(params):
             mesg = 'Steady state is indeterminate.'
             raise AttributeError(mesg)
         else:
