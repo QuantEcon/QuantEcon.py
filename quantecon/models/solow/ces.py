@@ -2,7 +2,7 @@
 Solow model with constant elasticity of substitution (CES) production.
 
 @author : David R. Pugh
-@date : 2014-12-08
+@date : 2014-12-11
 
 """
 import sympy as sym
@@ -101,7 +101,7 @@ class CESModel(model.Model):
             mesg = 'Elasticity of substitution must be strictly positive.'
             raise AttributeError(mesg)
         elif not self._isfinite_steady_state(params):
-            mesg = 'Parameters are inconsistent with finite steady state.'
+            mesg = 'Steady state is indeterminate.'
             raise AttributeError(mesg)
         else:
             return params
