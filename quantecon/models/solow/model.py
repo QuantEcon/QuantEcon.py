@@ -74,14 +74,6 @@ References
 @author : David R. Pugh
 @date : 2014-11-27
 
-TODO:
-2. Initial condition for simulation should require K0 and not k0. This requires
-a change to the IVP class!
-4. Prior to calibration need to fix PWT import statements!
-5. Finish section on solving Solow model in demo notebook.
-8. Finish section on calibrating the Solow model in the demo notebook.
-9. Finish writing docs (include some basic usage examples in the module docs).
-
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -379,7 +371,6 @@ class Model(object):
         motion for capital stock (per unit effective labor).
 
         .. math::
-
             :type: eqnarray
 
             \dot{k}(t) =& \frac{sF(K(t), A(t)L(t)) - \delta K(t)}{A(t)L(t)} - (g + n)k(t) \\
@@ -482,6 +473,37 @@ class Model(object):
 
         """
         return self._params
+
+    @property
+    def speed_of_convergence(self):
+        r"""
+        The speed of convergence for the Solow model.
+
+        :getter: Return the current speed of convergence.
+        :type: float
+
+        Notes
+        -----
+        The following is a derivation for the speed of convergence :math:`\lambda`:
+
+        .. :math::
+            :type: eqnarray
+
+            \lambda \equiv -\frac{\partial \dot{k}(k(t))}{\partial k(t)}\bigg|_{k(t)=k^*} =& -[sf'(k^*) - (g + n+ \delta)] \\
+            =& (g + n+ \delta) - sf'(k^*) \\
+            =& (g + n + \delta) - (g + n + \delta)\frac{k^*f'(k^*)}{f(k^*)} \\
+            =& (1 - \alpha_K(k^*))(g + n + \delta)
+
+        where the elasticity of output with respect to capital, $\alpha_K(k)$,
+        is defined as
+
+        .. :math::
+
+            \alpha_K(k) = \frac{k'(k)}{f(k)}.
+
+        """
+        alpha_K = self.evaluate_output_elasticity(self.steady_state)
+        return (1 - alpha_K) * self.effective_depreciation_rate
 
     @property
     def steady_state(self):
@@ -765,11 +787,8 @@ class Model(object):
             Array representing the linearized solution trajectory.
 
         """
-        # speed of convergence
-        lmbda = self.ivp.jac(0, self.steady_state, self.params)
-        kt = self.steady_state + np.exp(lmbda * t) * (k0 - self.steady_state)
-
-        # construct the linearized trajectory
+        kt = (self.steady_state + np.exp(-self.speed_of_convergence * t) *
+              (k0 - self.steady_state))
         linearized_traj = np.hstack((t[:, np.newaxis], kt[:, np.newaxis]))
 
         return linearized_traj
