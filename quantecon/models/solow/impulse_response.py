@@ -130,13 +130,14 @@ class ImpulseResponse(object):
         # economy is initial in steady state
         k0 = self.model.steady_state
 
-        # apply the impulse...
-        self.model.params.update(self.impulse)
+        # apply the impulse...force validate params!
+        tmp_params = self.model.params.copy()
+        tmp_params.update(self.impulse)
+        self.model.params = tmp_params
 
         # ...and generate the response
         soln = self.model.ivp.solve(t0=0.0, y0=k0, h=1.0, T=self.T,
                                     integrator='dop853')
-
         # gather the results
         k = soln[:, 1][:, np.newaxis]
         y = self.model.evaluate_intensive_output(k)
@@ -155,14 +156,15 @@ class ImpulseResponse(object):
 
         """
         # extract the relevant parameters
+        A0 = self.model.params['A0']
+        L0 = self.model.params['L0']
         g = self.model.params['g']
         n = self.model.params['n']
-        time = np.linspace(0, self.T, self.T + 1)
 
         if self.kind == 'per_capita':
-            factor = self._padding_scaling_factor[-1] * np.exp(g * time)
+            factor = A0 * np.exp(g * self._response_time)
         elif self.kind == 'levels':
-            factor = self._padding_scaling_factor[-1] * np.exp((g + n) * time)
+            factor = A0 * L0 * np.exp((g + n) * self._response_time)
         else:
             factor = np.ones(self.T + 1)
 
@@ -208,7 +210,7 @@ class ImpulseResponse(object):
         tmp_irf = np.vstack((self._padding, self._response))
 
         # reset the model parameters
-        self.model.params.update(orig_params)
+        self.model.params = orig_params
 
         return tmp_irf
 
@@ -247,8 +249,7 @@ class ImpulseResponse(object):
         else:
             return value
 
-    def plot_impulse_response(self, ax, variable, impulse,
-                              kind='efficiency_units', log=False):
+    def plot_impulse_response(self, ax, variable, log=False):
         """
         Plot an impulse response function.
 
@@ -281,12 +282,8 @@ class ImpulseResponse(object):
             for the model.
 
         """
-        # generate and irf
-        self.kind = kind
-        self.impulse = impulse
-        irf = self.impulse_response
-
         # create a mapping from variables to column indices
+        irf = self.impulse_response
         irf_dict = {'capital': irf[:, [0, 1]],
                     'output': irf[:, [0, 2]],
                     'consumption': irf[:, [0, 3]],
@@ -302,19 +299,23 @@ class ImpulseResponse(object):
         n = self.model.params['n']
         t = self.N + traj[:, 0]
 
-        if kind == 'per_capita':
+        if self.kind == 'per_capita':
             bgp_line = ax.plot(traj[:, 0], traj[0, 1] * np.exp(g * t), 'k--',
                                label='Original BGP')
-        elif kind == 'levels':
+            ax.set_ylabel(variable.title() + ' (per capita)', fontsize=15,
+                          family='serif')
+        elif self.kind == 'levels':
             bgp_line = ax.plot(traj[:, 0], traj[0, 1] * np.exp((g + n) * t),
                                'k--', label='Original BGP')
+            ax.set_ylabel(variable.title(), fontsize=15, family='serif')
         else:
             bgp_line = ax.axhline(traj[0, 1], linestyle='dashed', color='k',
                                   label='Original BGP')
+            ax.set_ylabel(variable.title() + ' (per unit effective labor)',
+                          fontsize=15, family='serif')
 
         # format axes, labels, title, legend, etc
         ax.set_xlabel('Time', fontsize=15, family='serif')
-        ax.set_ylabel(variable.title(), fontsize=15, family='serif')
         ax.set_ylim(0.95 * traj[:, 1].min(), 1.05 * traj[:, 1].max())
 
         if log is True:
