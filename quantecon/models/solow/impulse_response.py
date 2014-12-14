@@ -240,7 +240,7 @@ class ImpulseResponse(object):
         """Validates the kind attribute."""
         valid_kinds = ['levels', 'per_capita', 'efficiency_units']
 
-        if not (isinstance(value, str) or isinstance(value, unicode)):
+        if not isinstance(value, str):
             mesg = "ImpulseResponse.kind must have type str, not {}."
             raise AttributeError(mesg.format(value.__class__))
         elif value not in valid_kinds:
