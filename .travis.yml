@@ -25,7 +25,7 @@ install:
   - pip install coveralls coverage
   # - conda install --yes -c dan_blanchard python-coveralls nose-cov
   - python setup.py install
-  - cp testing/matplotlibrc .
+  - cp tests/matplotlibrc .
 
 script:
   - nosetests --with-coverage --cover-package=quantecon
