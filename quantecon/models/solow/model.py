@@ -727,7 +727,12 @@ class Model(object):
         return alpha_k
 
     def evaluate_solow_residual(self, Y, K, L):
-        return self._numeric_solow_residual(Y, K, L, *self.params.values())
+        """
+
+        """
+        residual = self._numeric_solow_residual(Y, K, L, *self.params.values())
+        assert residual.all() > 0, "Solow residual show always be positive!"
+        return residual
 
     def find_steady_state(self, a, b, method='brentq', **kwargs):
         """
