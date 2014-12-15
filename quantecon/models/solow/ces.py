@@ -38,7 +38,7 @@ class CESModel(model.Model):
         super(CESModel, self).__init__(ces_output, params)
 
     @property
-    def _symbolic_solow_residual(self):
+    def solow_residual(self):
         """
         Symbolic expression for the Solow residual which is used as a measure
         of technology.

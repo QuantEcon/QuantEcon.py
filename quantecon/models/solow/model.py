@@ -179,7 +179,7 @@ class Model(object):
         if self.__numeric_solow_residual is None:
             tmp_args = [Y, K, L] + sym.symbols(list(self.params.keys()))
             self.__numeric_solow_residual = sym.lambdify(tmp_args,
-                                                         self._symbolic_solow_residual,
+                                                         self.solow_residual,
                                                          self._modules)
         return self.__numeric_solow_residual
 
@@ -222,18 +222,6 @@ class Model(object):
         """
         N = self._symbolic_system.shape[0]
         return self._symbolic_system.jacobian([X[i] for i in range(N)])
-
-    @property
-    def _symbolic_solow_residual(self):
-        """
-        Symbolic expression for the Solow residual which is used as a measure
-        of technology.
-
-        :getter: Return the symbolic expression.
-        :type: sym.Basic
-
-        """
-        return sym.solve(Y - self.output, A)[0]
 
     @property
     def _symbolic_system(self):
@@ -475,6 +463,18 @@ class Model(object):
 
         """
         return self._params
+
+    @property
+    def solow_residual(self):
+        """
+        Symbolic expression for the Solow residual which is used as a measure
+        of technology.
+
+        :getter: Return the symbolic expression.
+        :type: sym.Basic
+
+        """
+        return sym.solve(Y - self.output, A)[0]
 
     @property
     def speed_of_convergence(self):
