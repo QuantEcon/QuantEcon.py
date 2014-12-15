@@ -728,6 +728,17 @@ class Model(object):
 
     def evaluate_solow_residual(self, Y, K, L):
         """
+        Return Solow residual.
+
+        Parameters
+        ----------
+        k : array_like (float)
+            Capital stock (per unit of effective labor)
+
+        Returns
+        -------
+        residual : array_like (float)
+            Solow residual
 
         """
         residual = self._numeric_solow_residual(Y, K, L, *self.params.values())
