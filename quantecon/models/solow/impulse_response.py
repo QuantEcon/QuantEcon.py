@@ -5,6 +5,8 @@ Classes for generating and plotting impulse response functions.
 @date : 2014-10-06
 
 """
+from __future__ import division
+
 import matplotlib.pyplot as plt
 import numpy as np
 

@@ -4,14 +4,11 @@ Test suite for the impulse_response.py module.
 @author : David R. Pugh
 
 """
+from __future__ import division
 import nose
-
-#import matplotlib
-#matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sympy as sym
 
 from .... models.solow import cobb_douglas
 
@@ -147,9 +144,6 @@ def test_plot_per_capita_impulse_response():
 
 def test_valid_kind():
     """Testing validation of the kind attribute."""
-    # kind attribute must be a string
-    with nose.tools.assert_raises(AttributeError):
-        model.irf.kind = 5
 
     # kind sttribute must be a valid string
     with nose.tools.assert_raises(AttributeError):

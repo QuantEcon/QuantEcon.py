@@ -75,6 +75,8 @@ References
 @date : 2014-11-27
 
 """
+from __future__ import division
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import optimize

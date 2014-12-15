@@ -5,9 +5,10 @@ Solow growth model with Cobb-Douglas aggregate production.
 @date : 2014-11-27
 
 """
+from __future__ import division
+
 import numpy as np
 import sympy as sym
-import pandas as pd
 
 from . import model
 

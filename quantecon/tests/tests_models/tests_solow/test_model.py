@@ -5,10 +5,8 @@ Test suite for solow module.
 @date : 2014-11-27
 
 """
+from __future__ import division
 import nose
-
-#import matplotlib
-#matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
