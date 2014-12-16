@@ -79,7 +79,7 @@ class CobbDouglasModel(model.Model):
 
         Parameters
         ----------
-        t : ndarray (shape=(T,))
+        t : numpy.ndarray (shape=(T,))
             Array of points at which the solution is desired.
         k0 : (float)
             Initial condition for capital stock (per unit of effective labor)
