@@ -13,7 +13,7 @@ from scipy.linalg import inv
 from .matrix_eqn import solve_discrete_riccati
 
 class Kalman:
-    r"""
+    """
     Implements the Kalman filter for the Gaussian state space model
 
     .. math::
