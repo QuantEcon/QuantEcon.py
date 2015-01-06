@@ -76,6 +76,7 @@ References
 
 """
 from __future__ import division
+import collections
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -97,8 +98,6 @@ class Model(object):
 
     __intensive_output = None
 
-    _modules = [{'ImmutableMatrix': np.array}, "numpy"]
-
     __mpk = None
 
     __numeric_jacobian = None
@@ -106,6 +105,8 @@ class Model(object):
     __numeric_solow_residual = None
 
     __numeric_system = None
+
+    _modules = [{'ImmutableMatrix': np.array}, "numpy"]
 
     _required_params = ['g', 'n', 's', 'delta', 'A0', 'L0']
 
@@ -540,7 +541,8 @@ class Model(object):
     @params.setter
     def params(self, value):
         """Set a new parameter dictionary."""
-        self._params = self._validate_params(value)
+        valid_params = self._validate_params(value)
+        self._params = self._order_params(valid_params)
 
     def _clear_cache(self):
         """Clear cached values."""
@@ -549,6 +551,11 @@ class Model(object):
         self.__numeric_jacobian = None
         self.__numeric_solow_residual = None
         self.__numeric_system = None
+
+    @staticmethod
+    def _order_params(params):
+        """Cast a dictionary to an order dictionary."""
+        return collections.OrderedDict(sorted(params.items()))
 
     def _validate_output(self, output):
         """Validate the production function."""
@@ -847,9 +854,9 @@ class Model(object):
         labors_share = 1 - capitals_share
 
         capitals_share_line, = ax.plot(k_grid, capitals_share, 'r-',
-                                       label=r'$\alpha_K(t)$')
+                                       label=r'$\alpha_K(k(t))$')
         labors_share_line, = ax.plot(k_grid, labors_share, 'b-',
-                                     label=r'$1 - \alpha_K(t)$')
+                                     label=r'$1 - \alpha_K(k(t))$')
         ax.set_xlabel('Capital (per unit effective labor), $k(t)$',
                       family='serif', fontsize=15)
         ax.set_title('Factor shares', family='serif', fontsize=20)
