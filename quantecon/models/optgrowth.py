@@ -12,6 +12,7 @@ import numpy as np
 from scipy.optimize import fminbound
 from scipy import interp
 
+
 class GrowthModel(object):
     """
 
@@ -39,11 +40,10 @@ class GrowthModel(object):
 
     """
     def __init__(self, f=lambda k: k**0.65, beta=0.95, u=np.log,
-            grid_max=2, grid_size=150):
+                 grid_max=2, grid_size=150):
 
         self.u, self.f, self.beta = u, f, beta
         self.grid = np.linspace(1e-6, grid_max, grid_size)
-
 
     def bellman_operator(self, w, compute_policy=False):
         """
@@ -67,7 +67,7 @@ class GrowthModel(object):
         # == set Tw[i] equal to max_c { u(c) + beta w(f(k_i) - c)} == #
         Tw = np.empty(len(w))
         for i, k in enumerate(self.grid):
-            objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
+            objective = lambda c: - self.u(c) - self.beta * Aw(self.f(k) - c)
             c_star = fminbound(objective, 1e-6, self.f(k))
             if compute_policy:
                 # sigma[i] = argmax_c { u(c) + beta w(f(k_i) - c)}
@@ -78,7 +78,6 @@ class GrowthModel(object):
             return Tw, sigma
         else:
             return Tw
-
 
     def compute_greedy(self, w):
         """

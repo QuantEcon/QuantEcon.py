@@ -15,6 +15,7 @@ from numpy import dot, log, sqrt, identity, hstack, vstack, trace
 from scipy.linalg import solve, inv, det
 from .matrix_eqn import solve_discrete_lyapunov
 
+
 class RBLQ:
     r"""
     Provides methods for analysing infinite horizon robust LQ control
@@ -354,4 +355,3 @@ class RBLQ:
         o_F = (ho + beta * tr) / (1 - beta)
 
         return K_F, P_F, d_F, O_F, o_F
-

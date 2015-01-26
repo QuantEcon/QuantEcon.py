@@ -8,8 +8,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from quantecon import mc_compute_stationary
 
-P = ((0.971, 0.029, 0.000),  
-     (0.145, 0.778, 0.077), 
+P = ((0.971, 0.029, 0.000),
+     (0.145, 0.778, 0.077),
      (0.000, 0.508, 0.492))
 P = np.array(P)
 

@@ -1,7 +1,7 @@
 from random import normalvariate
 import matplotlib.pyplot as plt
 ts_length = 100
-epsilon_values = []   
+epsilon_values = []
 i = 0
 while i < ts_length:
     e = normalvariate(0, 1)

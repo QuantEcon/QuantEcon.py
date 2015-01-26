@@ -13,7 +13,9 @@ from quantecon.models import ConsumerProblem
 # === solve for optimal consumption === #
 m = ConsumerProblem(r=0.03, grid_max=4)
 v_init, c_init = m.initialize()
-c = compute_fixed_point(m.coleman_operator, c_init) #Coleman Operator takes in (c)?
+
+# Coleman Operator takes in (c)?
+c = compute_fixed_point(m.coleman_operator, c_init)
 a = m.asset_grid
 R, z_vals = m.R, m.z_vals
 

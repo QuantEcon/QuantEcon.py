@@ -16,7 +16,7 @@ the model.
 
 import sys
 import numpy as np
-from numpy import sqrt, max, eye, dot, zeros, cumsum, array
+from numpy import sqrt, eye, dot, zeros, cumsum
 from numpy.random import randn
 import scipy.linalg
 import matplotlib.pyplot as plt
@@ -103,7 +103,7 @@ def compute_paths(T, econ):
     # == Simulate the exogenous process x == #
     if econ.discrete:
         state = mc_sample_path(P, init=0, sample_size=T)
-        x = x_vals[:,state]
+        x = x_vals[:, state]
     else:
         # == Generate an initial condition x0 satisfying x0 = A x0 == #
         nx, nx = A.shape
@@ -116,16 +116,16 @@ def compute_paths(T, econ):
         x = zeros((nx, T))
         w = randn(nw, T)
         x[:, 0] = x0.T
-        for t in range(1,T):
+        for t in range(1, T):
             x[:, t] = dot(A, x[:, t-1]) + dot(C, w[:, t])
 
     # == Compute exogenous variable sequences == #
     g, d, b, s = (dot(S, x).flatten() for S in (Sg, Sd, Sb, Ss))
 
     # == Solve for Lagrange multiplier in the govt budget constraint == #
-    ## In fact we solve for nu = lambda / (1 + 2*lambda).  Here nu is the
-    ## solution to a quadratic equation a(nu**2 - nu) + b = 0 where
-    ## a and b are expected discounted sums of quadratic forms of the state.
+    # In fact we solve for nu = lambda / (1 + 2*lambda).  Here nu is the
+    # solution to a quadratic equation a(nu**2 - nu) + b = 0 where
+    # a and b are expected discounted sums of quadratic forms of the state.
     Sm = Sb - Sd - Ss
     # == Compute a and b == #
     if econ.discrete:
@@ -176,7 +176,7 @@ def compute_paths(T, econ):
         B = temp[state] / p
         H = dot(P[state, :], dot(Sb - Sc, x_vals).T).flatten()
         R = p / (beta * H)
-        temp = dot(P[state,:], dot(Sb - Sc, x_vals).T).flatten()
+        temp = dot(P[state, :], dot(Sb - Sc, x_vals).T).flatten()
         xi = p[1:] / temp[:T-1]
     else:
         H = dot(Sl.T, Sl) - dot((Sb - Sc).T, Sl - Sg)
@@ -188,7 +188,7 @@ def compute_paths(T, econ):
         R = 1 / Rinv
         AF1 = dot(Sb - Sc, x[:, 1:])
         AF2 = dot(dot(Sb - Sc, A), x[:, :T-1])
-        xi =  AF1 / AF2
+        xi = AF1 / AF2
         xi = xi.flatten()
 
     pi = B[1:] - R[:T-1] * B[:T-1] - rvn[:T-1] + g[:T-1]
@@ -230,8 +230,8 @@ def gen_fig_1(path):
             axes[i, j].grid()
             axes[i, j].set_xlabel(r'Time')
     bbox = (0., 1.02, 1., .102)
-    legend_args = {'bbox_to_anchor' : bbox, 'loc' : 3, 'mode' : 'expand'}
-    p_args = {'lw' : 2, 'alpha' : 0.7}
+    legend_args = {'bbox_to_anchor': bbox, 'loc': 3, 'mode': 'expand'}
+    p_args = {'lw': 2, 'alpha': 0.7}
 
     # == Plot consumption, govt expenditure and revenue == #
     ax = axes[0, 0]
@@ -242,21 +242,21 @@ def gen_fig_1(path):
 
     # == Plot govt expenditure and debt == #
     ax = axes[0, 1]
-    ax.plot(list(range(1,T+1)), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
-    ax.plot(list(range(1,T+1)), path.g, label=r'$g_t$', **p_args)
-    ax.plot(list(range(1,T)), path.B[1:T], label=r'$B_{t+1}$', **p_args)
+    ax.plot(list(range(1, T+1)), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
+    ax.plot(list(range(1, T+1)), path.g, label=r'$g_t$', **p_args)
+    ax.plot(list(range(1, T)), path.B[1:T], label=r'$B_{t+1}$', **p_args)
     ax.legend(ncol=3, **legend_args)
 
     # == Plot risk free return == #
     ax = axes[1, 0]
-    ax.plot(list(range(1,T+1)), path.R - 1, label=r'$R_t - 1$', **p_args)
+    ax.plot(list(range(1, T+1)), path.R - 1, label=r'$R_t - 1$', **p_args)
     ax.legend(ncol=1, **legend_args)
 
     # == Plot revenue, expenditure and risk free rate == #
     ax = axes[1, 1]
-    ax.plot(list(range(1,T+1)), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
-    ax.plot(list(range(1,T+1)), path.g, label=r'$g_t$', **p_args)
-    axes[1, 1].plot(list(range(1,T)), path.pi, label=r'$\pi_{t+1}$', **p_args)
+    ax.plot(list(range(1, T+1)), path.rvn, label=r'$\tau_t \ell_t$', **p_args)
+    ax.plot(list(range(1, T+1)), path.g, label=r'$g_t$', **p_args)
+    axes[1, 1].plot(list(range(1, T)), path.pi, label=r'$\pi_{t+1}$', **p_args)
     ax.legend(ncol=3, **legend_args)
 
     plt.show()
@@ -276,22 +276,21 @@ def gen_fig_2(path):
     plt.subplots_adjust(hspace=0.5)
     bbox = (0., 1.02, 1., .102)
     bbox = (0., 1.02, 1., .102)
-    legend_args = {'bbox_to_anchor' : bbox, 'loc' : 3, 'mode' : 'expand'}
-    p_args = {'lw' : 2, 'alpha' : 0.7}
+    legend_args = {'bbox_to_anchor': bbox, 'loc': 3, 'mode': 'expand'}
+    p_args = {'lw': 2, 'alpha': 0.7}
 
     # == Plot adjustment factor == #
     ax = axes[0]
-    ax.plot(list(range(2,T+1)), path.xi, label=r'$\xi_t$', **p_args)
+    ax.plot(list(range(2, T+1)), path.xi, label=r'$\xi_t$', **p_args)
     ax.grid()
     ax.set_xlabel(r'Time')
     ax.legend(ncol=1, **legend_args)
 
     # == Plot adjusted cumulative return == #
     ax = axes[1]
-    ax.plot(list(range(2,T+1)), path.Pi, label=r'$\Pi_t$', **p_args)
+    ax.plot(list(range(2, T+1)), path.Pi, label=r'$\Pi_t$', **p_args)
     ax.grid()
     ax.set_xlabel(r'Time')
     ax.legend(ncol=1, **legend_args)
 
     plt.show()
-

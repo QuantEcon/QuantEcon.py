@@ -20,10 +20,10 @@ q       = 1e6
 
 # == Formulate as an LQ problem == #
 Q = 1
-R = np.zeros((2, 2)) 
+R = np.zeros((2, 2))
 Rf = np.zeros((2, 2))
 Rf[0, 0] = q
-A = [[1 + r, -c_bar + mu], 
+A = [[1 + r, -c_bar + mu],
      [0,     1]]
 B = [[-1],
      [0]]
@@ -36,7 +36,7 @@ x0 = (0, 1)
 xp, up, wp = lq.compute_sequence(x0)
 
 # == Convert back to assets, consumption and income == #
-assets = xp[0, :]           # a_t 
+assets = xp[0, :]           # a_t
 c = up.flatten() + c_bar    # c_t
 income = wp[0, 1:] + mu     # y_t
 
@@ -49,17 +49,18 @@ for i in range(n_rows):
     axes[i].grid()
     axes[i].set_xlabel(r'Time')
 bbox = (0., 1.02, 1., .102)
-legend_args = {'bbox_to_anchor' : bbox, 'loc' : 3, 'mode' : 'expand'}
-p_args = {'lw' : 2, 'alpha' : 0.7}
+legend_args = {'bbox_to_anchor': bbox, 'loc': 3, 'mode': 'expand'}
+p_args = {'lw': 2, 'alpha': 0.7}
 
-axes[0].plot(list(range(1, T+1)), income, 'g-', label="non-financial income", **p_args)
+axes[0].plot(list(range(1, T+1)), income, 'g-', label="non-financial income",
+             **p_args)
 axes[0].plot(list(range(T)), c, 'k-', label="consumption", **p_args)
 axes[0].legend(ncol=2, **legend_args)
 
-axes[1].plot(list(range(1, T+1)), np.cumsum(income - mu), 'r-', label="cumulative unanticipated income", **p_args)
+axes[1].plot(list(range(1, T+1)), np.cumsum(income - mu), 'r-',
+             label="cumulative unanticipated income", **p_args)
 axes[1].plot(list(range(T+1)), assets, 'b-', label="assets", **p_args)
 axes[1].plot(list(range(T)), np.zeros(T), 'k-')
 axes[1].legend(ncol=2, **legend_args)
 
 plt.show()
-

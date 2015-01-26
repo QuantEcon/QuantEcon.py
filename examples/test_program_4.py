@@ -1,8 +1,9 @@
 from random import normalvariate, uniform
 import matplotlib.pyplot as plt
 
+
 def generate_data(n, generator_type):
-    epsilon_values = []   
+    epsilon_values = []
     for i in range(n):
         if generator_type == 'U':
             e = uniform(0, 1)
