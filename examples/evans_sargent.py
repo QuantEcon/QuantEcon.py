@@ -22,6 +22,7 @@ from quantecon import LQ
 from quantecon.matrix_eqn import solve_discrete_lyapunov
 from scipy.optimize import root
 
+
 def computeG(A0, A1, d, Q0, tau0, beta, mu):
     """
     Compute government income given mu and return tax revenues and
@@ -107,6 +108,7 @@ mu0  = 0.0025
 Q0   = 1000.0
 tau0 = 0.0
 
+
 def gg(mu):
     """
     Computes the tax revenues for the government given Lagrangian
@@ -175,4 +177,3 @@ if __name__ == '__main__':
     print(y)
     print("-F")
     print(-F)
-

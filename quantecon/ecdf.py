@@ -10,6 +10,7 @@ of observations.
 
 import numpy as np
 
+
 class ECDF(object):
     """
     One-dimensional empirical distribution function given a vector of
@@ -45,4 +46,3 @@ class ECDF(object):
 
         """
         return np.mean(self.observations <= x)
-

@@ -59,7 +59,5 @@ yr2 = np.linspace(y_min, y_max, grid_size)
 x2, y2 = np.meshgrid(xr2, yr2)
 z2 = f(x2, y2)
 ax.plot_surface(x2, y2, z2, rstride=1, cstride=1, cmap=cm.jet,
-        linewidth=0, antialiased=True, alpha=0.2)
+                linewidth=0, antialiased=True, alpha=0.2)
 plt.show()
-
-

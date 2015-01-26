@@ -12,6 +12,7 @@ from numpy import dot
 from scipy.linalg import inv
 from .matrix_eqn import solve_discrete_riccati
 
+
 class Kalman:
     r"""
     Implements the Kalman filter for the Gaussian state space model
@@ -127,7 +128,7 @@ class Kalman:
         B = dot(dot(G, Sigma), G.T) + R
         M = dot(A, inv(B))
         self.current_x_hat = x_hat + dot(M, (y - dot(G, x_hat)))
-        self.current_Sigma = Sigma  - dot(M, dot(G,  Sigma))
+        self.current_Sigma = Sigma - dot(M, dot(G,  Sigma))
 
     def filtered_to_forecast(self):
         """

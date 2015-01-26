@@ -10,20 +10,15 @@ description of the model.
 
 """
 from __future__ import division
-import sys
-import numpy as np
-import scipy.linalg as la
-import matplotlib.pyplot as plt
-from numpy import sqrt, max, eye, dot, zeros, cumsum, array
-from numpy.random import randn
+from numpy import array, eye
 from quantecon.lqnash import nnash
 
 
-#---------------------------------------------------------------------#
+# ---------------------------------------------------------------------#
 # Set up parameter values and LQ matrices
 # Remember state is x_t = [1, y_{1, t}, y_{2, t}] and
 # control is u_{i, t} = [y_{i, t+1} - y_{i, t}]
-#---------------------------------------------------------------------#
+# ---------------------------------------------------------------------#
 a0 = 10.
 a1 = 1.
 beta = 1.
@@ -45,9 +40,9 @@ q1 = array([[-.5*d]])
 q2 = array([[-.5*d]])
 
 
-#---------------------------------------------------------------------#
+# ---------------------------------------------------------------------#
 # Solve using QE's nnash function
-#---------------------------------------------------------------------#
+# ---------------------------------------------------------------------#
 
 f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, 0., 0., 0., 0., 0., 0.,
                        tol=1e-8, max_iter=1000)

@@ -25,7 +25,7 @@ pi_plot_grid_size, w_plot_grid_size = 100, 100
 pi_plot_grid = np.linspace(0.001, 0.99, pi_plot_grid_size)
 w_plot_grid = np.linspace(0, sp.w_max, w_plot_grid_size)
 
-#plot_choice = 'value_function'
+# plot_choice = 'value_function'
 plot_choice = 'policy_function'
 
 if plot_choice == 'value_function':

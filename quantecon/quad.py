@@ -27,9 +27,9 @@ __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
            'qnwsimp', 'qnwtrap', 'qnwunif', 'quadrect', 'qnwbeta',
            'qnwgamma']
 
-## ------------------ ##
-#- Exported Functions -#
-## ------------------ ##
+# ------------------ #
+# Exported Functions #
+# ------------------ #
 
 
 def qnwcheb(n, a=1, b=1):
@@ -603,9 +603,9 @@ def qnwgamma(n, a=None):
     """
     return _make_multidim_func(_qnwgamma1, n, a)
 
-## ------------------ ##
-#- Internal Functions -#
-## ------------------ ##
+# ------------------ #
+# Internal Functions #
+# ------------------ #
 
 
 def _make_multidim_func(one_d_func, n, *args):

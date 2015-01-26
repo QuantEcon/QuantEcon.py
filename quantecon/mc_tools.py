@@ -297,9 +297,9 @@ def mc_sample_path(P, init=0, sample_size=1000):
     return X
 
 
-#---------------------------------------------------------------------#
+# ------------------------------------------------------------------- #
 # Set up the docstrings for the functions
-#---------------------------------------------------------------------#
+# ------------------------------------------------------------------- #
 
 # For drawing a sample path
 _sample_path_docstr = \
@@ -325,11 +325,10 @@ X : array_like(int, ndim=1)
 """
 
 # set docstring for functions
-mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg=
-"""P : array_like(float, ndim=2)
+mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
+    P : array_like(float, ndim=2)
     A Markov transition matrix.
-
-""")
+    """)
 
 # set docstring for methods
 

@@ -6,12 +6,12 @@ Base class for solving initial value problems (IVPs) of the form:
     \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
 
 using finite difference methods. The `quantecon.ivp` class uses various
-integrators from the `scipy.integrate.ode` module to perform the integration
-(i.e., solve the ODE) and parametric B-spline interpolation from
-`scipy.interpolate` to approximate the value of the solution between grid
-points. The `quantecon.ivp` module also provides a method for computing the
-residual of the solution which can be used for assessing the overall accuracy
-of the approximated solution.
+integrators from the `scipy.integrate.ode` module to perform the
+integration (i.e., solve the ODE) and parametric B-spline interpolation
+from `scipy.interpolate` to approximate the value of the solution
+between grid points. The `quantecon.ivp` module also provides a method
+for computing the residual of the solution which can be used for
+assessing the overall accuracy of the approximated solution.q
 
 @author : David R. Pugh
 @date : 2014-09-09
@@ -32,14 +32,14 @@ class IVP(integrate.ode):
         Parameters
         ----------
         f : callable ``f(t, y, *f_args)``
-            Right hand side of the system of equations defining the ODE. The
-            independent variable, ``t``, is a ``scalar``; ``y`` is an ``ndarray``
-            of dependent variables with ``y.shape == (n,)``. The function `f`
-            should return a ``scalar``, ``ndarray`` or ``list`` (but not a
-            ``tuple``).
+            Right hand side of the system of equations defining the ODE.
+            The independent variable, ``t``, is a ``scalar``; ``y`` is
+            an ``ndarray`` of dependent variables with ``y.shape ==
+            (n,)``. The function `f` should return a ``scalar``,
+            ``ndarray`` or ``list`` (but not a ``tuple``).
         jac : callable ``jac(t, y, *jac_args)``, optional(default=None)
-            Jacobian of the right hand side of the system of equations defining
-            the ODE.
+            Jacobian of the right hand side of the system of equations
+            defining the ODE.
 
             .. :math:
 
@@ -130,7 +130,8 @@ class IVP(integrate.ode):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_params) for i in range(T))
+        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_params)
+                            for i in range(T))
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)
