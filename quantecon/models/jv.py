@@ -6,9 +6,10 @@ Authors: Thomas Sargent, John Stachurski
 References
 -----------
 
-http://quant-econ.net/jv.html
+http://quant-econ.net/py/jv.html
 
 """
+from textwrap import dedent
 import sys
 import numpy as np
 from scipy.integrate import fixed_quad as integrate
@@ -65,6 +66,13 @@ class JvWorker(object):
         Discount factor
     grid_size : scalar(int), optional(default=50)
         Grid size for discretization
+    G : function, optional(default=lambda x, phi: A * (x * phi)**alpha)
+        Transition function for human captial
+    pi : function, optional(default=sqrt)
+        Function mapping search effort (:math:`s \in (0,1)`) to
+        probability of getting new job offer
+    F : distribution, optional(default=Beta(2,2))
+        Distribution from which the value of new job offers is drawn
 
     Attributes
     ----------
@@ -74,19 +82,37 @@ class JvWorker(object):
 
     """
 
-    def __init__(self, A=1.4, alpha=0.6, beta=0.96, grid_size=50):
+    def __init__(self, A=1.4, alpha=0.6, beta=0.96, grid_size=50,
+                 G=None, pi=np.sqrt, F=stats.beta(2, 2)):
         self.A, self.alpha, self.beta = A, alpha, beta
 
         # === set defaults for G, pi and F === #
-        self.G = lambda x, phi: A * (x * phi)**alpha
-        self.pi = np.sqrt
-        self.F = stats.beta(2, 2)
+        self.G = G if G is not None else lambda x, phi: A * (x * phi)**alpha
+        self.pi = pi
+        self.F = F
 
         # === Set up grid over the state space for DP === #
         # Max of grid is the max of a large quantile value for F and the
         # fixed point y = G(y, 1).
         grid_max = max(A**(1 / (1 - alpha)), self.F.ppf(1 - epsilon))
         self.x_grid = np.linspace(epsilon, grid_max, grid_size)
+
+    def __repr__(self):
+        m = "JvWorker(A={a:g}, alpha={al:g}, beta={b:g}, grid_size={gs})"
+        return m.format(a=self.A, al=self.alpha, b=self.beta,
+                        gs=self.x_grid.size)
+
+    def __str__(self):
+        m = """\
+        Jovanovic worker (on the job search):
+          - A (parameter in human capital transition function)     : {a:g}
+          - alpha (parameter in human capital transition function) : {al:g}
+          - beta (parameter in human capital transition function)  : {b:g}
+          - grid_size (number of grid points for human capital)    : {gs}
+          - grid_max (maximum of grid for human capital)           : {gm:g}
+        """
+        return dedent(m.format(a=self.A, al=self.alpha, b=self.beta,
+                               gs=self.x_grid.size, gm=self.x_grid.max()))
 
     def bellman_operator(self, V, brute_force=False, return_policies=False):
         """

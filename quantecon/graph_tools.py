@@ -89,6 +89,12 @@ class DiGraph(object):
 
         self._period = None
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "Directed Graph:\n  - n(number of nodes): {n}".format(n=self.n)
+
     def _find_scc(self):
         """
         Set ``self._num_scc`` and ``self._scc_proj``

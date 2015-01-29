@@ -31,10 +31,11 @@ class ECDF(object):
         self.observations = np.asarray(observations)
 
     def __repr__(self):
-        return "ECDF with {n} observations".format(n=self.observations.size)
+        return self.__str__()
 
     def __str__(self):
-        return self.__repr__()
+        m = "Empirical CDF:\n  - number of observations: {n}"
+        return m.format(n=self.observations.size)
 
     def __call__(self, x):
         """

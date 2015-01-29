@@ -7,14 +7,14 @@ Provides a class called LQ for solving linear quadratic control
 problems.
 
 """
-
+from textwrap import dedent
 import numpy as np
 from numpy import dot
 from scipy.linalg import solve
 from .matrix_eqn import solve_discrete_riccati
 
 
-class LQ:
+class LQ(object):
     r"""
     This class is for analyzing linear quadratic optimal control
     problems of either the infinite horizon form
@@ -142,6 +142,22 @@ class LQ:
             self.T = None
 
         self.F = None
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Linear Quadratic control system
+          - beta (discount parameter)   : {b}
+          - T (time horizon)            : {t}
+          - n (number of state variables)   : {n}
+          - k (number of control variables) : {k}
+          - j (number of shocks)            : {j}
+        """
+        t = "infinte" if self.T is None else self.T
+        return dedent(m.format(b=self.beta, n=self.n, k=self.k, j=self.j,
+                               t=t))
 
     def update_values(self):
         """

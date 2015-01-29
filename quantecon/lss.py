@@ -12,14 +12,13 @@ Computes quantities related to the Gaussian linear state space model
 The shocks {w_t} are iid and N(0, I)
 
 """
-
+from textwrap import dedent
 import numpy as np
-from numpy import dot
 from numpy.random import multivariate_normal
 from scipy.linalg import solve
 
 
-class LSS:
+class LSS(object):
     """
     A class that describes a Gaussian linear state space model of the
     form:
@@ -75,6 +74,18 @@ class LSS:
             self.Sigma_0 = np.zeros((self.n, self.n))
         else:
             self.Sigma_0 = Sigma_0
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Linear Gaussian state space model:
+          - dimension of state space          : {n}
+          - number of innovations             : {m}
+          - dimension of observation equation : {k}
+        """
+        return dedent(m.format(n=self.n, k=self.k, m=self.m))
 
     def convert(self, x):
         """

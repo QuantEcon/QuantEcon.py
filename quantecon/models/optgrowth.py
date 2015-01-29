@@ -6,8 +6,8 @@ Authors: John Stachurski and Thomas Sargent
 Solving the optimal growth problem via value function iteration.
 
 """
-
 from __future__ import division  # Omit for Python 3.x
+from textwrap import dedent
 import numpy as np
 from scipy.optimize import fminbound
 from scipy import interp
@@ -44,6 +44,23 @@ class GrowthModel(object):
 
         self.u, self.f, self.beta = u, f, beta
         self.grid = np.linspace(1e-6, grid_max, grid_size)
+
+    def __repr__(self):
+        m = "GrowthModel(beta={b}, grid_max={gm}, grid_size={gs})"
+        return m.format(b=self.beta, gm=self.grid.max(), gs=self.grid.size)
+
+    def __str__(self):
+        m = """\
+        GrowthModel:
+          - beta (discount factor)                             : {b}
+          - u (utility function)                               : {u}
+          - f (production function)                            : {f}
+          - grid bounds (bounds for grid over savings values)  : ({gl}, {gm})
+          - grid points (number of points in grid for savings) : {gs}
+        """
+        return dedent(m.format(b=self.beta, u=self.u, f=self.f,
+                               gl=self.grid.min(), gm=self.grid.max(),
+                               gs=self.grid.size))
 
     def bellman_operator(self, w, compute_policy=False):
         """

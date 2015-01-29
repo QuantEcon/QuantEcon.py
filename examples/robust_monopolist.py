@@ -19,8 +19,6 @@ For the linear regulator, we take the state and control to be
     x_t = (1, y_t, d_t) and u_t = y_{t+1} - y_t
 
 """
-
-
 import pandas as pd
 import numpy as np
 from scipy.linalg import eig
