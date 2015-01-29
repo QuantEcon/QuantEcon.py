@@ -8,13 +8,13 @@ A class to solve the career / job choice model due to Derek Neal.
 References
 ----------
 
-http://quant-econ.net/career.html
+http://quant-econ.net/py/career.html
 
 ..  [Neal1999] Neal, D. (1999). The Complexity of Job Mobility among
     Young Men, Journal of Labor Economics, 17(2), 237-261.
 
 """
-
+from textwrap import dedent
 import numpy as np
 from quantecon.distributions import BetaBinomial
 
@@ -69,6 +69,30 @@ class CareerWorkerProblem(object):
         self.G_probs = BetaBinomial(N-1, G_a, G_b).pdf()
         self.F_mean = np.sum(self.theta * self.F_probs)
         self.G_mean = np.sum(self.epsilon * self.G_probs)
+
+        # Store these parameters for str and repr methods
+        self._F_a, self._F_b = F_a, F_b
+        self._G_a, self._G_b = G_a, G_b
+
+    def __repr__(self):
+        m = "CareerWorkerProblem(beta={b:g}, B={B:g}, N={n:g}, F_a={fa:g}, "
+        m += "F_b={fb:g}, G_a={ga:g}, G_b={gb:g})"
+        return m.format(b=self.beta, B=self.B, n=self.N, fa=self._F_a,
+                        fb=self._F_b, ga=self._G_a, gb=self._G_b)
+
+    def __str__(self):
+        m = """\
+        CareerWorkerProblem (Neal, 1999)
+          - beta (discount factor)                          : {b:g}
+          - B (upper bound for epsilon and theta)           : {B:g}
+          - N (number of realizations of epsilon and theta) : {n:g}
+          - F_a (parameter a from career distribution)      : {fa:g}
+          - F_b (parameter b from career distribution)      : {fb:g}
+          - G_a (parameter a from job distribution)         : {ga:g}
+          - G_b (parameter b from job distribution)         : {gb:g}
+        """
+        return dedent(m.format(b=self.beta, B=self.B, n=self.N, fa=self._F_a,
+                               fb=self._F_b, ga=self._G_a, gb=self._G_b))
 
     def bellman_operator(self, v):
         """

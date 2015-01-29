@@ -12,10 +12,10 @@ aversion in the household's utility function.
 References
 ----------
 
-    http://quant-econ.net/markov_asset.html
+    http://quant-econ.net/py/markov_asset.html
 
 """
-
+from textwrap import dedent
 import numpy as np
 from numpy.linalg import solve
 
@@ -81,6 +81,22 @@ class AssetPrices(object):
         self.beta, self.gamma = beta, gamma
         self.P, self.s = P, s
         self.n = self.P.shape[0]
+
+    def __repr__(self):
+        m = "AssetPrices(beta={b:g}, P='{n:g} by {n:g}', s={s}, gamma={g:g})"
+        return m.format(b=self.beta, n=self.P.shape[0], s=self.s, g=self.gamma)
+
+    def __str__(self):
+        m = """\
+        AssetPrices (Merha and Prescott, 1985):
+          - beta (discount factor)               : {b:g}
+          - P (Transition matrix)                : {n:g} by {n:g}
+          - s (growth rate of consumption)       : {s:s}
+          - gamma (Coefficient of risk aversion) : {g:g}
+        """
+
+        return dedent(m.format(b=self.beta, n=self.P.shape[0], s=repr(self.s),
+                               g=self.gamma))
 
     @property
     def P_tilde(self):

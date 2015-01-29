@@ -11,7 +11,7 @@ integration (i.e., solve the ODE) and parametric B-spline interpolation
 from `scipy.interpolate` to approximate the value of the solution
 between grid points. The `quantecon.ivp` module also provides a method
 for computing the residual of the solution which can be used for
-assessing the overall accuracy of the approximated solution.q
+assessing the overall accuracy of the approximated solution.
 
 @author : David R. Pugh
 @date : 2014-09-09

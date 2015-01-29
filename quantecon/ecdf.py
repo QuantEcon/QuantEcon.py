@@ -30,6 +30,12 @@ class ECDF(object):
     def __init__(self, observations):
         self.observations = np.asarray(observations)
 
+    def __repr__(self):
+        return "ECDF with {n} observations".format(n=self.observations.size)
+
+    def __str__(self):
+        return self.__repr__()
+
     def __call__(self, x):
         """
         Evaluates the ecdf at x
