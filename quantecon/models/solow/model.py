@@ -79,6 +79,7 @@ References
 """
 from __future__ import division
 import collections
+from textwrap import dedent
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -128,6 +129,31 @@ class Model(object):
         self.irf = impulse_response.ImpulseResponse(self)
         self.output = output
         self.params = params
+
+    def __repr__(self):
+        """Machine readable summary of a Model instance."""
+        return self.__str__()
+
+    def __str__(self):
+        """Human readable summary of a Model instance."""
+        m = """
+        Solow (1956) model of economic growth:
+          - Output                                        : {Y}
+          - A0 (initial level of technology)              : {A0:g}
+          - L0 (initial amount of available labor)        : {L0:g}
+          - g (growth rate of technology)                 : {g:g}
+          - n (growth rate of the labor force)            : {n:g}
+          - s (savings rate)                              : {s:g}
+          - delta (depreciation rate of physical capital) : {delta:g}
+        """
+        formatted_str = dedent(m.format(Y=self.output,
+                                        A0=self.params['A0'],
+                                        L0=self.params['L0'],
+                                        g=self.params['g'],
+                                        n=self.params['n'],
+                                        s=self.params['s'],
+                                        delta=self.params['delta']))
+        return formatted_str
 
     @property
     def _intensive_output(self):

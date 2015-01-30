@@ -6,6 +6,7 @@ Solow growth model with Cobb-Douglas aggregate production.
 
 """
 from __future__ import division
+from textwrap import dedent
 
 import numpy as np
 import sympy as sym
@@ -37,6 +38,13 @@ class CobbDouglasModel(model.Model):
         """
         cobb_douglas_output = K**alpha * (A * L)**(1 - alpha)
         super(CobbDouglasModel, self).__init__(cobb_douglas_output, params)
+
+    def __str__(self):
+        """Human readable summary of a CESModel instance."""
+        m = super(CobbDouglasModel, self).__str__()
+        m += "  - alpha (output elasticity)                     : {alpha:g}\n"
+        formatted_str = dedent(m.format(alpha=self.params['alpha']))
+        return formatted_str
 
     @property
     def steady_state(self):
