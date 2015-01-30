@@ -5,6 +5,7 @@ Date: 10/16/14
 Provides Matlab-like tic, tac and toc functions.
 """
 
+
 class __Timer__:
     '''Computes elapsed time, between tic, tac, and toc.
 
@@ -25,13 +26,11 @@ class __Timer__:
     def tic(self):
         """Resets timer."""
 
-
         import time
 
         t = time.time()
         self.start = t
         self.last = t
-
 
     def tac(self):
         """Returns and prints time elapsed since last tic()"""
@@ -48,7 +47,6 @@ class __Timer__:
         print("TAC: Elapsed: {} seconds.".format(elapsed))
         return elapsed
 
-
     def toc(self):
         """Returns and prints time elapsed since last
         tic() or tac() whichever occured last"""
@@ -62,19 +60,21 @@ class __Timer__:
         self.last = t
         elapsed = t-self.start
 
-
         print("TOC: Elapsed: {} seconds.".format(elapsed))
         return elapsed
 
 __timer__ = __Timer__()
 
+
 def tic():
     """Saves time for future use with tac or toc."""
     return __timer__.tic()
 
+
 def tac():
     """Prints and returns elapsed time since last tic, tac or toc."""
     return __timer__.tac()
+
 
 def toc():
     """Prints and returns elapsed time since last tic, tac or toc."""

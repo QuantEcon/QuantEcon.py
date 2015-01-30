@@ -6,6 +6,7 @@ Solow model with constant elasticity of substitution (CES) production.
 
 """
 from __future__ import division
+from textwrap import dedent
 
 import sympy as sym
 
@@ -36,6 +37,15 @@ class CESModel(model.Model):
         rho = (sigma - 1) / sigma
         ces_output = (alpha * K**rho + (1 - alpha) * (A * L)**rho)**(1 / rho)
         super(CESModel, self).__init__(ces_output, params)
+
+    def __str__(self):
+        """Human readable summary of a CESModel instance."""
+        m = super(CESModel, self).__str__()
+        m += "  - alpha (capital's weight in output)            : {alpha:g}\n"
+        m += "  - sigma (elasticity of substitution)            : {sigma:g}"
+        formatted_str = dedent(m.format(alpha=self.params['alpha'],
+                                        sigma=self.params['sigma']))
+        return formatted_str
 
     @property
     def solow_residual(self):
@@ -113,7 +123,7 @@ class CESModel(model.Model):
         """Validate the model parameters."""
         params = super(CESModel, self)._validate_params(params)
         if params['alpha'] < 0.0 or params['alpha'] > 1.0:
-            raise AttributeError('Output elasticity must be in (0, 1).')
+            raise AttributeError('Capital weight must be in (0, 1).')
         elif params['sigma'] <= 0.0:
             mesg = 'Elasticity of substitution must be strictly positive.'
             raise AttributeError(mesg)

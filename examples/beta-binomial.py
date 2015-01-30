@@ -7,6 +7,7 @@ from scipy.special import binom, beta
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def gen_probs(n, a, b):
     probs = np.zeros(n+1)
     for k in range(n+1):
@@ -22,4 +23,3 @@ for a, b in zip(a_vals, b_vals):
     ax.plot(list(range(0, n+1)), gen_probs(n, a, b), '-o', label=ab_label)
 ax.legend()
 plt.show()
-

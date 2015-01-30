@@ -13,18 +13,21 @@ from numpy import log
 from scipy.optimize import fminbound
 from scipy import interp
 
-## Primitives and grid
+# Primitives and grid
 alpha = 0.65
-beta=0.95
-grid_max=2 
-grid_size=150
+beta = 0.95
+grid_max = 2
+grid_size = 150
 grid = np.linspace(1e-6, grid_max, grid_size)
-## Exact solution
+# Exact solution
 ab = alpha * beta
 c1 = (log(1 - ab) + log(ab) * ab / (1 - ab)) / (1 - beta)
 c2 = alpha / (1 - ab)
+
+
 def v_star(k):
     return c1 + c2 * log(k)
+
 
 def bellman_operator(w):
     """
@@ -37,19 +40,19 @@ def bellman_operator(w):
     points.
     """
     # === Apply linear interpolation to w === #
-    Aw = lambda x: interp(x, grid, w)  
+    Aw = lambda x: interp(x, grid, w)
 
     # === set Tw[i] equal to max_c { log(c) + beta w(f(k_i) - c)} === #
     Tw = np.empty(grid_size)
     for i, k in enumerate(grid):
-        objective = lambda c:  - log(c) - beta * Aw(k**alpha - c)
+        objective = lambda c: - log(c) - beta * Aw(k**alpha - c)
         c_star = fminbound(objective, 1e-6, k**alpha)
         Tw[i] = - objective(c_star)
 
     return Tw
 
 # === If file is run directly, not imported, produce figure === #
-if __name__ == '__main__':  
+if __name__ == '__main__':
 
     w = 5 * log(grid) - 25  # An initial condition -- fairly arbitrary
     n = 35
@@ -66,4 +69,3 @@ if __name__ == '__main__':
     ax.legend(loc='upper left')
 
     plt.show()
-

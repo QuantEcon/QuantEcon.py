@@ -19,7 +19,7 @@ v_init = np.ones((wp.N, wp.N))*100
 v = qe.compute_fixed_point(wp.bellman_operator, v_init)
 
 # === plot value function === #
-fig = plt.figure(figsize=(8,6))
+fig = plt.figure(figsize=(8, 6))
 ax = fig.add_subplot(111, projection='3d')
 tg, eg = np.meshgrid(wp.theta, wp.epsilon)
 ax.plot_surface(tg,

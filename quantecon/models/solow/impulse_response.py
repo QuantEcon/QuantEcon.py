@@ -6,6 +6,7 @@ Classes for generating and plotting impulse response functions.
 
 """
 from __future__ import division
+from textwrap import dedent
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,6 +32,20 @@ class ImpulseResponse(object):
 
         """
         self.model = model
+
+    def __repr__(self):
+        """Machine readable summary of a ImpulseResponse instance."""
+        return self.__str__()
+
+    def __str__(self):
+        """Human readable summary of a ImpulseResponse instance."""
+        m = """
+        Impulse response function (IRF):
+          - N (number of points used for padding) : {N:d}
+          - T (length of the impulse response)    : {T:d}
+        """
+        formatted_str = dedent(m.format(N=self.N, T=self.T))
+        return formatted_str
 
     @property
     def _padding(self):

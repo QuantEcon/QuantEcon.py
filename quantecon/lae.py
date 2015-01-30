@@ -16,13 +16,14 @@ This is a density in y.
 References
 ----------
 
-http://quant-econ.net/stationary_densities.html
+http://quant-econ.net/py/stationary_densities.html
 
 """
+from textwrap import dedent
 import numpy as np
 
 
-class LAE:
+class LAE(object):
     """
     An instance is a representation of a look ahead estimator associated
     with a given stochastic kernel p and a vector of observations X.
@@ -51,6 +52,16 @@ class LAE:
         X = X.flatten()  # So we know what we're dealing with
         n = len(X)
         self.p, self.X = p, X.reshape((n, 1))
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Look ahead estimator
+          - number of observations : {n}
+        """
+        return dedent(m.format(n=self.X.size))
 
     def __call__(self, y):
         """

@@ -1,6 +1,5 @@
 
 from __future__ import division  # Omit for Python 3.x
-import numpy as np
 import matplotlib.pyplot as plt
 from quantecon.models import LucasTree
 
@@ -21,4 +20,3 @@ ax.set_ylabel(r'price', fontsize=16)
 ax.legend(loc='upper left')
 
 plt.show()
-

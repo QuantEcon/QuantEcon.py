@@ -6,13 +6,14 @@ Authors: Thomas Sargent, John Stachurski
 Implements the Kalman filter for a linear Gaussian state space model.
 
 """
-
+from textwrap import dedent
 import numpy as np
 from numpy import dot
 from scipy.linalg import inv
 from .matrix_eqn import solve_discrete_riccati
 
-class Kalman:
+
+class Kalman(object):
     r"""
     Implements the Kalman filter for the Gaussian state space model
 
@@ -58,6 +59,17 @@ class Kalman:
     def __init__(self, A, G, Q, R):
         self.A, self.G, self.Q, self.R = list(map(self.convert, (A, G, Q, R)))
         self.k, self.n = self.G.shape
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Kalman filter:
+          - dimension of state space          : {n}
+          - dimension of observation equation : {k}
+        """
+        return dedent(m.format(n=self.n, k=self.k))
 
     def convert(self, x):
         """
@@ -127,7 +139,7 @@ class Kalman:
         B = dot(dot(G, Sigma), G.T) + R
         M = dot(A, inv(B))
         self.current_x_hat = x_hat + dot(M, (y - dot(G, x_hat)))
-        self.current_Sigma = Sigma  - dot(M, dot(G,  Sigma))
+        self.current_Sigma = Sigma - dot(M, dot(G,  Sigma))
 
     def filtered_to_forecast(self):
         """

@@ -3,8 +3,8 @@ r"""
 The Solow Growth Model
 ======================
 
-The following summary of the [solow1956] model of economic growth largely
-follows [romer2011].
+The following summary of the [solow1956] model of economic growth
+largely follows [romer2011].
 
 Assumptions
 ===========
@@ -13,10 +13,11 @@ The production function
 ----------------------------------------------
 
 The [solow1956] model of economic growth focuses on the behavior of four
-variables: output, `Y`, capital, `K`, labor, `L`, and knowledge (or technology
-or the ``effectiveness of labor''), `A`. At each point in time the economy has
-some amounts of capital, labor, and knowledge that can be combined to produce
-output according to some production function, `F`.
+variables: output, `Y`, capital, `K`, labor, `L`, and knowledge (or
+technology or the ``effectiveness of labor''), `A`. At each point in
+time the economy has some amounts of capital, labor, and knowledge that
+can be combined to produce output according to some production function,
+`F`.
 
 .. math::
 
@@ -26,41 +27,42 @@ where `t` denotes time.
 
 The evolution of the inputs to production
 -----------------------------------------
-The initial levels of capital, :math:`K_0`, labor, :math:`L_0`, and technology,
-:math:`A_0`, are taken as given. Labor and technology are assumed to grow at
-constant rates:
+
+The initial levels of capital, :math:`K_0`, labor, :math:`L_0`, and
+technology, :math:`A_0`, are taken as given. Labor and technology are
+assumed to grow at constant rates:
 
 .. math::
 
     \dot{A}(t) = gA(t)
     \dot{L}(t) = nL(t)
 
-where the rate of technological progrss, `g`, and the population growth rate,
-`n`, are exogenous parameters.
+where the rate of technological progrss, `g`, and the population growth
+rate, `n`, are exogenous parameters.
 
-Output is divided between consumption and investment. The fraction of output
-devoted to investment, :math:`0 < s < 1`, is exogenous and constant. One unit
-of output devoted to investment yields one unit of new capital. Capital is
-assumed to decpreciate at a rate :math:`0\le \delta`. Thus aggregate capital
-stock evolves according to
+Output is divided between consumption and investment. The fraction of
+output devoted to investment, :math:`0 < s < 1`, is exogenous and
+constant. One unit of output devoted to investment yields one unit of
+new capital. Capital is assumed to decpreciate at a rate :math:`0\le
+\delta`. Thus aggregate capital stock evolves according to
 
 .. math::
 
     \dot{K}(t) = sY(t) - \delta K(t).
 
-Although no restrictions are placed on the rates of technological progress and
-population growth, the sum of `g`, `n`, and :math:`delta` is assumed to be
-positive.
+Although no restrictions are placed on the rates of technological
+progress and population growth, the sum of `g`, `n`, and :math:`delta`
+is assumed to be positive.
 
 The dynamics of the model
 =========================
 
 Because the economy is growing over time (due to exogenous technological
 progress and population growth) it is useful to focus on the behavior of
-capital stock per unit of effective labor, :math:`k\equiv K/AL`. Applying
-the chain rule to the equation of motion for capital stock yields (after a
-bit of algebra!) an equation of motion for capital stock per unit of effective
-labor.
+capital stock per unit of effective labor, :math:`k\equiv K/AL`.
+Applying the chain rule to the equation of motion for capital stock
+yields (after a bit of algebra!) an equation of motion for capital stock
+per unit of effective labor.
 
 .. math::
 
@@ -77,6 +79,7 @@ References
 """
 from __future__ import division
 import collections
+from textwrap import dedent
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -117,7 +120,8 @@ class Model(object):
         Parameters
         ----------
         output : sym.Basic
-            Symbolic expression defining the aggregate production function.
+            Symbolic expression defining the aggregate production
+            function.
         params : dict
             Dictionary of model parameters.
 
@@ -125,6 +129,31 @@ class Model(object):
         self.irf = impulse_response.ImpulseResponse(self)
         self.output = output
         self.params = params
+
+    def __repr__(self):
+        """Machine readable summary of a Model instance."""
+        return self.__str__()
+
+    def __str__(self):
+        """Human readable summary of a Model instance."""
+        m = """
+        Solow (1956) model of economic growth:
+          - Output                                        : {Y}
+          - A0 (initial level of technology)              : {A0:g}
+          - L0 (initial amount of available labor)        : {L0:g}
+          - g (growth rate of technology)                 : {g:g}
+          - n (growth rate of the labor force)            : {n:g}
+          - s (savings rate)                              : {s:g}
+          - delta (depreciation rate of physical capital) : {delta:g}
+        """
+        formatted_str = dedent(m.format(Y=self.output,
+                                        A0=self.params['A0'],
+                                        L0=self.params['L0'],
+                                        g=self.params['g'],
+                                        n=self.params['n'],
+                                        s=self.params['s'],
+                                        delta=self.params['delta']))
+        return formatted_str
 
     @property
     def _intensive_output(self):
@@ -202,8 +231,8 @@ class Model(object):
     @property
     def _symbolic_args(self):
         """
-        List of symbolic arguments used in constructing vectorized versions of
-        _symbolic_system and _symbolic_jacobian.
+        List of symbolic arguments used in constructing vectorized
+        versions of _symbolic_system and _symbolic_jacobian.
 
         :getter: Return list of symbolic arguments.
         :type: list
@@ -239,17 +268,17 @@ class Model(object):
     @property
     def effective_depreciation_rate(self):
         """
-        Effective depreciation rate for capital stock (per unit effective
-        labor).
+        Effective depreciation rate for capital stock (per unit
+        effective labor).
 
         :getter: Return the current effective depreciation rate.
         :type: float
 
         Notes
         -----
-        The effective depreciation rate of physical capital takes into account
-        both technological progress and population growth, as well as physical
-        depreciation.
+        The effective depreciation rate of physical capital takes into
+        account both technological progress and population growth, as
+        well as physical depreciation.
 
         """
         return sum(self.params[key] for key in ['g', 'n', 'delta'])
@@ -257,32 +286,34 @@ class Model(object):
     @property
     def intensive_output(self):
         r"""
-        Symbolic expression for the intensive form of aggregate production.
+        Symbolic expression for the intensive form of aggregate
+        production.
 
         :getter: Return the current intensive production function.
         :type: sym.Basic
 
         Notes
         -----
-        The assumption of constant returns to scale allows us to work the the
-        intensive form of the aggregate production function, `F`. Defining
-        :math:`c=1/AL` one can write
+        The assumption of constant returns to scale allows us to work
+        the the intensive form of the aggregate production function,
+        `F`. Defining :math:`c=1/AL` one can write
 
         ..math::
 
             F\bigg(\frac{K}{AL}, 1\bigg) = \frac{1}{AL}F(A, K, L)
 
-        Defining :math:`k=K/AL` and :math:`y=Y/AL` to be capital per unit
-        effective labor and output per unit effective labor, respectively, the
-        intensive form of the production function can be written as
+        Defining :math:`k=K/AL` and :math:`y=Y/AL` to be capital per
+        unit effective labor and output per unit effective labor,
+        respectively, the intensive form of the production function can
+        be written as
 
         .. math::
 
             y = f(k).
 
         Additional assumptions are that `f` satisfies :math:`f(0)=0`, is
-        concave (i.e., :math:`f'(k) > 0, f''(k) < 0`), and satisfies the Inada
-        conditions:
+        concave (i.e., :math:`f'(k) > 0, f''(k) < 0`), and satisfies the
+        Inada conditions:
 
         .. math::
             :type: eqnarray
@@ -290,9 +321,9 @@ class Model(object):
             \lim_{k \rightarrow 0} &=& \infty \\
             \lim_{k \rightarrow \infty} &=& 0
 
-        The [inada1964]_ conditions are sufficient (but not necessary!) to
-        ensure that the time path of capital per effective worker does not
-        explode.
+        The [inada1964]_ conditions are sufficient (but not necessary!)
+        to ensure that the time path of capital per effective worker
+        does not explode.
 
         .. [inada1964] K. Inda. *Some structural characteristics of Turnpike Theorems*, Review of Economic Studies, 31(1):43-58, 1964.
 
@@ -304,21 +335,21 @@ class Model(object):
         r"""
         Initial value problem
 
-        :getter: Return an instance of the ivp.IVP class representing the Solow
-        model.
+        :getter: Return an instance of the ivp.IVP class representing
+        the Solow model.
         :type: ivp.IVP
 
         Notes
         -----
-        The Solow model with can be formulated as an initial value problem
-        (IVP) as follows.
+        The Solow model with can be formulated as an initial value
+        problem (IVP) as follows.
 
         .. math::
 
             \dot{k}(t) = sf(k(t)) - (g + n + \delta)k(t),\ t\ge t_0,\ k(t_0) = k_0
 
-        The solution to this IVP is a function :math:`k(t)` describing the time
-        path of capital stock (per unit effective labor).
+        The solution to this IVP is a function :math:`k(t)` describing
+        the time path of capital stock (per unit effective labor).
 
         """
         tmp_ivp = ivp.IVP(self._numeric_system, self._numeric_jacobian)
@@ -329,20 +360,21 @@ class Model(object):
     @property
     def k_dot(self):
         r"""
-        Symbolic expression for the equation of motion for capital (per unit
-        effective labor).
+        Symbolic expression for the equation of motion for capital (per
+        unit effective labor).
 
-        :getter: Return the current equation of motion for capital (per unit
-        effective labor).
+        :getter: Return the current equation of motion for capital (per
+        unit effective labor).
         :type: sym.Basic
 
         Notes
         -----
-        Because the economy is growing over time due to technological progress,
-        `g`, and population growth, `n`, it makes sense to focus on the capital
-        stock per unit effective labor, `k`, rather than aggregate physical
-        capital, `K`. Since, by definition, :math:`k=K/AL`, we can apply the
-        chain rule to the time derative of `k`.
+        Because the economy is growing over time due to technological
+        progress, `g`, and population growth, `n`, it makes sense to
+        focus on the capital stock per unit effective labor, `k`, rather
+        than aggregate physical capital, `K`. Since, by definition,
+        :math:`k=K/AL`, we can apply the chain rule to the time derative
+        of `k`.
 
         .. math::
             :type: eqnarray
@@ -350,16 +382,16 @@ class Model(object):
             \dot{k}(t) =& \frac{\dot{K}(t)}{A(t)L(t)} - \frac{K(t)}{[A(t)L(t)]^2}\bigg[\dot{A}(t)L(t) + \dot{L}(t)A(t)\bigg] \\
             =& \frac{\dot{K}(t)}{A(t)L(t)} - \bigg(\frac{\dot{A}(t)}{A(t)} + \frac{\dot{L}(t)}{L(t)}\bigg)\frac{K(t)}{A(t)L(t)}
 
-        By definition, math:`k=K/AL`, and by assumption :math:`\dot{A}/A` and
-        :math:`\dot{L}/L` are `g` and `n` respectively. Aggregate capital stock
-        evolves according to
+        By definition, math:`k=K/AL`, and by assumption
+        :math:`\dot{A}/A` and :math:`\dot{L}/L` are `g` and `n`
+        respectively. Aggregate capital stock evolves according to
 
         .. math::
 
             \dot{K}(t) = sF(K(t), A(t)L(t)) - \delta K(t).
 
-        Substituting these facts into the above equation yields the equation of
-        motion for capital stock (per unit effective labor).
+        Substituting these facts into the above equation yields the
+        equation of motion for capital stock (per unit effective labor).
 
         .. math::
             :type: eqnarray
@@ -374,11 +406,11 @@ class Model(object):
     @property
     def marginal_product_capital(self):
         r"""
-        Symbolic expression for the marginal product of capital (per unit
-        effective labor).
+        Symbolic expression for the marginal product of capital (per
+        unit effective labor).
 
-        :getter: Return the current marginal product of capital (per unit
-        effective labor).
+        :getter: Return the current marginal product of capital (per
+        unit effective labor).
         :type: sym.Basic
 
         Notes
@@ -389,7 +421,7 @@ class Model(object):
 
             \frac{\partial F(K, AL)}{\partial K} \equiv f'(k)
 
-        where :math:`k=K/AL` is capital stock (per unit effective labor).
+        where :math:`k=K/AL` is capital stock (per unit effective labor)
 
         """
         return sym.diff(self.intensive_output, k)
@@ -405,21 +437,23 @@ class Model(object):
 
         Notes
         -----
-        At each point in time the economy has some amounts of capital, `K`,
-        labor, `L`, and knowledge (or technology), `A`, that can be combined to
-        produce output, `Y`, according to some function, `F`.
+        At each point in time the economy has some amounts of capital,
+        `K`, labor, `L`, and knowledge (or technology), `A`, that can be
+        combined to produce output, `Y`, according to some function,
+        `F`.
 
         .. math::
 
             Y(t) = F(K(t), A(t)L(t))
 
-        where `t` denotes time. Note that `A` and `L` are assumed to enter
-        multiplicatively. Typically `A(t)L(t)` denotes "effective labor", and
-        technology that enters in this fashion is known as labor-augmenting or
-        "Harrod neutral."
+        where `t` denotes time. Note that `A` and `L` are assumed to
+        enter multiplicatively. Typically `A(t)L(t)` denotes "effective
+        labor", and technology that enters in this fashion is known as
+        labor-augmenting or "Harrod neutral."
 
         A key assumption of the model is that the function `F` exhibits
-        constant returns to scale in capital and labor inputs. Specifically,
+        constant returns to scale in capital and labor inputs.
+        Specifically,
 
         .. math::
 
@@ -446,7 +480,8 @@ class Model(object):
         A0: float
             Initial level of technology. Must satisfy :math:`A_0 > 0 `.
         L0: float
-            Initial amount of available labor. Must satisfy :math:`L_0 > 0 `.
+            Initial amount of available labor. Must satisfy
+            :math:`L_0 > 0 `.
         g : float
             Growth rate of technology.
         n : float
@@ -457,10 +492,11 @@ class Model(object):
             Depreciation rate of physical capital. Must satisfy
             :math:`0 < \delta`.
 
-        Although no restrictions are placed on the rates of technological
-        progress and population growth, the sum of `g`, `n`, and :math:`delta`
-        is assumed to be positive. The user mus also specify any additional
-        model parameters specific to the chosen aggregate production function.
+        Although no restrictions are placed on the rates of
+        technological progress and population growth, the sum of `g`,
+        `n`, and :math:`delta` is assumed to be positive. The user mus
+        also specify any additional model parameters specific to the
+        chosen aggregate production function.
 
         """
         return self._params
@@ -468,8 +504,8 @@ class Model(object):
     @property
     def solow_residual(self):
         """
-        Symbolic expression for the Solow residual which is used as a measure
-        of technology.
+        Symbolic expression for the Solow residual which is used as a
+        measure of technology.
 
         :getter: Return the symbolic expression.
         :type: sym.Basic
@@ -487,7 +523,8 @@ class Model(object):
 
         Notes
         -----
-        The following is a derivation for the speed of convergence :math:`\lambda`:
+        The following is a derivation for the speed of convergence
+        :math:`\lambda`:
 
         .. :math::
             :type: eqnarray
@@ -497,8 +534,8 @@ class Model(object):
             =& (g + n + \delta) - (g + n + \delta)\frac{k^*f'(k^*)}{f(k^*)} \\
             =& (1 - \alpha_K(k^*))(g + n + \delta)
 
-        where the elasticity of output with respect to capital, $\alpha_K(k)$,
-        is defined as
+        where the elasticity of output with respect to capital,
+        $\alpha_K(k)$, is defined as
 
         .. :math::
 
@@ -518,8 +555,8 @@ class Model(object):
 
         Notes
         -----
-        The steady state value of capital stock (per unit effective labor),
-        `k`, is defined as the value of `k` that solves
+        The steady state value of capital stock (per unit effective
+        labor), `k`, is defined as the value of `k` that solves
 
         .. math::
 
@@ -594,8 +631,8 @@ class Model(object):
 
     def evaluate_actual_investment(self, k):
         """
-        Return the amount of output (per unit of effective labor) invested in
-        the production of new capital.
+        Return the amount of output (per unit of effective labor)
+        invested in the production of new capital.
 
         Parameters
         ----------
@@ -632,9 +669,9 @@ class Model(object):
 
     def evaluate_effective_depreciation(self, k):
         """
-        Return amount of Capital stock (per unit of effective labor) that
-        depreciaties due to technological progress, population growth, and
-        physical depreciation.
+        Return amount of Capital stock (per unit of effective labor)
+        that depreciaties due to technological progress, population
+        growth, and physical depreciation.
 
         Parameters
         ----------
@@ -644,7 +681,8 @@ class Model(object):
         Returns
         -------
         effective_depreciation : array_like (float)
-            Amount of depreciated Capital stock (per unit of effective labor)
+            Amount of depreciated Capital stock (per unit of effective
+            labor)
 
         """
         effective_depreciation = self.effective_depreciation_rate * k
@@ -670,7 +708,8 @@ class Model(object):
 
     def evaluate_k_dot(self, k):
         """
-        Return time derivative of capital stock (per unit of effective labor).
+        Return time derivative of capital stock (per unit of effective
+        labor).
 
         Parameters
         ----------
@@ -680,7 +719,8 @@ class Model(object):
         Returns
         -------
         k_dot : ndarray (float)
-            Time derivative of capital stock (per unit of effective labor).
+            Time derivative of capital stock (per unit of effective
+            labor).
 
         """
         k_dot = (self.evaluate_actual_investment(k) -
@@ -689,7 +729,8 @@ class Model(object):
 
     def evaluate_mpk(self, k):
         """
-        Return marginal product of capital stock (per unit of effective labor).
+        Return marginal product of capital stock (per unit of effective
+        labor).
 
         Parameters
         ----------
@@ -699,7 +740,8 @@ class Model(object):
         Returns
         -------
         mpk : ndarray (float)
-            Marginal product of capital stock (per unit of effective labor).
+            Marginal product of capital stock (per unit of effective
+            labor).
 
         """
         mpk = self._mpk(k, *self.params.values())
@@ -707,8 +749,8 @@ class Model(object):
 
     def evaluate_output_elasticity(self, k):
         """
-        Return elasticity of output with respect to capital stock (per unit
-        effective labor).
+        Return elasticity of output with respect to capital stock (per
+        unit effective labor).
 
         Parameters
         ----------
@@ -723,14 +765,14 @@ class Model(object):
 
         Notes
         -----
-        Under the additional assumption that markets are perfectly competitive,
-        the elasticity of output with respect to capital stock is equivalent to
-        capital's share of income. Since, under perfect competition, firms earn
-        zero profits it must be true capital's share and labor's share must sum
-        to one.
+        Under the additional assumption that markets are perfectly
+        competitive, the elasticity of output with respect to capital
+        stock is equivalent to capital's share of income. Since, under
+        perfect competition, firms earn zero profits it must be true
+        capital's share and labor's share must sum to one.
 
         """
-        alpha_k = (k * self.evaluate_mpk(k)) / self.evaluate_intensive_output(k)
+        alpha_k = (k*self.evaluate_mpk(k)) / self.evaluate_intensive_output(k)
         return alpha_k
 
     def evaluate_solow_residual(self, Y, K, L):
@@ -754,8 +796,8 @@ class Model(object):
 
     def find_steady_state(self, a, b, method='brentq', **kwargs):
         """
-        Compute the equilibrium value of capital stock (per unit effective
-        labor).
+        Compute the equilibrium value of capital stock (per unit
+        effective labor).
 
         Parameters
         ----------
@@ -764,20 +806,21 @@ class Model(object):
         b : float
             The other end of the bracketing interval [a,b]
         method : str (default=`brentq`)
-            Method to use when computing the steady state. Supported methods
-            are `bisect`, `brenth`, `brentq`, `ridder`. See `scipy.optimize`
-            for more details (including references).
+            Method to use when computing the steady state. Supported
+            methods are `bisect`, `brenth`, `brentq`, `ridder`. See
+            `scipy.optimize` for more details (including references).
         kwargs : optional
-            Additional keyword arguments. Keyword arguments are method specific
-            see `scipy.optimize` for details.
+            Additional keyword arguments. Keyword arguments are method
+            specific see `scipy.optimize` for details.
 
         Returns
         -------
         x0 : float
             Zero of `f` between `a` and `b`.
         r : RootResults (present if ``full_output = True``)
-            Object containing information about the convergence. In particular,
-            ``r.converged`` is True if the routine converged.
+            Object containing information about the convergence. In
+            particular, ``r.converged`` is True if the routine
+            converged.
 
         """
         if method == 'bisect':
@@ -804,7 +847,8 @@ class Model(object):
         t : ndarray (shape=(T,))
             Array of points at which the solution is desired.
         k0 : (float)
-            Initial condition for capital stock (per unit of effective labor)
+            Initial condition for capital stock (per unit of effective
+            labor)
 
         Returns
         -------
@@ -820,14 +864,16 @@ class Model(object):
 
     def plot_factor_shares(self, ax, Nk=1e3, **new_params):
         """
-        Plot income/output shares of capital and labor inputs to production.
+        Plot income/output shares of capital and labor inputs to
+        production.
 
         Parameters
         ----------
         ax : `matplotlib.axes.AxesSubplot`
             An instance of `matplotlib.axes.AxesSubplot`.
         Nk : float (default=1e3)
-            Number of capital stock (per unit of effective labor) grid points.
+            Number of capital stock (per unit of effective labor) grid
+            points.
         new_params : dict (optional)
             Optional dictionary of parameter values to change.
 
@@ -836,11 +882,11 @@ class Model(object):
         A list containing...
 
         capitals_share_line : maplotlib.lines.Line2D
-            A Line2D object representing the time path for capital's share of
-            income.
+            A Line2D object representing the time path for capital's
+            share of income.
         labors_share_line : maplotlib.lines.Line2D
-            A Line2D object representing the time path for labor's share of
-            income.
+            A Line2D object representing the time path for labor's
+            share of income.
 
         """
         # create tmp_params dict to force check for valid params
@@ -875,7 +921,8 @@ class Model(object):
         ax : `matplotlib.axes.AxesSubplot`
             An instance of `matplotlib.axes.AxesSubplot`.
         Nk : float (default=1e3)
-            Number of capital stock (per unit of effective labor) grid points.
+            Number of capital stock (per unit of effective labor) grid
+            points.
         new_params : dict (optional)
             Optional dictionary of parameter values to change.
 
@@ -884,8 +931,8 @@ class Model(object):
         A list containing...
 
         intensive_output : maplotlib.lines.Line2D
-            A Line2D object representing intensive output as a function of
-            capital stock (per unit effective labor).
+            A Line2D object representing intensive output as a function
+            of capital stock (per unit effective labor).
 
         """
         # create tmp_params dict to force check for valid params
@@ -912,14 +959,16 @@ class Model(object):
         """
         Plot actual investment (per unit effective labor) and effective
         depreciation. The steady state value of capital stock (per unit
-        effective labor) balance acual investment and effective depreciation.
+        effective labor) balance acual investment and effective
+        depreciation.
 
         Parameters
         ----------
         ax : `matplotlib.axes.AxesSubplot`
             An instance of `matplotlib.axes.AxesSubplot`.
         Nk : float (default=1e3)
-            Number of capital stock (per unit of effective labor) grid points.
+            Number of capital stock (per unit of effective labor) grid
+            points.
         new_params : dict (optional)
             Optional dictionary of parameter values to change.
 
@@ -928,13 +977,15 @@ class Model(object):
         A list containing...
 
         actual_investment_line : maplotlib.lines.Line2D
-            A Line2D object representing the level of actual investment as a
-            function of capital stock (per unit effective labor).
-        breakeven_investment_line : maplotlib.lines.Line2D
-            A Line2D object representing the "break-even" level of investment
+            A Line2D object representing the level of actual investment
             as a function of capital stock (per unit effective labor).
+        breakeven_investment_line : maplotlib.lines.Line2D
+            A Line2D object representing the "break-even" level of
+            investment as a function of capital stock (per unit
+            effective labor).
         ss_line : maplotlib.lines.Line2D
-            A Line2D object representing the steady state level of investment.
+            A Line2D object representing the steady state level of
+            investment.
 
         """
         # create tmp_params dict to force check for valid params
@@ -975,7 +1026,8 @@ class Model(object):
         ax : `matplotlib.axes.AxesSubplot`
             An instance of `matplotlib.axes.AxesSubplot`.
         Nk : float (default=1e3)
-            Number of capital stock (per unit of effective labor) grid points.
+            Number of capital stock (per unit of effective labor) grid
+            points.
         new_params : dict (optional)
             Optional dictionary of parameter values to change.
 
@@ -984,14 +1036,14 @@ class Model(object):
         A list containing...
 
         k_dot_line : maplotlib.lines.Line2D
-            A Line2D object representing the rate of change of capital stock
-            (per unit effective labor) as a function of its level.
+            A Line2D object representing the rate of change of capital
+            stock (per unit effective labor) as a function of its level.
         origin_line : maplotlib.lines.Line2D
-            A Line2D object representing the origin (i.e., locus of points
-            where k_dot is zero).
+            A Line2D object representing the origin (i.e., locus of
+            points where k_dot is zero).
         ss_line : maplotlib.lines.Line2D
-            A Line2D object representing the steady state level of capital
-            stock (per unit effective labor).
+            A Line2D object representing the steady state level of
+            capital stock (per unit effective labor).
 
         """
         # create tmp_params dict to force check for valid params
@@ -1025,7 +1077,8 @@ class Model(object):
         ax : `matplotlib.axes.AxesSubplot`
             An instance of `matplotlib.axes.AxesSubplot`.
         Nk : float (default=1e3)
-            Number of capital stock (per unit of effective labor) grid points.
+            Number of capital stock (per unit of effective labor) grid
+            points.
         new_params : dict (optional)
             Optional dictionary of parameter values to change.
 
@@ -1034,13 +1087,15 @@ class Model(object):
         A list containing...
 
         actual_investment_line : maplotlib.lines.Line2D
-            A Line2D object representing the level of actual investment as a
-            function of capital stock (per unit effective labor).
-        breakeven_investment_line : maplotlib.lines.Line2D
-            A Line2D object representing the "break-even" level of investment
+            A Line2D object representing the level of actual investment
             as a function of capital stock (per unit effective labor).
+        breakeven_investment_line : maplotlib.lines.Line2D
+            A Line2D object representing the "break-even" level of
+            investment as a function of capital stock (per unit
+            effective labor).
         ss_line : maplotlib.lines.Line2D
-            A Line2D object representing the steady state level of investment.
+            A Line2D object representing the steady state level of
+            investment.
 
         """
         # create tmp_params dict to force check for valid params

@@ -12,14 +12,13 @@ Computes quantities related to the Gaussian linear state space model
 The shocks {w_t} are iid and N(0, I)
 
 """
-
+from textwrap import dedent
 import numpy as np
-from numpy import dot
 from numpy.random import multivariate_normal
-from scipy.linalg import eig, solve
-from .matrix_eqn import solve_discrete_lyapunov
+from scipy.linalg import solve
 
-class LSS:
+
+class LSS(object):
     """
     A class that describes a Gaussian linear state space model of the
     form:
@@ -67,14 +66,26 @@ class LSS:
         self.k, self.n = self.G.shape
         self.m = self.C.shape[1]
         # == Default initial conditions == #
-        if mu_0 == None:
+        if mu_0 is None:
             self.mu_0 = np.zeros((self.n, 1))
         else:
             self.mu_0 = np.asarray(mu_0)
-        if Sigma_0 == None:
+        if Sigma_0 is None:
             self.Sigma_0 = np.zeros((self.n, self.n))
         else:
             self.Sigma_0 = Sigma_0
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Linear Gaussian state space model:
+          - dimension of state space          : {n}
+          - number of innovations             : {m}
+          - dimension of observation equation : {k}
+        """
+        return dedent(m.format(n=self.n, k=self.k, m=self.m))
 
     def convert(self, x):
         """
@@ -105,7 +116,7 @@ class LSS:
 
         """
         x = np.empty((self.n, ts_length))
-        x[:,0] = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
+        x[:, 0] = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
         w = np.random.randn(self.m, ts_length-1)
         for t in range(ts_length-1):
             x[:, t+1] = self.A.dot(x[:, t]) + self.C.dot(w[:, t])
@@ -230,7 +241,6 @@ class LSS:
 
         return mu_x_star, mu_y_star, Sigma_x_star, Sigma_y_star
 
-
     def geometric_sums(self, beta, x_t):
         """
         Forecast the geometric sums
@@ -263,4 +273,3 @@ class LSS:
         S_y = self.G.dot(S_x)
 
         return S_x, S_y
-

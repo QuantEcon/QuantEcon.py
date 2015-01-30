@@ -7,13 +7,14 @@ Provides a class called LQ for solving linear quadratic control
 problems.
 
 """
-
+from textwrap import dedent
 import numpy as np
 from numpy import dot
 from scipy.linalg import solve
 from .matrix_eqn import solve_discrete_riccati
 
-class LQ:
+
+class LQ(object):
     r"""
     This class is for analyzing linear quadratic optimal control
     problems of either the infinite horizon form
@@ -70,13 +71,13 @@ class LQ:
         state variable x and is `n x n`. Should be symetric and
         non-negative definite
     N : array_like(float)
-        N is the cross product term in the payoff, as above.  It should 
+        N is the cross product term in the payoff, as above.  It should
         be `k x n`.
     A : array_like(float)
-        A is part of the state transition as described above. It should 
+        A is part of the state transition as described above. It should
         be `n x n`
     B : array_like(float)
-        B is part of the state transition as described above. It should 
+        B is part of the state transition as described above. It should
         be `n x k`
     C : array_like(float), optional(default=None)
         C is part of the state transition as described above and
@@ -110,14 +111,14 @@ class LQ:
     def __init__(self, Q, R, A, B, C=None, N=None, beta=1, T=None, Rf=None):
         # == Make sure all matrices can be treated as 2D arrays == #
         converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
-        self.A, self.B, self.Q, self.R, self.N = \
-                list(map(converter, (A, B, Q, R, N)))
+        self.A, self.B, self.Q, self.R, self.N = list(map(converter,
+                                                          (A, B, Q, R, N)))
         # == Record dimensions == #
         self.k, self.n = self.Q.shape[0], self.R.shape[0]
 
         self.beta = beta
 
-        if C == None:
+        if C is None:
             # == If C not given, then model is deterministic. Set C=0. == #
             self.j = 1
             self.C = np.zeros((self.n, self.j))
@@ -125,7 +126,7 @@ class LQ:
             self.C = converter(C)
             self.j = self.C.shape[1]
 
-        if N == None:
+        if N is None:
             # == No cross product term in payoff. Set N=0. == #
             self.N = np.zeros((self.k, self.n))
 
@@ -141,6 +142,22 @@ class LQ:
             self.T = None
 
         self.F = None
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Linear Quadratic control system
+          - beta (discount parameter)   : {b}
+          - T (time horizon)            : {t}
+          - n (number of state variables)   : {n}
+          - k (number of control variables) : {k}
+          - j (number of shocks)            : {j}
+        """
+        t = "infinte" if self.T is None else self.T
+        return dedent(m.format(b=self.beta, n=self.n, k=self.k, j=self.j,
+                               t=t))
 
     def update_values(self):
         """
@@ -258,7 +275,6 @@ class LQ:
             T = ts_length if ts_length else 100
             self.stationary_values()
 
-
         # == Set up initial condition and arrays to store paths == #
         x0 = np.asarray(x0)
         x0 = x0.reshape(self.n, 1)  # Make sure x0 is a column vector
@@ -280,9 +296,9 @@ class LQ:
         for t in range(1, T):
             F = policies.pop()
             Ax, Bu = dot(A, x_path[:, t-1]), dot(B, u_path[:, t-1])
-            x_path[:, t] =  Ax + Bu + w_path[:, t]
+            x_path[:, t] = Ax + Bu + w_path[:, t]
             u_path[:, t] = - dot(F, x_path[:, t])
         Ax, Bu = dot(A, x_path[:, T-1]), dot(B, u_path[:, T-1])
-        x_path[:, T] =  Ax + Bu + w_path[:, T]
+        x_path[:, T] = Ax + Bu + w_path[:, T]
 
         return x_path, u_path, w_path

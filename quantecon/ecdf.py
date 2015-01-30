@@ -10,6 +10,7 @@ of observations.
 
 import numpy as np
 
+
 class ECDF(object):
     """
     One-dimensional empirical distribution function given a vector of
@@ -29,6 +30,13 @@ class ECDF(object):
     def __init__(self, observations):
         self.observations = np.asarray(observations)
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = "Empirical CDF:\n  - number of observations: {n}"
+        return m.format(n=self.observations.size)
+
     def __call__(self, x):
         """
         Evaluates the ecdf at x
@@ -45,4 +53,3 @@ class ECDF(object):
 
         """
         return np.mean(self.observations <= x)
-

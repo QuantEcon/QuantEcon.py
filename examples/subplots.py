@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def subplots():
     "Custom subplots with axes throught the origin"
     fig, ax = plt.subplots()
@@ -11,7 +12,7 @@ def subplots():
         ax.spines[spine].set_position('zero')
     for spine in ['right', 'top']:
         ax.spines[spine].set_color('none')
-    
+
     ax.grid()
     return fig, ax
 
@@ -22,4 +23,3 @@ y = np.sin(x)
 ax.plot(x, y, 'r-', linewidth=2, label='sine function', alpha=0.6)
 ax.legend(loc='lower right')
 plt.show()
-

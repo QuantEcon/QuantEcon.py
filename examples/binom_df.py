@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom
 
@@ -6,7 +5,7 @@ fig, axes = plt.subplots(2, 2)
 plt.subplots_adjust(hspace=0.4)
 axes = axes.flatten()
 ns = [1, 2, 4, 8]
-dom = list(range(9)) 
+dom = list(range(9))
 
 for ax, n in zip(axes, ns):
     b = binom(n, 0.5)
@@ -18,4 +17,3 @@ for ax, n in zip(axes, ns):
     ax.set_title(r'$n = {}$'.format(n))
 
 fig.show()
-

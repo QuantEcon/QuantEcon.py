@@ -2,7 +2,7 @@
 Filename: gaussian_contours.py
 Authors: John Stachurski and Thomas Sargent
 
-Plots of bivariate Gaussians to illustrate the Kalman filter.  
+Plots of bivariate Gaussians to illustrate the Kalman filter.
 """
 
 from scipy import linalg
@@ -31,11 +31,12 @@ x_grid = np.linspace(-1.5, 2.9, 100)
 y_grid = np.linspace(-3.1, 1.7, 100)
 X, Y = np.meshgrid(x_grid, y_grid)
 
+
 def gen_gaussian_plot_vals(mu, C):
     "Z values for plotting the bivariate Gaussian N(mu, C)"
     m_x, m_y = float(mu[0]), float(mu[1])
-    s_x, s_y = np.sqrt(C[0,0]), np.sqrt(C[1,1])
-    s_xy = C[0,1]
+    s_x, s_y = np.sqrt(C[0, 0]), np.sqrt(C[1, 1])
+    s_xy = C[0, 1]
     return bivariate_normal(X, Y, s_x, s_y, m_x, m_y, s_xy)
 
 fig, ax = plt.subplots()
@@ -44,11 +45,13 @@ ax.yaxis.grid(True, zorder=0)
 
 # == Code for the 4 plots, choose one below == #
 
+
 def plot1():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
     ax.contourf(X, Y, Z, 6, alpha=0.6, cmap=cm.jet)
     cs = ax.contour(X, Y, Z, 6, colors="black")
     ax.clabel(cs, inline=1, fontsize=10)
+
 
 def plot2():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
@@ -57,18 +60,20 @@ def plot2():
     ax.clabel(cs, inline=1, fontsize=10)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
 
+
 def plot3():
     Z = gen_gaussian_plot_vals(x_hat, Sigma)
     cs1 = ax.contour(X, Y, Z, 6, colors="black")
     ax.clabel(cs1, inline=1, fontsize=10)
     M = Sigma * G.T * linalg.inv(G * Sigma * G.T + R)
-    x_hat_F =  x_hat + M * (y - G * x_hat)
-    Sigma_F = Sigma  - M * G * Sigma
+    x_hat_F = x_hat + M * (y - G * x_hat)
+    Sigma_F = Sigma - M * G * Sigma
     new_Z = gen_gaussian_plot_vals(x_hat_F, Sigma_F)
     cs2 = ax.contour(X, Y, new_Z, 6, colors="black")
     ax.clabel(cs2, inline=1, fontsize=10)
     ax.contourf(X, Y, new_Z, 6, alpha=0.6, cmap=cm.jet)
     ax.text(float(y[0]), float(y[1]), r"$y$", fontsize=20, color="black")
+
 
 def plot4():
     # Density 1
@@ -77,13 +82,13 @@ def plot4():
     ax.clabel(cs1, inline=1, fontsize=10)
     # Density 2
     M = Sigma * G.T * linalg.inv(G * Sigma * G.T + R)
-    x_hat_F =  x_hat + M * (y - G * x_hat)
-    Sigma_F = Sigma  - M * G * Sigma
+    x_hat_F = x_hat + M * (y - G * x_hat)
+    Sigma_F = Sigma - M * G * Sigma
     Z_F = gen_gaussian_plot_vals(x_hat_F, Sigma_F)
     cs2 = ax.contour(X, Y, Z_F, 6, colors="black")
     ax.clabel(cs2, inline=1, fontsize=10)
     # Density 3
-    new_x_hat = A * x_hat_F 
+    new_x_hat = A * x_hat_F
     new_Sigma = A * Sigma_F * A.T + Q
     new_Z = gen_gaussian_plot_vals(new_x_hat, new_Sigma)
     cs3 = ax.contour(X, Y, new_Z, 6, colors="black")

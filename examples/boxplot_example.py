@@ -11,7 +11,5 @@ fig, ax = plt.subplots(figsize=(10, 6.6))
 ax.boxplot([x, y, z])
 ax.set_xticks((1, 2, 3))
 ax.set_ylim(-2, 14)
-ax.set_xticklabels((r'$X$', r'$Y$', r'$Z$'), fontsize=16) 
+ax.set_xticklabels((r'$X$', r'$Y$', r'$Z$'), fontsize=16)
 plt.show()
-
-

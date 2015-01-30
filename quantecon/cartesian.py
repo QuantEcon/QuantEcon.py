@@ -9,6 +9,7 @@ Implements cartesian products and regular cartesian grids.
 import numpy
 from numba import njit
 
+
 def cartesian(nodes, order='C'):
     '''Cartesian product of a list of arrays
 
@@ -31,7 +32,6 @@ def cartesian(nodes, order='C'):
     l = numpy.prod(shapes)
     out = numpy.zeros((l, n), dtype=dtype)
 
-
     if order == 'C':
         repetitions = numpy.cumprod([1] + shapes[:-1])
     else:
@@ -42,9 +42,10 @@ def cartesian(nodes, order='C'):
         repetitions.reverse()
 
     for i in range(n):
-        _repeat_1d(nodes[i], repetitions[i], out[:,i])
+        _repeat_1d(nodes[i], repetitions[i], out[:, i])
 
     return out
+
 
 def mlinspace(a, b, nums, order='C'):
     '''Constructs a regular cartesian grid
@@ -71,14 +72,20 @@ def mlinspace(a, b, nums, order='C'):
 
 @njit
 def _repeat_1d(x, K, out):
-    '''Repeats each element of a vector many times and repeats the whole result many times
+    '''
+    Repeats each element of a vector many times and repeats the
+    whole result many times
 
     Parameters
     ----------
 
-    x: (1d array)       vector to be repeated
-    K: (int)            number of times each element of x is repeated (inner iterations)
-    out: (1d array)     placeholder for the result
+    x : array_like(Any, ndim=1)
+        The vector to be repeated
+    K : scalar(int)
+        The number of times each element of x
+        is repeated (inner iterations)
+    out : array_like(Any, ndim=1)
+        placeholder for the result
 
     Returns
     -------
@@ -86,8 +93,8 @@ def _repeat_1d(x, K, out):
     '''
 
     N = x.shape[0]
-    L = out.shape[0] // (K*N) # number of outer iterations
-    # K                       # number of inner iterations
+    L = out.shape[0] // (K*N)  # number of outer iterations
+    # K                        # number of inner iterations
 
     # the result out should enumerate in C-order the elements
     # of a 3-dimensional array T of dimensions (K,N,L)

@@ -34,6 +34,12 @@ class DiscreteRV(object):
         self._q = q
         self.Q = cumsum(q)
 
+    def __repr__(self):
+        return "DiscreteRV with {n} elements".format(n=self._q.size)
+
+    def __str__(self):
+        return self.__repr__()
+
     @property
     def q(self):
         """

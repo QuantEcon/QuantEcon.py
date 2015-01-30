@@ -5,6 +5,7 @@ Illustrates preimages of functions
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def f(x):
     return 0.6 * np.cos(4 * x) + 1.4
 
@@ -17,7 +18,7 @@ ya, yb = np.min(y), np.max(y)
 fig, axes = plt.subplots(2, 1, figsize=(8, 8))
 
 for ax in axes:
-# Set the axes through the origin
+    # Set the axes through the origin
     for spine in ['left', 'bottom']:
         ax.spines[spine].set_position('zero')
     for spine in ['right', 'top']:
@@ -28,7 +29,7 @@ for ax in axes:
     ax.set_yticks(())
     ax.set_xticks(())
 
-    ax.plot(x, y, 'k-', lw=2, label=r'$f$') 
+    ax.plot(x, y, 'k-', lw=2, label=r'$f$')
     ax.fill_between(x, ya, yb, facecolor='blue', alpha=0.05)
     ax.vlines([0], ya, yb, lw=3, color='blue', label=r'range of $f$')
     ax.text(0.04, -0.3, '$0$', fontsize=16)

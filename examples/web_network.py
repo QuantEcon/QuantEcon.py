@@ -1,9 +1,8 @@
-
 import numpy as np
-import matplotlib.pyplot as plt
 import re
 
 alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
 
 def gen_rw_mat(n):
     "Generate an n x n matrix of zeros and ones."
@@ -11,9 +10,10 @@ def gen_rw_mat(n):
     Q = np.where(Q > 0, 1, 0)
     # Make sure that no row contains only zeros
     for i in range(n):
-        if Q[i,:].sum() == 0:
-            Q[i,np.random.randint(0, n, 1)] = 1
+        if Q[i, :].sum() == 0:
+            Q[i, np.random.randint(0, n, 1)] = 1
     return Q
+
 
 def adj_matrix_to_dot(Q, outfile='/tmp/foo_out.dot'):
     """
@@ -29,6 +29,7 @@ def adj_matrix_to_dot(Q, outfile='/tmp/foo_out.dot'):
     f.write('}\n')
     f.close()
 
+
 def dot_to_adj_matrix(node_num, infile='/tmp/foo_out.dot'):
     Q = np.zeros((node_num, node_num), dtype=int)
     f = open(infile, 'r')
@@ -41,11 +42,10 @@ def dot_to_adj_matrix(node_num, infile='/tmp/foo_out.dot'):
         Q[i, j] = 1
     return Q
 
+
 def adj_matrix_to_markov(Q):
     n = Q.shape[0]
     P = np.empty((n, n))
     for i in range(n):
-        P[i,:] = Q[i,:] / float(Q[i,:].sum())
+        P[i, :] = Q[i, :] / float(Q[i, :].sum())
     return P
-
-

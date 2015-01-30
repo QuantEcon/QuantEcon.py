@@ -5,7 +5,7 @@ Authors: John Stachurski, Thomas J. Sargent
 """
 
 
-class QuadMap:
+class QuadMap(object):
 
     def __init__(self, initial_state):
         self.x = initial_state
@@ -14,9 +14,9 @@ class QuadMap:
         "Apply the quadratic map to update the state."
         self.x = 4 * self.x * (1 - self.x)
 
-    def generate_series(self, n): 
+    def generate_series(self, n):
         """
-        Generate and return a trajectory of length n, starting at the 
+        Generate and return a trajectory of length n, starting at the
         current state.
         """
         trajectory = []
@@ -24,4 +24,3 @@ class QuadMap:
             trajectory.append(self.x)
             self.update()
         return trajectory
-

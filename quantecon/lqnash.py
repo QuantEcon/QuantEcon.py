@@ -12,11 +12,11 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
     problem, player i minimizes
 
     .. math::
-        \sum_{t=0}^{\infty} 
+        \sum_{t=0}^{\infty}
         \left\{
             x_t' r_i x_t + 2 x_t' w_i
             u_{it} +u_{it}' q_i u_{it} + u_{jt}' s_i u_{jt} + 2 u_{jt}'
-            m_i u_{it} 
+            m_i u_{it}
         \right\}
 
     subject to the law of motion
@@ -81,7 +81,7 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
 
     """
     # == Unload parameters and make sure everything is an array == #
-    params = A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2 
+    params = A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2
     params = map(np.asarray, params)
     A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2 = params
 
@@ -121,9 +121,9 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
 
         # break up the computation of F1, F2
         F1_left = v1 - dot(H1.dot(B2)+G1.dot(M1.T),
-                            H2.dot(B1)+G2.dot(M2.T))
+                           H2.dot(B1)+G2.dot(M2.T))
         F1_right = H1.dot(A)+G1.dot(W1.T) - dot(H1.dot(B2)+G1.dot(M1.T),
-                                                 H2.dot(A)+G2.dot(W2.T))
+                                                H2.dot(A)+G2.dot(W2.T))
         F1 = solve(F1_left, F1_right)
         F2 = H2.dot(A)+G2.dot(W2.T) - dot(H2.dot(B1)+G2.dot(M2.T), F1)
 
@@ -133,9 +133,9 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         Pi2 = R2 + dot(F1.T, S2.dot(F1))
 
         P1 = dot(Lambda1.T, P1.dot(Lambda1)) + Pi1 - \
-              dot(dot(Lambda1.T, P1.dot(B1)) + W1 - F2.T.dot(M1), F1)
+             dot(dot(Lambda1.T, P1.dot(B1)) + W1 - F2.T.dot(M1), F1)
         P2 = dot(Lambda2.T, P2.dot(Lambda2)) + Pi2 - \
-              dot(dot(Lambda2.T, P2.dot(B2)) + W2 - F1.T.dot(M2), F2)
+             dot(dot(Lambda2.T, P2.dot(B2)) + W2 - F1.T.dot(M2), F2)
 
         dd = np.max(np.abs(F10 - F1)) + np.max(np.abs(F20 - F2))
 
@@ -147,4 +147,3 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         raise ValueError(msg.format(max_iter))
 
     return F1, F2, P1, P2
-
