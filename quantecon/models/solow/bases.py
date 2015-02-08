@@ -62,7 +62,7 @@ class SymbolicBase(object):
 
     @property
     def _variable_subs(self):
-        """Variable substitutions."""
+        """Generic variable substitutions."""
         return dict(zip(self.dependent_vars, [X[i] for i in range(self.N)]))
 
     @property
@@ -184,7 +184,7 @@ class SymbolicBase(object):
     def _validate_rhs(self):
         raise NotImplementedError
 
-    def evaluate_jacobian(self, t, X, *args):
+    def evaluate_jacobian(self, t, X):
         """
         Return the Jacobian matrix of partial derivatives evaluated at specific
         values of the independent variable, `t`, and dependent variables, `X`.
@@ -195,8 +195,6 @@ class SymbolicBase(object):
             Independent variable.
         X : numpy.ndarray (shape=(N,))
             Array of values for the `N` dependent variables.
-        args : tuple
-            Additional parameter arguments necessary to evaluate the Jacobian.
 
         Returns
         -------
@@ -204,10 +202,10 @@ class SymbolicBase(object):
             Evaluated Jacobian matrix.
 
         """
-        jac = self._jacobian(t, X, *args)
+        jac = self._jacobian(t, X, *self.params.values())
         return jac
 
-    def evaluate_rhs(self, t, X, *args):
+    def evaluate_rhs(self, t, X):
         """
         Return the right-hand side of a system of differential/difference
         equations evaluated at specific values of the independent variable,
@@ -219,8 +217,6 @@ class SymbolicBase(object):
             Independent variable.
         X : numpy.ndarray (shape=(N,))
             Array of values for the `N` dependent variables.
-        args : tuple
-            Additional parameter arguments necessary to evaluate the Jacobian.
 
         Returns
         -------
@@ -228,5 +224,5 @@ class SymbolicBase(object):
             Evaluated Jacobian matrix.
 
         """
-        rhs = self._rhs(t, X, *args)
+        rhs = self._rhs(t, X, *self.params.values())
         return rhs
