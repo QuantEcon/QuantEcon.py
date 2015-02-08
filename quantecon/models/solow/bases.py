@@ -187,8 +187,13 @@ class SymbolicBase(object):
         else:
             return value
 
-    def _validate_rhs(self):
-        raise NotImplementedError
+    def _validate_rhs(self, rhs):
+        """Validate the rhs attribute."""
+        if not (rhs.shape[0] == len(self.dependent_vars)):
+            mesg = "Number of equations must equal number of dependent variables."
+            raise ValueError(mesg)
+        else:
+            return rhs
 
     def compute_eigenvalues(self, t, X):
         """
