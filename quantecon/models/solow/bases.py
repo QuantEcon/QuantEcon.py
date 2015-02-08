@@ -27,6 +27,8 @@ class SymbolicBase(object):
 
     __numeric_rhs = None
 
+    __symbolic_jacobian = None
+
     _modules = [{'ImmutableMatrix': np.array}, 'numpy']
 
     @property
@@ -108,7 +110,9 @@ class SymbolicBase(object):
         :type: sympy.Matrix
 
         """
-        return self.rhs.jacobian(self.dependent_vars)
+        if self.__symbolic_jacobian is None:
+            self.__symbolic_jacobian = self.rhs.jacobian(self.dependent_vars)
+        return self.__symbolic_jacobian
 
     @property
     def N(self):
@@ -162,6 +166,7 @@ class SymbolicBase(object):
         """Clear cached values."""
         self.__numeric_jacobian = None
         self.__numeric_rhs = None
+        self.__symbolic_jacobian = None
 
     def _lambdify_factory(self, expression):
         """Lambdify a symbolic expression."""
