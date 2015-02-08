@@ -9,6 +9,7 @@ from __future__ import division
 import collections
 
 import numpy as np
+from scipy import linalg
 import sympy as sym
 
 # declare generic symbolic variables
@@ -188,6 +189,28 @@ class SymbolicBase(object):
 
     def _validate_rhs(self):
         raise NotImplementedError
+
+    def compute_eigenvalues(self, t, X):
+        """
+        Compute the eigenvalues of the Jacobian matrix of partial derivatives
+        evaluated at specific values of the independent variable, `t`, and
+        dependent variables, `X`.
+
+        Parameters
+        ----------
+        t : float
+            Independent variable.
+        X : numpy.ndarray (shape=(N,))
+            Array of values for the `N` dependent variables.
+
+        Returns
+        -------
+        eigvals : numpy.ndarray (shape=(N,))
+            Array of eigenvalues of the Jacobian matrix.
+
+        """
+        eigvals = linalg.eigvals(self.evaluate_jacobian(t, X))
+        return eigvals
 
     def evaluate_jacobian(self, t, X):
         """
