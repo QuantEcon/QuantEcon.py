@@ -6,8 +6,10 @@ objects imported here will live in the `quantecon.models` namespace
 """
 
 __all__ = ["AssetPrices", "CareerWorkerProblem", "ConsumerProblem",
-           "JvWorker", "LucasTree", "SearchProblem", "GrowthModel"]
+           "JvWorker", "LucasTree", "SearchProblem", "GrowthModel",
+           "solow"]
 
+from . import solow
 from .asset_pricing import AssetPrices
 from .career import CareerWorkerProblem
 from .ifp import ConsumerProblem
