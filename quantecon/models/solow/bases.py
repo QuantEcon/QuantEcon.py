@@ -12,9 +12,6 @@ import numpy as np
 from scipy import linalg
 import sympy as sym
 
-# declare generic symbolic variables
-t, X = sym.symbols('t'), sym.DeferredVector('X')
-
 
 class SymbolicBase(object):
     """
@@ -36,16 +33,14 @@ class SymbolicBase(object):
     def _numeric_jacobian(self):
         """Vectorized function for evaluating Jacobian matrix."""
         if self.__numeric_jacobian is None:
-            expr = self.jacobian.subs(self._variable_subs)
-            self.__numeric_jacobian = self._lambdify_factory(expr)
+            self.__numeric_jacobian = self._lambdify_factory(self.jacobian)
         return self.__numeric_jacobian
 
     @property
     def _numeric_rhs(self):
         """Vectorized function for evaluating right-hand side of system."""
         if self.__numeric_rhs is None:
-            expr = self.rhs.subs(self._variable_subs)
-            self.__numeric_rhs = self._lambdify_factory(expr)
+            self.__numeric_rhs = self._lambdify_factory(self.rhs)
         return self.__numeric_rhs
 
     @property
@@ -61,12 +56,7 @@ class SymbolicBase(object):
     @property
     def _symbolic_vars(self):
         """List of symbolic model variables."""
-        return [t, X]
-
-    @property
-    def _variable_subs(self):
-        """Generic variable substitutions."""
-        return dict(zip(self.dependent_vars, [X[i] for i in range(self.N)]))
+        return self.independent_var + self.dependent_vars
 
     @property
     def dependent_vars(self):
