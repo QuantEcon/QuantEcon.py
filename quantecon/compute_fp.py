@@ -69,7 +69,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
 
     if verbose:
         start_time = time.time()
-        _print_after_skip(print_skip, iter=None)
+        _print_after_skip(print_skip, it=None)
 
     while iterate < max_iter and error > error_tol:
         new_v = T(v, *args, **kwargs)
