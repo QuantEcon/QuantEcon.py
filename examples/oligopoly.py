@@ -134,6 +134,7 @@ def solve_for_opt_policy(params, eta0=0., Q0=0., q0=0.):
     # Step 4: Find optimal x_0 and \mu_{x, 0}
     z0 = np.array([1., eta0, Q0, q0])
     x0 = -P22inv*np.dot(P21, z0)
+    D0 = -np.dot(P22inv, P21)
 
     # Do some rearranging for convenient representation of policy
     # TODO: Finish getting the equations into the from
@@ -154,7 +155,7 @@ def solve_for_opt_policy(params, eta0=0., Q0=0., q0=0.):
     coeff_zt = coeffs[0, :-1]
     coeff_ztm1 = f12*(m12 - f12**(-1)*m22*f11)
 
-    return coeffs, x0, (coeff_utm1, coeff_zt, coeff_ztm1)
+    return P, F, D0
 
 
 # Parameter values
@@ -171,11 +172,9 @@ beta = .95
 params = np.array([a0, a1, rho, c_eps, c, d, e, g, h, beta])
 
 
-coefficients, x0, alt_coeffs = solve_for_opt_policy(params)
+P, F, D0  = solve_for_opt_policy(params)
 
-print("The original coefficients are")
-print("u_t = {} [z_t mu_[x, t]]'".format(coefficients))
-print("or in other terms")
-print("u_t = {} u_[t-1] \n + {} z_t \n + {} z_[t-1]".format(alt_coeffs[0],
-                                                            alt_coeffs[1],
-                                                            alt_coeffs[2]))
+print("P = "), P
+print("F = "), F
+print("D0 = "), D0
+
