@@ -6,23 +6,16 @@ import os
 
 VERSION = '0.1.7-2'
 
-
 def write_version_py(filename=None):
-    doc = '''
     """
-    This is a VERSION file and should NOT be manually altered
-
+    This constructs a version file for the project
     """
-
-    version = "%s"
-    ''' % VERSION
-
-    return doc
-
+    doc = "\"\"\"\nThis is a VERSION file and should NOT be manually altered\n\"\"\""
+    doc += "\nversion = '%s'" % VERSION
+    
     if not filename:
-        filename = os.path.join(
-            os.path.dirname(__file__), 'quantecon', 'version.py')
-
+        filename = os.path.join(os.path.dirname(__file__), 'quantecon', 'version.py')
+    
     fl = open(filename, 'w')
     try:
         fl.write(doc)
@@ -100,7 +93,11 @@ CLASSIFIERS = [
 #~~~~~~~#
 
 setup(name='quantecon',
-      packages=['quantecon', 'quantecon.models', "quantecon.tests"],
+      packages=['quantecon', 
+                'quantecon.models',
+                'quantecon.models.solow', 
+                'quantecon.tests',
+                ],
       version=VERSION,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
