@@ -3,7 +3,7 @@ Authors: Thomas J. Sargent, John Stachurski
 
 Filename: lss.py
 
-Computes quantities related to the Gaussian linear state space model
+Computes quantities associated with the Gaussian linear state space model
 
     x_{t+1} = A x_t + C w_{t+1}
 
@@ -23,13 +23,9 @@ class LSS(object):
     A class that describes a Gaussian linear state space model of the
     form:
 
-    .. math::
+      x_{t+1} = A x_t + C w_{t+1}
 
-        x_{t+1} = A x_t + C w_{t+1}
-
-    .. math::
-
-        y_t = G x_t
+      y_t = G x_t
 
     where {w_t} are iid and N(0, I).  If the initial conditions mu_0
     and Sigma_0 for x_0 ~ N(mu_0, Sigma_0) are not supplied, both
@@ -244,8 +240,6 @@ class LSS(object):
     def geometric_sums(self, beta, x_t):
         """
         Forecast the geometric sums
-
-        .. math::
 
             S_x := E [sum_{j=0}^{\infty} beta^j x_{t+j} | x_t ]
 

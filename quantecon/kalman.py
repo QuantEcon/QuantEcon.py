@@ -17,13 +17,11 @@ class Kalman(object):
     r"""
     Implements the Kalman filter for the Gaussian state space model
 
-    .. math::
+        x_{t+1} = A x_t + w_{t+1}
+        y_t = G x_t + v_t.
 
-        x_{t+1} &= A x_t + w_{t+1}\\
-        y_t &= G x_t + v_t.
-
-    Here :math:`x_t` is the hidden state and :math:`y_t` is the
-    measurement. The shocks :math:`w_t` and :math:`v_t` are iid zero
+    Here x_t is the hidden state and y_t is the
+    measurement. The shocks w_t and v_t are iid zero
     mean Gaussians with covariance matrices Q and R respectively.
 
     Parameters
@@ -115,12 +113,11 @@ class Kalman(object):
 
         The updates are according to
 
-        .. math::
-
-            x_{hat}^F &= x_{hat} + \Sigma G' (G \Sigma G' + R)^{-1}
-            (y - G x_{hat}) \\
-            \Sigma^F &= \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
-            \Sigma
+        
+            x_{hat}^F = x_{hat} + Sigma G' (G Sigma G' + R)^{-1}
+            (y - G x_{hat}) 
+            Sigma^F = Sigma - Sigma G' (G Sigma G' + R)^{-1} G
+            Sigma
 
         Parameters
         ----------
@@ -158,7 +155,7 @@ class Kalman(object):
 
     def update(self, y):
         """
-        Updates `x_hat` and `Sigma` given k x 1 ndarray `y`.  The full
+        Updates x_hat and Sigma given k x 1 ndarray y.  The full
         update, from one period to the next
 
         Parameters
@@ -172,7 +169,7 @@ class Kalman(object):
 
     def stationary_values(self):
         """
-        Computes the limit of :math:`Sigma_t` as :math:`t \to \infty` by
+        Computes the limit of Sigma_t as t  goes to infinity by
         solving the associated Riccati equation.  Computation is via the
         doubling algorithm (see the documentation in
         `matrix_eqn.solve_discrete_riccati`).
