@@ -1,7 +1,6 @@
 """
 Filename: kalman.py
-
-Authors: Thomas Sargent, John Stachurski
+Reference: http://quant-econ.net/py/kalman.html
 
 Implements the Kalman filter for a linear Gaussian state space model.
 
@@ -11,7 +10,6 @@ import numpy as np
 from numpy import dot
 from scipy.linalg import inv
 from .matrix_eqn import solve_discrete_riccati
-
 
 class Kalman(object):
     r"""
@@ -45,7 +43,12 @@ class Kalman(object):
     current_Sigma : array_like or scalar(float)
         The n x n covariance matrix
     current_x_hat : array_like or scalar(float)
-        The mean of the state
+        The mean of the state        
+    Sigma_infinity : array_like or scalar(float)
+        The infinite limit of Sigma_t
+    K_infinity : array_like or scalar(float)
+        The stationary Kalman gain.
+        
 
     References
     ----------
@@ -57,6 +60,8 @@ class Kalman(object):
     def __init__(self, A, G, Q, R):
         self.A, self.G, self.Q, self.R = list(map(self.convert, (A, G, Q, R)))
         self.k, self.n = self.G.shape
+        self.K_infinity = None
+        self.Sigma_infinity = None
 
     def __repr__(self):
         return self.__str__()
@@ -189,5 +194,50 @@ class Kalman(object):
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)
+        # == record as attributes and return == #
+        self.Sigma_infinity, self.K_infinity = Sigma_infinity, K_infinity
 
         return Sigma_infinity, K_infinity
+    
+    def stationary_coefficients(self, j, coeff_type='ma'):
+        """
+        Wold representation moving average or VAR coefficients for the
+        steady state Kalman filter.
+        
+        Parameters
+        ----------
+        j : int
+            The lag length
+        coeff_type : string, either 'ma' or 'var' (default='ma')
+            The type of coefficent sequence to compute.  Either 'ma' for 
+            moving average or 'var' for VAR.
+        """
+        # == simplify notation == #
+        A, G = self.A, self.G
+        K_infinity = self.K_infinity
+        # == make sure that K_infinity has actually been computed == #
+        if K_infinity is None: 
+            S, K_infinity = self.stationary_values()            
+        # == compute and return coefficients == #
+        coeffs = [np.identity(self.k)]
+        i = 1
+        if coeff_type == 'ma':
+            P = A
+        elif coeff_type == 'var':
+            P = A - dot(K_infinity, G)
+        else:
+            raise ValueError("Unknown coefficient type")
+        while i <= j:
+            coeffs.append(dot(dot(G, P), K_infinity))
+            P = dot(P, P)
+            i += 1
+        return coeffs
+
+    def stationary_innovation_covar(self):
+        # == simplify notation == #
+        R, G = self.R, self.G
+        Sigma_infinity = self.Sigma_infinity
+        # == Make sure that Sigma_infinity has been computed == #
+        if Sigma_infinity is None: 
+            Sigma_infinity, K = self.stationary_values()            
+        return dot(G dot(Sigma_infinity, G.T)) + R
