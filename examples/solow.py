@@ -1,3 +1,7 @@
+"""
+Filename: solow.py
+Reference: http://quant-econ.net/py/python_oop.html
+"""
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 
@@ -11,22 +15,10 @@ class Solow:
     """
 
     def __init__(self, n, s, d, alpha, z, k):
-        """ Solow growth model with Cobb Douglas production function.
-
-        Parameters
-        ----------
-        n : scalar
-            population growth rate
-        s : scalar
-            savings rate
-        d : scalar
-            depreciation rate
-        alpha : scalar
-            capital's share of income
-        z : scalar
-            productivity parameter
-        k : scalar
-            current capital stock
+        """ 
+        Solow growth model with Cobb Douglas production function.  All
+        parameters are scalars.  See http://quant-econ.net/py/python_oop.html
+        for interpretation.
         """
         self.n, self.s, self.d, self.alpha, self.z = n, s, d, alpha, z
         self.k = k
