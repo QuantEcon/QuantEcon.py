@@ -26,23 +26,19 @@ class Market:
         "Compute equilibrium quantity"
         return  self.ad - self.bd * self.price()
         
-    def area1(self):
-        "Compute area under inverse demand function"
-        a, error = quad(lambda x: (self.ad/self.bd) - (1/self.bd)* x, 0, self.quantity())
-        return a
-        
     def consumer_surp(self):
         "Compute consumer surplus"
-        return  self.area1() - self.price() * self.quantity()
-    
-    def area2(self):
-        "Compute area above the supply curve.  Note that we exclude the tax."
-        a, error = quad(lambda x: -(self.az/self.bz) + (1/self.bz) * x, 0, self.quantity())  
-        return a
+        # == Compute area under inverse demand function == #
+        integrand = lambda x: (self.ad/self.bd) - (1/self.bd)* x
+        area, error = quad(integrand, 0, self.quantity())
+        return area - self.price() * self.quantity()
     
     def producer_surp(self):
         "Compute producer surplus"
-        return (self.price() - self.tax) * self.quantity() - self.area2()
+        #  == Compute area above supply curve, excluding tax == #
+        integrand = lambda x: -(self.az/self.bz) + (1/self.bz) * x
+        area, error = quad(integrand, 0, self.quantity())  
+        return (self.price() - self.tax) * self.quantity() - area
     
     def taxrev(self):
         "Compute tax revenue"
@@ -59,6 +55,4 @@ class Market:
     def inverse_supply_no_tax(self,x):
         "Compute inverse supply curve without tax"
         return -(self.az/self.bz) + (1/self.bz) * x
-    
-    
-    
+
