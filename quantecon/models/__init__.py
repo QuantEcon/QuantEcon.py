@@ -9,7 +9,7 @@ __all__ = ["AssetPrices", "CareerWorkerProblem", "ConsumerProblem",
            "JvWorker", "LucasTree", "SearchProblem", "GrowthModel",
            "solow"]
 
-#from . import solow as solow
+from . import solow as solow
 from .asset_pricing import AssetPrices
 from .career import CareerWorkerProblem
 from .ifp import ConsumerProblem
