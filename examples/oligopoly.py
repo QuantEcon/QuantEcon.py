@@ -119,39 +119,14 @@ def solve_for_opt_policy(params, eta0=0., Q0=0., q0=0.):
     P22 = P[-1, -1]
     P21 = P[-1, :-1]
     P22inv = P22**(-1)
-    dotmat = np.empty((5, 5))
-    upper = np.eye(4, 5)  # Gives me 4x4 identity with a column of 0s
-    lower = np.hstack([-P22inv*P21, P22inv])
-    dotmat[:-1, :] = upper
-    dotmat[-1, :] = lower
-
-    coeffs = np.dot(-F, dotmat)
 
     # Step 4: Find optimal x_0 and \mu_{x, 0}
     z0 = np.array([1., eta0, Q0, q0])
     x0 = -P22inv*np.dot(P21, z0)
     D0 = -np.dot(P22inv, P21)
 
-    # Do some rearranging for convenient representation of policy
-    # TODO: Finish getting the equations into the from
-    # u_t = rho u_{t-1} + gamma_1 z_t + gamma_2 z_{t-1}
-
-    part1 = np.vstack([np.eye(4, 5), P[-1, :]])
-    part2 = A - np.dot(B, F)
-    part3 = dotmat
-    m = np.dot(part1, part2).dot(part3)
-    m12 = m[-1, :-1]
-    m22 = m[-1, -1]
-
-    f = np.dot(-F, dotmat)
-    f11 = f[-1, :-1]
-    f12 = f[-1, -1]
-
-    coeff_utm1 = f12*m22*f12**(-1)
-    coeff_zt = coeffs[0, :-1]
-    coeff_ztm1 = f12*(m12 - f12**(-1)*m22*f11)
-
-    return P, F, D0, Pf, Ff
+    # Return -F and -Ff because we use u_t = -F y_t
+    return P, -F, D0, Pf, -Ff
 
 
 # Parameter values
@@ -172,7 +147,7 @@ P, F, D0, Pf,Ff  = solve_for_opt_policy(params)
 
 # np.set_printoptions(precision=2)
 print("P = {}".format(P))
-print("F = {}".format(F))
+print("-F = {}".format(F))
 print("D0 = {}".format(D0))
 print("Pf = {}".format(Pf))
-print("Ff = {}".format(Ff))
+print("-Ff = {}".format(Ff))
