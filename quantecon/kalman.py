@@ -240,4 +240,4 @@ class Kalman(object):
         # == Make sure that Sigma_infinity has been computed == #
         if Sigma_infinity is None: 
             Sigma_infinity, K = self.stationary_values()            
-        return dot(G dot(Sigma_infinity, G.T)) + R
+        return dot(G, dot(Sigma_infinity, G.T)) + R
