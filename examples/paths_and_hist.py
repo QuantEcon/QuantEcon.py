@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from quantecon import LSS
+from quantecon import LinearStateSpace
 import random
 
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
@@ -15,7 +15,7 @@ C = [sigma, 0, 0, 0]
 G = [1, 0, 0, 0]
 
 T = 30
-ar = LSS(A, C, G, mu_0=np.ones(4))
+ar = LinearStateSpace(A, C, G, mu_0=np.ones(4))
 
 ymin, ymax = -0.8, 1.25
 
