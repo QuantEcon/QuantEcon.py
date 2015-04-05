@@ -23,7 +23,7 @@ class TestLinearStateSpace(unittest.TestCase):
         G = 1.
         mu_0 = .75
 
-        self.ss = LinearStateSpace(A, C, G, mu_0)
+        self.ss = LinearStateSpace(A, C, G, mu_0=mu_0)
 
     def tearDown(self):
         del self.ss
