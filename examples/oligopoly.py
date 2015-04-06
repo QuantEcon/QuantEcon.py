@@ -145,9 +145,28 @@ params = np.array([a0, a1, rho, c_eps, c, d, e, g, h, beta])
 
 P, F, D0, Pf,Ff  = solve_for_opt_policy(params)
 
-# np.set_printoptions(precision=2)
+
+# Checking time-inconsistency:
+A, B, Q, R, Rf = setup_matrices(params)
+# arbitrary initial z_0
+y0 = np.array([[1, 1, 1, 1]]).T
+# optimal x_0 = i_0
+i0 = np.dot(D0,y0)
+# iterate one period using the closed-loop system
+y1 = np.dot( A + np.dot(B,F) , np.vstack([y0, i0]) )
+# the last element of y_1 is x_1 = i_1
+i1_0 = y1[-1,0]
+
+# compare this to the case when the leader solves a Stackelberg problem
+# in period 1. if in period 1 the leader could choose i1 given
+# (1, v_1, Q_1, \bar{q}_1)
+i1_1 = np.dot(D0, y1[0:-1,0])
+
+
 print("P = {}".format(P))
 print("-F = {}".format(F))
 print("D0 = {}".format(D0))
 print("Pf = {}".format(Pf))
 print("-Ff = {}".format(Ff))
+print("i1_0 = {}".format(i1_0))
+print("i1_1 = {}".format(i1_1))
