@@ -8,7 +8,63 @@ from textwrap import dedent
 import numpy as np
 from numpy.random import multivariate_normal
 from scipy.linalg import solve
+import warnings
 
+numba_installed = True
+try:
+    from numba import autojit
+except ImportError:
+    numba_installed = False
+    numba_warning_message = "Numba import failed.  Falling back to non-optimized routine."
+    warnings.warn(numba_warning_message, UserWarning)
+
+
+def simulate_linear_model(A, x0, x, v, ts_length):
+    """
+    This is a separate function for simulating a vector linear system of 
+    the form
+    
+        x_{t+1} = A x_t + v_{t+1} given x_0 = x0
+        
+    Here 
+    
+        * x_t is n x 1
+        * v_t is m x 1
+        
+    In the parameter list, x is an empty matrix of shape n x ts_length,
+    and computed values are written into it.  The matrix w should be
+    m x ts_length, and its t-th column is used as the time t shock w_t
+    
+    The purpose of separating this functionality out is to target it for 
+    optimization by Numba. 
+    
+    Parameters
+    ----------
+    A : array_like or scalar(float)
+        Should be `n x n`
+    C : array_like or scalar(float)
+        Should be `n x m`
+    d : array_like or scalar(float)
+        Should be `n x 1`
+    x0 : array_like
+        Should be `n x 1`.  Initial condition
+    x : np.ndarray
+        Should be `n x ts_length`.  Will be overwritten and returned.
+    w : np.ndarray
+        Should be `m x ts_length-1`.  Columns are current shock vectors.
+
+    Returns
+    --------
+    x : np.ndarray
+        Time series, with t-th column being x_t
+    """
+    x[:, 0] = x0
+    for t in range(ts_length-1):
+        x[:, t+1] = A.dot(x[:, t]) + v[:, t]
+    return x
+
+if numba_installed:
+    simulate_linear_model = autojit(simulate_linear_model)
 
 class LinearStateSpace(object):
     """
@@ -107,10 +163,13 @@ class LinearStateSpace(object):
 
         """
         x = np.empty((self.n, ts_length))
-        x[:, 0] = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
+        x0 = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
         w = np.random.randn(self.m, ts_length-1)
-        for t in range(ts_length-1):
-            x[:, t+1] = self.A.dot(x[:, t]) + self.C.dot(w[:, t])
+        v = self.C.dot(w) # Multiply each w_t by C to get v_t = C w_t
+        
+        # == populate x with simulated time series == #
+        simulate_linear_model(self.A, x0, x, v, ts_length)
+        
         if self.H is not None:
             v = np.random.randn(self.l, ts_length)
             y = self.G.dot(x) + self.H.dot(v)
