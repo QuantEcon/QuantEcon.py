@@ -29,12 +29,14 @@ class Kalman(object):
     -----------
     ss : instance of LinearStateSpace
         An instance of the quantecon.lss.LinearStateSpace class
-    x_hat : scalar(float) or array_like(float)
+    x_hat : scalar(float) or array_like(float), optional(default=None)
         An n x 1 array representing the mean x_hat and covariance
-        matrix Sigma of the prior/predictive density.
-    Sigma : scalar(float) or array_like(float)
+        matrix Sigma of the prior/predictive density.  Set to zero if 
+        not supplied.
+    Sigma : scalar(float) or array_like(float), optional(default=None)
         An n x n array representing the covariance matrix Sigma of
         the prior/predictive density.  Must be positive definite.
+        Set to the identity if not supplied.
 
     Attributes
     ----------
@@ -52,14 +54,22 @@ class Kalman(object):
 
     """
 
-    def __init__(self, ss, x_hat, Sigma):
+    def __init__(self, ss, x_hat=None, Sigma=None):
         self.ss = ss
-        self.Sigma = np.atleast_2d(Sigma)
-        self.x_hat = np.atleast_2d(x_hat)
+        self.set_state(x_hat, Sigma)
         self.K_infinity = None
         self.Sigma_infinity = None
-        # == make x_hat a column vector == #
-        self.x_hat.shape = ss.n, 1
+
+    def set_state(self, x_hat, Sigma):
+        if Sigma == None:
+            Sigma = np.identity(self.ss.n)
+        else:
+            self.Sigma = np.atleast_2d(Sigma)
+        if x_hat == None:
+            x_hat = np.zeros((self.ss.n, 1))
+        else:
+            self.x_hat = np.atleast_2d(x_hat)
+            self.x_hat.shape = self.ss.n, 1
 
     def __repr__(self):
         return self.__str__()
@@ -97,7 +107,7 @@ class Kalman(object):
 
         # === and then update === #
         y = np.atleast_2d(y)
-        y.shape = ss.k, 1
+        y.shape = self.ss.k, 1
         E = dot(self.Sigma, G.T)
         F = dot(dot(G, self.Sigma), G.T) + R
         M = dot(E, inv(F))

@@ -10,6 +10,7 @@ import os
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
+from quantecon.lss import LinearStateSpace
 from quantecon.kalman import Kalman
 
 
@@ -18,12 +19,16 @@ class TestKalman(unittest.TestCase):
     def setUp(self):
         # Initial Values
         self.A = np.array([[.95, 0], [0., .95]])
-        self.Q = np.eye(2) * 0.5
+        self.C = np.eye(2) * np.sqrt(0.5)
         self.G = np.eye(2) * .5
-        self.R = np.eye(2) * 0.2
+        self.H = np.eye(2) * np.sqrt(0.2)
 
-        self.kf = Kalman(self.A, self.G, self.Q, self.R)
+        self.Q = np.dot(self.C, self.C.T)
+        self.R = np.dot(self.H, self.H.T)
 
+        ss = LinearStateSpace(self.A, self.C, self.G, self.H)
+
+        self.kf = Kalman(ss)
 
 
     def tearDown(self):
@@ -58,8 +63,8 @@ class TestKalman(unittest.TestCase):
 
         kf.update(np.zeros((2, 1)))
 
-        assert_allclose(kf.current_Sigma, sig_inf, rtol=1e-4, atol=1e-2)
-        assert_allclose(kf.current_x_hat.squeeze(), np.zeros(2), rtol=1e-4, atol=1e-2)
+        assert_allclose(kf.Sigma, sig_inf, rtol=1e-4, atol=1e-2)
+        assert_allclose(kf.x_hat.squeeze(), np.zeros(2), rtol=1e-4, atol=1e-2)
 
 
     def test_update_nonstationary(self):
@@ -79,8 +84,8 @@ class TestKalman(unittest.TestCase):
 
         new_xhat = A.dot(curr_x) + curr_k.dot(y_observed - G.dot(curr_x))
 
-        assert_allclose(kf.current_Sigma, new_sigma, rtol=1e-4, atol=1e-2)
-        assert_allclose(kf.current_x_hat, new_xhat, rtol=1e-4, atol=1e-2)
+        assert_allclose(kf.Sigma, new_sigma, rtol=1e-4, atol=1e-2)
+        assert_allclose(kf.x_hat, new_xhat, rtol=1e-4, atol=1e-2)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestKalman)
