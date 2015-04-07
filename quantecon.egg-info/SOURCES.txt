@@ -37,6 +37,11 @@ quantecon/models/jv.py
 quantecon/models/lucastree.py
 quantecon/models/odu.py
 quantecon/models/optgrowth.py
+quantecon/models/solow/__init__.py
+quantecon/models/solow/ces.py
+quantecon/models/solow/cobb_douglas.py
+quantecon/models/solow/impulse_response.py
+quantecon/models/solow/model.py
 quantecon/tests/__init__.py
 quantecon/tests/test_arma.py
 quantecon/tests/test_cartesian.py

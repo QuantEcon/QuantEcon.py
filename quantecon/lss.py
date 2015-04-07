@@ -8,7 +8,62 @@ from textwrap import dedent
 import numpy as np
 from numpy.random import multivariate_normal
 from scipy.linalg import solve
+import warnings
 
+numba_installed = True
+try:
+    from numba import jit
+except ImportError:
+    numba_installed = False
+    numba_warning_message = "Numba import failed.  Falling back to non-optimized routine."
+    warnings.warn(numba_warning_message, UserWarning)
+
+
+def simulate_linear_model(A, x0, v, ts_length):
+    """
+    This is a separate function for simulating a vector linear system of 
+    the form
+    
+        x_{t+1} = A x_t + v_t given x_0 = x0
+        
+    Here x_t and v_t are both n x 1 and A is n x n.
+        
+    The purpose of separating this functionality out is to target it for 
+    optimization by Numba.  For the same reason, matrix multiplication is
+    broken down into for loops.
+    
+    Parameters
+    ----------
+    A : array_like or scalar(float)
+        Should be n x n
+    x0 : array_like
+        Should be n x 1.  Initial condition
+    v : np.ndarray
+        Should be n x ts_length-1.  Its t-th column is used as the time t
+        shock v_t
+    ts_length : int
+        The length of the time series
+
+    Returns
+    --------
+    x : np.ndarray
+        Time series with ts_length columns, the t-th column being x_t
+    """
+    A = np.asarray(A)
+    n = A.shape[0]
+    x = np.empty((n, ts_length))
+    
+    x[:, 0] = x0
+    for t in range(ts_length-1):
+        # x[:, t+1] = A.dot(x[:, t]) + v[:, t]
+        for i in range(n):
+            x[i, t+1] = v[i, t]
+            for j in range(n):
+                x[i, t+1] += A[i, j] * x[j, t]
+    return x
+
+if numba_installed:
+    simulate_linear_model = jit(simulate_linear_model)
 
 class LinearStateSpace(object):
     """
@@ -61,6 +116,7 @@ class LinearStateSpace(object):
             self.mu_0 = np.zeros((self.n, 1))
         else:
             self.mu_0 = self.convert(mu_0)
+            self.mu_0.shape = self.n, 1  
         if Sigma_0 is None:
             self.Sigma_0 = np.zeros((self.n, self.n))
         else:
@@ -106,11 +162,12 @@ class LinearStateSpace(object):
             A k x ts_length array, where the t-th column is y_t
 
         """
-        x = np.empty((self.n, ts_length))
-        x[:, 0] = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
+        x0 = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
         w = np.random.randn(self.m, ts_length-1)
-        for t in range(ts_length-1):
-            x[:, t+1] = self.A.dot(x[:, t]) + self.C.dot(w[:, t])
+        v = self.C.dot(w) # Multiply each w_t by C to get v_t = C w_t
+        # == simulate time series == #
+        x = simulate_linear_model(self.A, x0, v, ts_length)
+        
         if self.H is not None:
             v = np.random.randn(self.l, ts_length)
             y = self.G.dot(x) + self.H.dot(v)
