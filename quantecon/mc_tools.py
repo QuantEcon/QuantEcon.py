@@ -92,6 +92,7 @@ from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
 from warnings import warn
+from numba import jit
 
 
 class MarkovChain(object):
@@ -276,25 +277,43 @@ def mc_compute_stationary(P):
     return MarkovChain(P).stationary_distributions
 
 
+@jit
 def mc_sample_path(P, init=0, sample_size=1000):
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
+
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+
     # === set up array to store output === #
     X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
         X[0] = init
     else:
-        X[0] = DiscreteRV(init).draw()
-
-    # === turn each row into a distribution === #
-    # In particular, let P_dist[i] be the distribution corresponding to the
-    # i-th row P[i,:]
-    n = len(P)
-    P_dist = [DiscreteRV(P[i, :]) for i in range(n)]
+        cdf0 = np.cumsum(init)
+        X[0] = search_cdf(cdf0, u[0])
 
     # === generate the sample path === #
-    for t in range(sample_size - 1):
-        X[t+1] = P_dist[X[t]].draw()
+    n = len(cdfs)
+    for t in range(sample_size-1):
+        X[t+1] = search_cdf(cdfs[X[t]], u[t+1])
 
     return X
+
+
+@jit(nopython=True)
+def search_cdf(cdf, v):
+    n = len(cdf)
+
+    lo = -1
+    hi = n - 1
+    while(lo < hi-1):
+        m = (lo + hi) // 2
+        if v < cdf[m]:
+            hi = m
+        else:
+            lo = m
+    return hi
 
 
 # ------------------------------------------------------------------- #
