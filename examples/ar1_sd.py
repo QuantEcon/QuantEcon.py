@@ -4,6 +4,7 @@ Plots spectral density for AR(1) X' = phi X + epsilon
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def ar1_sd(phi, omega):
     return 1 / (1 - 2 * phi * np.cos(omega) + phi**2)
 

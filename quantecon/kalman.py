@@ -1,52 +1,51 @@
 """
 Filename: kalman.py
-
-Authors: Thomas Sargent, John Stachurski
+Reference: http://quant-econ.net/py/kalman.html
 
 Implements the Kalman filter for a linear Gaussian state space model.
 
 """
-
+from textwrap import dedent
 import numpy as np
 from numpy import dot
 from scipy.linalg import inv
-from .matrix_eqn import solve_discrete_riccati
+from quantecon.matrix_eqn import solve_discrete_riccati
 
-class Kalman:
+class Kalman(object):
     r"""
     Implements the Kalman filter for the Gaussian state space model
 
-    .. math::
+        x_{t+1} = A x_t + C w_{t+1}
+        y_t = G x_t + H v_t.
 
-        x_{t+1} &= A x_t + w_{t+1}\\
-        y_t &= G x_t + v_t.
-
-    Here :math:`x_t` is the hidden state and :math:`y_t` is the
-    measurement. The shocks :math:`w_t` and :math:`v_t` are iid zero
-    mean Gaussians with covariance matrices Q and R respectively.
+    Here x_t is the hidden state and y_t is the measurement. The shocks 
+    w_t and v_t are iid standard normals.  Below we use the notation
+    
+        Q := CC'
+        R := HH'
+    
 
     Parameters
     -----------
-    A : array_like or scalar(float)
-        The n x n matrix A
-    Q : array_like or scalar(float)
-        Q is n x n, symmetric and nonnegative definite
-    G : array_like or scalar(float)
-        G is k x n
-    R : array_like or scalar(float)
-        R is k x k, symmetric and nonnegative definite
+    ss : instance of LinearStateSpace
+        An instance of the quantecon.lss.LinearStateSpace class
+    x_hat : scalar(float) or array_like(float), optional(default=None)
+        An n x 1 array representing the mean x_hat and covariance
+        matrix Sigma of the prior/predictive density.  Set to zero if 
+        not supplied.
+    Sigma : scalar(float) or array_like(float), optional(default=None)
+        An n x n array representing the covariance matrix Sigma of
+        the prior/predictive density.  Must be positive definite.
+        Set to the identity if not supplied.
 
     Attributes
     ----------
-    A, Q, G, R : see Parameters
-    k : scalar(int)
-        Number of rows of G
-    n : scalar(int)
-        Number of columns of G
-    current_Sigma : array_like or scalar(float)
-        The n x n covariance matrix
-    current_x_hat : array_like or scalar(float)
-        The mean of the state
+    Sigma, x_hat : as above        
+    Sigma_infinity : array_like or scalar(float)
+        The infinite limit of Sigma_t
+    K_infinity : array_like or scalar(float)
+        The stationary Kalman gain.
+        
 
     References
     ----------
@@ -55,46 +54,34 @@ class Kalman:
 
     """
 
-    def __init__(self, A, G, Q, R):
-        self.A, self.G, self.Q, self.R = list(map(self.convert, (A, G, Q, R)))
-        self.k, self.n = self.G.shape
-
-    def convert(self, x):
-        """
-        Convert array_like objects (lists of lists, floats, etc.) into
-        well formed 2D NumPy arrays
-
-        Parameters
-        ----------
-        x : scalar or array_like(float)
-            Argument to be converted into a 2D NumPy array
-
-        Returns
-        -------
-        array_like(float)
-            A 2D NumPy array
-
-        """
-        return np.atleast_2d(np.asarray(x, dtype='float32'))
+    def __init__(self, ss, x_hat=None, Sigma=None):
+        self.ss = ss
+        self.set_state(x_hat, Sigma)
+        self.K_infinity = None
+        self.Sigma_infinity = None
 
     def set_state(self, x_hat, Sigma):
-        """
-        Set the state of the filter (mean and variance of prior
-        density).
+        if Sigma == None:
+            Sigma = np.identity(self.ss.n)
+        else:
+            self.Sigma = np.atleast_2d(Sigma)
+        if x_hat == None:
+            x_hat = np.zeros((self.ss.n, 1))
+        else:
+            self.x_hat = np.atleast_2d(x_hat)
+            self.x_hat.shape = self.ss.n, 1
 
-        Parameters
-        ----------
-        x_hat : scalar(float) or array_like(float)
-            An n x 1 array representing the mean x_hat and covariance
-            matrix Sigma of the prior/predictive density.
-        Sigma : scalar(float) or array_like(float)
-            An n x n array representing the covariance matrix Sigma of
-            the prior/predictive density.  Must be positive definite.
+    def __repr__(self):
+        return self.__str__()
 
+    def __str__(self):
+        m = """\
+        Kalman filter:
+          - dimension of state space          : {n}
+          - dimension of observation equation : {k}
         """
-        self.current_Sigma = self.convert(Sigma)
-        self.current_x_hat = self.convert(x_hat)
-        self.current_x_hat.shape = self.n, 1
+        return dedent(m.format(n=self.ss.n, k=self.ss.k))
+
 
     def prior_to_filtered(self, y):
         r"""
@@ -102,13 +89,11 @@ class Kalman:
         time t filtering distribution, using current measurement y_t.
 
         The updates are according to
-
-        .. math::
-
-            x_{hat}^F &= x_{hat} + \Sigma G' (G \Sigma G' + R)^{-1}
-            (y - G x_{hat}) \\
-            \Sigma^F &= \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
-            \Sigma
+        
+            x_{hat}^F = x_{hat} + Sigma G' (G Sigma G' + R)^{-1}
+                (y - G x_{hat}) 
+            Sigma^F = Sigma - Sigma G' (G Sigma G' + R)^{-1} G
+                Sigma
 
         Parameters
         ----------
@@ -117,17 +102,17 @@ class Kalman:
 
         """
         # === simplify notation === #
-        G, R = self.G, self.R
-        x_hat, Sigma = self.current_x_hat, self.current_Sigma
+        G, H = self.ss.G, self.ss.H
+        R = np.dot(H, H.T)
 
         # === and then update === #
-        y = self.convert(y)
-        y.shape = self.k, 1
-        A = dot(Sigma, G.T)
-        B = dot(dot(G, Sigma), G.T) + R
-        M = dot(A, inv(B))
-        self.current_x_hat = x_hat + dot(M, (y - dot(G, x_hat)))
-        self.current_Sigma = Sigma  - dot(M, dot(G,  Sigma))
+        y = np.atleast_2d(y)
+        y.shape = self.ss.k, 1
+        E = dot(self.Sigma, G.T)
+        F = dot(dot(G, self.Sigma), G.T) + R
+        M = dot(E, inv(F))
+        self.x_hat = self.x_hat + dot(M, (y - dot(G, self.x_hat)))
+        self.Sigma = self.Sigma - dot(M, dot(G,  self.Sigma))
 
     def filtered_to_forecast(self):
         """
@@ -137,16 +122,16 @@ class Kalman:
 
         """
         # === simplify notation === #
-        A, Q = self.A, self.Q
-        x_hat, Sigma = self.current_x_hat, self.current_Sigma
+        A, C = self.ss.A, self.ss.C
+        Q = np.dot(C, C.T)
 
         # === and then update === #
-        self.current_x_hat = dot(A, x_hat)
-        self.current_Sigma = dot(A, dot(Sigma, A.T)) + Q
+        self.x_hat = dot(A, self.x_hat)
+        self.Sigma = dot(A, dot(self.Sigma, A.T)) + Q
 
     def update(self, y):
         """
-        Updates `x_hat` and `Sigma` given k x 1 ndarray `y`.  The full
+        Updates x_hat and Sigma given k x 1 ndarray y.  The full
         update, from one period to the next
 
         Parameters
@@ -160,7 +145,7 @@ class Kalman:
 
     def stationary_values(self):
         """
-        Computes the limit of :math:`Sigma_t` as :math:`t \to \infty` by
+        Computes the limit of Sigma_t as t  goes to infinity by
         solving the associated Riccati equation.  Computation is via the
         doubling algorithm (see the documentation in
         `matrix_eqn.solve_discrete_riccati`).
@@ -174,11 +159,60 @@ class Kalman:
 
         """
         # === simplify notation === #
-        A, Q, G, R = self.A, self.Q, self.G, self.R
+        A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
+        Q, R = np.dot(C, C.T), np.dot(H, H.T)
+        
         # === solve Riccati equation, obtain Kalman gain === #
         Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R)
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)
-
+        
+        # == record as attributes and return == #
+        self.Sigma_infinity, self.K_infinity = Sigma_infinity, K_infinity
         return Sigma_infinity, K_infinity
+    
+    def stationary_coefficients(self, j, coeff_type='ma'):
+        """
+        Wold representation moving average or VAR coefficients for the
+        steady state Kalman filter.
+        
+        Parameters
+        ----------
+        j : int
+            The lag length
+        coeff_type : string, either 'ma' or 'var' (default='ma')
+            The type of coefficent sequence to compute.  Either 'ma' for 
+            moving average or 'var' for VAR.
+        """
+        # == simplify notation == #
+        A, G = self.ss.A, self.ss.G
+        K_infinity = self.K_infinity
+        # == make sure that K_infinity has actually been computed == #
+        if K_infinity is None: 
+            S, K_infinity = self.stationary_values()            
+        # == compute and return coefficients == #
+        coeffs = [np.identity(self.ss.k)]
+        i = 1
+        if coeff_type == 'ma':
+            P = A
+        elif coeff_type == 'var':
+            P = A - dot(K_infinity, G)
+        else:
+            raise ValueError("Unknown coefficient type")
+        while i <= j:
+            coeffs.append(dot(dot(G, P), K_infinity))
+            P = dot(P, P)
+            i += 1
+        return coeffs
+
+    def stationary_innovation_covar(self):
+        # == simplify notation == #
+        H, G = self.ss.H, self.ss.G
+        R = np.dot(H, H.T)
+        Sigma_infinity = self.Sigma_infinity
+        
+        # == make sure that Sigma_infinity has been computed == #
+        if Sigma_infinity is None: 
+            Sigma_infinity, K = self.stationary_values()            
+        return dot(G, dot(Sigma_infinity, G.T)) + R

@@ -13,10 +13,11 @@ T       = 20  # Time horizon
 S       = 5   # Impulse date
 sigma1  = sigma2 = 0.15
 
+
 def time_path(permanent=False):
     "Time path of consumption and debt given shock sequence"
-    w1 = np.zeros(T+1) 
-    w2 = np.zeros(T+1) 
+    w1 = np.zeros(T+1)
+    w2 = np.zeros(T+1)
     b = np.zeros(T+1)
     c = np.zeros(T+1)
     if permanent:
@@ -31,7 +32,7 @@ def time_path(permanent=False):
 
 fig, axes = plt.subplots(2, 1)
 plt.subplots_adjust(hspace=0.5)
-p_args = {'lw' : 2, 'alpha' : 0.7}
+p_args = {'lw': 2, 'alpha': 0.7}
 
 L = 0.175
 
@@ -55,4 +56,3 @@ ax.plot(list(range(T+1)), c, 'g-', label="consumption", **p_args)
 ax.plot(list(range(T+1)), b, 'b-', label="debt", **p_args)
 ax.legend(loc='lower right')
 plt.show()
-

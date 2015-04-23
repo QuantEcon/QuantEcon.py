@@ -1,8 +1,9 @@
-from random import normalvariate, uniform
+from random import uniform
 import matplotlib.pyplot as plt
 
+
 def generate_data(n, generator_type):
-    epsilon_values = []   
+    epsilon_values = []
     for i in range(n):
         e = generator_type(0, 1)
         epsilon_values.append(e)
@@ -11,4 +12,3 @@ def generate_data(n, generator_type):
 data = generate_data(100, uniform)
 plt.plot(data, 'b-')
 plt.show()
-

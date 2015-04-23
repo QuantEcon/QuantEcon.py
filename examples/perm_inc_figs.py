@@ -14,8 +14,9 @@ T       = 60
 sigma   = 0.15
 mu = 1
 
+
 def time_path():
-    w = np.random.randn(T+1) # w_0, w_1, ..., w_T
+    w = np.random.randn(T+1)  # w_0, w_1, ..., w_T
     w[0] = 0
     b = np.zeros(T+1)
     for t in range(1, T+1):
@@ -30,14 +31,16 @@ def time_path():
 if 1:
     fig, ax = plt.subplots()
 
-    p_args = {'lw' : 2, 'alpha' : 0.7}
+    p_args = {'lw': 2, 'alpha': 0.7}
     ax.grid()
     ax.set_xlabel(r'Time')
     bbox = (0., 1.02, 1., .102)
-    legend_args = {'bbox_to_anchor' : bbox, 'loc' : 'upper left', 'mode' : 'expand'}
+    legend_args = {'bbox_to_anchor': bbox, 'loc': 'upper left',
+                   'mode': 'expand'}
 
     w, b, c = time_path()
-    ax.plot(list(range(T+1)), mu + sigma * w, 'g-', label="non-financial income", **p_args)
+    ax.plot(list(range(T+1)), mu + sigma * w, 'g-',
+            label="non-financial income", **p_args)
     ax.plot(list(range(T+1)), c, 'k-', label="consumption", **p_args)
     ax.plot(list(range(T+1)), b, 'b-', label="debt", **p_args)
     ax.legend(ncol=3, **legend_args)
@@ -49,7 +52,7 @@ if 1:
 if 0:
     fig, ax = plt.subplots()
 
-    p_args = {'lw' : 0.8, 'alpha' : 0.7}
+    p_args = {'lw': 0.8, 'alpha': 0.7}
     ax.grid()
     ax.set_xlabel(r'Time')
     ax.set_ylabel(r'Consumption')
@@ -60,5 +63,3 @@ if 0:
         ax.plot(list(range(T+1)), c, color=rcolor, **p_args)
 
     plt.show()
-
-

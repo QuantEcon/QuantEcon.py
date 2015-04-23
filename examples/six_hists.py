@@ -1,5 +1,4 @@
-import matplotlib.pyplot as plt 
-import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats import norm
 from random import uniform
 num_rows, num_cols = 3, 2
@@ -11,8 +10,6 @@ for i in range(num_rows):
         axes[i, j].hist(x, alpha=0.6, bins=20)
         t = r'$\mu = {0:.1f}, \quad \sigma = {1:.1f}$'.format(m, s)
         axes[i, j].set_title(t)
-        axes[i, j].set_xticks([-4, 0, 4]) 
+        axes[i, j].set_xticks([-4, 0, 4])
         axes[i, j].set_yticks([])
 plt.show()
-
-

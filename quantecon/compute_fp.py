@@ -6,12 +6,35 @@ Compute the fixed point of a given operator T, starting from
 specified initial condition v.
 
 """
-
+import time
 import numpy as np
 
 
-def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1, *args,
-                        **kwargs):
+def _print_after_skip(skip, it=None, dist=None, etime=None):
+    if it is None:
+        # print initial header
+        msg = "{i:<13}{d:<15}{t:<17}".format(i="Iteration",
+                                             d="Distance",
+                                             t="Elapsed (seconds)")
+        print(msg)
+        print("-" * len(msg))
+
+        return
+
+    if it % skip == 0:
+        if etime is None:
+            print("After {it} iterations dist is {d}".format(it=it, d=dist))
+
+        else:
+            # leave 4 spaces between columns if we have %3.3e in d, t
+            msg = "{i:<13}{d:<15.3e}{t:<18.3e}"
+            print(msg.format(i=it, d=dist, t=etime))
+
+    return
+
+
+def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
+                        print_skip=5, *args, **kwargs):
     """
     Computes and returns :math:`T^k v`, an approximate fixed point.
 
@@ -43,12 +66,20 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1, *args,
     """
     iterate = 0
     error = error_tol + 1
+
+    if verbose:
+        start_time = time.time()
+        _print_after_skip(print_skip, it=None)
+
     while iterate < max_iter and error > error_tol:
         new_v = T(v, *args, **kwargs)
         iterate += 1
         error = np.max(np.abs(new_v - v))
+
         if verbose:
-            print("Computed iterate %d with error %f" % (iterate, error))
+            etime = time.time() - start_time
+            _print_after_skip(print_skip, iterate, error, etime)
+
         try:
             v[:] = new_v
         except TypeError:

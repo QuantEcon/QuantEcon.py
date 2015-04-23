@@ -1,0 +1,62 @@
+Metadata-Version: 1.1
+Name: quantecon
+Version: 0.1.8
+Summary: QuantEcon is a package to support all forms of quantitative economic modelling.
+Home-page: https://github.com/QuantEcon/QuantEcon.py
+Author: Thomas J. Sargent and John Stachurski (Project coordinators)
+Author-email: john.stachurski@gmail.com
+License: BSD
+Description: 
+        **QuantEcon** is an organization run by economists for economists with the aim of coordinating 
+        distributed development of high quality open source code for all forms of quantitative economic modelling. 
+        
+        The project website is located at `http://quantecon.org/ <http://quantecon.org/>`_. This website provides
+        more information with regards to the **quantecon** library, documentation, in addition to some resources 
+        in regards to how you can use and/or contribute to the package. 
+        
+        The **quantecon** Package
+        -------------------------
+        
+        The `repository <https://github.com/QuantEcon/QuantEcon.py>`_ includes the Python package ``quantecon``
+        
+        Assuming you have `pip <https://pypi.python.org/pypi/pip>`_ on your computer --- as will be the case if you've `installed Anaconda <http://quant-econ.net/getting_started.html#installing-anaconda>`_ --- you can install the latest stable release of ``quantecon`` by typing
+        
+            pip install quantecon
+        
+        at a terminal prompt
+        
+        Repository
+        ----------
+        
+        The main repository is hosted on Github `QuantEcon.py <https://github.com/QuantEcon/QuantEcon.py>`_
+        
+        **Note:** There is also a Julia version available for Julia users `QuantEcon.jl <https://github.com/QuantEcon/QuantEcon.jl>`_
+        
+        Current Build and Coverage Status
+        ---------------------------------
+        
+        |Build Status| |Coverage Status|
+        
+        .. |Build Status| image:: https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master
+           :target: https://travis-ci.org/QuantEcon/QuantEcon.py
+        .. |Coverage Status| image:: https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png
+           :target: https://coveralls.io/r/QuantEcon/QuantEcon.py
+        
+        Additional Links
+        ----------------
+        
+        1. `QuantEcon Course Website <http://quant-econ.net>`_ 
+        
+        
+Keywords: quantitative,economics
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Operating System :: OS Independent
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Topic :: Scientific/Engineering

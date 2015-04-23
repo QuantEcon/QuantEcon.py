@@ -64,7 +64,7 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
         Represents the value V
 
     """
-    if method=="doubling":
+    if method == "doubling":
         A, B = list(map(np.atleast_2d, [A, B]))
         alpha0 = A
         gamma0 = B
@@ -75,7 +75,7 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
         while diff > 1e-15:
 
             alpha1 = alpha0.dot(alpha0)
-            gamma1 = gamma0 + np.dot(alpha0.dot(gamma0), alpha0.T)
+            gamma1 = gamma0 + np.dot(alpha0.dot(gamma0), alpha0.conjugate().T)
 
             diff = np.max(np.abs(gamma1 - gamma0))
             alpha0 = alpha1
@@ -87,7 +87,7 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
                 msg = "Exceeded maximum iterations {}, check input matrics"
                 raise ValueError(msg.format(n_its))
 
-    elif method=="bartels-stewart":
+    elif method == "bartels-stewart":
         gamma1 = sp_solve_discrete_lyapunov(A, B)
 
     else:
@@ -149,7 +149,7 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     A, B, Q, R = np.atleast_2d(A, B, Q, R)
     n, k = R.shape[0], Q.shape[0]
     I = np.identity(k)
-    if N == None:
+    if N is None:
         N = np.zeros((n, k))
     else:
         N = np.atleast_2d(N)
@@ -171,7 +171,7 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
             f2 = gamma * f1
             f3 = np.linalg.cond(I + dot(G0, H0))
             f_gamma = max(f1, f2, f3)
-            if  f_gamma < current_min:
+            if f_gamma < current_min:
                 best_gamma = gamma
                 current_min = f_gamma
 
@@ -182,8 +182,6 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
 
     gamma = best_gamma
     R_hat = R + gamma * BB
-
-
 
     # == Initial conditions == #
     Q_tilde = - Q + dot(N.T, solve(R_hat, N + gamma * BTA)) + gamma * I
@@ -210,4 +208,3 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
             i += 1
 
     return H1 + gamma * I  # Return X
-

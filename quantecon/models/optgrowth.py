@@ -6,11 +6,12 @@ Authors: John Stachurski and Thomas Sargent
 Solving the optimal growth problem via value function iteration.
 
 """
-
 from __future__ import division  # Omit for Python 3.x
+from textwrap import dedent
 import numpy as np
 from scipy.optimize import fminbound
 from scipy import interp
+
 
 class GrowthModel(object):
     """
@@ -20,7 +21,7 @@ class GrowthModel(object):
     Parameters
     ----------
     f : function, optional(default=k**.65)
-        The production function; they default is the Cobb-Douglas
+        The production function; the default is the Cobb-Douglas
         production function with power of .65
     beta : scalar(int), optional(default=.95)
         The utility discounting parameter
@@ -39,11 +40,27 @@ class GrowthModel(object):
 
     """
     def __init__(self, f=lambda k: k**0.65, beta=0.95, u=np.log,
-            grid_max=2, grid_size=150):
+                 grid_max=2, grid_size=150):
 
         self.u, self.f, self.beta = u, f, beta
         self.grid = np.linspace(1e-6, grid_max, grid_size)
 
+    def __repr__(self):
+        m = "GrowthModel(beta={b}, grid_max={gm}, grid_size={gs})"
+        return m.format(b=self.beta, gm=self.grid.max(), gs=self.grid.size)
+
+    def __str__(self):
+        m = """\
+        GrowthModel:
+          - beta (discount factor)                             : {b}
+          - u (utility function)                               : {u}
+          - f (production function)                            : {f}
+          - grid bounds (bounds for grid over savings values)  : ({gl}, {gm})
+          - grid points (number of points in grid for savings) : {gs}
+        """
+        return dedent(m.format(b=self.beta, u=self.u, f=self.f,
+                               gl=self.grid.min(), gm=self.grid.max(),
+                               gs=self.grid.size))
 
     def bellman_operator(self, w, compute_policy=False):
         """
@@ -67,7 +84,7 @@ class GrowthModel(object):
         # == set Tw[i] equal to max_c { u(c) + beta w(f(k_i) - c)} == #
         Tw = np.empty(len(w))
         for i, k in enumerate(self.grid):
-            objective = lambda c:  - self.u(c) - self.beta * Aw(self.f(k) - c)
+            objective = lambda c: - self.u(c) - self.beta * Aw(self.f(k) - c)
             c_star = fminbound(objective, 1e-6, self.f(k))
             if compute_policy:
                 # sigma[i] = argmax_c { u(c) + beta w(f(k_i) - c)}
@@ -78,7 +95,6 @@ class GrowthModel(object):
             return Tw, sigma
         else:
             return Tw
-
 
     def compute_greedy(self, w):
         """

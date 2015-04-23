@@ -10,6 +10,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 import numpy as np
 from scipy.stats import norm
 
+
 def approx_markov(rho, sigma_u, m=3, n=7):
     """
     Computes the Markov matrix associated with a discretized version of

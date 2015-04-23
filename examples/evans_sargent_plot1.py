@@ -7,7 +7,7 @@ Edited by: John Stachurski
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from evans_sargent import T, y 
+from evans_sargent import T, y
 
 tt = np.arange(T)  # tt is used to make the plot time index correct.
 
@@ -20,8 +20,8 @@ for ax in axes:
     ax.set_xlim(0, 15)
 
 bbox = (0., 1.02, 1., .102)
-legend_args = {'bbox_to_anchor' : bbox, 'loc' : 3, 'mode' : 'expand'}
-p_args = {'lw' : 2, 'alpha' : 0.7}
+legend_args = {'bbox_to_anchor': bbox, 'loc': 3, 'mode': 'expand'}
+p_args = {'lw': 2, 'alpha': 0.7}
 
 ax = axes[0]
 ax.plot(tt, y[1, :], 'b-', label="output", **p_args)
@@ -42,4 +42,3 @@ ax.legend(ncol=1, **legend_args)
 ax.set_xlabel(r'time', fontsize=16)
 
 plt.show()
-

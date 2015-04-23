@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
 from random import uniform
@@ -12,5 +12,3 @@ for i in range(3):
     ax.plot(x, y, linewidth=2, alpha=0.6, label=current_label)
 ax.legend()
 plt.show()
-
-

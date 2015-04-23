@@ -6,8 +6,8 @@ Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski
 Solves robust LQ control problems.
 
 """
-
 from __future__ import division  # Remove for Python 3.sx
+from textwrap import dedent
 import numpy as np
 from .lqcontrol import LQ
 from .quadsums import var_quadratic_sum
@@ -15,7 +15,8 @@ from numpy import dot, log, sqrt, identity, hstack, vstack, trace
 from scipy.linalg import solve, inv, det
 from .matrix_eqn import solve_discrete_lyapunov
 
-class RBLQ:
+
+class RBLQ(object):
     r"""
     Provides methods for analysing infinite horizon robust LQ control
     problems of the form
@@ -73,6 +74,21 @@ class RBLQ:
         self.j = self.C.shape[1]
         # == Remaining parameters == #
         self.beta, self.theta = beta, theta
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Robust linear quadratic control system
+          - beta (discount parameter)   : {b}
+          - theta (robustness factor)   : {th}
+          - n (number of state variables)   : {n}
+          - k (number of control variables) : {k}
+          - j (number of shocks)            : {j}
+        """
+        return dedent(m.format(b=self.beta, n=self.n, k=self.k, j=self.j,
+                               th=self.theta))
 
     def d_operator(self, P):
         r"""
@@ -354,4 +370,3 @@ class RBLQ:
         o_F = (ho + beta * tr) / (1 - beta)
 
         return K_F, P_F, d_F, O_F, o_F
-

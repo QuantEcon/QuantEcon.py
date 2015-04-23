@@ -2,8 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-from quantecon import LSS
-import random
+from quantecon import LinearStateSpace
 
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
 sigma = 0.1
@@ -16,11 +15,11 @@ C = [sigma, 0, 0, 0]
 G = [1, 0, 0, 0]
 
 T = 30
-ar = LSS(A, C, G)
+ar = LinearStateSpace(A, C, G)
 
 ymin, ymax = -0.8, 1.25
 
-fig, ax = plt.subplots(figsize=(8,4))
+fig, ax = plt.subplots(figsize=(8, 4))
 
 ax.set_xlim(ymin, ymax)
 ax.set_xlabel(r'$y_t$', fontsize=16)

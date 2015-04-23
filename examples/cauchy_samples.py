@@ -21,11 +21,9 @@ if 1:
         sample_mean[i] = np.mean(data[:i])
 
     # == Plot == #
-    ax.plot(list(range(n)), sample_mean, 'r-', lw=3, alpha=0.6, label=r'$\bar X_n$')
+    ax.plot(list(range(n)), sample_mean, 'r-', lw=3, alpha=0.6,
+            label=r'$\bar X_n$')
     ax.plot(list(range(n)), [0] * n, 'k--', lw=0.5)
     ax.legend()
 
 fig.show()
-
-
-

@@ -35,6 +35,7 @@ where LN means lognormal.
 
 """
 from __future__ import division  # == Omit for Python 3.x == #
+from textwrap import dedent
 import numpy as np
 from scipy import interp
 from scipy.stats import lognorm
@@ -105,6 +106,24 @@ class LucasTree(object):
 
         # == Set up h from the Lucas Operator == #
         self.h = self._init_h()
+
+    def __repr__(self):
+        m = "LucasTree(gamma={g}, beta={b}, alpha={a}, sigma={s})"
+        return m.format(g=self.gamma, b=self.beta, a=self.alpha, s=self.sigma)
+
+    def __str__(self):
+        m = """\
+        Lucas Pricing Model (Lucas, 1978):
+         - gamma (coefficient of risk aversion)             : {g}
+         - beta (discount parameter)                        : {b}
+         - alpha (correlation coefficient in shock process) : {a}
+         - sigma (volatility of shock process)              : {s}
+         - grid bounds (bounds for where to compute prices) : ({gl:g}, {gu:g})
+         - grid points (number of grid points)              : {gs}
+        """
+        return dedent(m.format(g=self.gamma, b=self.beta, a=self.alpha,
+                               s=self.sigma, gl=self.grid_min,
+                               gu=self.grid_max, gs=self.grid_size))
 
     def _init_h(self):
         """

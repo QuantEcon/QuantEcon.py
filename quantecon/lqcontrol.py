@@ -7,42 +7,35 @@ Provides a class called LQ for solving linear quadratic control
 problems.
 
 """
-
+from textwrap import dedent
 import numpy as np
 from numpy import dot
 from scipy.linalg import solve
 from .matrix_eqn import solve_discrete_riccati
 
-class LQ:
+
+class LQ(object):
     r"""
     This class is for analyzing linear quadratic optimal control
     problems of either the infinite horizon form
 
-    .. math::
-
-        \min E \sum_{t=0}^{\infty} \beta^t r(x_t, u_t)
+    .     min E sum_{t=0}^{\infty} beta^t r(x_t, u_t)
 
     with
 
-    .. math::
-
-        r(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t
+         r(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t
 
     or the finite horizon form
 
-    .. math::
-
-        \min E \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + \beta^T x_T' R_f x_T
+         min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T
 
     Both are minimized subject to the law of motion
 
-    .. math::
-
-        x_{t+1} = A x_t + B u_t + C w_{t+1}
+         x_{t+1} = A x_t + B u_t + C w_{t+1}
 
     Here x is n x 1, u is k x 1, w is j x 1 and the matrices are
     conformable for these dimensions.  The sequence {w_t} is assumed to
-    be white noise, with zero mean and :math:`E w_t w_t' = I`, the j x j
+    be white noise, with zero mean and E w_t w_t = I, the j x j
     identity.
 
     If C is not supplied as a parameter, the model is assumed to be
@@ -52,44 +45,42 @@ class LQ:
     For this model, the time t value (i.e., cost-to-go) function V_t
     takes the form
 
-    .. math ::
+         x' P_T x + d_T
 
-        x' P_T x + d_T
-
-    and the optimal policy is of the form :math:`u_T = -F_T x_T`.  In
+    and the optimal policy is of the form u_T = -F_T x_T.  In
     the infinite horizon case, V, P, d and F are all stationary.
 
     Parameters
     ----------
     Q : array_like(float)
         Q is the payoff(or cost) matrix that corresponds with the
-        control variable u and is `k x k`. Should be symmetric and
+        control variable u and is k x k. Should be symmetric and
         nonnegative definite
     R : array_like(float)
         R is the payoff(or cost) matrix that corresponds with the
-        state variable x and is `n x n`. Should be symetric and
+        state variable x and is n x n. Should be symetric and
         non-negative definite
     N : array_like(float)
-        N is the cross product term in the payoff, as above.  It should 
-        be `k x n`.
+        N is the cross product term in the payoff, as above.  It should
+        be k x n.
     A : array_like(float)
-        A is part of the state transition as described above. It should 
-        be `n x n`
+        A is part of the state transition as described above. It should
+        be n x n
     B : array_like(float)
-        B is part of the state transition as described above. It should 
-        be `n x k`
+        B is part of the state transition as described above. It should
+        be n x k
     C : array_like(float), optional(default=None)
         C is part of the state transition as described above and
         corresponds to the random variable today.  If the model is
-        deterministic then C should take default value of `None`
+        deterministic then C should take default value of None
     beta : scalar(float), optional(default=1)
         beta is the discount parameter
     T : scalar(int), optional(default=None)
         T is the number of periods in a finite horizon problem.
     Rf : array_like(float), optional(default=None)
         Rf is the final (in a finite horizon model) payoff(or cost)
-        matrix that corresponds with the control variable u and is `n x
-        n`.  Should be symetric and non-negative definite
+        matrix that corresponds with the control variable u and is n x
+        n.  Should be symetric and non-negative definite
 
 
     Attributes
@@ -110,14 +101,14 @@ class LQ:
     def __init__(self, Q, R, A, B, C=None, N=None, beta=1, T=None, Rf=None):
         # == Make sure all matrices can be treated as 2D arrays == #
         converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
-        self.A, self.B, self.Q, self.R, self.N = \
-                list(map(converter, (A, B, Q, R, N)))
+        self.A, self.B, self.Q, self.R, self.N = list(map(converter,
+                                                          (A, B, Q, R, N)))
         # == Record dimensions == #
         self.k, self.n = self.Q.shape[0], self.R.shape[0]
 
         self.beta = beta
 
-        if C == None:
+        if C is None:
             # == If C not given, then model is deterministic. Set C=0. == #
             self.j = 1
             self.C = np.zeros((self.n, self.j))
@@ -125,7 +116,7 @@ class LQ:
             self.C = converter(C)
             self.j = self.C.shape[1]
 
-        if N == None:
+        if N is None:
             # == No cross product term in payoff. Set N=0. == #
             self.N = np.zeros((self.k, self.n))
 
@@ -142,19 +133,33 @@ class LQ:
 
         self.F = None
 
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = """\
+        Linear Quadratic control system
+          - beta (discount parameter)   : {b}
+          - T (time horizon)            : {t}
+          - n (number of state variables)   : {n}
+          - k (number of control variables) : {k}
+          - j (number of shocks)            : {j}
+        """
+        t = "infinite" if self.T is None else self.T
+        return dedent(m.format(b=self.beta, n=self.n, k=self.k, j=self.j,
+                               t=t))
+
     def update_values(self):
         """
         This method is for updating in the finite horizon case.  It
         shifts the current value function
 
-        .. math::
+             V_t(x) = x' P_t x + d_t
 
-            V_t(x) = x' P_t x + d_t
-
-        and the optimal policy :math:`F_t` one step *back* in time,
-        replacing the pair :math:`P_t` and :math:`d_t` with
-        :math`P_{t-1}` and :math:`d_{t-1}`, and :math:`F_t` with
-        :math:`F_{t-1}`
+        and the optimal policy F_t one step *back* in time,
+        replacing the pair P_t and d_t with
+        P_{t-1} and d_{t-1}, and F_t with
+        F_{t-1}
 
         """
         # === Simplify notation === #
@@ -178,9 +183,7 @@ class LQ:
         Computes the matrix P and scalar d that represent the value
         function
 
-        .. math::
-
-            V(x) = x' P x + d
+             V(x) = x' P x + d
 
         in the infinite horizon case.  Also computes the control matrix
         F from u = - Fx
@@ -221,8 +224,8 @@ class LQ:
     def compute_sequence(self, x0, ts_length=None):
         """
         Compute and return the optimal state and control sequences
-        :math:`x_0,..., x_T` and :math:`u_0,..., u_T`  under the
-        assumption that :math:`{w_t}` is iid and N(0, 1).
+        x_0, ..., x_T and u_0,..., u_T  under the
+        assumption that {w_t} is iid and N(0, 1).
 
         Parameters
         ===========
@@ -258,7 +261,6 @@ class LQ:
             T = ts_length if ts_length else 100
             self.stationary_values()
 
-
         # == Set up initial condition and arrays to store paths == #
         x0 = np.asarray(x0)
         x0 = x0.reshape(self.n, 1)  # Make sure x0 is a column vector
@@ -280,9 +282,9 @@ class LQ:
         for t in range(1, T):
             F = policies.pop()
             Ax, Bu = dot(A, x_path[:, t-1]), dot(B, u_path[:, t-1])
-            x_path[:, t] =  Ax + Bu + w_path[:, t]
+            x_path[:, t] = Ax + Bu + w_path[:, t]
             u_path[:, t] = - dot(F, x_path[:, t])
         Ax, Bu = dot(A, x_path[:, T-1]), dot(B, u_path[:, T-1])
-        x_path[:, T] =  Ax + Bu + w_path[:, T]
+        x_path[:, T] = Ax + Bu + w_path[:, T]
 
         return x_path, u_path, w_path

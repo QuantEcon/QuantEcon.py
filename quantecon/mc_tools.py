@@ -91,8 +91,15 @@ import sys
 from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
-from warnings import warn
+from warnings import warn                
 
+numba_installed = True
+try:
+    from numba import jit
+except ImportError:
+    numba_installed = False
+    from .common_messages import numba_import_fail_message
+    warnings.warn(numba_import_fail_message, UserWarning)
 
 class MarkovChain(object):
     """
@@ -277,29 +284,110 @@ def mc_compute_stationary(P):
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
+
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+
     # === set up array to store output === #
     X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
         X[0] = init
     else:
-        X[0] = DiscreteRV(init).draw()
-
-    # === turn each row into a distribution === #
-    # In particular, let P_dist[i] be the distribution corresponding to the
-    # i-th row P[i,:]
-    n = len(P)
-    P_dist = [DiscreteRV(P[i, :]) for i in range(n)]
+        cdf0 = np.cumsum(init)
+        X[0] = search_cdf(cdf0, u[0])
 
     # === generate the sample path === #
-    for t in range(sample_size - 1):
-        X[t+1] = P_dist[X[t]].draw()
+    n = len(cdfs)
+    for t in range(sample_size-1):
+        X[t+1] = search_cdf(cdfs[X[t]], u[t+1])
 
     return X
 
+## --> Previous Implementation discussed: 
+## --> http://nbviewer.ipython.org/github/oyamad/mc_sample_path_numba/blob/master/mc_sample_path_numba02.ipynb <-- ##
 
-#---------------------------------------------------------------------#
+@jit
+def mc_sample_path_jit(P, init, sample_size):
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
+    
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+    
+    # === set up array to store output === #
+    X = np.empty(sample_size, dtype=int)
+    if isinstance(init, int):
+        X[0] = init
+    else:
+        cdf0 = np.cumsum(init)
+        X[0] = cdf0.searchsorted(u[0], side='right')
+
+    # === generate the sample path === #
+    n = len(cdfs)
+    for t in range(sample_size-1):
+        lo = -1
+        hi = n - 1
+        while(lo < hi-1):
+            m = (lo + hi) // 2
+            if u[t+1] < cdfs[X[t], m]:
+                hi = m
+            else:
+                lo = m
+        X[t+1] = hi
+
+    return X
+
+## --> END <-- ##
+
+def mc_sample_path_numpy(P, init=0, sample_size=1000):
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
+    
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+    
+    # === set up array to store output === #
+    X = np.empty(sample_size, dtype=int)
+    if isinstance(init, int):
+        X[0] = init
+    else:
+        cdf0 = np.cumsum(init)
+        X[0] = cdf0.searchsorted(u[0], side='right')
+
+    # === generate the sample path === #
+    for t in range(sample_size-1):
+        X[t+1] = cdfs[X[t]].searchsorted(u[t+1], side='right')
+
+    return X
+
+if numba_installed:
+    mc_sample_path = jit(mc_sample_path)
+else:
+    mc_sample_path = mc_sample_path_numpy
+
+
+def search_cdf(cdf, v):
+    n = len(cdf)
+
+    lo = -1
+    hi = n - 1
+    while(lo < hi-1):
+        m = (lo + hi) // 2
+        if v < cdf[m]:
+            hi = m
+        else:
+            lo = m
+    return hi
+
+if numba_installed:
+	search_cdf = jit(search_cdf)
+
+
+# ------------------------------------------------------------------- #
 # Set up the docstrings for the functions
-#---------------------------------------------------------------------#
+# ------------------------------------------------------------------- #
 
 # For drawing a sample path
 _sample_path_docstr = \
@@ -325,11 +413,10 @@ X : array_like(int, ndim=1)
 """
 
 # set docstring for functions
-mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg=
-"""P : array_like(float, ndim=2)
+mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
+    P : array_like(float, ndim=2)
     A Markov transition matrix.
-
-""")
+    """)
 
 # set docstring for methods
 

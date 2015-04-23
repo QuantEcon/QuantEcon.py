@@ -1,26 +1,24 @@
 """
 Filename: robust_monopolist.py
-Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski 
+Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski
 
 The robust control problem for a monopolist with adjustment costs.  The
 inverse demand curve is:
 
   p_t = a_0 - a_1 y_t + d_t
 
-where d_{t+1} = \rho d_t + \sigma_d w_{t+1} for w_t ~ N(0,1) and iid.  
+where d_{t+1} = \rho d_t + \sigma_d w_{t+1} for w_t ~ N(0, 1) and iid.
 The period return function for the monopolist is
 
-  r_t =  p_t y_t - gamma (y_{t+1} - y_t)^2 / 2 - c y_t   
+  r_t =  p_t y_t - gamma (y_{t+1} - y_t)^2 / 2 - c y_t
 
 The objective of the firm is E_t \sum_{t=0}^\infty \beta^t r_t
 
 For the linear regulator, we take the state and control to be
 
-    x_t = (1, y_t, d_t) and u_t = y_{t+1} - y_t 
+    x_t = (1, y_t, d_t) and u_t = y_{t+1} - y_t
 
 """
-
-
 import pandas as pd
 import numpy as np
 from scipy.linalg import eig
@@ -44,26 +42,26 @@ ac    = (a_0 - c) / 2.0
 
 # == Define LQ matrices == #
 
-R = np.array([[0.,  ac,  0.], 
-              [ac, -a_1, 0.5], 
+R = np.array([[0.,  ac,  0.],
+              [ac, -a_1, 0.5],
               [0., 0.5,  0.]])
 
 R = -R  # For minimization
 Q = gamma / 2
 
-A = np.array([[1., 0., 0.], 
-              [0., 1., 0.], 
+A = np.array([[1., 0., 0.],
+              [0., 1., 0.],
               [0., 0., rho]])
-B = np.array([[0.], 
-              [1.], 
+B = np.array([[0.],
+              [1.],
               [0.]])
-C = np.array([[0.], 
-              [0.], 
+C = np.array([[0.],
+              [0.],
               [sigma_d]])
 
-#-----------------------------------------------------------------------------#
-#                                 Functions 
-#-----------------------------------------------------------------------------#
+# -------------------------------------------------------------------------- #
+#                                 Functions
+# -------------------------------------------------------------------------- #
 
 
 def evaluate_policy(theta, F):
@@ -87,20 +85,20 @@ def value_and_entropy(emax, F, bw, grid_size=1000):
 
     Parameters
     ==========
-    emax : scalar
+    emax: scalar
         The target entropy value
 
-    F : array_like
+    F: array_like
         The policy function to be evaluated
 
-    bw : str
+    bw: str
         A string specifying whether the implied shock path follows best
         or worst assumptions. The only acceptable values are 'best' and
         'worst'.
 
     Returns
     =======
-    df : pd.DataFrame
+    df: pd.DataFrame
         A pandas DataFrame containing the value function and entropy
         values up to the emax parameter. The columns are 'value' and
         'entropy'.
@@ -122,9 +120,9 @@ def value_and_entropy(emax, F, bw, grid_size=1000):
     return df
 
 
-#-----------------------------------------------------------------------------#
+# -------------------------------------------------------------------------- #
 #                                    Main
-#-----------------------------------------------------------------------------#
+# -------------------------------------------------------------------------- #
 
 
 # == Compute the optimal rule == #
@@ -157,16 +155,17 @@ ax.set_xlabel("Entropy")
 ax.grid()
 
 for axis in 'x', 'y':
-    plt.ticklabel_format(style='sci', axis=axis, scilimits=(0,0))
+    plt.ticklabel_format(style='sci', axis=axis, scilimits=(0, 0))
 
-plot_args = {'lw' : 2, 'alpha' : 0.7} 
+plot_args = {'lw': 2, 'alpha': 0.7}
 
 colors = 'r', 'b'
 
 df_pairs = ((optimal_best_case, optimal_worst_case),
             (robust_best_case, robust_worst_case))
 
-class Curve:
+
+class Curve(object):
 
     def __init__(self, x, y):
         self.x, self.y = x, y
@@ -186,10 +185,9 @@ for c, df_pair in zip(colors, df_pairs):
         print(ax.plot(egrid, curve(egrid), color=c, **plot_args))
         curves.append(curve)
     # == Color fill between curves == #
-    ax.fill_between(egrid, 
-            curves[0](egrid), 
-            curves[1](egrid), 
-            color=c, alpha=0.1)
+    ax.fill_between(egrid,
+                    curves[0](egrid),
+                    curves[1](egrid),
+                    color=c, alpha=0.1)
 
 plt.show()
-

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def qm(x0, n):
     x = np.empty(n+1)
     x[0] = x0
