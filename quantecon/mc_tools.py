@@ -91,9 +91,15 @@ import sys
 from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
-from warnings import warn
-from numba import jit
+from warnings import warn                
 
+numba_installed = True
+try:
+    from numba import jit
+except ImportError:
+    numba_installed = False
+    from .common_messages import numba_import_fail_message
+    warnings.warn(numba_import_fail_message, UserWarning)
 
 class MarkovChain(object):
     """
@@ -277,7 +283,6 @@ def mc_compute_stationary(P):
     return MarkovChain(P).stationary_distributions
 
 
-@jit
 def mc_sample_path(P, init=0, sample_size=1000):
     # CDFs, one for each row of P
     cdfs = np.cumsum(P, axis=-1)
@@ -300,8 +305,69 @@ def mc_sample_path(P, init=0, sample_size=1000):
 
     return X
 
+## --> Previous Implementation discussed: 
+## --> http://nbviewer.ipython.org/github/oyamad/mc_sample_path_numba/blob/master/mc_sample_path_numba02.ipynb <-- ##
 
-@jit(nopython=True)
+@jit
+def mc_sample_path_jit(P, init, sample_size):
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
+    
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+    
+    # === set up array to store output === #
+    X = np.empty(sample_size, dtype=int)
+    if isinstance(init, int):
+        X[0] = init
+    else:
+        cdf0 = np.cumsum(init)
+        X[0] = cdf0.searchsorted(u[0], side='right')
+
+    # === generate the sample path === #
+    n = len(cdfs)
+    for t in range(sample_size-1):
+        lo = -1
+        hi = n - 1
+        while(lo < hi-1):
+            m = (lo + hi) // 2
+            if u[t+1] < cdfs[X[t], m]:
+                hi = m
+            else:
+                lo = m
+        X[t+1] = hi
+
+    return X
+
+## --> END <-- ##
+
+def mc_sample_path_numpy(P, init=0, sample_size=1000):
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
+    
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+    
+    # === set up array to store output === #
+    X = np.empty(sample_size, dtype=int)
+    if isinstance(init, int):
+        X[0] = init
+    else:
+        cdf0 = np.cumsum(init)
+        X[0] = cdf0.searchsorted(u[0], side='right')
+
+    # === generate the sample path === #
+    for t in range(sample_size-1):
+        X[t+1] = cdfs[X[t]].searchsorted(u[t+1], side='right')
+
+    return X
+
+if numba_installed:
+    mc_sample_path = jit(mc_sample_path)
+else:
+    mc_sample_path = mc_sample_path_numpy
+
+
 def search_cdf(cdf, v):
     n = len(cdf)
 
@@ -314,6 +380,9 @@ def search_cdf(cdf, v):
         else:
             lo = m
     return hi
+
+if numba_installed:
+	search_cdf = jit(search_cdf)
 
 
 # ------------------------------------------------------------------- #
