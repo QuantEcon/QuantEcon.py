@@ -4,6 +4,7 @@ Reference: http://quant-econ.net/py/linear_models.html
 
 Computes quantities associated with the Gaussian linear state space model.
 """
+
 from textwrap import dedent
 import numpy as np
 from numpy.random import multivariate_normal
@@ -15,8 +16,8 @@ try:
     from numba import jit
 except ImportError:
     numba_installed = False
-    numba_warning_message = "Numba import failed.  Falling back to non-optimized routine."
-    warnings.warn(numba_warning_message, UserWarning)
+    from .common_messages import numba_import_fail_message
+    warnings.warn(numba_import_fail_message, UserWarning)
 
 
 def simulate_linear_model(A, x0, v, ts_length):
