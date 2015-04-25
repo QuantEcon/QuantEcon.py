@@ -9,10 +9,8 @@ Functions
 """
 from __future__ import division
 
-import sys
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
-import nose
 from nose.tools import eq_, raises
 
 from quantecon.mc_tools import MarkovChain, mc_compute_stationary
@@ -252,6 +250,9 @@ def test_raises_value_error_non_sum_one():
 
 
 if __name__ == '__main__':
+    import sys
+    import nose
+
     argv = sys.argv[:]
     argv.append('--verbose')
     argv.append('--nocapture')
