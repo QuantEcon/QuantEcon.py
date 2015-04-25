@@ -88,7 +88,6 @@ from __future__ import division
 import numpy as np
 from fractions import gcd
 import sys
-from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
 from warnings import warn
@@ -298,7 +297,6 @@ def mc_sample_path(P, init=0, sample_size=1000):
         X[0] = search_cdf(cdf0, u[0])
 
     # === generate the sample path === #
-    n = len(cdfs)
     for t in range(sample_size-1):
         X[t+1] = search_cdf(cdfs[X[t]], u[t+1])
 
@@ -346,7 +344,7 @@ def search_cdf(cdf, v):
     return hi
 
 if numba_installed:
-	search_cdf = jit(search_cdf)
+    search_cdf = jit(search_cdf)
 
 
 # ------------------------------------------------------------------- #
