@@ -13,7 +13,9 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
 from nose.tools import eq_, raises
 
-from quantecon.mc_tools import MarkovChain, mc_compute_stationary
+from quantecon.mc_tools import (
+    MarkovChain, mc_compute_stationary, searchsorted
+)
 
 
 def list_of_array_equal(s, t):
@@ -223,6 +225,25 @@ def test_simulate_for_matrices_with_C_F_orders():
     computed_F = MarkovChain(P_F).simulate(init, sample_size)
     assert_array_equal(computed_C, sample_path)
     assert_array_equal(computed_F, sample_path)
+
+
+def test_searchsorted():
+    a = np.array([0.2, 0.4, 1.0])
+    eq_(searchsorted(a, 0.1), 0)
+    eq_(searchsorted(a, 0.4), 2)
+    eq_(searchsorted(a, 2), 3)
+
+    a = np.ones(0)
+    for (v, i) in zip([0, 1, 2], [0, 0, 0]):
+        eq_(searchsorted(a, v), i)
+
+    a = np.ones(1)
+    for (v, i) in zip([0, 1, 2], [0, 1, 1]):
+        eq_(searchsorted(a, v), i)
+
+    a = np.ones(2)
+    for (v, i) in zip([0, 1, 2], [0, 2, 2]):
+        eq_(searchsorted(a, v), i)
 
 
 @raises(ValueError)
