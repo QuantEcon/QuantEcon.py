@@ -161,7 +161,9 @@ def test_matrices_with_C_F_orders():
     See the issue and fix on Numba:
     github.com/numba/numba/issues/1103
     github.com/numba/numba/issues/1104
-    This should fail with Numba <= 0.18.2
+
+    Fix in gth_solve(A):
+    added `order='C'` when `A1` copies the input `A`
     """
     P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
     P_F = np.array([[0.5, 0.5], [0, 1]], order='F')

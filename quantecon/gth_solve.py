@@ -67,7 +67,9 @@ def gth_solve(A):
        Simulation, Princeton University Press, 2009.
 
     """
-    A1 = np.array(A, dtype=float, copy=True)
+    A1 = np.array(A, dtype=float, copy=True, order='C')
+    # `order='C'` is for use with Numba <= 0.18.2
+    # See issue github.com/numba/numba/issues/1103
 
     if len(A1.shape) != 2 or A1.shape[0] != A1.shape[1]:
         raise ValueError  # ('matrix must be square')
