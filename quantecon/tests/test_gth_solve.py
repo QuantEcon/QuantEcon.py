@@ -9,6 +9,7 @@ from __future__ import division
 
 import sys
 import numpy as np
+from numpy.testing import assert_array_equal
 import nose
 from nose.tools import eq_, ok_, raises
 
@@ -152,6 +153,27 @@ class StationaryDistLeftEigenVec(AddDescription):
 class StationaryDistEqualToKnown(AddDescription):
     def __call__(self, y, x):
         ok_(np.allclose(y, x, atol=TOL))
+
+
+def test_matrices_with_C_F_orders():
+    """
+    Test matrices with C- and F-contiguous orders
+    See the issue and fix on Numba:
+    github.com/numba/numba/issues/1103
+    github.com/numba/numba/issues/1104
+    This should fail with Numba <= 0.18.2
+    """
+    P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
+    P_F = np.array([[0.5, 0.5], [0, 1]], order='F')
+    stationary_dist = [0., 1.]
+
+    computed_C_and_F = gth_solve(np.array([[1]]))
+    assert_array_equal(computed_C_and_F, [1])
+
+    computed_C = gth_solve(P_C)
+    computed_F = gth_solve(P_F)
+    assert_array_equal(computed_C, stationary_dist)
+    assert_array_equal(computed_F, stationary_dist)
 
 
 @raises(ValueError)
