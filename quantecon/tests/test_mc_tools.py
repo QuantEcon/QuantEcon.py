@@ -204,6 +204,29 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
                 assert_allclose(np.dot(curr_v, mc.P), curr_v, atol=self.TOL)
 
 
+def test_simulate_for_matrices_with_C_F_orders():
+    """
+    Test MarkovChasin.simulate for matrices with C- and F-orders
+    See the issue and fix on Numba:
+    github.com/numba/numba/issues/1103
+    github.com/numba/numba/issues/1104
+    """
+    P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
+    P_F = np.array([[0.5, 0.5], [0, 1]], order='F')
+    init = 1
+    sample_size = 10
+    sample_path = np.ones(sample_size, dtype=int)
+
+    computed_C_and_F = \
+        MarkovChain(np.array([[1.]])).simulate(init=0, sample_size=sample_size)
+    assert_array_equal(computed_C_and_F, np.zeros(sample_size, dtype=int))
+
+    computed_C = MarkovChain(P_C).simulate(init, sample_size)
+    computed_F = MarkovChain(P_F).simulate(init, sample_size)
+    assert_array_equal(computed_C, sample_path)
+    assert_array_equal(computed_F, sample_path)
+
+
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
