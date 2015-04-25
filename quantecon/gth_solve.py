@@ -72,7 +72,7 @@ def gth_solve(A):
     # See issue github.com/numba/numba/issues/1103
 
     if len(A1.shape) != 2 or A1.shape[0] != A1.shape[1]:
-        raise ValueError  # ('matrix must be square')
+        raise ValueError('matrix must be square')
 
     n = A1.shape[0]
     x = np.zeros(n)
