@@ -300,41 +300,6 @@ def mc_sample_path(P, init=0, sample_size=1000):
 
     return X
 
-## --> Previous Implementation discussed: 
-## --> http://nbviewer.ipython.org/github/oyamad/mc_sample_path_numba/blob/master/mc_sample_path_numba02.ipynb <-- ##
-
-@jit
-def mc_sample_path_jit(P, init, sample_size):
-    # CDFs, one for each row of P
-    cdfs = np.cumsum(P, axis=-1)
-    
-    # Random values, uniformly sampled from [0, 1)
-    u = np.random.random(size=sample_size)
-    
-    # === set up array to store output === #
-    X = np.empty(sample_size, dtype=int)
-    if isinstance(init, int):
-        X[0] = init
-    else:
-        cdf0 = np.cumsum(init)
-        X[0] = cdf0.searchsorted(u[0], side='right')
-
-    # === generate the sample path === #
-    n = len(cdfs)
-    for t in range(sample_size-1):
-        lo = -1
-        hi = n - 1
-        while(lo < hi-1):
-            m = (lo + hi) // 2
-            if u[t+1] < cdfs[X[t], m]:
-                hi = m
-            else:
-                lo = m
-        X[t+1] = hi
-
-    return X
-
-## --> END <-- ##
 
 def mc_sample_path_numpy(P, init=0, sample_size=1000):
     # CDFs, one for each row of P
