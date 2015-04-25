@@ -91,10 +91,11 @@ import sys
 from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
-from warnings import warn                
+from warnings import warn
 
 #-Check if Numba is Available-#
 from .external import numba_installed, jit
+
 
 class MarkovChain(object):
     """
@@ -279,8 +280,11 @@ def mc_compute_stationary(P):
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
+    n = len(P)
+
     # CDFs, one for each row of P
-    cdfs = np.cumsum(P, axis=-1)
+    cdfs = np.empty((n, n), order='C')  # see issue #137#issuecomment-96128186
+    np.cumsum(P, axis=-1, out=cdfs)
 
     # Random values, uniformly sampled from [0, 1)
     u = np.random.random(size=sample_size)
@@ -304,10 +308,10 @@ def mc_sample_path(P, init=0, sample_size=1000):
 def mc_sample_path_numpy(P, init=0, sample_size=1000):
     # CDFs, one for each row of P
     cdfs = np.cumsum(P, axis=-1)
-    
+
     # Random values, uniformly sampled from [0, 1)
     u = np.random.random(size=sample_size)
-    
+
     # === set up array to store output === #
     X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
