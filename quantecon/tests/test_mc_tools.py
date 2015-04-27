@@ -14,8 +14,10 @@ from numpy.testing import assert_allclose, assert_array_equal
 from nose.tools import eq_, raises
 
 from quantecon.mc_tools import (
-    MarkovChain, mc_compute_stationary, searchsorted
+    MarkovChain, mc_compute_stationary, searchsorted, mc_sample_path, mc_sample_path_numpy
 )
+
+from ..external import numba_installed, jit
 
 
 def list_of_array_equal(s, t):
@@ -244,6 +246,28 @@ def test_searchsorted():
     a = np.ones(2)
     for (v, i) in zip([0, 1, 2], [0, 2, 2]):
         eq_(searchsorted(a, v), i)
+
+
+def test_mc_sample_path_functions():
+    """
+    Test Numba and Numpy Versions of the mc_sample_path() Functions
+    """
+    
+    ##-!!-ERROR-!!-##
+    #-Set Seed-#
+    np.random.seed(0)
+    ##-!!-END ERROR-!!-##
+    
+    if not numba_installed:
+        raise ImportError("This test requires numba to be installed!")
+    #-Test Data-#
+    P = np.array([[0.4, 0.6], [0.2, 0.8]])
+    init = (0.25, 0.75)
+    sample_size = 10
+    #-Core-#
+    numba_result = mc_sample_path(P, init=init, sample_size=sample_size)
+    numpy_result = mc_sample_path_numpy(P, init=init, sample_size=sample_size)
+    assert_array_equal(numba_result, numpy_result)
 
 
 @raises(ValueError)
