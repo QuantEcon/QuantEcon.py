@@ -278,9 +278,9 @@ def mc_compute_stationary(P):
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
-	"""
-	See Section: DocStrings below
-	"""
+    """
+    See Section: DocStrings below
+    """
     n = len(P)
 
     # CDFs, one for each row of P
@@ -306,9 +306,9 @@ def mc_sample_path(P, init=0, sample_size=1000):
 
 
 def mc_sample_path_numpy(P, init=0, sample_size=1000):
-	"""
-	See Section: DocStrings below
-	"""
+    """
+    See Section: DocStrings below
+    """
     # CDFs, one for each row of P
     cdfs = np.cumsum(P, axis=-1)
 
