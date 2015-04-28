@@ -259,7 +259,6 @@ class MarkovChain(object):
 
     def simulate(self, init=0, sample_size=1000):
         X = mc_sample_path(self.P, init, sample_size)
-
         return X
 
 
@@ -279,6 +278,9 @@ def mc_compute_stationary(P):
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
+	"""
+	See Section: DocStrings below
+	"""
     n = len(P)
 
     # CDFs, one for each row of P
@@ -304,6 +306,9 @@ def mc_sample_path(P, init=0, sample_size=1000):
 
 
 def mc_sample_path_numpy(P, init=0, sample_size=1000):
+	"""
+	See Section: DocStrings below
+	"""
     # CDFs, one for each row of P
     cdfs = np.cumsum(P, axis=-1)
 
@@ -331,12 +336,11 @@ else:
 
 
 
+#------------#
+#-DocStrings-#
+#------------#
 
-# ------------------------------------------------------------------- #
-# Set up the docstrings for the functions
-# ------------------------------------------------------------------- #
-
-# For drawing a sample path
+#-mc_sample_path() function and MarkovChain.simulate() method-#
 _sample_path_docstr = \
 """
 Generates one sample path from the Markov chain represented by (n x n)
@@ -344,7 +348,8 @@ transition matrix P on state space S = {{0,...,n-1}}.
 
 Parameters
 ----------
-{p_arg}init : array_like(float ndim=1) or scalar(int)
+{p_arg}
+init : array_like(float ndim=1) or scalar(int), optional(default=0)
     If init is an array_like, then it is treated as the initial
     distribution across states.  If init is a scalar, then it treated as
     the deterministic initial state.
@@ -359,14 +364,21 @@ X : array_like(int, ndim=1)
 
 """
 
-# set docstring for functions
+#-Functions-#
+
+#-mc_sample_path-#
 mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
-    P : array_like(float, ndim=2)
+P : array_like(float, ndim=2)
     A Markov transition matrix.
-    """)
+""")
+mc_sample_path_numpy.__doc__ = sample_path_docstr.format(p_arg="""
+P : array_like(float, ndim=2)
+    A Markov transition matrix.
+""")
 
-# set docstring for methods
+#-Methods-#
 
+#-Markovchain.simulate()-#
 if sys.version_info[0] == 3:
     MarkovChain.simulate.__doc__ = _sample_path_docstr.format(p_arg="")
 elif sys.version_info[0] == 2:
