@@ -252,12 +252,6 @@ def test_mc_sample_path_functions():
     """
     Test Numba and Numpy Versions of the mc_sample_path() Functions
     """
-    
-    ##-!!-ERROR-!!-##
-    #-Set Seed-#
-    np.random.seed(0)
-    ##-!!-END ERROR-!!-##
-    
     if not numba_installed:
         raise ImportError("This test requires numba to be installed!")
     #-Test Data-#
@@ -265,7 +259,9 @@ def test_mc_sample_path_functions():
     init = (0.25, 0.75)
     sample_size = 10
     #-Core-#
+    np.random.seed(1234)  
     numba_result = mc_sample_path(P, init=init, sample_size=sample_size)
+    np.random.seed(1234)  
     numpy_result = mc_sample_path_numpy(P, init=init, sample_size=sample_size)
     assert_array_equal(numba_result, numpy_result)
 
