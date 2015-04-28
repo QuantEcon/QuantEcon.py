@@ -371,7 +371,7 @@ mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
 P : array_like(float, ndim=2)
     A Markov transition matrix.
 """)
-mc_sample_path_numpy.__doc__ = sample_path_docstr.format(p_arg="""
+mc_sample_path_numpy.__doc__ = _sample_path_docstr.format(p_arg="""
 P : array_like(float, ndim=2)
     A Markov transition matrix.
 """)
