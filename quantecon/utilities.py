@@ -10,11 +10,13 @@ searchsorted
 
 """
 
+import numpy as np
 from .external import numba_installed, jit
- 
-#-----------------#
-#-ARRAY UTILITIES-#
-#-----------------#
+
+# ----------------- #
+# -ARRAY UTILITIES- #
+# ----------------- #
+
 
 def searchsorted(a, v):
     """
