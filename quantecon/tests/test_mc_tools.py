@@ -14,7 +14,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 from nose.tools import eq_, raises
 
 from quantecon.mc_tools import (
-    MarkovChain, mc_compute_stationary, searchsorted, mc_sample_path, mc_sample_path_numpy
+    MarkovChain, mc_compute_stationary, mc_sample_path, mc_sample_path_numpy
 )
 
 from ..external import numba_installed, jit
@@ -229,25 +229,6 @@ def test_simulate_for_matrices_with_C_F_orders():
     assert_array_equal(computed_F, sample_path)
 
 
-def test_searchsorted():
-    a = np.array([0.2, 0.4, 1.0])
-    eq_(searchsorted(a, 0.1), 0)
-    eq_(searchsorted(a, 0.4), 2)
-    eq_(searchsorted(a, 2), 3)
-
-    a = np.ones(0)
-    for (v, i) in zip([0, 1, 2], [0, 0, 0]):
-        eq_(searchsorted(a, v), i)
-
-    a = np.ones(1)
-    for (v, i) in zip([0, 1, 2], [0, 1, 1]):
-        eq_(searchsorted(a, v), i)
-
-    a = np.ones(2)
-    for (v, i) in zip([0, 1, 2], [0, 2, 2]):
-        eq_(searchsorted(a, v), i)
-
-
 def test_mc_sample_path_functions():
     """
     Test Numba and Numpy Versions of the mc_sample_path() Functions
@@ -259,9 +240,9 @@ def test_mc_sample_path_functions():
     init = (0.25, 0.75)
     sample_size = 10
     #-Core-#
-    np.random.seed(1234)  
+    np.random.seed(1234)
     numba_result = mc_sample_path(P, init=init, sample_size=sample_size)
-    np.random.seed(1234)  
+    np.random.seed(1234)
     numpy_result = mc_sample_path_numpy(P, init=init, sample_size=sample_size)
     assert_array_equal(numba_result, numpy_result)
 
