@@ -67,6 +67,7 @@ def _searchsorted(a, v):
 if numba_installed:
     searchsorted = jit(nopython=True)(_searchsorted)
 else:
-    searchsorted = lambda a, v: np.searchsorted(a, v, side='right')
+    def searchsorted(a, v):
+        return np.searchsorted(a, v, side='right')
 
 searchsorted.__doc__ = _searchsorted.__doc__
