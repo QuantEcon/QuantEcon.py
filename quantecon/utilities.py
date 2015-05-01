@@ -18,7 +18,7 @@ from .external import numba_installed, jit
 # ----------------- #
 
 
-def searchsorted(a, v):
+def _searchsorted(a, v):
     """
     Custom version of np.searchsorted. Return the largest index `i` such
     that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `v[n-1] <=
@@ -65,6 +65,8 @@ def searchsorted(a, v):
     return hi
 
 if numba_installed:
-    searchsorted = jit(nopython=True)(searchsorted)
+    searchsorted = jit(nopython=True)(_searchsorted)
 else:
     searchsorted = lambda a, v: np.searchsorted(a, v, side='right')
+
+searchsorted.__doc__ = _searchsorted.__doc__
