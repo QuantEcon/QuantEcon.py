@@ -9,15 +9,9 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 """
 import numpy as np
 from numba import jit
-from warnings import warn
 
-numba_installed = True
-try:
-    from numba import jit
-except ImportError:
-    numba_installed = False
-    from .common_messages import numba_import_fail_message
-    warnings.warn(numba_import_fail_message, UserWarning)
+from .external import numba_installed, jit
+if not numba_installed:
     try:
         xrange
     except:  # python3
