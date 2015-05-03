@@ -6,8 +6,8 @@ Created on Fri Feb 20 14:07:56 2015
 """
 import matplotlib.pyplot as plt
 import numpy as np
-import LucasStokey as LS
-import AMSS
+import lucas_stokey as LS
+import amss
 from calibrations.BGP import M1
 from calibrations.CES import M1 as M_convergence
 from calibrations.CES import M_time_example
@@ -23,7 +23,7 @@ Time Varying Example
 
 M_time_example.transfers = True #Government can use transfers
 PP_seq_time = LS.Planners_Allocation_Sequential(M_time_example) #solve sequential problem
-PP_im_time = AMSS.Planners_Allocation_Bellman(M_time_example,muvec)
+PP_im_time = amss.Planners_Allocation_Bellman(M_time_example,muvec)
 
 sHist_h = np.array([0,1,2,3,5,5,5])
 sHist_l = np.array([0,1,2,4,5,5,5])
@@ -85,7 +85,7 @@ BGP Example
 M1.transfers = False #Government can use transfers
 PP_seq = LS.Planners_Allocation_Sequential(M1) #solve sequential problem
 PP_bel = LS.Planners_Allocation_Bellman(M1,muvec) #solve recursive problem
-PP_im = AMSS.Planners_Allocation_Bellman(M1,muvec)
+PP_im = amss.Planners_Allocation_Bellman(M1,muvec)
 
 T = 20
 #sHist = utilities.simulate_markov(M1.Pi,0,T)
@@ -173,7 +173,7 @@ plt.savefig('Long_SimulationAMSS.png')
 Show Convergence example
 '''
 muvec = np.linspace(-0.15,0.0,100) #change 
-PP_C = AMSS.Planners_Allocation_Bellman(M_convergence,muvec)
+PP_C = amss.Planners_Allocation_Bellman(M_convergence,muvec)
 xgrid = PP_C.xgrid
 xf = PP_C.policies[-2] #get x policies
 plt.figure()

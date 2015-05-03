@@ -8,7 +8,7 @@ import numpy as np
 from scipy.optimize import root
 from scipy.optimize import fmin_slsqp
 import utilities
-import LucasStokey as LS
+import lucas_stokey as LS
 from utilities import simulate_markov
 
 class Planners_Allocation_Bellman(object):
@@ -160,7 +160,7 @@ class Planners_Allocation_Bellman(object):
         
 class BellmanEquation(object):
     '''
-    Bellman equation for the continuation of the Lucas-Stockey Problem
+    Bellman equation for the continuation of the Lucas-Stokey Problem
     '''
     def __init__(self,Para,xgrid,policies0):
         '''

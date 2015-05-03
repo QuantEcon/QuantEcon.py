@@ -6,7 +6,7 @@ Created on Fri Feb 20 14:07:56 2015
 """
 import matplotlib.pyplot as plt
 import numpy as np
-import LucasStokey as LS
+import lucas_stokey as LS
 from calibrations.BGP import M1
 from calibrations.CES import M2
 from calibrations.CES import M_time_example
