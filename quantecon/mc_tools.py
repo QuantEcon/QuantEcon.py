@@ -88,18 +88,13 @@ from __future__ import division
 import numpy as np
 from fractions import gcd
 import sys
-from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
-from warnings import warn                
+from warnings import warn
 
-numba_installed = True
-try:
-    from numba import jit
-except ImportError:
-    numba_installed = False
-    from .common_messages import numba_import_fail_message
-    warnings.warn(numba_import_fail_message, UserWarning)
+#-Check if Numba is Available-#
+from .external import numba_installed, jit
+from .utilities import searchsorted
 
 class MarkovChain(object):
     """
@@ -264,7 +259,6 @@ class MarkovChain(object):
 
     def simulate(self, init=0, sample_size=1000):
         X = mc_sample_path(self.P, init, sample_size)
-
         return X
 
 
@@ -284,8 +278,14 @@ def mc_compute_stationary(P):
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
+    """
+    See Section: DocStrings below
+    """
+    n = len(P)
+
     # CDFs, one for each row of P
-    cdfs = np.cumsum(P, axis=-1)
+    cdfs = np.empty((n, n), order='C')  # see issue #137#issuecomment-96128186
+    np.cumsum(P, axis=-1, out=cdfs)
 
     # Random values, uniformly sampled from [0, 1)
     u = np.random.random(size=sample_size)
@@ -296,58 +296,25 @@ def mc_sample_path(P, init=0, sample_size=1000):
         X[0] = init
     else:
         cdf0 = np.cumsum(init)
-        X[0] = search_cdf(cdf0, u[0])
+        X[0] = searchsorted(cdf0, u[0])
 
     # === generate the sample path === #
-    n = len(cdfs)
     for t in range(sample_size-1):
-        X[t+1] = search_cdf(cdfs[X[t]], u[t+1])
+        X[t+1] = searchsorted(cdfs[X[t]], u[t+1])
 
     return X
 
-## --> Previous Implementation discussed: 
-## --> http://nbviewer.ipython.org/github/oyamad/mc_sample_path_numba/blob/master/mc_sample_path_numba02.ipynb <-- ##
-
-@jit
-def mc_sample_path_jit(P, init, sample_size):
-    # CDFs, one for each row of P
-    cdfs = np.cumsum(P, axis=-1)
-    
-    # Random values, uniformly sampled from [0, 1)
-    u = np.random.random(size=sample_size)
-    
-    # === set up array to store output === #
-    X = np.empty(sample_size, dtype=int)
-    if isinstance(init, int):
-        X[0] = init
-    else:
-        cdf0 = np.cumsum(init)
-        X[0] = cdf0.searchsorted(u[0], side='right')
-
-    # === generate the sample path === #
-    n = len(cdfs)
-    for t in range(sample_size-1):
-        lo = -1
-        hi = n - 1
-        while(lo < hi-1):
-            m = (lo + hi) // 2
-            if u[t+1] < cdfs[X[t], m]:
-                hi = m
-            else:
-                lo = m
-        X[t+1] = hi
-
-    return X
-
-## --> END <-- ##
 
 def mc_sample_path_numpy(P, init=0, sample_size=1000):
+    """
+    See Section: DocStrings below
+    """
     # CDFs, one for each row of P
     cdfs = np.cumsum(P, axis=-1)
-    
+
     # Random values, uniformly sampled from [0, 1)
     u = np.random.random(size=sample_size)
-    
+
     # === set up array to store output === #
     X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
@@ -368,28 +335,12 @@ else:
     mc_sample_path = mc_sample_path_numpy
 
 
-def search_cdf(cdf, v):
-    n = len(cdf)
 
-    lo = -1
-    hi = n - 1
-    while(lo < hi-1):
-        m = (lo + hi) // 2
-        if v < cdf[m]:
-            hi = m
-        else:
-            lo = m
-    return hi
+#------------#
+#-DocStrings-#
+#------------#
 
-if numba_installed:
-	search_cdf = jit(search_cdf)
-
-
-# ------------------------------------------------------------------- #
-# Set up the docstrings for the functions
-# ------------------------------------------------------------------- #
-
-# For drawing a sample path
+#-mc_sample_path() function and MarkovChain.simulate() method-#
 _sample_path_docstr = \
 """
 Generates one sample path from the Markov chain represented by (n x n)
@@ -397,7 +348,8 @@ transition matrix P on state space S = {{0,...,n-1}}.
 
 Parameters
 ----------
-{p_arg}init : array_like(float ndim=1) or scalar(int)
+{p_arg}
+init : array_like(float ndim=1) or scalar(int), optional(default=0)
     If init is an array_like, then it is treated as the initial
     distribution across states.  If init is a scalar, then it treated as
     the deterministic initial state.
@@ -412,14 +364,21 @@ X : array_like(int, ndim=1)
 
 """
 
-# set docstring for functions
+#-Functions-#
+
+#-mc_sample_path-#
 mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
-    P : array_like(float, ndim=2)
+P : array_like(float, ndim=2)
     A Markov transition matrix.
-    """)
+""")
+mc_sample_path_numpy.__doc__ = _sample_path_docstr.format(p_arg="""
+P : array_like(float, ndim=2)
+    A Markov transition matrix.
+""")
 
-# set docstring for methods
+#-Methods-#
 
+#-Markovchain.simulate()-#
 if sys.version_info[0] == 3:
     MarkovChain.simulate.__doc__ = _sample_path_docstr.format(p_arg="")
 elif sys.version_info[0] == 2:

@@ -11,14 +11,8 @@ from numpy.random import multivariate_normal
 from scipy.linalg import solve
 import warnings
 
-numba_installed = True
-try:
-    from numba import jit
-except ImportError:
-    numba_installed = False
-    from .common_messages import numba_import_fail_message
-    warnings.warn(numba_import_fail_message, UserWarning)
-
+#-Check if Numba is Available-#
+from .external import numba_installed, jit
 
 def simulate_linear_model(A, x0, v, ts_length):
     """
