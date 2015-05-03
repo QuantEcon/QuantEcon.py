@@ -9,13 +9,15 @@ Functions
 """
 from __future__ import division
 
-import sys
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
-import nose
 from nose.tools import eq_, raises
 
-from quantecon.mc_tools import MarkovChain, mc_compute_stationary
+from quantecon.mc_tools import (
+    MarkovChain, mc_compute_stationary, mc_sample_path, mc_sample_path_numpy
+)
+
+from ..external import numba_installed, jit
 
 
 def list_of_array_equal(s, t):
@@ -204,6 +206,47 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
                 assert_allclose(np.dot(curr_v, mc.P), curr_v, atol=self.TOL)
 
 
+def test_simulate_for_matrices_with_C_F_orders():
+    """
+    Test MarkovChasin.simulate for matrices with C- and F-orders
+    See the issue and fix on Numba:
+    github.com/numba/numba/issues/1103
+    github.com/numba/numba/issues/1104
+    """
+    P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
+    P_F = np.array([[0.5, 0.5], [0, 1]], order='F')
+    init = 1
+    sample_size = 10
+    sample_path = np.ones(sample_size, dtype=int)
+
+    computed_C_and_F = \
+        MarkovChain(np.array([[1.]])).simulate(init=0, sample_size=sample_size)
+    assert_array_equal(computed_C_and_F, np.zeros(sample_size, dtype=int))
+
+    computed_C = MarkovChain(P_C).simulate(init, sample_size)
+    computed_F = MarkovChain(P_F).simulate(init, sample_size)
+    assert_array_equal(computed_C, sample_path)
+    assert_array_equal(computed_F, sample_path)
+
+
+def test_mc_sample_path_functions():
+    """
+    Test Numba and Numpy Versions of the mc_sample_path() Functions
+    """
+    if not numba_installed:
+        raise ImportError("This test requires numba to be installed!")
+    #-Test Data-#
+    P = np.array([[0.4, 0.6], [0.2, 0.8]])
+    init = (0.25, 0.75)
+    sample_size = 10
+    #-Core-#
+    np.random.seed(1234)
+    numba_result = mc_sample_path(P, init=init, sample_size=sample_size)
+    np.random.seed(1234)
+    numpy_result = mc_sample_path_numpy(P, init=init, sample_size=sample_size)
+    assert_array_equal(numba_result, numpy_result)
+
+
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
@@ -229,6 +272,9 @@ def test_raises_value_error_non_sum_one():
 
 
 if __name__ == '__main__':
+    import sys
+    import nose
+
     argv = sys.argv[:]
     argv.append('--verbose')
     argv.append('--nocapture')

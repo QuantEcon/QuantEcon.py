@@ -88,11 +88,13 @@ from __future__ import division
 import numpy as np
 from fractions import gcd
 import sys
-from .discrete_rv import DiscreteRV
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
 from warnings import warn
 
+#-Check if Numba is Available-#
+from .external import numba_installed, jit
+from .utilities import searchsorted
 
 class MarkovChain(object):
     """
@@ -257,7 +259,6 @@ class MarkovChain(object):
 
     def simulate(self, init=0, sample_size=1000):
         X = mc_sample_path(self.P, init, sample_size)
-
         return X
 
 
@@ -277,31 +278,69 @@ def mc_compute_stationary(P):
 
 
 def mc_sample_path(P, init=0, sample_size=1000):
+    """
+    See Section: DocStrings below
+    """
+    n = len(P)
+
+    # CDFs, one for each row of P
+    cdfs = np.empty((n, n), order='C')  # see issue #137#issuecomment-96128186
+    np.cumsum(P, axis=-1, out=cdfs)
+
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+
     # === set up array to store output === #
     X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
         X[0] = init
     else:
-        X[0] = DiscreteRV(init).draw()
-
-    # === turn each row into a distribution === #
-    # In particular, let P_dist[i] be the distribution corresponding to the
-    # i-th row P[i,:]
-    n = len(P)
-    P_dist = [DiscreteRV(P[i, :]) for i in range(n)]
+        cdf0 = np.cumsum(init)
+        X[0] = searchsorted(cdf0, u[0])
 
     # === generate the sample path === #
-    for t in range(sample_size - 1):
-        X[t+1] = P_dist[X[t]].draw()
+    for t in range(sample_size-1):
+        X[t+1] = searchsorted(cdfs[X[t]], u[t+1])
 
     return X
 
 
-# ------------------------------------------------------------------- #
-# Set up the docstrings for the functions
-# ------------------------------------------------------------------- #
+def mc_sample_path_numpy(P, init=0, sample_size=1000):
+    """
+    See Section: DocStrings below
+    """
+    # CDFs, one for each row of P
+    cdfs = np.cumsum(P, axis=-1)
 
-# For drawing a sample path
+    # Random values, uniformly sampled from [0, 1)
+    u = np.random.random(size=sample_size)
+
+    # === set up array to store output === #
+    X = np.empty(sample_size, dtype=int)
+    if isinstance(init, int):
+        X[0] = init
+    else:
+        cdf0 = np.cumsum(init)
+        X[0] = cdf0.searchsorted(u[0], side='right')
+
+    # === generate the sample path === #
+    for t in range(sample_size-1):
+        X[t+1] = cdfs[X[t]].searchsorted(u[t+1], side='right')
+
+    return X
+
+if numba_installed:
+    mc_sample_path = jit(mc_sample_path)
+else:
+    mc_sample_path = mc_sample_path_numpy
+
+
+
+#------------#
+#-DocStrings-#
+#------------#
+
+#-mc_sample_path() function and MarkovChain.simulate() method-#
 _sample_path_docstr = \
 """
 Generates one sample path from the Markov chain represented by (n x n)
@@ -309,7 +348,8 @@ transition matrix P on state space S = {{0,...,n-1}}.
 
 Parameters
 ----------
-{p_arg}init : array_like(float ndim=1) or scalar(int)
+{p_arg}
+init : array_like(float ndim=1) or scalar(int), optional(default=0)
     If init is an array_like, then it is treated as the initial
     distribution across states.  If init is a scalar, then it treated as
     the deterministic initial state.
@@ -324,14 +364,21 @@ X : array_like(int, ndim=1)
 
 """
 
-# set docstring for functions
+#-Functions-#
+
+#-mc_sample_path-#
 mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
-    P : array_like(float, ndim=2)
+P : array_like(float, ndim=2)
     A Markov transition matrix.
-    """)
+""")
+mc_sample_path_numpy.__doc__ = _sample_path_docstr.format(p_arg="""
+P : array_like(float, ndim=2)
+    A Markov transition matrix.
+""")
 
-# set docstring for methods
+#-Methods-#
 
+#-Markovchain.simulate()-#
 if sys.version_info[0] == 3:
     MarkovChain.simulate.__doc__ = _sample_path_docstr.format(p_arg="")
 elif sys.version_info[0] == 2:
