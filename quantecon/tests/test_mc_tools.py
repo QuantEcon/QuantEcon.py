@@ -229,24 +229,6 @@ def test_simulate_for_matrices_with_C_F_orders():
     assert_array_equal(computed_F, sample_path)
 
 
-def test_mc_sample_path_functions():
-    """
-    Test Numba and Numpy Versions of the mc_sample_path() Functions
-    """
-    if not numba_installed:
-        raise ImportError("This test requires numba to be installed!")
-    #-Test Data-#
-    P = np.array([[0.4, 0.6], [0.2, 0.8]])
-    init = (0.25, 0.75)
-    sample_size = 10
-    #-Core-#
-    np.random.seed(1234)
-    numba_result = mc_sample_path(P, init=init, sample_size=sample_size)
-    np.random.seed(1234)
-    numpy_result = mc_sample_path_numpy(P, init=init, sample_size=sample_size)
-    assert_array_equal(numba_result, numpy_result)
-
-
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""

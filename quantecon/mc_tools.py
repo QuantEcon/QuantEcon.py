@@ -304,36 +304,8 @@ def mc_sample_path(P, init=0, sample_size=1000):
 
     return X
 
-
-def mc_sample_path_numpy(P, init=0, sample_size=1000):
-    """
-    See Section: DocStrings below
-    """
-    # CDFs, one for each row of P
-    cdfs = np.cumsum(P, axis=-1)
-
-    # Random values, uniformly sampled from [0, 1)
-    u = np.random.random(size=sample_size)
-
-    # === set up array to store output === #
-    X = np.empty(sample_size, dtype=int)
-    if isinstance(init, int):
-        X[0] = init
-    else:
-        cdf0 = np.cumsum(init)
-        X[0] = cdf0.searchsorted(u[0], side='right')
-
-    # === generate the sample path === #
-    for t in range(sample_size-1):
-        X[t+1] = cdfs[X[t]].searchsorted(u[t+1], side='right')
-
-    return X
-
 if numba_installed:
     mc_sample_path = jit(mc_sample_path)
-else:
-    mc_sample_path = mc_sample_path_numpy
-
 
 
 #------------#
