@@ -90,11 +90,11 @@ from fractions import gcd
 import sys
 from .graph_tools import DiGraph
 from .gth_solve import gth_solve
-from warnings import warn
 
-#-Check if Numba is Available-#
+# -Check if Numba is Available- #
 from .external import numba_installed, jit
 from .utilities import searchsorted
+
 
 class MarkovChain(object):
     """
@@ -308,11 +308,11 @@ if numba_installed:
     mc_sample_path = jit(mc_sample_path)
 
 
-#------------#
-#-DocStrings-#
-#------------#
+# ------------ #
+# -DocStrings- #
+# ------------ #
 
-#-mc_sample_path() function and MarkovChain.simulate() method-#
+# -mc_sample_path() function and MarkovChain.simulate() method- #
 _sample_path_docstr = \
 """
 Generates one sample path from the Markov chain represented by (n x n)
@@ -336,9 +336,9 @@ X : array_like(int, ndim=1)
 
 """
 
-#-Functions-#
+# -Functions- #
 
-#-mc_sample_path-#
+# -mc_sample_path- #
 mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
 P : array_like(float, ndim=2)
     A Markov transition matrix.
@@ -348,10 +348,11 @@ P : array_like(float, ndim=2)
     A Markov transition matrix.
 """)
 
-#-Methods-#
+# -Methods- #
 
-#-Markovchain.simulate()-#
+# -Markovchain.simulate()- #
 if sys.version_info[0] == 3:
     MarkovChain.simulate.__doc__ = _sample_path_docstr.format(p_arg="")
 elif sys.version_info[0] == 2:
-    MarkovChain.simulate.__func__.__doc__ = _sample_path_docstr.format(p_arg="")
+    MarkovChain.simulate.__func__.__doc__ = \
+        _sample_path_docstr.format(p_arg="")
