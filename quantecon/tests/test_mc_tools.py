@@ -14,7 +14,7 @@ from numpy.testing import assert_allclose, assert_array_equal
 from nose.tools import eq_, raises
 
 from quantecon.mc_tools import (
-    MarkovChain, mc_compute_stationary, mc_sample_path, mc_sample_path_numpy
+    MarkovChain, mc_compute_stationary, mc_sample_path
 )
 
 from ..external import numba_installed, jit
