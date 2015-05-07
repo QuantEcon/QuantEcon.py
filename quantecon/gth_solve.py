@@ -8,14 +8,17 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 
 """
 import numpy as np
+from numba import jit
 
-try:
-    xrange
-except:  # python3
-    xrange = range
+from .external import numba_installed, jit
+if not numba_installed:
+    try:
+        xrange
+    except:  # python3
+        xrange = range
 
 
-def gth_solve(A, overwrite=False):
+def gth_solve(A):
     r"""
     This routine computes the stationary distribution of an irreducible
     Markov transition matrix (stochastic matrix) or transition rate
@@ -42,8 +45,6 @@ def gth_solve(A, overwrite=False):
     ----------
     A : array_like(float, ndim=2)
         Stochastic matrix or generator matrix. Must be of shape n x n.
-    overwrite : bool, optional(default=False)
-        Whether to overwrite `A`; may improve performance.
 
     Returns
     -------
@@ -60,34 +61,85 @@ def gth_solve(A, overwrite=False):
        Simulation, Princeton University Press, 2009.
 
     """
-    A1 = np.array(A, dtype=float, copy=not overwrite)
+    A1 = np.array(A, dtype=float, copy=True, order='C')
+    # `order='C'` is for use with Numba <= 0.18.2
+    # See issue github.com/numba/numba/issues/1103
 
     if len(A1.shape) != 2 or A1.shape[0] != A1.shape[1]:
         raise ValueError('matrix must be square')
 
     n = A1.shape[0]
-
     x = np.zeros(n)
 
+    if numba_installed:
+        _gth_solve_jit(A1, x)
+        return x
+
+    # if not numba_installed
     # === Reduction === #
-    for i in xrange(n-1):
-        scale = np.sum(A1[i, i+1:n])
+    for k in xrange(n-1):
+        scale = np.sum(A1[k, k+1:n])
         if scale <= 0:
             # There is one (and only one) recurrent class contained in
-            # {0, ..., i};
+            # {0, ..., k};
             # compute the solution associated with that recurrent class.
-            n = i+1
+            n = k+1
             break
-        A1[i+1:n, i] /= scale
+        A1[k+1:n, k] /= scale
 
-        A1[i+1:n, i+1:n] += np.dot(A1[i+1:n, i:i+1], A1[i:i+1, i+1:n])
+        A1[k+1:n, k+1:n] += np.dot(A1[k+1:n, k:k+1], A1[k:k+1, k+1:n])
 
     # === Backward substitution === #
     x[n-1] = 1
-    for i in xrange(n-2, -1, -1):
-        x[i] = np.dot(x[i+1:n], A1[i+1:n, i])
+    for k in xrange(n-2, -1, -1):
+        x[k] = np.dot(x[k+1:n], A1[k+1:n, k])
 
     # === Normalization === #
     x /= np.sum(x)
 
     return x
+
+
+if numba_installed:
+    @jit(nopython=True)
+    def _gth_solve_jit(A, out):
+        """
+        JIT complied version of the main routine of gth_solve.
+
+        Parameters
+        ----------
+        A : numpy.ndarray(float, ndim=2)
+            Stochastic matrix or generator matrix. Must be of shape n x n.
+            Data will be overwritten.
+
+        out : numpy.ndarray(float, ndim=1)
+            Output array in which to place the stationary distribution of A.
+
+        """
+        n = A.shape[0]
+
+        # === Reduction === #
+        for k in range(n-1):
+            scale = np.sum(A[k, k+1:n])
+            if scale <= 0:
+                # There is one (and only one) recurrent class contained in
+                # {0, ..., k};
+                # compute the solution associated with that recurrent class.
+                n = k+1
+                break
+            for i in range(k+1, n):
+                A[i, k] /= scale
+
+                for j in range(k+1, n):
+                    A[i, j] += A[i, k] * A[k, j]
+
+        # === Backward substitution === #
+        out[n-1] = 1
+        for k in range(n-2, -1, -1):
+            for i in range(k+1, n):
+                out[k] += out[i] * A[i, k]
+
+        # === Normalization === #
+        norm = np.sum(out)
+        for k in range(n):
+            out[k] /= norm
