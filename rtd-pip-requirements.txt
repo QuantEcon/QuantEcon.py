@@ -1,6 +1,6 @@
 # These are the required packages for the quant-econ package to build
 
-Sphinx
+sphinx
 
 ipython
 
@@ -11,3 +11,5 @@ numpydoc
 scipy
 
 matplotlib
+
+sympy
