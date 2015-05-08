@@ -2,11 +2,11 @@
 Author: Pablo Winant
 Filename: test_cartesian.py
 
-Tests for cartesian.py file
+Tests for gridtools.py file
 
 """
 
-from quantecon.cartesian import cartesian, _repeat_1d
+from quantecon.gridtools import cartesian, _repeat_1d
 
 def test_cartesian_C_order():
 
