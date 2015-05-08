@@ -4,11 +4,11 @@ Import the main names to top level.
 
 from . import models as models
 from .compute_fp import compute_fixed_point
-from .cartesian import cartesian, mlinspace
 from .discrete_rv import DiscreteRV
 from .ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
 from .graph_tools import DiGraph
+from .gridtools import cartesian, mlinspace
 from .gth_solve import gth_solve
 from .kalman import Kalman
 from .lae import LAE
@@ -23,6 +23,7 @@ from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
 from . import quad as quad
+from .utilities import searchsorted
 
 #Add Version Attribute
 from .version import version as __version__

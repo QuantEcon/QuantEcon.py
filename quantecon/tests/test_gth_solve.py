@@ -7,9 +7,8 @@ Tests for gth_solve.py
 """
 from __future__ import division
 
-import sys
 import numpy as np
-import nose
+from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_, raises
 
 from quantecon.gth_solve import gth_solve
@@ -118,9 +117,9 @@ def test_kmr_matrix():
         yield StationaryDistLeftEigenVec(), matrix_dict['A'], x
 
 
-def test_gen_solve():
+def test_gen_matrix():
     """Test with generator matrices"""
-    print(__name__ + '.' + test_gen_solve.__name__)
+    print(__name__ + '.' + test_gen_matrix.__name__)
     matrices = Matrices()
     for matrix_dict in matrices.gen_matrix_dicts:
         x = gth_solve(matrix_dict['A'])
@@ -154,6 +153,29 @@ class StationaryDistEqualToKnown(AddDescription):
         ok_(np.allclose(y, x, atol=TOL))
 
 
+def test_matrices_with_C_F_orders():
+    """
+    Test matrices with C- and F-contiguous orders
+    See the issue and fix on Numba:
+    github.com/numba/numba/issues/1103
+    github.com/numba/numba/issues/1104
+
+    Fix in gth_solve(A):
+    added `order='C'` when `A1` copies the input `A`
+    """
+    P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
+    P_F = np.array([[0.5, 0.5], [0, 1]], order='F')
+    stationary_dist = [0., 1.]
+
+    computed_C_and_F = gth_solve(np.array([[1]]))
+    assert_array_equal(computed_C_and_F, [1])
+
+    computed_C = gth_solve(P_C)
+    computed_F = gth_solve(P_F)
+    assert_array_equal(computed_C, stationary_dist)
+    assert_array_equal(computed_F, stationary_dist)
+
+
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
@@ -167,6 +189,9 @@ def test_raises_value_error_non_square():
 
 
 if __name__ == '__main__':
+    import sys
+    import nose
+
     argv = sys.argv[:]
     argv.append('--verbose')
     argv.append('--nocapture')
