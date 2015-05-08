@@ -229,6 +229,17 @@ def test_simulate_for_matrices_with_C_F_orders():
     assert_array_equal(computed_F, sample_path)
 
 
+def test_mc_sample_path_seed():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    init = 0
+    sample_size = 10
+
+    np.random.seed(42)
+    expected = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1]
+    computed = mc_sample_path(P, init=init, sample_size=sample_size)
+    assert_array_equal(computed, expected)
+
+
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
