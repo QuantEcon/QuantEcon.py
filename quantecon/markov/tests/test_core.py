@@ -226,15 +226,15 @@ def test_simulate_for_matrices_with_C_F_orders():
     P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
     P_F = np.array([[0.5, 0.5], [0, 1]], order='F')
     init = 1
-    sample_size = 10
-    sample_path = np.ones(sample_size, dtype=int)
+    ts_length = 10
+    sample_path = np.ones(ts_length, dtype=int)
 
     computed_C_and_F = \
-        MarkovChain(np.array([[1.]])).simulate(init=0, sample_size=sample_size)
-    assert_array_equal(computed_C_and_F, np.zeros(sample_size, dtype=int))
+        MarkovChain(np.array([[1.]])).simulate(ts_length, init=0)
+    assert_array_equal(computed_C_and_F, np.zeros(ts_length, dtype=int))
 
-    computed_C = MarkovChain(P_C).simulate(init, sample_size)
-    computed_F = MarkovChain(P_F).simulate(init, sample_size)
+    computed_C = MarkovChain(P_C).simulate(ts_length, init)
+    computed_F = MarkovChain(P_F).simulate(ts_length, init=init)
     assert_array_equal(computed_C, sample_path)
     assert_array_equal(computed_F, sample_path)
 

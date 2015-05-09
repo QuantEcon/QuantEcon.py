@@ -140,11 +140,6 @@ class MarkovChain(object):
         List of numpy arrays containing the cyclic classes. Defined only
         when the Markov chain is irreducible.
 
-    Methods
-    -------
-    simulate : Simulates the markov chain for a given initial state or
-        distribution.
-
     """
 
     def __init__(self, P):
@@ -170,6 +165,7 @@ class MarkovChain(object):
         self.digraph = DiGraph(self.P)
 
         self._stationary_dists = None
+        self._cdfs = None
 
     def __repr__(self):
         msg = "Markov chain with transition matrix \nP = \n{0}"
@@ -256,9 +252,113 @@ class MarkovChain(object):
             self._compute_stationary()
         return self._stationary_dists
 
-    def simulate(self, init=0, sample_size=1000):
-        X = mc_sample_path(self.P, init, sample_size)
-        return X
+    @property
+    def cdfs(self):
+        if self._cdfs is None:
+            # See issue #137#issuecomment-96128186
+            cdfs = np.empty((self.n, self.n), order='C')
+            np.cumsum(self.P, axis=-1, out=cdfs)
+            self._cdfs = cdfs
+        return self._cdfs
+
+    def simulate(self, ts_length, init=None, num_reps=None):
+        """
+        Simulate time series of state transitions.
+
+        Parameters
+        ----------
+        ts_length : scalar(int)
+            Length of each simulation.
+
+        init : scalar(int) or array_like(int, ndim=1),
+               optional(default=None)
+            Initial state(s). If None, the initial state is randomly
+            drawn.
+
+        num_reps : scalar(int), optional(default=None)
+            Number of simulations. Relevant only when init is a scalar
+            or None.
+
+        Returns
+        -------
+        X : ndarray(int, ndim=1 or 2)
+            Array containing the sample path(s), of shape (ts_length,)
+            if init is a scalar (integer) or None and num_reps is None;
+            of shape (k, ts_length) otherwise, where k = len(init) if
+            init is an array_like, otherwise k = num_reps.
+
+        """
+        try:
+            num_reps = len(init)  # init is an array; make num_reps not None
+            init_states = np.asarray(init, dtype=int)
+        except:  # init is a scalar(int) or None
+            k = 1 if num_reps is None else num_reps
+            if init is None:
+                init_states = np.random.randint(self.n, size=k)
+            elif isinstance(init, int):
+                init_states = np.ones(k, dtype=int) * init
+            else:
+                raise ValueError(
+                    'init must be int, array_like of ints, or None'
+                )
+
+        X = _simulate_markov_chain(self.cdfs, ts_length, init_states,
+                                   random_state=np.random.RandomState())
+
+        if num_reps is None:
+            return X[0]
+        else:
+            return X
+
+
+def _simulate_markov_chain(P_cdfs, ts_length, init_states, random_state):
+    """
+    Main body of MarkovChain.simulate.
+
+    Generate len(init_states) sample paths of length ts_length.
+
+    Parameters
+    ----------
+    P_cdfs : ndarray(float, ndim=2)
+        Array containing as rows the CDFs of the state transition.
+
+    ts_length : scalar(int)
+        Length of each sample path.
+
+    init_states : array_like(int, ndim=1)
+        Array containing the initial states.
+
+    random_state : np.random.RandomState
+
+    Returns
+    -------
+    X : ndarray(int, ndim=2)
+        Array containing the sample paths, of shape (len(init_states),
+        ts_length)
+
+    Notes
+    -----
+    This routine is jit-complied if the module Numba is vailable.
+
+    """
+    num_reps = len(init_states)
+
+    # === set up array to store output === #
+    X = np.empty((num_reps, ts_length), dtype=int)
+    X[:, 0] = init_states
+
+    # Random values, uniformly sampled from [0, 1)
+    u = random_state.random_sample(size=(num_reps, ts_length-1))
+
+    # === generate the sample paths === #
+    for i in range(num_reps):
+        for t in range(ts_length-1):
+            X[i, t+1] = searchsorted(P_cdfs[X[i, t]], u[i, t])
+
+    return X
+
+if numba_installed:
+    _simulate_markov_chain = jit(_simulate_markov_chain)
 
 
 def mc_compute_stationary(P):
@@ -278,76 +378,33 @@ def mc_compute_stationary(P):
 
 def mc_sample_path(P, init=0, sample_size=1000):
     """
-    See Section: DocStrings below
+    Generates one sample path from the Markov chain represented by
+    (n x n) transition matrix P on state space S = {{0,...,n-1}}.
+
+    Parameters
+    ----------
+    P : array_like(float, ndim=2)
+        A Markov transition matrix.
+
+    init : array_like(float ndim=1) or scalar(int), optional(default=0)
+        If init is an array_like, then it is treated as the initial
+        distribution across states.  If init is a scalar, then it
+        treated as the deterministic initial state.
+
+    sample_size : scalar(int), optional(default=1000)
+        The length of the sample path.
+
+    Returns
+    -------
+    X : array_like(int, ndim=1)
+        The simulation of states.
+
     """
-    n = len(P)
-
-    # CDFs, one for each row of P
-    cdfs = np.empty((n, n), order='C')  # see issue #137#issuecomment-96128186
-    np.cumsum(P, axis=-1, out=cdfs)
-
-    # Random values, uniformly sampled from [0, 1)
-    u = np.random.random(size=sample_size)
-
-    # === set up array to store output === #
-    X = np.empty(sample_size, dtype=int)
     if isinstance(init, int):
-        X[0] = init
+        X_0 = init
     else:
         cdf0 = np.cumsum(init)
-        X[0] = searchsorted(cdf0, u[0])
+        u_0 = np.random.random(size=1)
+        X_0 = searchsorted(cdf0, u_0)
 
-    # === generate the sample path === #
-    for t in range(sample_size-1):
-        X[t+1] = searchsorted(cdfs[X[t]], u[t+1])
-
-    return X
-
-if numba_installed:
-    mc_sample_path = jit(mc_sample_path)
-
-
-# ------------ #
-# -DocStrings- #
-# ------------ #
-
-# -mc_sample_path() function and MarkovChain.simulate() method- #
-_sample_path_docstr = \
-"""
-Generates one sample path from the Markov chain represented by (n x n)
-transition matrix P on state space S = {{0,...,n-1}}.
-
-Parameters
-----------
-{p_arg}
-init : array_like(float ndim=1) or scalar(int), optional(default=0)
-    If init is an array_like, then it is treated as the initial
-    distribution across states.  If init is a scalar, then it treated as
-    the deterministic initial state.
-
-sample_size : scalar(int), optional(default=1000)
-    The length of the sample path.
-
-Returns
--------
-X : array_like(int, ndim=1)
-    The simulation of states.
-
-"""
-
-# -Functions- #
-
-# -mc_sample_path- #
-mc_sample_path.__doc__ = _sample_path_docstr.format(p_arg="""
-P : array_like(float, ndim=2)
-    A Markov transition matrix.
-""")
-
-# -Methods- #
-
-# -Markovchain.simulate()- #
-if sys.version_info[0] == 3:
-    MarkovChain.simulate.__doc__ = _sample_path_docstr.format(p_arg="")
-elif sys.version_info[0] == 2:
-    MarkovChain.simulate.__func__.__doc__ = \
-        _sample_path_docstr.format(p_arg="")
+    return MarkovChain(P).simulate(ts_length=sample_size, init=X_0)
