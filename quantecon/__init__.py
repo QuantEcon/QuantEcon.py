@@ -19,6 +19,7 @@ from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .mc_tools import MarkovChain, mc_compute_stationary, mc_sample_path
 from .quadsums import var_quadratic_sum, m_quadratic_sum
+from .random_mc import random_markov_chain, random_stochastic_matrix
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
