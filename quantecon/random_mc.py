@@ -90,7 +90,7 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
         raise ValueError
 
     # n prob vectors of dimension k, shape (n, k)
-    probvecs = _random_probvec(n, k, random_state=_random_state)
+    probvecs = random_probvec(n, k, random_state=_random_state)
 
     if k == n:
         P = probvecs
@@ -101,7 +101,10 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
 
     # if k < n:
     rows = np.repeat(np.arange(n), k)
-    cols = _random_indices(n, n, k, random_state=_random_state).ravel()
+    cols = \
+        random_choice_without_replacement(
+            n, k, num_trials=n, random_state=_random_state
+        ).ravel()
     data = probvecs.ravel()
 
     if sparse:
@@ -113,7 +116,7 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
         return P
 
 
-def _random_probvec(m, k, random_state=None):
+def random_probvec(m, k, random_state=None):
     """
     Return m probability vectors of dimension k.
 
@@ -146,37 +149,55 @@ def _random_probvec(m, k, random_state=None):
 
 
 @jit
-def _random_indices(n, m, k, random_state=None):
+def random_choice_without_replacement(n, k, num_trials=None,
+                                      random_state=None):
     """
-    Return m arrays of k integers randomly chosen without replacement
-    from 0, ..., n-1. About 10x faster than numpy.random.choice with
-    replace=False. Logic taken from random.sample.
+    Randomly choose k integers without replacement from 0, ..., n-1.
 
     Parameters
     ----------
     n : scalar(int)
         Number of integers, 0, ..., n-1, to sample from.
 
-    m : scalar(int), optional(default=1)
-        Number of arrays.
-
     k : scalar(int)
-        Number of elements of each array.
+        Number of integers to sample.
+
+    num_trials : scalar(int), optional(default=None)
+        Number of trials.
 
     random_state : numpy.random.RandomState, optional(default=None)
         Random number generator. If None, np.random is used.
 
     Returns
     -------
-    result : ndarray(int, ndim=2)
-        m x k array. Each row contains k unique integers chosen from
-        0, ..., n-1.
+    result : ndarray(int, ndim=1 or 2)
+        Array of shape (k,) if num_trials is None, or of shape
+        (num_trials, k) otherwise, (each row of) which contains k unique
+        random elements chosen from 0, ..., n-1.
+
+    Examples
+    --------
+    >>> qe.random_mc.random_choice_without_replacement(5, 3)
+    array([1, 4, 3])
+    >>> qe.random_mc.random_choice_without_replacement(5, 3, num_trials=4)
+    array([[1, 2, 0],
+           [2, 0, 4],
+           [4, 1, 2],
+           [2, 3, 4]])
 
     """
+    if n <= 0:
+        raise ValueError('n must be greater than 0')
+    if k > n:
+        raise ValueError('k must be smaller than or equal to n')
+
+    m = 1 if num_trials is None else num_trials
+
     if random_state is None:
         random_state = np.random
     r = random_state.random_sample(size=(m, k))
 
+    # Logic taken from random.sample in the standard library
     result = np.empty((m, k), dtype=int)
     pool = np.empty((m, n), dtype=int)
     for i in range(m):
@@ -189,4 +210,7 @@ def _random_indices(n, m, k, random_state=None):
             result[i, j] = pool[i, idx]
             pool[i, idx] = pool[i, n-j-1]
 
-    return result
+    if num_trials is None:
+        return result[0]
+    else:
+        return result
