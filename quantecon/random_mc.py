@@ -8,8 +8,9 @@ Generate a random stochastic matrix.
 """
 import numpy as np
 import scipy.sparse
-from numba import jit
+
 from .mc_tools import MarkovChain
+from .external import numba_installed, jit
 
 
 def random_markov_chain(n, k=None, sparse=False, random_state=None):
@@ -36,6 +37,19 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
     Returns
     -------
     mc : MarkovChain
+
+    Examples
+    --------
+    >>> mc = qe.random_markov_chain(3, random_state=1234)
+    >>> mc.P
+    array([[ 0.19151945,  0.43058932,  0.37789123],
+           [ 0.43772774,  0.34763084,  0.21464142],
+           [ 0.27259261,  0.5073832 ,  0.22002419]])
+    >>> mc = qe.random_markov_chain(3, k=2, random_state=1234)
+    >>> mc.P
+    array([[ 0.        ,  0.80848055,  0.19151945],
+           [ 0.62210877,  0.        ,  0.37789123],
+           [ 0.        ,  0.56227226,  0.43772774]])
 
     """
     if sparse:
@@ -148,7 +162,6 @@ def random_probvec(m, k, random_state=None):
     return np.diff(x, axis=-1)
 
 
-@jit
 def random_choice_without_replacement(n, k, num_trials=None,
                                       random_state=None):
     """
@@ -214,3 +227,6 @@ def random_choice_without_replacement(n, k, num_trials=None,
         return result[0]
     else:
         return result
+
+if numba_installed:
+    random_choice_without_replacement = jit(random_choice_without_replacement)
