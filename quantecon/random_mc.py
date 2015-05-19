@@ -91,6 +91,8 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
         Stochastic matrix.
 
     """
+    if not (isinstance(n, int) and n > 0):
+        raise ValueError('n must be a positive integer')
     if k is None:
         k = n
     if not (isinstance(k, int) and 0 < k <= n):
