@@ -3,7 +3,7 @@ Filename: random_mc.py
 
 Author: Daisuke Oyama
 
-Generate a random stochastic matrix.
+Generate a MarkovChain randomly.
 
 """
 import numpy as np
@@ -15,14 +15,15 @@ from .external import numba_installed, jit
 
 def random_markov_chain(n, k=None, sparse=False, random_state=None):
     """
-    Return a MarkovChain instance.
+    Return a randomly sampled MarkovChain instance with n states, where
+    each state has k states with positive transition probability.
 
     Parameters
     ----------
     n : scalar(int)
         Number of states.
 
-    k : scalar(int), optional
+    k : scalar(int), optional(default=None)
         Number of states that may be reached from each state with
         positive probability. Set to n if not specified.
 
@@ -63,14 +64,15 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
 def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
                              random_state=None):
     """
-    Return a random stochastic matrix.
+    Return a randomly sampled n x n stochastic matrix with k nonzero
+    entries for each row.
 
     Parameters
     ----------
     n : scalar(int)
         Number of states.
 
-    k : scalar(int), optional
+    k : scalar(int), optional(default=None)
         Number of nonzero entries in each row of the matrix. Set to n if
         not specified.
 
@@ -134,7 +136,7 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
 
 def random_probvec(m, k, random_state=None):
     """
-    Return m probability vectors of dimension k.
+    Return m randomly sampled probability vectors of dimension k.
 
     Parameters
     ----------
