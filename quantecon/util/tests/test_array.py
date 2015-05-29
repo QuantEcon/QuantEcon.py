@@ -1,5 +1,5 @@
 """
-Tests for utilities.py
+Tests for Array Utilities
 
 Functions
 ---------
@@ -8,7 +8,7 @@ searchsorted
 """
 import numpy as np
 from nose.tools import eq_
-from quantecon.utilities import searchsorted
+from quantecon.util import searchsorted
 
 
 def test_searchsorted():
