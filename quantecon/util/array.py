@@ -1,8 +1,6 @@
 """
-Utilities Module for QuantEcon
-==============================
-
-An assortment of utilities that are useful throughout QuantEcon
+Array Utilities
+===============
 
 Array
 -----
@@ -11,7 +9,7 @@ searchsorted
 """
 
 import numpy as np
-from .external import numba_installed, jit
+from ..external import numba_installed, jit
 
 # ----------------- #
 # -ARRAY UTILITIES- #

@@ -93,7 +93,7 @@ from .gth_solve import gth_solve
 
 # -Check if Numba is Available- #
 from .external import numba_installed, jit
-from .utilities import searchsorted
+from .util import searchsorted
 
 
 class MarkovChain(object):
