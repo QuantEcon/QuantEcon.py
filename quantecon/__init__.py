@@ -23,7 +23,7 @@ from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
 from . import quad as quad
-from .utilities import searchsorted
+from .util import searchsorted
 
 #Add Version Attribute
 from .version import version as __version__
