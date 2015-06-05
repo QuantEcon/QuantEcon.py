@@ -32,9 +32,12 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
         Whether to store the transition probability matrix in sparse
         matrix form. (Sparse format is not yet implemented.)
 
-    random_state : {numpy.random.RandomState, int},
+    random_state : scalar(int) or np.random.RandomState,
                    optional(default=None)
-        Random number generator instance or random seed (int).
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
 
     Returns
     -------
@@ -84,9 +87,12 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
              optional(default='csr')
         Sparse matrix format. Relevant only when sparse=True.
 
-    random_state : {numpy.random.RandomState, int},
+    random_state : scalar(int) or np.random.RandomState,
                    optional(default=None)
-        Random number generator instance or random seed (int).
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
 
     Returns
     -------
@@ -140,8 +146,12 @@ def random_probvec(m, k, random_state=None):
     k : scalar(int)
         Dimension of each probability vectors.
 
-    random_state : numpy.random.RandomState, optional(default=None)
-        Random number generator. If None, np.random is used.
+    random_state : scalar(int) or np.random.RandomState,
+                   optional(default=None)
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
 
     Returns
     -------
@@ -175,8 +185,12 @@ def random_choice_without_replacement(n, k, num_trials=None,
     num_trials : scalar(int), optional(default=None)
         Number of trials.
 
-    random_state : numpy.random.RandomState, optional(default=None)
-        Random number generator. If None, np.random is used.
+    random_state : scalar(int) or np.random.RandomState,
+                   optional(default=None)
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
 
     Returns
     -------
