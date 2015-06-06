@@ -221,7 +221,7 @@ class MarkovChain(object):
             # Determine the period, the LCM of the periods of rec_classes
             d = 1
             for rec_class in rec_classes:
-                period = DiGraph(self.P[rec_class, :][:, rec_class]).period
+                period = self.digraph.subgraph(rec_class).period
                 d = (d * period) // gcd(d, period)
 
             return d

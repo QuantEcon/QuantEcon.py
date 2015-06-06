@@ -263,6 +263,27 @@ class DiGraph(object):
             return [np.where(self._cyclic_components_proj == k)[0]
                     for k in range(self.period)]
 
+    def subgraph(self, nodes):
+        """
+        Return the subgraph consisting of the given nodes and edges
+        between thses nodes.
+
+        Parameters
+        ----------
+        nodes : array_like(int, ndim=1)
+           Array of nodes.
+
+        Returns
+        -------
+        DiGraph
+            A DiGraph representing the subgraph.
+
+        """
+        adj_matrix = self.csgraph[nodes, :][:, nodes]
+
+        weighted = True  # To copy the dtype
+        return DiGraph(adj_matrix, weighted=weighted)
+
 
 def _csr_matrix_indices(S):
     """
