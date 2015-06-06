@@ -2,7 +2,7 @@ r"""
 Authors: Chase Coleman, Spencer Lyon, Daisuke Oyama, Tom Sargent,
          John Stachurski
 
-Filename: core.py
+Filename: mc_tools.py
 
 This file contains some useful objects for handling a finite-state
 discrete-time Markov chain.
@@ -88,11 +88,17 @@ from __future__ import division
 import numpy as np
 from fractions import gcd
 import sys
+from .graph_tools import DiGraph
 from .gth_solve import gth_solve
-from ..graph_tools import DiGraph
 
 # -Check if Numba is Available- #
+<<<<<<< HEAD
 from ..util import searchsorted, numba_installed, jit
+=======
+from .external import numba_installed, jit
+
+from .util import searchsorted, check_random_state
+>>>>>>> `random_state` option, as well as tests, added
 
 
 class MarkovChain(object):
@@ -106,6 +112,13 @@ class MarkovChain(object):
     ----------
     P : array_like(float, ndim=2)
         The transition matrix.  Must be of shape n x n.
+
+    random_state : scalar(int) or np.random.RandomState,
+                   optional(default=None)
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
 
     Attributes
     ----------
@@ -142,7 +155,7 @@ class MarkovChain(object):
 
     """
 
-    def __init__(self, P):
+    def __init__(self, P, random_state=None):
         self.P = np.asarray(P)
 
         # Check Properties
@@ -160,6 +173,9 @@ class MarkovChain(object):
 
         # The number of states
         self.n = self.P.shape[0]
+
+        # random state
+        self.random_state = random_state
 
         # To analyze the structure of P as a directed graph
         self._digraph = None
@@ -294,6 +310,8 @@ class MarkovChain(object):
             init is an array_like, otherwise k = num_reps.
 
         """
+        random_state = check_random_state(self.random_state)
+
         try:
             num_reps = len(init)  # init is an array; make num_reps not None
             init_states = np.asarray(init, dtype=int)
@@ -309,7 +327,7 @@ class MarkovChain(object):
                 )
 
         X = _simulate_markov_chain(self.cdfs, ts_length, init_states,
-                                   random_state=np.random.RandomState())
+                                   random_state=random_state)
 
         if num_reps is None:
             return X[0]
@@ -382,7 +400,7 @@ def mc_compute_stationary(P):
     return MarkovChain(P).stationary_distributions
 
 
-def mc_sample_path(P, init=0, sample_size=1000):
+def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     """
     Generates one sample path from the Markov chain represented by
     (n x n) transition matrix P on state space S = {{0,...,n-1}}.
@@ -400,17 +418,27 @@ def mc_sample_path(P, init=0, sample_size=1000):
     sample_size : scalar(int), optional(default=1000)
         The length of the sample path.
 
+    random_state : scalar(int) or np.random.RandomState,
+                   optional(default=None)
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
     Returns
     -------
     X : array_like(int, ndim=1)
         The simulation of states.
 
     """
+    random_state = check_random_state(random_state)
+
     if isinstance(init, int):
         X_0 = init
     else:
         cdf0 = np.cumsum(init)
-        u_0 = np.random.random(size=1)
+        u_0 = random_state.random_sample()
         X_0 = searchsorted(cdf0, u_0)
 
-    return MarkovChain(P).simulate(ts_length=sample_size, init=X_0)
+    mc = MarkovChain(P, random_state=random_state)
+    return mc.simulate(ts_length=sample_size, init=X_0)
