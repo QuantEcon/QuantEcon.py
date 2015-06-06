@@ -313,12 +313,13 @@ class MarkovChain(object):
         random_state = check_random_state(self.random_state)
 
         try:
-            num_reps = len(init)  # init is an array; make num_reps not None
+            k = len(init)  # init is an array
+            num_reps = k  # make num_reps not None
             init_states = np.asarray(init, dtype=int)
-        except:  # init is a scalar(int) or None
+        except TypeError:  # init is a scalar(int) or None
             k = 1 if num_reps is None else num_reps
             if init is None:
-                init_states = np.random.randint(self.n, size=k)
+                init_states = random_state.randint(self.n, size=k)
             elif isinstance(init, int):
                 init_states = np.ones(k, dtype=int) * init
             else:
@@ -326,8 +327,14 @@ class MarkovChain(object):
                     'init must be int, array_like of ints, or None'
                 )
 
-        X = _simulate_markov_chain(self.cdfs, ts_length, init_states,
-                                   random_state=random_state)
+        # === set up array to store output === #
+        X = np.empty((k, ts_length), dtype=int)
+
+        # Random values, uniformly sampled from [0, 1)
+        random_values = random_state.random_sample(size=(k, ts_length-1))
+
+        # Generate sample paths and store in X
+        _generate_sample_paths(self.cdfs, init_states, random_values, out=X)
 
         if num_reps is None:
             return X[0]
@@ -335,54 +342,41 @@ class MarkovChain(object):
             return X
 
 
-def _simulate_markov_chain(P_cdfs, ts_length, init_states, random_state):
+def _generate_sample_paths(P_cdfs, init_states, random_values, out):
     """
-    Main body of MarkovChain.simulate.
-
-    Generate len(init_states) sample paths of length ts_length.
+    Generate num_reps sample paths of length ts_length, where num_reps =
+    out.shape[0] and ts_length = out.shape[1].
 
     Parameters
     ----------
     P_cdfs : ndarray(float, ndim=2)
         Array containing as rows the CDFs of the state transition.
 
-    ts_length : scalar(int)
-        Length of each sample path.
-
     init_states : array_like(int, ndim=1)
-        Array containing the initial states.
+        Array containing the initial states. Its length must be equal to
+        num_reps.
 
-    random_state : np.random.RandomState
+    random_values : ndarray(float, ndim=2)
+        Array containing random values from [0, 1). Its shape must be
+        equal to (num_reps, ts_length-1)
 
-    Returns
-    -------
-    X : ndarray(int, ndim=2)
-        Array containing the sample paths, of shape (len(init_states),
-        ts_length)
+    out : ndarray(int, ndim=2)
+        Array to store the sample paths.
 
     Notes
     -----
     This routine is jit-complied if the module Numba is vailable.
 
     """
-    num_reps = len(init_states)
+    num_reps, ts_length = out.shape
 
-    # === set up array to store output === #
-    X = np.empty((num_reps, ts_length), dtype=int)
-    X[:, 0] = init_states
-
-    # Random values, uniformly sampled from [0, 1)
-    u = random_state.random_sample(size=(num_reps, ts_length-1))
-
-    # === generate the sample paths === #
     for i in range(num_reps):
+        out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            X[i, t+1] = searchsorted(P_cdfs[X[i, t]], u[i, t])
-
-    return X
+            out[i, t+1] = searchsorted(P_cdfs[out[i, t]], random_values[i, t])
 
 if numba_installed:
-    _simulate_markov_chain = jit(_simulate_markov_chain)
+    _generate_sample_paths = jit(nopython=True)(_generate_sample_paths)
 
 
 def mc_compute_stationary(P):
