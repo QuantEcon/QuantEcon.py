@@ -162,7 +162,7 @@ class MarkovChain(object):
         self.n = self.P.shape[0]
 
         # To analyze the structure of P as a directed graph
-        self.digraph = DiGraph(self.P)
+        self._digraph = None
 
         self._stationary_dists = None
         self._cdfs = None
@@ -178,6 +178,12 @@ class MarkovChain(object):
 
     def __str__(self):
         return str(self.__repr__)
+
+    @property
+    def digraph(self):
+        if self._digraph is None:
+            self._digraph = DiGraph(self.P)
+        return self._digraph
 
     @property
     def is_irreducible(self):
