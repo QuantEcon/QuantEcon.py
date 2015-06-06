@@ -216,6 +216,23 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
                 assert_allclose(np.dot(curr_v, mc.P), curr_v, atol=self.TOL)
 
 
+def test_simulate_shape():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    (ts_length, init, num_reps) = (10, None, None)
+    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                       (ts_length,))
+
+    for (ts_length, init, num_reps) in [(10, [0, 1], None), (10, [0, 1], 3)]:
+        assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                           (len(init), ts_length))
+
+    for (ts_length, init, num_reps) in [(10, None, 3), (10, None, 1)]:
+        assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                           (num_reps, ts_length))
+
+
 def test_simulate_for_matrices_with_C_F_orders():
     """
     Test MarkovChasin.simulate for matrices with C- and F-orders
