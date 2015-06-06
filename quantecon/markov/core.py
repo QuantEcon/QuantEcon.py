@@ -265,7 +265,8 @@ class MarkovChain(object):
                 stationary_dists = gth_solve(self.P).reshape(1, self.n)
             else:  # Sparse
                 stationary_dists = \
-                    gth_solve(self.P.toarray()).reshape(1, self.n)
+                    gth_solve(self.P.toarray(),
+                              overwrite=True).reshape(1, self.n)
         else:
             rec_classes = self.recurrent_classes
             stationary_dists = np.zeros((len(rec_classes), self.n))
@@ -275,7 +276,8 @@ class MarkovChain(object):
                         gth_solve(self.P[rec_class, :][:, rec_class])
                 else:  # Sparse
                     stationary_dists[i, rec_class] = \
-                        gth_solve(self.P[rec_class, :][:, rec_class].toarray())
+                        gth_solve(self.P[rec_class, :][:, rec_class].toarray(),
+                                  overwrite=True)
 
         self._stationary_dists = stationary_dists
 
