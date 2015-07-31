@@ -6,7 +6,9 @@ Tests for random_mc.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal, assert_raises
+from numpy.testing import (
+    assert_array_equal, assert_raises, assert_array_almost_equal_nulp
+)
 from nose.tools import eq_, ok_, raises
 
 from quantecon.random_mc import (
@@ -16,17 +18,26 @@ from quantecon.random_mc import (
 
 
 def test_random_markov_chain_dense():
-    n, k = 10, 5
-    mc = random_markov_chain(n, k, sparse=False)
-    assert_array_equal(mc.P.shape, (n, n))
+    sparse = False
+    n, k = 5, 3
+    mc_dicts = [{'P': random_markov_chain(n, sparse=sparse).P, 'k': n},
+                {'P': random_markov_chain(n, k, sparse=sparse).P, 'k': k}]
+    for mc_dict in mc_dicts:
+        P = mc_dict['P']
+        assert_array_equal(P.shape, (n, n))
+        assert_array_equal((P > 0).sum(axis=1), [mc_dict['k']]*n)
 
 
 @raises(NotImplementedError)
 def test_random_markov_chain_sparse():
-    n, k = 10, 5
-    mc = random_markov_chain(n, k, sparse=True)
-    assert_array_equal(mc.P.shape, (n, n))
-    eq_(mc.P.nnz, n*k)
+    sparse = True
+    n, k = 5, 3
+    mc_dicts = [{'P': random_markov_chain(n, sparse=sparse).P, 'k': n},
+                {'P': random_markov_chain(n, k, sparse=sparse).P, 'k': k}]
+    for mc_dict in mc_dicts:
+        P = mc_dict['P']
+        assert_array_equal(P.shape, (n, n))
+        assert_array_equal(P.getnnz(axis=1), [mc_dict['k']]*n)
 
 
 def test_random_markov_chain_value_error():
@@ -38,6 +49,26 @@ def test_random_markov_chain_value_error():
 
     # k > n
     assert_raises(ValueError, random_markov_chain, 2, 3)
+
+
+def test_random_stochastic_matrix_dense():
+    sparse = False
+    n, k = 5, 3
+    Ps = [random_stochastic_matrix(n, sparse=sparse),
+          random_stochastic_matrix(n, k, sparse=sparse)]
+    for P in Ps:
+        ok_(np.all(P >= 0))
+        assert_array_almost_equal_nulp(P.sum(axis=1), np.ones(n))
+
+
+def test_random_stochastic_matrix_sparse():
+    sparse = True
+    n, k = 5, 3
+    Ps = [random_stochastic_matrix(n, sparse=sparse),
+          random_stochastic_matrix(n, k, sparse=sparse)]
+    for P in Ps:
+        ok_(np.all(P.data >= 0))
+        assert_array_almost_equal_nulp(P.sum(axis=1), np.ones(n))
 
 
 def test_random_stochastic_matrix_dense_vs_sparse():
