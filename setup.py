@@ -93,7 +93,8 @@ CLASSIFIERS = [
 #~~~~~~~#
 
 setup(name='quantecon',
-      packages=['quantecon', 
+      packages=['quantecon',
+                'quantecon.markov', 
                 'quantecon.models',
                 'quantecon.models.solow', 
                 'quantecon.tests',
