@@ -11,10 +11,10 @@ from numpy.testing import (
 )
 from nose.tools import eq_, ok_, raises
 
-from quantecon.random_mc import (
-    random_markov_chain, random_stochastic_matrix,
-    random_choice_without_replacement
+from quantecon.markov import (
+    random_markov_chain, random_stochastic_matrix
 )
+from quantecon.util import random_sample_without_replacement
 
 
 def test_random_markov_chain_dense():
@@ -83,36 +83,36 @@ def test_random_stochastic_matrix_dense_vs_sparse():
     assert_array_equal(P_dense, P_sparse.toarray())
 
 
-# random_choice_without_replacement #
+# random_sample_without_replacement #
 
-def test_random_choice_without_replacement_shape():
-    assert_array_equal(random_choice_without_replacement(2, 0).shape, (0,))
+def test_random_sample_without_replacement_shape():
+    assert_array_equal(random_sample_without_replacement(2, 0).shape, (0,))
 
     n, k, m = 5, 3, 4
     assert_array_equal(
-        random_choice_without_replacement(n, k).shape,
+        random_sample_without_replacement(n, k).shape,
         (k,)
     )
     assert_array_equal(
-        random_choice_without_replacement(n, k, num_trials=m).shape,
+        random_sample_without_replacement(n, k, num_trials=m).shape,
         (m, k)
     )
 
 
-def test_random_choice_without_replacement_uniqueness():
+def test_random_sample_without_replacement_uniqueness():
     n = 10
-    a = random_choice_without_replacement(n, n)
+    a = random_sample_without_replacement(n, n)
     b = np.unique(a)
     eq_(len(b), n)
 
 
-def test_random_choice_without_replacement_value_error():
+def test_random_sample_without_replacement_value_error():
     # n <= 0
-    assert_raises(ValueError, random_choice_without_replacement, 0, 2)
-    assert_raises(ValueError, random_choice_without_replacement, -1, -1)
+    assert_raises(ValueError, random_sample_without_replacement, 0, 2)
+    assert_raises(ValueError, random_sample_without_replacement, -1, -1)
 
     # k > n
-    assert_raises(ValueError, random_choice_without_replacement, 2, 3)
+    assert_raises(ValueError, random_sample_without_replacement, 2, 3)
 
 
 if __name__ == '__main__':
