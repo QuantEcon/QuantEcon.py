@@ -9,7 +9,7 @@ Generate a MarkovChain randomly.
 import numpy as np
 import scipy.sparse
 
-from ..mc_tools import MarkovChain
+from .core import MarkovChain
 from ..external import numba_installed, jit
 from ..util import check_random_state, random_probvec, random_sample_without_replacement
 
