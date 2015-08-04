@@ -19,14 +19,14 @@ from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .mc_tools import MarkovChain, mc_compute_stationary, mc_sample_path
 from .quadsums import var_quadratic_sum, m_quadratic_sum
-from .random_mc import random_markov_chain, random_stochastic_matrix
+from .markov import random_markov_chain, random_stochastic_matrix
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
 from . import quad as quad
-from .util import searchsorted
-from .util import probvec as random_probvec
-from .util import sample_without_replacement as random_sample_without_replacement
+from .util import searchsorted, random_probvec, random_sample_without_replacement
+
+#-Module Imports-#
 import util.random as random
 
 #Add Version Attribute
