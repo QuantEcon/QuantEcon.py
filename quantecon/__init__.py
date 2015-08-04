@@ -25,6 +25,9 @@ from .robustlq import RBLQ
 from .tauchen import approx_markov
 from . import quad as quad
 from .util import searchsorted
+from .util import probvec as random_probvec
+from .util import sample_without_replacement as random_sample_without_replacement
+import util.random as random
 
 #Add Version Attribute
 from .version import version as __version__
