@@ -17,9 +17,9 @@ from .lqcontrol import LQ
 from .lqnash import nnash
 from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
-from .mc_tools import MarkovChain, mc_compute_stationary, mc_sample_path
 from .quadsums import var_quadratic_sum, m_quadratic_sum
-from .markov import random_markov_chain, random_stochastic_matrix
+from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix
+from .markov import mc_compute_stationary, mc_sample_path 							#Imports that Should be Deprecated with markov package
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
