@@ -27,7 +27,7 @@ from . import quad as quad
 from .util import searchsorted, random_probvec, random_sample_without_replacement
 
 #-Module Imports-#
-import util.random as random
+from .util import random
 
 #Add Version Attribute
 from .version import version as __version__
