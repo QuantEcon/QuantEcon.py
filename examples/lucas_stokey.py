@@ -9,7 +9,7 @@ from scipy.optimize import root
 from scipy.optimize import fmin_slsqp
 from scipy.interpolate import UnivariateSpline
 from quantecon import compute_fixed_point
-from quantecon.mc_tools import mc_sample_path
+from quantecon.markov import mc_sample_path
 
 
 class Planners_Allocation_Sequential(object):
