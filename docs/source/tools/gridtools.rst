@@ -1,7 +1,7 @@
-cartesian
+gridtools
 =========
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.gridtools
     :members:
     :undoc-members:
     :show-inheritance:

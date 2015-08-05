@@ -1,7 +1,7 @@
-cartesian
+gth_solve
 =========
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.gth_solve
     :members:
     :undoc-members:
     :show-inheritance:

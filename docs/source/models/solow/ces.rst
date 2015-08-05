@@ -1,7 +1,7 @@
-cartesian
-=========
+solow.ces
+===
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.models.solow.ces
     :members:
     :undoc-members:
     :show-inheritance:
