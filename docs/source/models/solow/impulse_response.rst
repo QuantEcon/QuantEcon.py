@@ -1,4 +1,4 @@
-solow.impulse_response
+impulse_response
 ================
 
 .. automodule:: quantecon.models.solow.impulse_response

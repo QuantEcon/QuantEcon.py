@@ -57,6 +57,15 @@ model_module_template = """{mod_name}
     :show-inheritance:
 """
 
+solow_model_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.models.solow.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
 all_index_template = """=======================
 QuantEcon documentation
 =======================
@@ -181,7 +190,7 @@ def model_tool():
         new_path = os.path.join("source", "models", "solow", mod + ".rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
-            f.write(model_module_template.format(mod_name="solow."+mod, equals=equals))  
+            f.write(solow_model_module_template.format(mod_name=mod, equals=equals))  
 
     # Write file for each tool
     for mod in tools:
@@ -196,7 +205,7 @@ def model_tool():
 
     mods = "models/" + "\n   models/".join(models)
     sol = "models/solow/" + "\n   models/solow/".join(solow)
-    mods = mods  + "\n   " + sol                                #Add Solow folder to Models
+    mods = mods  + "\n   solow"                                 #Add solow sub directory to models
     tlz = "tools/" + "\n   tools/".join(tools)
     toc_tree_list = {"models": mods,
                      "tools": tlz}

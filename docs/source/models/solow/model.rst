@@ -1,4 +1,4 @@
-solow.model
+model
 =====
 
 .. automodule:: quantecon.models.solow.model
