@@ -11,7 +11,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_, raises
 
-from quantecon.gth_solve import gth_solve
+from quantecon.markov import gth_solve
 
 
 TOL = 1e-15
