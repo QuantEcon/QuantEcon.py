@@ -88,8 +88,8 @@ from __future__ import division
 import numpy as np
 from fractions import gcd
 import sys
+from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
-from ..gth_solve import gth_solve
 
 # -Check if Numba is Available- #
 from ..external import numba_installed, jit
