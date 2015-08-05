@@ -9,7 +9,6 @@ from .ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
 from .graph_tools import DiGraph
 from .gridtools import cartesian, mlinspace
-from .gth_solve import gth_solve
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
@@ -18,7 +17,7 @@ from .lqnash import nnash
 from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .quadsums import var_quadratic_sum, m_quadratic_sum
-from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix
+from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, gth_solve
 from .markov import mc_compute_stationary, mc_sample_path 							#Imports that Should be Deprecated with markov package
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ

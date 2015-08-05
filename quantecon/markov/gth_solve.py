@@ -10,7 +10,7 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 import numpy as np
 from numba import jit
 
-from .external import numba_installed, jit
+from ..external import numba_installed, jit
 if not numba_installed:
     try:
         xrange
