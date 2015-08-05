@@ -1,7 +1,7 @@
-cartesian
-=========
+timing
+======
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.timing
     :members:
     :undoc-members:
     :show-inheritance:

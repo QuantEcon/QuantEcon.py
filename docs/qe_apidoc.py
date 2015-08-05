@@ -153,13 +153,19 @@ def model_tool():
     # Alphabetize
     models.sort()
 
+    # list file names with models.solow
+    solow_files = glob("../quantecon/models/solow/[a-z0-9]*.py")
+    solow = map(lambda x: x.split('/')[-1][:-3], solow_files)
+    # Alphabetize
+    solow.sort()
+
     # list file names of tools
     tool_files = glob("../quantecon/[a-z0-9]*.py")
     tools = map(lambda x: x.split('/')[-1][:-3], tool_files)
     # Alphabetize
     tools.sort()
 
-    for folder in ["models", "tools"]:
+    for folder in ["models","models/solow", "tools"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
 
@@ -169,6 +175,13 @@ def model_tool():
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(model_module_template.format(mod_name=mod, equals=equals))
+
+    # Write file for each model.solow
+    for mod in solow:
+        new_path = os.path.join("source", "models", "solow", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(model_module_template.format(mod_name="solow."+mod, equals=equals))  
 
     # Write file for each tool
     for mod in tools:
@@ -182,6 +195,8 @@ def model_tool():
         index.write(split_index_template)
 
     mods = "models/" + "\n   models/".join(models)
+    sol = "models/solow/" + "\n   models/solow/".join(solow)
+    mods = mods  + "\n   " + sol                                #Add Solow folder to Models
     tlz = "tools/" + "\n   tools/".join(tools)
     toc_tree_list = {"models": mods,
                      "tools": tlz}

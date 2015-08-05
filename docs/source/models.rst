@@ -11,3 +11,7 @@ Models
    models/lucastree
    models/odu
    models/optgrowth
+   models/solow/ces
+   models/solow/cobb_douglas
+   models/solow/impulse_response
+   models/solow/model
