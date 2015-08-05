@@ -1,4 +1,4 @@
-solow.ces
+ces
 ===
 
 .. automodule:: quantecon.models.solow.ces
