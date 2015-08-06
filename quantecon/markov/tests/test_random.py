@@ -1,8 +1,8 @@
 """
-Filename: test_random_mc.py
+Filename: test_random.py
 Author: Daisuke Oyama
 
-Tests for random_mc.py
+Tests for markov/random_mc.py
 
 """
 import numpy as np
@@ -14,7 +14,6 @@ from nose.tools import eq_, ok_, raises
 from quantecon.markov import (
     random_markov_chain, random_stochastic_matrix
 )
-from quantecon.util import random_sample_without_replacement
 
 
 def test_random_markov_chain_dense():
@@ -81,38 +80,6 @@ def test_random_stochastic_matrix_dense_vs_sparse():
     P_dense = random_stochastic_matrix(n, k, sparse=False, random_state=seed)
     P_sparse = random_stochastic_matrix(n, k, sparse=True, random_state=seed)
     assert_array_equal(P_dense, P_sparse.toarray())
-
-
-# random_sample_without_replacement #
-
-def test_random_sample_without_replacement_shape():
-    assert_array_equal(random_sample_without_replacement(2, 0).shape, (0,))
-
-    n, k, m = 5, 3, 4
-    assert_array_equal(
-        random_sample_without_replacement(n, k).shape,
-        (k,)
-    )
-    assert_array_equal(
-        random_sample_without_replacement(n, k, num_trials=m).shape,
-        (m, k)
-    )
-
-
-def test_random_sample_without_replacement_uniqueness():
-    n = 10
-    a = random_sample_without_replacement(n, n)
-    b = np.unique(a)
-    eq_(len(b), n)
-
-
-def test_random_sample_without_replacement_value_error():
-    # n <= 0
-    assert_raises(ValueError, random_sample_without_replacement, 0, 2)
-    assert_raises(ValueError, random_sample_without_replacement, -1, -1)
-
-    # k > n
-    assert_raises(ValueError, random_sample_without_replacement, 2, 3)
 
 
 if __name__ == '__main__':
