@@ -11,7 +11,7 @@ import os
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.tauchen import approx_markov
+from quantecon.markov import approx_markov
 
 
 class TestApproxMarkov(unittest.TestCase):
