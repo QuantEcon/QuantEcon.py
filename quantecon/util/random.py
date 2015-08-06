@@ -6,22 +6,23 @@ import numpy as np
 import numbers
 from ..external import numba_installed, jit
 
+
 #-Random States-#
 
 def check_random_state(seed):
     """
-    Check the random state of a given seed. 
-    
+    Check the random state of a given seed.
+
     If seed is None, return the RandomState singleton used by np.random.
     If seed is an int, return a new RandomState instance seeded with seed.
     If seed is already a RandomState instance, return it.
-    
+
     Otherwise raise ValueError.
 
     .. Note
        ----
-    	1. This code was sourced from scikit-learn
-        
+        1. This code was sourced from scikit-learn
+
     """
     if seed is None or seed is np.random:
         return np.random.mtrand._rand
@@ -31,6 +32,7 @@ def check_random_state(seed):
         return seed
     raise ValueError('%r cannot be used to seed a numpy.random.RandomState'
                      ' instance' % seed)
+
 
 #-Generating Arrays and Vectors-#
 
@@ -58,6 +60,12 @@ def probvec(m, k, random_state=None):
     ndarray(float, ndim=2)
         Array of shape (m, k) containing probability vectors as rows.
 
+    Examples
+    --------
+    >>> qe.random.probvec(2, 3, random_state=1234)
+    array([[ 0.19151945,  0.43058932,  0.37789123],
+           [ 0.43772774,  0.34763084,  0.21464142]])
+
     """
     x = np.empty((m, k+1))
 
@@ -69,8 +77,7 @@ def probvec(m, k, random_state=None):
     return np.diff(x, axis=-1)
 
 
-def sample_without_replacement(n, k, num_trials=None,
-                                      random_state=None):
+def sample_without_replacement(n, k, num_trials=None, random_state=None):
     """
     Randomly choose k integers without replacement from 0, ..., n-1.
 
@@ -101,13 +108,14 @@ def sample_without_replacement(n, k, num_trials=None,
 
     Examples
     --------
-    >>> qe.random_mc.random_choice_without_replacement(5, 3)
-    array([1, 4, 3])
-    >>> qe.random_mc.random_choice_without_replacement(5, 3, num_trials=4)
-    array([[1, 2, 0],
-           [2, 0, 4],
-           [4, 1, 2],
-           [2, 3, 4]])
+    >>> qe.random.sample_without_replacement(5, 3, random_state=1234)
+    array([0, 2, 1])
+    >>> qe.random.sample_without_replacement(5, 3, num_trials=4,
+    ...                                      random_state=1234)
+    array([[0, 2, 1],
+           [3, 4, 0],
+           [1, 3, 2],
+           [4, 1, 3]])
 
     """
     if n <= 0:

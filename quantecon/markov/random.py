@@ -45,16 +45,16 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
 
     Examples
     --------
-    >>> mc = qe.random_markov_chain(3, random_state=1234)
+    >>> mc = qe.markov.random_markov_chain(3, random_state=1234)
     >>> mc.P
     array([[ 0.19151945,  0.43058932,  0.37789123],
            [ 0.43772774,  0.34763084,  0.21464142],
            [ 0.27259261,  0.5073832 ,  0.22002419]])
-    >>> mc = qe.random_markov_chain(3, k=2, random_state=1234)
+    >>> mc = qe.markov.random_markov_chain(3, k=2, random_state=1234)
     >>> mc.P
-    array([[ 0.        ,  0.80848055,  0.19151945],
-           [ 0.62210877,  0.        ,  0.37789123],
-           [ 0.        ,  0.56227226,  0.43772774]])
+    array([[ 0.19151945,  0.80848055,  0.        ],
+           [ 0.        ,  0.62210877,  0.37789123],
+           [ 0.56227226,  0.        ,  0.43772774]])
 
     """
     if sparse:
@@ -99,6 +99,10 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
     P : numpy ndarray or scipy sparse matrix (float, ndim=2)
         Stochastic matrix.
 
+    See also
+    --------
+    random_markov_chain : Return a random MarkovChain instance.
+
     """
     if not (isinstance(n, int) and n > 0):
         raise ValueError('n must be a positive integer')
@@ -132,4 +136,3 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
         P = np.zeros((n, n))
         P[rows, cols] = data
         return P
-
