@@ -1,5 +1,5 @@
 """
-Filename: random_mc.py
+Filename: random.py
 
 Author: Daisuke Oyama
 
@@ -11,8 +11,9 @@ import scipy.sparse
 
 from .core import MarkovChain
 from ..external import numba_installed, jit
-from ..util.random import (
-    check_random_state, probvec, sample_without_replacement
+from ..util import check_random_state
+from ..random import (
+    probvec, sample_without_replacement
 )
 
 

@@ -23,7 +23,7 @@ from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .tauchen import approx_markov
 from . import quad as quad
-from .util import searchsorted, random_probvec, random_sample_without_replacement
+from .util import searchsorted
 
 #-Module Imports-#
 from .util import random

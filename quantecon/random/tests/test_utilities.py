@@ -9,7 +9,7 @@ sample_without_replacement
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises
 from nose.tools import eq_
-from quantecon.util.random import sample_without_replacement
+from quantecon.random import sample_without_replacement
 
 
 # sample_without_replacement #
