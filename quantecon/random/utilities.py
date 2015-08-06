@@ -34,7 +34,7 @@ def probvec(m, k, random_state=None):
 
     Examples
     --------
-    >>> qe.util.random_probvec(2, 3, random_state=1234)
+    >>> qe.random.probvec(2, 3, random_state=1234)
     array([[ 0.19151945,  0.43058932,  0.37789123],
            [ 0.43772774,  0.34763084,  0.21464142]])
 

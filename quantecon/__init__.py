@@ -25,8 +25,5 @@ from .tauchen import approx_markov
 from . import quad as quad
 from .util import searchsorted
 
-#-Module Imports-#
-from .util import random
-
 #Add Version Attribute
 from .version import version as __version__
