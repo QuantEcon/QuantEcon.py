@@ -17,11 +17,12 @@ from .lqnash import nnash
 from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .quadsums import var_quadratic_sum, m_quadratic_sum
-from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, gth_solve
+#->Propose Delete From Top Level
+from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, gth_solve, approx_markov #Promote to keep current examples working
 from .markov import mc_compute_stationary, mc_sample_path 							#Imports that Should be Deprecated with markov package
+#<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
-from .tauchen import approx_markov
 from . import quad as quad
 from .util import searchsorted
 
