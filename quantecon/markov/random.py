@@ -11,7 +11,9 @@ import scipy.sparse
 
 from .core import MarkovChain
 from ..external import numba_installed, jit
-from ..util import check_random_state, random_probvec, random_sample_without_replacement
+from ..util.random import (
+    check_random_state, probvec, sample_without_replacement
+)
 
 
 def random_markov_chain(n, k=None, sparse=False, random_state=None):
@@ -112,7 +114,7 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
         raise ValueError('k must be an integer with 0 < k <= n')
 
     # n prob vectors of dimension k, shape (n, k)
-    probvecs = random_probvec(n, k, random_state=random_state)
+    probvecs = probvec(n, k, random_state=random_state)
 
     if k == n:
         P = probvecs
@@ -124,7 +126,7 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
     # if k < n:
     rows = np.repeat(np.arange(n), k)
     cols = \
-        random_sample_without_replacement(
+        sample_without_replacement(
             n, k, num_trials=n, random_state=random_state
         ).ravel()
     data = probvecs.ravel()
