@@ -1,9 +1,9 @@
 """
-Filename: test_tauchen.py
+Filename: test_approximation.py
 Authors: Chase Coleman
 Date: 07/18/2014
 
-Tests for tauchen.py file
+Tests for approximation.py file (i.e. tauchen)
 
 """
 import sys
@@ -11,10 +11,10 @@ import os
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.tauchen import approx_markov
+from quantecon.markov import tauchen
 
 
-class TestApproxMarkov(unittest.TestCase):
+class TestTauchen(unittest.TestCase):
 
     def setUp(self):
         self.rho, self.sigma_u = np.random.rand(2)
@@ -22,7 +22,7 @@ class TestApproxMarkov(unittest.TestCase):
         self.m = np.random.random_integers(4)
         self.tol = 1e-12
 
-        self.x, self.P = approx_markov(self.rho, self.sigma_u, self.m, self.n)
+        self.x, self.P = tauchen(self.rho, self.sigma_u, self.m, self.n)
 
     def tearDown(self):
         del self.x
@@ -51,5 +51,5 @@ class TestApproxMarkov(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestApproxMarkov)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestTauchen)
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)

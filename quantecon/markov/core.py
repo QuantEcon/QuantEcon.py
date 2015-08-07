@@ -2,7 +2,7 @@ r"""
 Authors: Chase Coleman, Spencer Lyon, Daisuke Oyama, Tom Sargent,
          John Stachurski
 
-Filename: mc_tools.py
+Filename: core.py
 
 This file contains some useful objects for handling a finite-state
 discrete-time Markov chain.
@@ -88,12 +88,12 @@ from __future__ import division
 import numpy as np
 from fractions import gcd
 import sys
-from .graph_tools import DiGraph
 from .gth_solve import gth_solve
+from ..graph_tools import DiGraph
 
 # -Check if Numba is Available- #
-from .external import numba_installed, jit
-from .utilities import searchsorted
+from ..external import numba_installed, jit
+from ..util import searchsorted
 
 
 class MarkovChain(object):
