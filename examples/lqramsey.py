@@ -9,7 +9,7 @@ related quantities.
 
 Functions for plotting the results are also provided below.
 
-See the lecture at http://quant-econ.net/lqramsey.html for a description of
+See the lecture at http://quant-econ.net/py/lqramsey.html for a description of
 the model.
 
 """

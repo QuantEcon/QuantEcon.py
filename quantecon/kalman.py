@@ -50,7 +50,7 @@ class Kalman(object):
     References
     ----------
 
-    http://quant-econ.net/kalman.html
+    http://quant-econ.net/py/kalman.html
 
     """
 
