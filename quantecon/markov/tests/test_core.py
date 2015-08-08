@@ -233,16 +233,19 @@ def test_simulate_shape():
                            (num_reps, ts_length))
 
 
-def test_simulate_lln():
+def test_simulate_ergodicity():
     P = [[0.4, 0.6], [0.2, 0.8]]
     stationary_dist = [0.25, 0.75]
+    init = 0
     mc = MarkovChain(P)
 
-    seed = 34
-    ts_length = 10**4
-    tol = 0.02
+    seed = 4433
+    ts_length = 100
+    num_reps = 300
+    tol = 0.1
 
-    frequency_1 = mc.simulate(ts_length, random_state=seed).mean()
+    x = mc.simulate(ts_length, init=init, num_reps=num_reps, random_state=seed)
+    frequency_1 = x[:, -1].mean()
     ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
@@ -288,6 +291,20 @@ def test_mc_sample_path():
     computed = mc_sample_path(P, init=distribution, sample_size=sample_size,
                               random_state=seed)
     assert_array_equal(computed, expected)
+
+
+def test_mc_sample_path_lln():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    stationary_dist = [0.25, 0.75]
+    init = 0
+
+    seed = 4433
+    sample_size = 10**4
+    tol = 0.02
+
+    frequency_1 = mc_sample_path(P, init=init, sample_size=sample_size,
+                                 random_state=seed).mean()
+    ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
 @raises(ValueError)
