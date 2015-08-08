@@ -11,7 +11,7 @@ from __future__ import division
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
-from nose.tools import eq_, raises
+from nose.tools import eq_, ok_, raises
 
 from quantecon.markov import (
     MarkovChain, mc_compute_stationary, mc_sample_path
@@ -231,6 +231,19 @@ def test_simulate_shape():
     for (ts_length, init, num_reps) in [(10, None, 3), (10, None, 1)]:
         assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
                            (num_reps, ts_length))
+
+
+def test_simulate_lln():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    stationary_dist = [0.25, 0.75]
+    mc = MarkovChain(P)
+
+    seed = 34
+    ts_length = 10**4
+    tol = 0.02
+
+    frequency_1 = mc.simulate(ts_length, random_state=seed).mean()
+    ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
 def test_simulate_for_matrices_with_C_F_orders():
