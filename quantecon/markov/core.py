@@ -2,7 +2,7 @@ r"""
 Authors: Chase Coleman, Spencer Lyon, Daisuke Oyama, Tom Sargent,
          John Stachurski
 
-Filename: mc_tools.py
+Filename: core.py
 
 This file contains some useful objects for handling a finite-state
 discrete-time Markov chain.
@@ -87,11 +87,11 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 from __future__ import division
 import numpy as np
 from fractions import gcd
-import sys
-from .graph_tools import DiGraph
 from .gth_solve import gth_solve
+from ..graph_tools import DiGraph
 
 # -Check if Numba is Available- #
+<<<<<<< HEAD
 <<<<<<< HEAD
 from ..util import searchsorted, numba_installed, jit
 =======
@@ -99,6 +99,11 @@ from .external import numba_installed, jit
 
 from .util import searchsorted, check_random_state
 >>>>>>> `random_state` option, as well as tests, added
+=======
+from ..external import numba_installed, jit
+
+from ..util import searchsorted, check_random_state
+>>>>>>> Import statements corrected
 
 
 class MarkovChain(object):
