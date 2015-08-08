@@ -118,13 +118,6 @@ class MarkovChain(object):
     P : array_like(float, ndim=2)
         The transition matrix.  Must be of shape n x n.
 
-    random_state : scalar(int) or np.random.RandomState,
-                   optional(default=None)
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
-
     Attributes
     ----------
     P : see Parameters
@@ -160,7 +153,7 @@ class MarkovChain(object):
 
     """
 
-    def __init__(self, P, random_state=None):
+    def __init__(self, P):
         self.P = np.asarray(P)
 
         # Check Properties
@@ -178,9 +171,6 @@ class MarkovChain(object):
 
         # The number of states
         self.n = self.P.shape[0]
-
-        # random state
-        self.random_state = random_state
 
         # To analyze the structure of P as a directed graph
         self._digraph = None
@@ -288,7 +278,7 @@ class MarkovChain(object):
             self._cdfs = cdfs
         return self._cdfs
 
-    def simulate(self, ts_length, init=None, num_reps=None):
+    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
         """
         Simulate time series of state transitions.
 
@@ -306,6 +296,13 @@ class MarkovChain(object):
             Number of simulations. Relevant only when init is a scalar
             or None.
 
+        random_state : scalar(int) or np.random.RandomState,
+                       optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
+
         Returns
         -------
         X : ndarray(int, ndim=1 or 2)
@@ -315,7 +312,7 @@ class MarkovChain(object):
             init is an array_like, otherwise k = num_reps.
 
         """
-        random_state = check_random_state(self.random_state)
+        random_state = check_random_state(random_state)
 
         try:
             k = len(init)  # init is an array
@@ -439,5 +436,6 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
         u_0 = random_state.random_sample()
         X_0 = searchsorted(cdf0, u_0)
 
-    mc = MarkovChain(P, random_state=random_state)
-    return mc.simulate(ts_length=sample_size, init=X_0)
+    mc = MarkovChain(P)
+    return mc.simulate(ts_length=sample_size, init=X_0,
+                       random_state=random_state)
