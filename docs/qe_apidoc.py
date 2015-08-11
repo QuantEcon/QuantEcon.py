@@ -156,6 +156,12 @@ def all_auto():
 
 
 def model_tool():
+    # list file names with markov
+    markov_files = glob("../quantecon/markov/[a-z0-9]*.py")
+    markov = map(lambda x: x.split('/')[-1][:-3], markov_files)
+    # Alphabetize
+    markov.sort()
+
     # list file names with models
     mod_files = glob("../quantecon/models/[a-z0-9]*.py")
     models = map(lambda x: x.split('/')[-1][:-3], mod_files)
@@ -168,15 +174,29 @@ def model_tool():
     # Alphabetize
     solow.sort()
 
+    # list file names with random
+    random_files = glob("../quantecon/random/[a-z0-9]*.py")
+    random = map(lambda x: x.split('/')[-1][:-3], random_files)
+    # Alphabetize
+    random.sort()
+
     # list file names of tools
     tool_files = glob("../quantecon/[a-z0-9]*.py")
     tools = map(lambda x: x.split('/')[-1][:-3], tool_files)
     # Alphabetize
     tools.sort()
 
-    for folder in ["models","models/solow", "tools"]:
+
+    for folder in ["markov","models","models/solow","random","tools"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
+
+    # Write file for each markov file
+    for mod in markov:
+        new_path = os.path.join("source", "markov", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(model_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each model
     for mod in models:
@@ -192,6 +212,13 @@ def model_tool():
             equals = "=" * len(mod)
             f.write(solow_model_module_template.format(mod_name=mod, equals=equals))  
 
+    # Write file for each random file
+    for mod in random:
+        new_path = os.path.join("source", "random", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(model_module_template.format(mod_name=mod, equals=equals))
+
     # Write file for each tool
     for mod in tools:
         new_path = os.path.join("source", "tools", mod + ".rst")
@@ -203,14 +230,18 @@ def model_tool():
     with open(source_join("index.rst"), "w") as index:
         index.write(split_index_template)
 
+    mark = "markov/" + "\n   markov/".join(markov)
     mods = "models/" + "\n   models/".join(models)
-    sol = "models/solow/" + "\n   models/solow/".join(solow)
-    mods = mods  + "\n   solow"                                 #Add solow sub directory to models
+    mods = mods  + "\n   solow/"                                 #Add solow sub directory to models
+    rand = "random/" + "\n   random/".join(random)
     tlz = "tools/" + "\n   tools/".join(tools)
-    toc_tree_list = {"models": mods,
-                     "tools": tlz}
+    toc_tree_list = {"markov":mark,
+                     "models": mods,
+                     "tools": tlz,
+                     "random":rand,
+                     }
 
-    for f_name in ("models", "tools"):
+    for f_name in ("markov","models","random","tools"):
         with open(source_join(f_name + ".rst"), "w") as f:
             temp = split_file_template.format(name=f_name.capitalize(),
                                               equals="="*len(f_name),
