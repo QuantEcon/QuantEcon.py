@@ -39,6 +39,7 @@ from glob import glob
 ######################
 ## String Templates ##
 ######################
+
 module_template = """{mod_name}
 {equals}
 
@@ -221,6 +222,7 @@ def model_tool():
     # Alphabetize
     util.sort()
 
+
     for folder in ["markov","models","models/solow","random","tools","util"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
@@ -277,6 +279,7 @@ def model_tool():
     rand = "random/" + "\n   random/".join(random)
     tlz = "tools/" + "\n   tools/".join(tools)
     utls = "util/" + "\n   util/".join(util)
+    #-TocTree-#
     toc_tree_list = {"markov":mark,
                      "models": mods,
                      "tools": tlz,
