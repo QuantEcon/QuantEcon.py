@@ -10,7 +10,9 @@ econ.net <http://quant-econ.net>`_.
 .. toctree::
    :maxdepth: 2
 
+   markov
    models
+   random
    tools
 
 Indices and tables

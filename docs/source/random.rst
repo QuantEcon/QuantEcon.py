@@ -4,4 +4,4 @@ Random
 .. toctree::
    :maxdepth: 2
 
-   random/
+   random/utilities

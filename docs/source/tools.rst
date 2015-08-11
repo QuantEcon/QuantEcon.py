@@ -16,7 +16,6 @@ Tools
    tools/external
    tools/graph_tools
    tools/gridtools
-   tools/gth_solve
    tools/ivp
    tools/kalman
    tools/lae
@@ -24,12 +23,9 @@ Tools
    tools/lqnash
    tools/lss
    tools/matrix_eqn
-   tools/mc_tools
    tools/quad
    tools/quadsums
    tools/rank_nullspace
    tools/robustlq
-   tools/tauchen
    tools/timing
-   tools/utilities
    tools/version
