@@ -28,4 +28,3 @@ Tools
    tools/rank_nullspace
    tools/robustlq
    tools/timing
-   tools/version
