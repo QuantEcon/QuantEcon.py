@@ -229,7 +229,6 @@ def model_tool():
     # Alphabetize
     util.sort()
 
-
     for folder in ["markov","models","models/solow","random","tools","util"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
