@@ -39,7 +39,6 @@ def probvec(m, k, random_state=None):
            [ 0.43772774,  0.34763084,  0.21464142]])
 
     """
-
     x = np.empty((m, k+1))
 
     random_state = check_random_state(random_state)
@@ -91,7 +90,6 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
            [4, 1, 3]])
 
     """
-    
     if n <= 0:
         raise ValueError('n must be greater than 0')
     if k > n:
