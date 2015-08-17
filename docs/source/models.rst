@@ -11,3 +11,4 @@ Models
    models/lucastree
    models/odu
    models/optgrowth
+   solow/

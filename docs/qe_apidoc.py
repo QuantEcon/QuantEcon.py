@@ -39,6 +39,7 @@ from glob import glob
 ######################
 ## String Templates ##
 ######################
+
 module_template = """{mod_name}
 {equals}
 
@@ -48,10 +49,46 @@ module_template = """{mod_name}
     :show-inheritance:
 """
 
+markov_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.markov.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
 model_module_template = """{mod_name}
 {equals}
 
 .. automodule:: quantecon.models.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
+solow_model_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.models.solow.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
+random_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.random.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
+util_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.util.{mod_name}
     :members:
     :undoc-members:
     :show-inheritance:
@@ -81,16 +118,24 @@ split_index_template = """=======================
 QuantEcon documentation
 =======================
 
-The `quantecon` python library is composed of two main section: models
-and tools. The models section contains implementations of standard
+The `quantecon` python library consists of a number of modules which
+includes economic models (models), markov chains (markov), random 
+generation utilities (random), a collection of tools (tools), 
+and other utilities (util) which are 
+mainly used by developers internal to the package. 
+
+The models section, for example, contains implementations of standard
 models, many of which are discussed in lectures on the website `quant-
 econ.net <http://quant-econ.net>`_.
 
 .. toctree::
    :maxdepth: 2
 
+   markov
    models
+   random
    tools
+   util
 
 Indices and tables
 ==================
@@ -147,21 +192,53 @@ def all_auto():
 
 
 def model_tool():
+    # list file names with markov
+    markov_files = glob("../quantecon/markov/[a-z0-9]*.py")
+    markov = map(lambda x: x.split('/')[-1][:-3], markov_files)
+    # Alphabetize
+    markov.sort()
+
     # list file names with models
     mod_files = glob("../quantecon/models/[a-z0-9]*.py")
     models = map(lambda x: x.split('/')[-1][:-3], mod_files)
     # Alphabetize
     models.sort()
 
-    # list file names of tools
+    # list file names with models.solow
+    solow_files = glob("../quantecon/models/solow/[a-z0-9]*.py")
+    solow = map(lambda x: x.split('/')[-1][:-3], solow_files)
+    # Alphabetize
+    solow.sort()
+
+    # list file names with random
+    random_files = glob("../quantecon/random/[a-z0-9]*.py")
+    random = map(lambda x: x.split('/')[-1][:-3], random_files)
+    # Alphabetize
+    random.sort()
+
+    # list file names of tools (base level modules)
     tool_files = glob("../quantecon/[a-z0-9]*.py")
     tools = map(lambda x: x.split('/')[-1][:-3], tool_files)
     # Alphabetize
+    tools.remove("version")
     tools.sort()
+    
+    # list file names of utilities
+    util_files = glob("../quantecon/util/[a-z0-9]*.py")
+    util = map(lambda x: x.split('/')[-1][:-3], util_files)
+    # Alphabetize
+    util.sort()
 
-    for folder in ["models", "tools"]:
+    for folder in ["markov","models","models/solow","random","tools","util"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
+
+    # Write file for each markov file
+    for mod in markov:
+        new_path = os.path.join("source", "markov", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(markov_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each model
     for mod in models:
@@ -170,23 +247,53 @@ def model_tool():
             equals = "=" * len(mod)
             f.write(model_module_template.format(mod_name=mod, equals=equals))
 
-    # Write file for each tool
+    # Write file for each model.solow
+    for mod in solow:
+        new_path = os.path.join("source", "models", "solow", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(solow_model_module_template.format(mod_name=mod, equals=equals))  
+
+    # Write file for each random file
+    for mod in random:
+        new_path = os.path.join("source", "random", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(random_module_template.format(mod_name=mod, equals=equals))
+
+    # Write file for each tool (base level modules)
     for mod in tools:
         new_path = os.path.join("source", "tools", mod + ".rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(module_template.format(mod_name=mod, equals=equals))
 
+    # Write file for each utility
+    for mod in util:
+        new_path = os.path.join("source", "util", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(util_module_template.format(mod_name=mod, equals=equals))
+
     # write (index|models|tools).rst file to include autogenerated files
     with open(source_join("index.rst"), "w") as index:
         index.write(split_index_template)
 
+    mark = "markov/" + "\n   markov/".join(markov)
     mods = "models/" + "\n   models/".join(models)
+    mods = mods  + "\n   solow/"                                 #Add solow sub directory to models
+    rand = "random/" + "\n   random/".join(random)
     tlz = "tools/" + "\n   tools/".join(tools)
-    toc_tree_list = {"models": mods,
-                     "tools": tlz}
+    utls = "util/" + "\n   util/".join(util)
+    #-TocTree-#
+    toc_tree_list = {"markov":mark,
+                     "models": mods,
+                     "tools": tlz,
+                     "random":rand,
+                     "util":utls,
+                     }
 
-    for f_name in ("models", "tools"):
+    for f_name in ("markov","models","random","tools","util"):
         with open(source_join(f_name + ".rst"), "w") as f:
             temp = split_file_template.format(name=f_name.capitalize(),
                                               equals="="*len(f_name),

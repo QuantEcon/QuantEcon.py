@@ -1,7 +1,7 @@
-version
-=======
+array
+=====
 
-.. automodule:: quantecon.version
+.. automodule:: quantecon.util.array
     :members:
     :undoc-members:
     :show-inheritance:

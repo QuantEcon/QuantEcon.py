@@ -119,4 +119,6 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
         return result
 
 if numba_installed:
+    docs = sample_without_replacement.__doc__
     sample_without_replacement = jit(sample_without_replacement)
+    sample_without_replacement.__doc__ = docs

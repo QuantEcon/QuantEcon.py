@@ -1,7 +1,7 @@
-cartesian
-=========
+external
+========
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.external
     :members:
     :undoc-members:
     :show-inheritance:

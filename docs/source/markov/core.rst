@@ -1,7 +1,7 @@
-cartesian
-=========
+core
+====
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.markov.core
     :members:
     :undoc-members:
     :show-inheritance:

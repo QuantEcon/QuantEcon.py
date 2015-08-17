@@ -1,7 +1,7 @@
-cartesian
-=========
+model
+=====
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.models.solow.model
     :members:
     :undoc-members:
     :show-inheritance:

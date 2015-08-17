@@ -1,7 +1,7 @@
-mc_tools
-========
+timing
+======
 
-.. automodule:: quantecon.mc_tools
+.. automodule:: quantecon.timing
     :members:
     :undoc-members:
     :show-inheritance:

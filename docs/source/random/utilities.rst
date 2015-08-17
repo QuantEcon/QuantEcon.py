@@ -1,7 +1,7 @@
-cartesian
+utilities
 =========
 
-.. automodule:: quantecon.cartesian
+.. automodule:: quantecon.random.utilities
     :members:
     :undoc-members:
     :show-inheritance:
