@@ -9,13 +9,12 @@ Generate a MarkovChain randomly.
 import numpy as np
 import scipy.sparse
 
-from .core import MarkovChain
-from ..external import numba_installed, jit
-from ..util import check_random_state
+from ..util import check_random_state, numba_installed, jit
 from ..random import (
     probvec, sample_without_replacement
 )
 
+from .core import MarkovChain
 
 def random_markov_chain(n, k=None, sparse=False, random_state=None):
     """

@@ -9,7 +9,7 @@ searchsorted
 """
 
 import numpy as np
-from ..external import numba_installed, jit
+from .external import numba_installed, jit
 
 # ----------------- #
 # -ARRAY UTILITIES- #
