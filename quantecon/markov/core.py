@@ -92,8 +92,7 @@ from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
 
 # -Check if Numba is Available- #
-from ..external import numba_installed, jit
-from ..util import searchsorted
+from ..util import searchsorted, numba_installed, jit
 
 
 class MarkovChain(object):

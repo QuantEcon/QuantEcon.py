@@ -17,7 +17,7 @@ from quantecon.markov import (
     MarkovChain, mc_compute_stationary, mc_sample_path
 )
 
-from quantecon.external import numba_installed, jit
+from quantecon.util import numba_installed, jit
 
 
 def list_of_array_equal(s, t):

@@ -3,8 +3,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import numpy as np
-from ..external import numba_installed, jit
-from ..util import check_random_state
+from ..util import check_random_state, numba_installed, jit
 
 #-Generating Arrays and Vectors-#
 

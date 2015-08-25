@@ -9,10 +9,9 @@ from textwrap import dedent
 import numpy as np
 from numpy.random import multivariate_normal
 from scipy.linalg import solve
-import warnings
 
 #-Check if Numba is Available-#
-from .external import numba_installed, jit
+from .util import numba_installed, jit
 
 def simulate_linear_model(A, x0, v, ts_length):
     """
