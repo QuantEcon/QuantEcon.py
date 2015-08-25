@@ -596,8 +596,11 @@ class MDP(object):
             Solution method.
 
         v_init : array_like(float, ndim=1), optional(default=None)
-            Initial value function, of length n. If None, set v_init(s)
-            = max_a r(s, a).
+            Initial value function, of length n. If None, `v_init` is
+            set such that v_init(s) = max_a r(s, a) for value iteration
+            and policy iteration; for modified policy iteration,
+            v_init(s) = min_(s', a) r(s', a)/(1 - beta) to guarantee
+            convergence.
 
         epsilon : scalar(float), optional(default=None)
             Value for epsilon-optimality. If None, the value stored in
@@ -731,7 +734,7 @@ class MDP(object):
 
         v = np.empty(self.num_states)
         if v_init is None:
-            self.s_wise_max(self.R, out=v)
+            v[:] = self.R[self.R > -np.inf].min() / (1 - self.beta)
         else:
             v[:] = v_init
 
