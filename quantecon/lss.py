@@ -11,7 +11,7 @@ from numpy.random import multivariate_normal
 from scipy.linalg import solve
 
 #-Check if Numba is Available-#
-from util import numba_installed, jit
+from .util import numba_installed, jit
 
 def simulate_linear_model(A, x0, v, ts_length):
     """
