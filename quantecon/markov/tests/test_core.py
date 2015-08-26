@@ -11,13 +11,11 @@ from __future__ import division
 
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
-from nose.tools import eq_, raises
+from nose.tools import eq_, ok_, raises
 
 from quantecon.markov import (
     MarkovChain, mc_compute_stationary, mc_sample_path
 )
-
-from quantecon.util import numba_installed, jit
 
 
 def list_of_array_equal(s, t):
@@ -216,6 +214,55 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
                 assert_allclose(np.dot(curr_v, mc.P), curr_v, atol=self.TOL)
 
 
+def test_simulate_shape():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    (ts_length, init, num_reps) = (10, None, None)
+    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                       (ts_length,))
+
+    (ts_length, init, num_reps) = (10, [0, 1], None)
+    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                       (len(init), ts_length))
+
+    (ts_length, init, num_reps) = (10, [0, 1], 3)
+    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                       (len(init)*num_reps, ts_length))
+
+    for (ts_length, init, num_reps) in [(10, None, 3), (10, None, 1)]:
+        assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                           (num_reps, ts_length))
+
+
+def test_simulate_init_array_num_reps():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    ts_length = 10
+    init=[0, 1]
+    num_reps=3
+
+    X = mc.simulate(ts_length, init, num_reps)
+    assert_array_equal(X[:, 0], init*num_reps)
+
+
+def test_simulate_ergodicity():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    stationary_dist = [0.25, 0.75]
+    init = 0
+    mc = MarkovChain(P)
+
+    seed = 4433
+    ts_length = 100
+    num_reps = 300
+    tol = 0.1
+
+    x = mc.simulate(ts_length, init=init, num_reps=num_reps, random_state=seed)
+    frequency_1 = x[:, -1].mean()
+    ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
+
+
 def test_simulate_for_matrices_with_C_F_orders():
     """
     Test MarkovChasin.simulate for matrices with C- and F-orders
@@ -226,17 +273,52 @@ def test_simulate_for_matrices_with_C_F_orders():
     P_C = np.array([[0.5, 0.5], [0, 1]], order='C')
     P_F = np.array([[0.5, 0.5], [0, 1]], order='F')
     init = 1
-    sample_size = 10
-    sample_path = np.ones(sample_size, dtype=int)
+    ts_length = 10
+    sample_path = np.ones(ts_length, dtype=int)
 
     computed_C_and_F = \
-        MarkovChain(np.array([[1.]])).simulate(init=0, sample_size=sample_size)
-    assert_array_equal(computed_C_and_F, np.zeros(sample_size, dtype=int))
+        MarkovChain(np.array([[1.]])).simulate(ts_length, init=0)
+    assert_array_equal(computed_C_and_F, np.zeros(ts_length, dtype=int))
 
-    computed_C = MarkovChain(P_C).simulate(init, sample_size)
-    computed_F = MarkovChain(P_F).simulate(init, sample_size)
+    computed_C = MarkovChain(P_C).simulate(ts_length, init)
+    computed_F = MarkovChain(P_F).simulate(ts_length, init=init)
     assert_array_equal(computed_C, sample_path)
     assert_array_equal(computed_F, sample_path)
+
+
+def test_mc_sample_path():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    init = 0
+    sample_size = 10
+
+    seed = 42
+
+    # init: integer
+    expected = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1]
+    computed = mc_sample_path(P, init=init, sample_size=sample_size,
+                              random_state=seed)
+    assert_array_equal(computed, expected)
+
+    # init: distribution
+    distribution = (0.5, 0.5)
+    expected = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1]
+    computed = mc_sample_path(P, init=distribution, sample_size=sample_size,
+                              random_state=seed)
+    assert_array_equal(computed, expected)
+
+
+def test_mc_sample_path_lln():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    stationary_dist = [0.25, 0.75]
+    init = 0
+
+    seed = 4433
+    sample_size = 10**4
+    tol = 0.02
+
+    frequency_1 = mc_sample_path(P, init=init, sample_size=sample_size,
+                                 random_state=seed).mean()
+    ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
 @raises(ValueError)
