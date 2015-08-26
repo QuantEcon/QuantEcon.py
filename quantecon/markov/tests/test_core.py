@@ -224,13 +224,29 @@ def test_simulate_shape():
     assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
                        (ts_length,))
 
-    for (ts_length, init, num_reps) in [(10, [0, 1], None), (10, [0, 1], 3)]:
-        assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
-                           (len(init), ts_length))
+    (ts_length, init, num_reps) = (10, [0, 1], None)
+    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                       (len(init), ts_length))
+
+    (ts_length, init, num_reps) = (10, [0, 1], 3)
+    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                       (len(init)*num_reps, ts_length))
 
     for (ts_length, init, num_reps) in [(10, None, 3), (10, None, 1)]:
         assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
                            (num_reps, ts_length))
+
+
+def test_simulate_init_array_num_reps():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    ts_length = 10
+    init=[0, 1]
+    num_reps=3
+
+    X = mc.simulate(ts_length, init, num_reps)
+    assert_array_equal(X[:, 0], init*num_reps)
 
 
 def test_simulate_ergodicity():

@@ -281,15 +281,14 @@ class MarkovChain(object):
             drawn.
 
         num_reps : scalar(int), optional(default=None)
-            Number of simulations. Relevant only when init is a scalar
-            or None.
+            Number of repetitions of simulation.
 
         random_state : scalar(int) or np.random.RandomState,
                        optional(default=None)
-            Random seed (integer) or np.random.RandomState instance to set
-            the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState is
-            used.
+            Random seed (integer) or np.random.RandomState instance to
+            set the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState
+            is used.
 
         Returns
         -------
@@ -297,17 +296,26 @@ class MarkovChain(object):
             Array containing the sample path(s), of shape (ts_length,)
             if init is a scalar (integer) or None and num_reps is None;
             of shape (k, ts_length) otherwise, where k = len(init) if
-            init is an array_like, otherwise k = num_reps.
+            (init, num_reps) = (array, None), k = num_reps if (init,
+            num_reps) = (int or None, int), and k = len(init)*num_reps
+            if (init, num_reps) = (array, int).
 
         """
         random_state = check_random_state(random_state)
+        dim = 1  # Dimension of the returned array: 1 or 2
 
         try:
             k = len(init)  # init is an array
-            num_reps = k  # make num_reps not None
+            dim = 2
             init_states = np.asarray(init, dtype=int)
+            if num_reps is not None:
+                k *= num_reps
+                init_states = np.tile(init_states, num_reps)
         except TypeError:  # init is a scalar(int) or None
-            k = 1 if num_reps is None else num_reps
+            k = 1
+            if num_reps is not None:
+                dim = 2
+                k = num_reps
             if init is None:
                 init_states = random_state.randint(self.n, size=k)
             elif isinstance(init, int):
@@ -326,7 +334,7 @@ class MarkovChain(object):
         # Generate sample paths and store in X
         _generate_sample_paths(self.cdfs, init_states, random_values, out=X)
 
-        if num_reps is None:
+        if dim == 1:
             return X[0]
         else:
             return X
