@@ -91,19 +91,7 @@ from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
 
 # -Check if Numba is Available- #
-<<<<<<< HEAD
-<<<<<<< HEAD
-from ..util import searchsorted, numba_installed, jit
-=======
-from .external import numba_installed, jit
-
-from .util import searchsorted, check_random_state
->>>>>>> `random_state` option, as well as tests, added
-=======
-from ..external import numba_installed, jit
-
-from ..util import searchsorted, check_random_state
->>>>>>> Import statements corrected
+from ..util import searchsorted, check_random_state, numba_installed, jit
 
 
 class MarkovChain(object):
