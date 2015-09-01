@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: quantecon
-Version: 0.1.8
+Version: 0.1.9
 Summary: QuantEcon is a package to support all forms of quantitative economic modelling.
 Home-page: https://github.com/QuantEcon/QuantEcon.py
 Author: Thomas J. Sargent and John Stachurski (Project coordinators)
