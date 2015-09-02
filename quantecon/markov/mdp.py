@@ -814,8 +814,6 @@ class MDP(object):
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)
-        if self._sparse:
-            Q_sigma = Q_sigma.toarray()
         return MarkovChain(Q_sigma)
 
 
