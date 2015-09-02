@@ -35,6 +35,7 @@ quantecon/markov/core.py
 quantecon/markov/gth_solve.py
 quantecon/markov/random.py
 quantecon/models/__init__.py
+quantecon/models/arellano_vfi.py
 quantecon/models/asset_pricing.py
 quantecon/models/career.py
 quantecon/models/ifp.py

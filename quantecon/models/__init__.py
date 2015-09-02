@@ -17,3 +17,4 @@ from .jv import JvWorker
 from .lucastree import LucasTree
 from .odu import SearchProblem
 from .optgrowth import GrowthModel
+from .arellano_vfi import Arellano_Economy
