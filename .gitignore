@@ -3,7 +3,7 @@
 
 build/
 /dist/
-/*.egg_info
+quantecon.egg-info/
 *.DS_Store
 *.TODO
 *.noseids
