@@ -9,12 +9,13 @@ Generate a MarkovChain randomly.
 import numpy as np
 import scipy.sparse
 
-from ..util import check_random_state, numba_installed, jit
+from ..util import check_random_state
 from ..random import (
     probvec, sample_without_replacement
 )
 
 from .core import MarkovChain
+
 
 def random_markov_chain(n, k=None, sparse=False, random_state=None):
     """
@@ -32,7 +33,7 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
 
     sparse : bool, optional(default=False)
         Whether to store the transition probability matrix in sparse
-        matrix form. (Sparse format is not yet implemented.)
+        matrix form.
 
     random_state : scalar(int) or np.random.RandomState,
                    optional(default=None)
@@ -59,8 +60,6 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
            [ 0.56227226,  0.        ,  0.43772774]])
 
     """
-    if sparse:
-        raise NotImplementedError
     P = random_stochastic_matrix(n, k, sparse, format='csr',
                                  random_state=random_state)
     mc = MarkovChain(P)

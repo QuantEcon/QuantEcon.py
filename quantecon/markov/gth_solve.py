@@ -18,7 +18,7 @@ if not numba_installed:
         xrange = range
 
 
-def gth_solve(A):
+def gth_solve(A, overwrite=False):
     r"""
     This routine computes the stationary distribution of an irreducible
     Markov transition matrix (stochastic matrix) or transition rate
@@ -51,6 +51,9 @@ def gth_solve(A):
     x : numpy.ndarray(float, ndim=1)
         Stationary distribution of `A`.
 
+    overwrite : bool, optional(default=False)
+        Whether to overwrite `A`.
+
     References
     ----------
     .. [1] W. K. Grassmann, M. I. Taksar and D. P. Heyman, "Regenerative
@@ -61,7 +64,7 @@ def gth_solve(A):
        Simulation, Princeton University Press, 2009.
 
     """
-    A1 = np.array(A, dtype=float, copy=True, order='C')
+    A1 = np.array(A, dtype=float, copy=not overwrite, order='C')
     # `order='C'` is for use with Numba <= 0.18.2
     # See issue github.com/numba/numba/issues/1103
 

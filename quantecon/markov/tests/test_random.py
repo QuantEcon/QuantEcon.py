@@ -2,7 +2,7 @@
 Filename: test_random.py
 Author: Daisuke Oyama
 
-Tests for markov/random_mc.py
+Tests for markov/random.py
 
 """
 import numpy as np
@@ -27,7 +27,6 @@ def test_random_markov_chain_dense():
         assert_array_equal((P > 0).sum(axis=1), [mc_dict['k']]*n)
 
 
-@raises(NotImplementedError)
 def test_random_markov_chain_sparse():
     sparse = True
     n, k = 5, 3

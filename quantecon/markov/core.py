@@ -86,6 +86,7 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 """
 from __future__ import division
 import numpy as np
+from scipy import sparse
 from fractions import gcd
 from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
@@ -103,12 +104,13 @@ class MarkovChain(object):
 
     Parameters
     ----------
-    P : array_like(float, ndim=2)
+    P : array_like or scipy sparse matrix (float, ndim=2)
         The transition matrix.  Must be of shape n x n.
 
     Attributes
     ----------
-    P : see Parameters
+    P : ndarray or scipy.sparse.csr_matrix (float, ndim=2)
+        See Parameters
 
     stationary_distributions : array_like(float, ndim=2)
         Array containing stationary distributions, one for each
@@ -139,32 +141,50 @@ class MarkovChain(object):
         List of numpy arrays containing the cyclic classes. Defined only
         when the Markov chain is irreducible.
 
+    Notes
+    -----
+    In computing stationary distributions, if the input matrix is a
+    sparse matrix, internally it is converted to a dense matrix.
+
     """
 
     def __init__(self, P):
-        self.P = np.asarray(P)
+        if sparse.issparse(P):  # Sparse matrix
+            self.P = sparse.csr_matrix(P)
+            self.is_sparse = True
+        else:  # Dense matrix
+            self.P = np.asarray(P)
+            self.is_sparse = False
 
         # Check Properties
         # Double check that P is a square matrix
         if len(self.P.shape) != 2 or self.P.shape[0] != self.P.shape[1]:
             raise ValueError('P must be a square matrix')
 
+        # The number of states
+        self.n = self.P.shape[0]
+
         # Double check that P is a nonnegative matrix
-        if not np.all(self.P >= 0):
+        if not self.is_sparse:
+            data_nonnegative = (self.P >= 0)  # ndarray
+        else:
+            data_nonnegative = (self.P.data >= 0)  # csr_matrx
+        if not np.all(data_nonnegative):
             raise ValueError('P must be nonnegative')
 
         # Double check that the rows of P sum to one
-        if not np.allclose(np.sum(self.P, axis=1), np.ones(self.P.shape[0])):
+        row_sums = self.P.sum(axis=1)
+        if self.is_sparse:  # row_sums is np.matrix (ndim=2)
+            row_sums = row_sums.getA1()
+        if not np.allclose(row_sums, np.ones(self.n)):
             raise ValueError('The rows of P must sum to 1')
-
-        # The number of states
-        self.n = self.P.shape[0]
 
         # To analyze the structure of P as a directed graph
         self._digraph = None
 
         self._stationary_dists = None
-        self._cdfs = None
+        self._cdfs = None  # For dense matrix
+        self._cdfs1d = None  # For sparse matrix
 
     def __repr__(self):
         msg = "Markov chain with transition matrix \nP = \n{0}"
@@ -221,7 +241,7 @@ class MarkovChain(object):
             # Determine the period, the LCM of the periods of rec_classes
             d = 1
             for rec_class in rec_classes:
-                period = DiGraph(self.P[rec_class, :][:, rec_class]).period
+                period = self.digraph.subgraph(rec_class).period
                 d = (d * period) // gcd(d, period)
 
             return d
@@ -241,13 +261,23 @@ class MarkovChain(object):
 
         """
         if self.is_irreducible:
-            stationary_dists = gth_solve(self.P).reshape(1, self.n)
+            if not self.is_sparse:  # Dense
+                stationary_dists = gth_solve(self.P).reshape(1, self.n)
+            else:  # Sparse
+                stationary_dists = \
+                    gth_solve(self.P.toarray(),
+                              overwrite=True).reshape(1, self.n)
         else:
             rec_classes = self.recurrent_classes
             stationary_dists = np.zeros((len(rec_classes), self.n))
             for i, rec_class in enumerate(rec_classes):
-                stationary_dists[i, rec_class] = \
-                    gth_solve(self.P[rec_class, :][:, rec_class])
+                if not self.is_sparse:  # Dense
+                    stationary_dists[i, rec_class] = \
+                        gth_solve(self.P[rec_class, :][:, rec_class])
+                else:  # Sparse
+                    stationary_dists[i, rec_class] = \
+                        gth_solve(self.P[rec_class, :][:, rec_class].toarray(),
+                                  overwrite=True)
 
         self._stationary_dists = stationary_dists
 
@@ -259,12 +289,26 @@ class MarkovChain(object):
 
     @property
     def cdfs(self):
-        if self._cdfs is None:
+        if (self._cdfs is None) and not self.is_sparse:
             # See issue #137#issuecomment-96128186
             cdfs = np.empty((self.n, self.n), order='C')
             np.cumsum(self.P, axis=-1, out=cdfs)
             self._cdfs = cdfs
         return self._cdfs
+
+    @property
+    def cdfs1d(self):
+        if (self._cdfs1d is None) and self.is_sparse:
+            data = self.P.data
+            indices = self.P.indices
+            indptr = self.P.indptr
+
+            cdfs1d = np.empty(self.P.nnz, order='C')
+            for i in range(self.n):
+                cdfs1d[indptr[i]:indptr[i+1]] = \
+                    data[indptr[i]:indptr[i+1]].cumsum()
+            self._cdfs1d = cdfs1d
+        return self._cdfs1d
 
     def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
         """
@@ -332,7 +376,15 @@ class MarkovChain(object):
         random_values = random_state.random_sample(size=(k, ts_length-1))
 
         # Generate sample paths and store in X
-        _generate_sample_paths(self.cdfs, init_states, random_values, out=X)
+        if not self.is_sparse:  # Dense
+            _generate_sample_paths(
+                self.cdfs, init_states, random_values, out=X
+            )
+        else:  # Sparse
+            _generate_sample_paths_sparse(
+                self.cdfs1d, self.P.indices, self.P.indptr, init_states,
+                random_values, out=X
+            )
 
         if dim == 1:
             return X[0]
@@ -375,6 +427,55 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
 
 if numba_installed:
     _generate_sample_paths = jit(nopython=True)(_generate_sample_paths)
+
+
+def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
+                                  random_values, out):
+    """
+    For sparse matrix.
+
+    Generate num_reps sample paths of length ts_length, where num_reps =
+    out.shape[0] and ts_length = out.shape[1].
+
+    Parameters
+    ----------
+    P_cdfs1d : ndarray(float, ndim=1)
+        1D array containing the CDFs of the state transition.
+
+    indices : ndarray(int, ndim=1)
+        CSR format index array.
+
+    indptr : ndarray(int, ndim=1)
+        CSR format index pointer array.
+
+    init_states : array_like(int, ndim=1)
+        Array containing the initial states. Its length must be equal to
+        num_reps.
+
+    random_values : ndarray(float, ndim=2)
+        Array containing random values from [0, 1). Its shape must be
+        equal to (num_reps, ts_length-1)
+
+    out : ndarray(int, ndim=2)
+        Array to store the sample paths.
+
+    Notes
+    -----
+    This routine is jit-complied if the module Numba is vailable.
+
+    """
+    num_reps, ts_length = out.shape
+
+    for i in range(num_reps):
+        out[i, 0] = init_states[i]
+        for t in range(ts_length-1):
+            k = searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
+                             random_values[i, t])
+            out[i, t+1] = indices[indptr[out[i, t]]+k]
+
+if numba_installed:
+    _generate_sample_paths_sparse = \
+        jit(nopython=True)(_generate_sample_paths_sparse)
 
 
 def mc_compute_stationary(P):

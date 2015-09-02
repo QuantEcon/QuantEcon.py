@@ -4,13 +4,15 @@ Tests for mc_tools.py
 Functions
 ---------
     mc_compute_stationary   [Status: Tested in test_markovchain_pmatrices]
-    mc_sample_path          [Status: TBD]
+    mc_sample_path          [Status: Tested in test_mc_sample_path]
 
 """
 from __future__ import division
 
 import numpy as np
-from numpy.testing import assert_allclose, assert_array_equal
+from scipy import sparse
+import itertools
+from numpy.testing import assert_allclose, assert_array_equal, assert_raises
 from nose.tools import eq_, ok_, raises
 
 from quantecon.markov import (
@@ -87,6 +89,15 @@ def test_markovchain_pmatrices():
          'is_aperiodic': True,
          'cyclic_classes': [np.arange(2)],
          },
+        {'P': sparse.csr_matrix([[0.4, 0.6], [0.2, 0.8]]),
+         'stationary_dists': np.array([[0.25, 0.75]]),
+         'comm_classes': [np.arange(2)],
+         'rec_classes': [np.arange(2)],
+         'is_irreducible': True,
+         'period': 1,
+         'is_aperiodic': True,
+         'cyclic_classes': [np.arange(2)],
+         },
         {'P': np.array([[0, 1], [1, 0]]),
          'stationary_dists': np.array([[0.5, 0.5]]),
          'comm_classes': [np.arange(2)],
@@ -115,6 +126,14 @@ def test_markovchain_pmatrices():
          'is_aperiodic': True,
          },
         {'P': Q,
+         'stationary_dists': Q_stationary_dists,
+         'comm_classes': [np.array([0, 1]), np.array([2]), np.array([3, 4, 5])],
+         'rec_classes': [np.array([0, 1]), np.array([3, 4, 5])],
+         'is_irreducible': False,
+         'period': 6,
+         'is_aperiodic': False,
+         },
+        {'P': sparse.csr_matrix(Q),
          'stationary_dists': Q_stationary_dists,
          'comm_classes': [np.array([0, 1]), np.array([2]), np.array([3, 4, 5])],
          'rec_classes': [np.array([0, 1]), np.array([3, 4, 5])],
@@ -216,23 +235,24 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
 
 def test_simulate_shape():
     P = [[0.4, 0.6], [0.2, 0.8]]
-    mc = MarkovChain(P)
+    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
 
-    (ts_length, init, num_reps) = (10, None, None)
-    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
-                       (ts_length,))
-
-    (ts_length, init, num_reps) = (10, [0, 1], None)
-    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
-                       (len(init), ts_length))
-
-    (ts_length, init, num_reps) = (10, [0, 1], 3)
-    assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
-                       (len(init)*num_reps, ts_length))
-
-    for (ts_length, init, num_reps) in [(10, None, 3), (10, None, 1)]:
+    for mc in mcs:
+        (ts_length, init, num_reps) = (10, None, None)
         assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
-                           (num_reps, ts_length))
+                           (ts_length,))
+
+        (ts_length, init, num_reps) = (10, [0, 1], None)
+        assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                           (len(init), ts_length))
+
+        (ts_length, init, num_reps) = (10, [0, 1], 3)
+        assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                           (len(init)*num_reps, ts_length))
+
+        for (ts_length, init, num_reps) in [(10, None, 3), (10, None, 1)]:
+            assert_array_equal(mc.simulate(ts_length, init, num_reps).shape,
+                               (num_reps, ts_length))
 
 
 def test_simulate_init_array_num_reps():
@@ -240,11 +260,31 @@ def test_simulate_init_array_num_reps():
     mc = MarkovChain(P)
 
     ts_length = 10
-    init=[0, 1]
-    num_reps=3
+    init = [0, 1]
+    num_reps = 3
 
     X = mc.simulate(ts_length, init, num_reps)
     assert_array_equal(X[:, 0], init*num_reps)
+
+
+def test_simulate_dense_vs_sparse():
+    n = 5
+    a = 1/3
+    b = (1 - a)/2
+    P = np.zeros((n, n))
+    for i in range(n):
+        P[i, (i-1) % n], P[i, i], P[i, (i+1) % n] = b, a, b
+    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+
+    ts_length = 10
+    inits = (None, 0, [0, 1])
+    num_repss = (None, 2)
+
+    random_state = 0
+    for init, num_reps in itertools.product(inits, num_repss):
+        assert_array_equal(*(mc.simulate(ts_length, init, num_reps,
+                                         random_state=random_state)
+                             for mc in mcs))
 
 
 def test_simulate_ergodicity():
@@ -288,23 +328,28 @@ def test_simulate_for_matrices_with_C_F_orders():
 
 def test_mc_sample_path():
     P = [[0.4, 0.6], [0.2, 0.8]]
+    Ps = [P, sparse.csr_matrix(P)]
+
     init = 0
     sample_size = 10
 
     seed = 42
 
-    # init: integer
-    expected = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1]
-    computed = mc_sample_path(P, init=init, sample_size=sample_size,
-                              random_state=seed)
-    assert_array_equal(computed, expected)
+    for P in Ps:
+        # init: integer
+        expected = [0, 0, 1, 1, 1, 0, 0, 0, 1, 1]
+        computed = mc_sample_path(
+            P, init=init, sample_size=sample_size, random_state=seed
+        )
+        assert_array_equal(computed, expected)
 
-    # init: distribution
-    distribution = (0.5, 0.5)
-    expected = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1]
-    computed = mc_sample_path(P, init=distribution, sample_size=sample_size,
-                              random_state=seed)
-    assert_array_equal(computed, expected)
+        # init: distribution
+        distribution = (0.5, 0.5)
+        expected = [0, 1, 1, 1, 0, 0, 0, 1, 1, 1]
+        computed = mc_sample_path(
+            P, init=distribution, sample_size=sample_size, random_state=seed
+        )
+        assert_array_equal(computed, expected)
 
 
 def test_mc_sample_path_lln():
@@ -327,22 +372,25 @@ def test_raises_value_error_non_2dim():
     mc = MarkovChain(np.array([0.4, 0.6]))
 
 
-@raises(ValueError)
 def test_raises_value_error_non_sym():
     """Test with non symmetric input"""
-    mc = MarkovChain(np.array([[0.4, 0.6]]))
+    P = np.array([[0.4, 0.6]])
+    assert_raises(ValueError, MarkovChain, P)
+    assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
 
 
-@raises(ValueError)
 def test_raises_value_error_non_nonnegative():
     """Test with non nonnegative input"""
-    mc = MarkovChain(np.array([[0.4, 0.6], [-0.2, 1.2]]))
+    P = np.array([[0.4, 0.6], [-0.2, 1.2]])
+    assert_raises(ValueError, MarkovChain, P)
+    assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
 
 
-@raises(ValueError)
 def test_raises_value_error_non_sum_one():
     """Test with input such that some of the rows does not sum to one"""
-    mc = MarkovChain(np.array([[0.4, 0.6], [0.2, 0.9]]))
+    P = np.array([[0.4, 0.6], [0.2, 0.9]])
+    assert_raises(ValueError, MarkovChain, P)
+    assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
 
 
 if __name__ == '__main__':

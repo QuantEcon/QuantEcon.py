@@ -204,6 +204,30 @@ class TestDiGraph:
                 eq_(graph_dict['g'].is_strongly_connected, False)
 
 
+def test_subgraph():
+    adj_matrix = [[0, 1, 0], [0, 0, 1], [1, 0, 0]]
+    g = DiGraph(adj_matrix)
+    nodes = [1, 2]
+
+    subgraph_adj_matrix = [[False, True], [False, False]]
+    assert_array_equal(
+        g.subgraph(nodes).csgraph.toarray(),
+        subgraph_adj_matrix
+    )
+
+
+def test_subgraph_weighted():
+    adj_matrix = np.arange(3**2).reshape(3, 3)
+    g = DiGraph(adj_matrix, weighted=True)
+    nodes = [0, 1]
+
+    subgraph_adj_matrix = [[0, 1], [3, 4]]
+    assert_array_equal(
+        g.subgraph(nodes).csgraph.toarray(),
+        subgraph_adj_matrix
+    )
+
+
 @raises(ValueError)
 def test_raises_value_error_non_sym():
     """Test with non symmetric input"""
