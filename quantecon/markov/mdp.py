@@ -395,6 +395,9 @@ class MDP(object):
 
             self.s_wise_max = s_wise_max
 
+        # Check that for every state, at least one action is feasible
+        self._check_action_feasibility()
+
         if not (0 <= beta < 1):
             raise ValueError('beta must be in [0, 1)')
         self.beta = beta
@@ -409,6 +412,34 @@ class MDP(object):
         else:
             self._lineq_solve = np.linalg.solve
             self._I = np.identity(self.num_states)
+
+    def _check_action_feasibility(self):
+        """
+        Check that for every state, reward is finite for some action,
+        and for the case sa_pair is True, that for every state, there is
+        some action available.
+
+        """
+        # Check that for every state, reward is finite for some action
+        R_max = self.s_wise_max(self.R)
+        if (R_max == -np.inf).any():
+            # First state index such that all actions yield -inf
+            s = np.where(R_max == -np.inf)[0][0]
+            raise ValueError(
+                'for every state the reward must be finite for some action: '
+                'violated for state {s}'.format(s=s)
+            )
+
+        if self._sa_pair:
+            # Check that for every state there is at least one action available
+            diff = np.diff(self.a_indptr)
+            if (diff == 0).any():
+                # First state index such that no action is available
+                s = np.where(diff == 0)[0][0]
+                raise ValueError(
+                    'for every state at least one action must be available: '
+                    'violated for state {s}'.format(s=s)
+                )
 
     def RQ_sigma(self, sigma):
         """

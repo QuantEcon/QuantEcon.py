@@ -9,7 +9,7 @@ from __future__ import division
 
 import numpy as np
 import scipy.sparse as sparse
-from numpy.testing import assert_array_equal, assert_allclose
+from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 from nose.tools import eq_, ok_
 
 from quantecon.markov import MDP
@@ -136,6 +136,42 @@ def test_mdp_beta_0():
             res = mdp.solve(method=method, v_init=v_init)
             assert_array_equal(res.sigma, sigma_star)
             assert_array_equal(res.v, v_star)
+
+
+def test_mdp_negative_inf_error():
+    n, m = 3, 2
+    R = np.array([[0, 1], [0, -np.inf], [-np.inf, -np.inf]])
+    Q = np.empty((n, m, n))
+    Q[:] = 1/n
+
+    s_indices = [0, 0, 1, 1, 2, 2]
+    a_indices = [0, 1, 0, 1, 0, 1]
+    R_sa = R.reshape(n*m)
+    Q_sa_dense = Q.reshape(n*m, n)
+    Q_sa_sparse = sparse.csr_matrix(Q_sa_dense)
+
+    beta = 0.95
+
+    assert_raises(ValueError, MDP, R, Q, beta)
+    assert_raises(
+        ValueError, MDP, R_sa, Q_sa_dense, beta, s_indices, a_indices
+    )
+    assert_raises(
+        ValueError, MDP, R_sa, Q_sa_sparse, beta, s_indices, a_indices
+    )
+
+
+def test_mdp_no_feasibile_action_error():
+    n, m = 3, 2
+
+    # No action is feasible at state 1
+    s_indices = [0, 0, 2, 2]
+    a_indices = [0, 1, 0, 1]
+    R = [1, 0, 0, 1]
+    Q = [(1/2, 1/2) for i in range(4)]
+    beta = 0.95
+
+    assert_raises(ValueError, MDP, R, Q, beta, s_indices, a_indices)
 
 
 if __name__ == '__main__':
