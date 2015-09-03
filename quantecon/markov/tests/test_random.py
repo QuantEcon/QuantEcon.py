@@ -12,7 +12,7 @@ from numpy.testing import (
 from nose.tools import eq_, ok_, raises
 
 from quantecon.markov import (
-    random_markov_chain, random_stochastic_matrix
+    random_markov_chain, random_stochastic_matrix, random_discrete_dp
 )
 
 
@@ -79,6 +79,59 @@ def test_random_stochastic_matrix_dense_vs_sparse():
     P_dense = random_stochastic_matrix(n, k, sparse=False, random_state=seed)
     P_sparse = random_stochastic_matrix(n, k, sparse=True, random_state=seed)
     assert_array_equal(P_dense, P_sparse.toarray())
+
+
+class TestRandomDiscreteDP:
+    def setUp(self):
+        self.num_states, self.num_actions = 5, 4
+        self.num_sa = self.num_states * self.num_actions
+        self.k = 3
+        seed = 1234
+
+        self.ddp = \
+            random_discrete_dp(self.num_states, self.num_actions, k=self.k,
+                               sparse=False, sa_pair=False, random_state=seed)
+
+        labels = ['dense', 'sparse']
+        self.ddps_sa = {}
+        for label in labels:
+            is_sparse = (label == 'sparse')
+            self.ddps_sa[label] = \
+                random_discrete_dp(self.num_states, self.num_actions, k=self.k,
+                                   sparse=is_sparse, sa_pair=True,
+                                   random_state=seed)
+
+    def test_shape(self):
+        n, m, L = self.num_states, self.num_actions, self.num_sa
+
+        eq_(self.ddp.R.shape, (n, m))
+        eq_(self.ddp.Q.shape, (n, m, n))
+
+        for ddp in self.ddps_sa.values():
+            eq_(ddp.R.shape, (L,))
+            eq_(ddp.Q.shape, (L, n))
+
+    def test_nonzero(self):
+        n, m, L, k = self.num_states, self.num_actions, self.num_sa, self.k
+
+        assert_array_equal((self.ddp.Q > 0).sum(axis=-1), np.ones((n, m))*k)
+        assert_array_equal((self.ddps_sa['dense'].Q > 0).sum(axis=-1),
+                           np.ones(L)*k)
+        assert_array_equal(self.ddps_sa['sparse'].Q.getnnz(axis=-1),
+                           np.ones(L)*k)
+
+    def test_equal_reward(self):
+        assert_array_equal(self.ddp.R.ravel(), self.ddps_sa['dense'].R)
+        assert_array_equal(self.ddps_sa['dense'].R, self.ddps_sa['sparse'].R)
+
+    def test_equal_probability(self):
+        assert_array_equal(self.ddp.Q.ravel(), self.ddps_sa['dense'].Q.ravel())
+        assert_array_equal(self.ddps_sa['dense'].Q,
+                           self.ddps_sa['sparse'].Q.toarray())
+
+    def test_equal_beta(self):
+        for ddp in self.ddps_sa.values():
+            eq_(ddp.beta, self.ddp.beta)
 
 
 if __name__ == '__main__':

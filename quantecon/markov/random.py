@@ -3,18 +3,16 @@ Filename: random.py
 
 Author: Daisuke Oyama
 
-Generate a MarkovChain randomly.
+Generate MarkovChain and DiscreteDP instances randomly.
 
 """
 import numpy as np
 import scipy.sparse
 
-from ..util import check_random_state
-from ..random import (
-    probvec, sample_without_replacement
-)
-
 from .core import MarkovChain
+from .ddp import DiscreteDP
+from ..util import check_random_state, numba_installed, jit
+from ..random import probvec, sample_without_replacement
 
 
 def random_markov_chain(n, k=None, sparse=False, random_state=None):
@@ -105,15 +103,25 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
     random_markov_chain : Return a random MarkovChain instance.
 
     """
-    if not (isinstance(n, int) and n > 0):
-        raise ValueError('n must be a positive integer')
+    P = _random_stochastic_matrix(m=n, n=n, k=k, sparse=sparse, format=format,
+                                  random_state=random_state)
+    return P
+
+
+def _random_stochastic_matrix(m, n, k=None, sparse=False, format='csr',
+                              random_state=None):
+    """
+    Generate a "non-square stochastic matrix" of shape (m, n), which
+    contains as rows m probability vectors of length n with k nonzero
+    entries.
+
+    For other parameters, see `random_stochastic_matrix`.
+
+    """
     if k is None:
         k = n
-    if not (isinstance(k, int) and 0 < k <= n):
-        raise ValueError('k must be an integer with 0 < k <= n')
-
-    # n prob vectors of dimension k, shape (n, k)
-    probvecs = probvec(n, k, random_state=random_state)
+    # m prob vectors of dimension k, shape (m, k)
+    probvecs = probvec(m, k, random_state=random_state)
 
     if k == n:
         P = probvecs
@@ -123,17 +131,107 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
             return P
 
     # if k < n:
-    rows = np.repeat(np.arange(n), k)
+    rows = np.repeat(np.arange(m), k)
     cols = \
         sample_without_replacement(
-            n, k, num_trials=n, random_state=random_state
+            n, k, num_trials=m, random_state=random_state
         ).ravel()
     data = probvecs.ravel()
 
     if sparse:
-        P = scipy.sparse.coo_matrix((data, (rows, cols)), shape=(n, n))
+        P = scipy.sparse.coo_matrix((data, (rows, cols)), shape=(m, n))
         return P.asformat(format)
     else:
-        P = np.zeros((n, n))
+        P = np.zeros((m, n))
         P[rows, cols] = data
         return P
+
+
+def random_discrete_dp(num_states, num_actions, beta=None,
+               k=None, scale=1, sparse=False, sa_pair=False,
+               random_state=None):
+    """
+    Generate a DiscreteDP randomly. The reward values are drawn from the
+    normal distribution with mean 0 and standard deviation `scale`.
+
+    Parameters
+    ----------
+    num_states : scalar(int)
+        Number of states.
+
+    num_actions : scalar(int)
+        Number of actions.
+
+    beta : scalar(float), optional(default=None)
+        Discount factor. Randomly chosen from [0, 1) if not specified.
+
+    k : scalar(int), optional(default=None)
+        Number of possible next states for each state-action pair. Equal
+        to `num_states` if not specified.
+
+    scale : scalar(float), optional(default=1)
+        Standard deviation of the normal distribution for the reward
+        values.
+
+    sparse : bool, optional(default=False)
+        Whether to store the transition probability array in sparse
+        matrix form.
+
+    sa_pair : bool, optional(default=False)
+        Whether to represent the data in the state-action pairs
+        formulation. (If `sparse=True`, automatically set `True`.)
+
+    random_state : scalar(int) or np.random.RandomState,
+                   optional(default=None)
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    ddp : DiscreteDP
+        An instance of DiscreteDP.
+
+    """
+    if sparse:
+        sa_pair = True
+
+    # Number of state-action pairs
+    L = num_states * num_actions
+
+    random_state = check_random_state(random_state)
+    R = scale * random_state.randn(L)
+    Q = _random_stochastic_matrix(L, num_states, k=k,
+                                  sparse=sparse, format='csr',
+                                  random_state=random_state)
+    if beta is None:
+        beta = random_state.random_sample()
+
+    if sa_pair:
+        s_indices, a_indices = _sa_indices(num_states, num_actions)
+    else:
+        s_indices, a_indices = None, None
+        R.shape = (num_states, num_actions)
+        Q.shape = (num_states, num_actions, num_states)
+
+    ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
+    return ddp
+
+
+def _sa_indices(num_states, num_actions):
+    L = num_states * num_actions
+    s_indices = np.empty(L, dtype=int)
+    a_indices = np.empty(L, dtype=int)
+
+    i = 0
+    for s in range(num_states):
+        for a in range(num_actions):
+            s_indices[i] = s
+            a_indices[i] = a
+            i += 1
+
+    return s_indices, a_indices
+
+if numba_installed:
+    _sa_indices = jit(_sa_indices)
