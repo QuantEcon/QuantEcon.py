@@ -1,15 +1,15 @@
 """
-Filename: mdp.py
+Filename: ddp.py
 
 Author: Daisuke Oyama
 
-Module for solving Markov decision processes (MDP) with finite states
-and actions.
+Module for solving dynamic programs (also known as Markov decision
+processes) with finite states and actions.
 
-Markov Decision Processes
--------------------------
+Discrete Dynamic Programming
+----------------------------
 
-A finite Markov decision process consists of the following components:
+A discrete dynamic program consists of the following components:
 
 * finite set of states :math:`S = \{0, \ldots, n-1\}`;
 * finite set of available actions :math:`A(s)` for each state :math:`s
@@ -78,7 +78,8 @@ equation, or the unique fixed point of the Bellman operator, and that
 Solution Algorithms
 -------------------
 
-The `MDP` class currently implements the following solution algorithms:
+The `DiscreteDP` class currently implements the following solution
+algorithms:
 
 * value iteration;
 * policy iteration;
@@ -115,16 +116,15 @@ from .core import MarkovChain
 from ..util import numba_installed, jit
 
 
-class MDP(object):
+class DiscreteDP(object):
     """
-    Class for dealing with a Markov decision process (MDP) with finite
-    states and actions.
+    Class for dealing with a discrete dynamic program.
 
-    There are two ways to represent the data for instantiating an `MDP`
-    object. Let n, m, and L denote the numbers of states, actions, and
-    feasbile state-action pairs, respectively.
+    There are two ways to represent the data for instantiating a
+    `DiscreteDP` object. Let n, m, and L denote the numbers of states,
+    actions, and feasbile state-action pairs, respectively.
 
-    1. `MDP(R, Q, beta)`
+    1. `DiscreteDP(R, Q, beta)`
 
        with parameters:
 
@@ -137,7 +137,7 @@ class MDP(object):
        next period is `s'` when the current state is `s` and the action
        chosen is `a`.
 
-    2. `MDP(R, Q, beta, s_indices, a_indices)`
+    2. `DiscreteDP(R, Q, beta, s_indices, a_indices)`
 
        with parameters:
 
@@ -216,7 +216,7 @@ class MDP(object):
 
     * Discount factor 0.95
 
-    **Creating an `MDP` instance**
+    **Creating a `DiscreteDP` instance**
 
     *Product formulation*
 
@@ -226,7 +226,7 @@ class MDP(object):
     >>> R = [[5, 10], [-1, -float('inf')]]
     >>> Q = [[(0.5, 0.5), (0, 1)], [(0, 1), (0.5, 0.5)]]
     >>> beta = 0.95
-    >>> mdp = MDP(R, Q, beta)
+    >>> ddp = DiscreteDP(R, Q, beta)
 
     (`Q[1, 1]` is an arbitrary probability vector.)
 
@@ -240,13 +240,13 @@ class MDP(object):
     >>> R = [5, 10, -1]
     >>> Q = [(0.5, 0.5), (0, 1), (0, 1)]
     >>> beta = 0.95
-    >>> mdp = MDP(R, Q, beta, s_indices, a_indices)
+    >>> ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
 
     **Solving the model**
 
     *Policy iteration*
 
-    >>> res = mdp.solve(method='policy_iteration', v_init=[0, 0])
+    >>> res = ddp.solve(method='policy_iteration', v_init=[0, 0])
     >>> res.sigma  # Optimal policy function
     array([0, 0])
     >>> res.v  # Optimal value function
@@ -256,7 +256,7 @@ class MDP(object):
 
     *Value iteration*
 
-    >>> res = mdp.solve(method='value_iteration', v_init=[0, 0],
+    >>> res = ddp.solve(method='value_iteration', v_init=[0, 0],
     ...                 epsilon=0.01)
     >>> res.sigma  # (Approximate) optimal policy function
     array([0, 0])
@@ -267,8 +267,8 @@ class MDP(object):
 
     *Modified policy iteration*
 
-    >>> res = mdp.solve(method='modified_policy_iteration',
-                        v_init=[0, 0], epsilon=0.01)
+    >>> res = ddp.solve(method='modified_policy_iteration',
+    ...                 v_init=[0, 0], epsilon=0.01)
     >>> res.sigma  # (Approximate) optimal policy function
     array([0, 0])
     >>> res.v  # (Approximate) optimal value function
@@ -647,9 +647,9 @@ class MDP(object):
 
         Returns
         -------
-        res : MDPSolveResult
-            Optimization result represetned as an MDPSolveResult. See
-            `MDPSolveResult` for details.
+        res : DPSolveResult
+            Optimization result represetned as a DPSolveResult. See
+            `DPSolveResult` for details.
 
         """
         if method in ['value_iteration', 'vi']:
@@ -699,7 +699,7 @@ class MDP(object):
                                            Tv=Tv)
         sigma = self.compute_greedy(v)
 
-        res = MDPSolveResult(v=v,
+        res = DPSolveResult(v=v,
                              sigma=sigma,
                              num_iter=num_iter,
                              mc=self.controlled_mc(sigma),
@@ -736,7 +736,7 @@ class MDP(object):
 
         num_iter = i + 1
 
-        res = MDPSolveResult(v=v_sigma,
+        res = DPSolveResult(v=v_sigma,
                              sigma=sigma,
                              num_iter=num_iter,
                              mc=self.controlled_mc(sigma),
@@ -789,7 +789,7 @@ class MDP(object):
 
         num_iter = i + 1
 
-        res = MDPSolveResult(v=v,
+        res = DPSolveResult(v=v,
                              sigma=sigma,
                              num_iter=num_iter,
                              mc=self.controlled_mc(sigma),
@@ -809,6 +809,8 @@ class MDP(object):
         sigma : array_like(int, ndim=1)
             Policy vector, of length n.
 
+        Returns
+        -------
         mc : MarkovChain
             Controlled Markov Chain.
 
@@ -817,9 +819,9 @@ class MDP(object):
         return MarkovChain(Q_sigma)
 
 
-class MDPSolveResult(dict):
+class DPSolveResult(dict):
     """
-    Contain the information about the MDP optimization result.
+    Contain the information about the dynamic programming result.
 
     Attributes
     ----------

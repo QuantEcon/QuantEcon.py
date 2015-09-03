@@ -1,7 +1,7 @@
-mdp
+ddp
 ===
 
-.. automodule:: quantecon.markov.mdp
+.. automodule:: quantecon.markov.ddp
     :members:
     :undoc-members:
     :show-inheritance:

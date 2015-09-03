@@ -3,14 +3,14 @@ Filename: random.py
 
 Author: Daisuke Oyama
 
-Generate MarkovChain and MDP instances randomly.
+Generate MarkovChain and DiscreteDP instances randomly.
 
 """
 import numpy as np
 import scipy.sparse
 
 from .core import MarkovChain
-from .mdp import MDP
+from .ddp import DiscreteDP
 from ..util import check_random_state, numba_installed, jit
 from ..random import probvec, sample_without_replacement
 
@@ -147,11 +147,11 @@ def _random_stochastic_matrix(m, n, k=None, sparse=False, format='csr',
         return P
 
 
-def random_mdp(num_states, num_actions, beta=None,
+def random_discrete_dp(num_states, num_actions, beta=None,
                k=None, scale=1, sparse=False, sa_pair=False,
                random_state=None):
     """
-    Generate an MDP randomly. The reward values are drawn from the
+    Generate a DiscreteDP randomly. The reward values are drawn from the
     normal distribution with mean 0 and standard deviation `scale`.
 
     Parameters
@@ -190,8 +190,8 @@ def random_mdp(num_states, num_actions, beta=None,
 
     Returns
     -------
-    mdp : MDP
-        An instance of MDP.
+    ddp : DiscreteDP
+        An instance of DiscreteDP.
 
     """
     if sparse:
@@ -215,8 +215,8 @@ def random_mdp(num_states, num_actions, beta=None,
         R.shape = (num_states, num_actions)
         Q.shape = (num_states, num_actions, num_states)
 
-    mdp = MDP(R, Q, beta, s_indices, a_indices)
-    return mdp
+    ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
+    return ddp
 
 
 def _sa_indices(num_states, num_actions):

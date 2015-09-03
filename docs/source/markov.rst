@@ -8,4 +8,4 @@ Markov
    markov/core
    markov/gth_solve
    markov/random
-   markov/mdp
+   markov/ddp
