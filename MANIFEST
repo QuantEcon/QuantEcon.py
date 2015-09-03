@@ -29,9 +29,11 @@ quantecon/version.py
 quantecon/markov/__init__.py
 quantecon/markov/approximation.py
 quantecon/markov/core.py
+quantecon/markov/ddp.py
 quantecon/markov/gth_solve.py
 quantecon/markov/random.py
 quantecon/models/__init__.py
+quantecon/models/arellano_vfi.py
 quantecon/models/asset_pricing.py
 quantecon/models/career.py
 quantecon/models/ifp.py
@@ -39,6 +41,7 @@ quantecon/models/jv.py
 quantecon/models/lucastree.py
 quantecon/models/odu.py
 quantecon/models/optgrowth.py
+quantecon/models/uncertainty_traps.py
 quantecon/models/solow/__init__.py
 quantecon/models/solow/ces.py
 quantecon/models/solow/cobb_douglas.py
