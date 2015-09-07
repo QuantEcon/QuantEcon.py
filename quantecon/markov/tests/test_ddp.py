@@ -169,7 +169,7 @@ def test_ddp_no_feasibile_action_error():
     s_indices = [0, 0, 2, 2]
     a_indices = [0, 1, 0, 1]
     R = [1, 0, 0, 1]
-    Q = [(1/2, 1/2) for i in range(4)]
+    Q = [(1/3, 1/3, 1/3) for i in range(4)]
     beta = 0.95
 
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
