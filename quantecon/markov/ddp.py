@@ -320,25 +320,33 @@ class DiscreteDP(object):
                     'the number of state-action pairs'
                 )
 
-            # Sort indices and elements of Q
-            sa_ptrs = sp.coo_matrix(
-                (np.arange(self.num_sa_pairs), (s_indices, a_indices))
-            ).tocsr()
-            sa_ptrs.sort_indices()
-            self.a_indices = sa_ptrs.indices
-            self.a_indptr = sa_ptrs.indptr
-            self.num_actions = sa_ptrs.shape[1]
+            self.s_indices = np.asarray(s_indices)
+            self.a_indices = np.asarray(a_indices)
+            self.num_actions = self.a_indices.max() + 1
 
-            self.Q = self.Q[sa_ptrs.data]
+            if _has_sorted_sa_indices(self.s_indices, self.a_indices):
+                a_indptr = np.empty(self.num_states+1, dtype=int)
+                _generate_a_indptr(self.num_states, self.s_indices,
+                                   out=a_indptr)
+                self.a_indptr = a_indptr
+            else:
+                # Sort indices and elements of R and Q
+                sa_ptrs = sp.coo_matrix(
+                    (np.arange(self.num_sa_pairs), (s_indices, a_indices))
+                ).tocsr()
+                sa_ptrs.sort_indices()
+                self.a_indices = sa_ptrs.indices
+                self.a_indptr = sa_ptrs.indptr
 
-            _s_indices = np.empty(self.num_sa_pairs,
-                                  dtype=self.a_indices.dtype)
-            for i in range(self.num_states):
-                for j in range(self.a_indptr[i], self.a_indptr[i+1]):
-                    _s_indices[j] = i
-            self.s_indices = _s_indices
+                self.R = self.R[sa_ptrs.data]
+                self.Q = self.Q[sa_ptrs.data]
 
-            self.R = self.R[sa_ptrs.data]
+                _s_indices = np.empty(self.num_sa_pairs,
+                                      dtype=self.a_indices.dtype)
+                for i in range(self.num_states):
+                    for j in range(self.a_indptr[i], self.a_indptr[i+1]):
+                        _s_indices[j] = i
+                self.s_indices = _s_indices
 
             # Define state-wise maximization
             def s_wise_max(vals, out=None, out_argmax=None):
@@ -904,3 +912,54 @@ def _find_indices(a_indices, a_indptr, sigma, out):
 
 if numba_installed:
     _find_indices = jit(nopython=True)(_find_indices)
+
+
+@jit(nopython=True)
+def _has_sorted_sa_indices(s_indices, a_indices):
+    """
+    Check whether `s_indices` and `a_indices` are sorted in
+    lexicographic order.
+
+    Parameters
+    ----------
+    s_indices, a_indices : ndarray(ndim=1)
+
+    Returns
+    -------
+    bool
+        Whether `s_indices` and `a_indices` are sorted.
+
+    """
+    L = len(s_indices)
+    for i in range(L-1):
+        if s_indices[i] > s_indices[i+1]:
+            return False
+        if s_indices[i] == s_indices[i+1]:
+            if a_indices[i] >= a_indices[i+1]:
+                return False
+    return True
+
+
+@jit(nopython=True)
+def _generate_a_indptr(num_states, s_indices, out):
+    """
+    Generate `a_indptr`; stored in `out`. `s_indices` is assumed to be
+    in sorted order.
+
+    Parameters
+    ----------
+    num_states : scalar(int)
+
+    s_indices : ndarray(int, ndim=1)
+
+    out : ndarray(int, ndim=1)
+        Length must be num_states+1.
+
+    """
+    idx = 0
+    out[0] = 0
+    for s in range(num_states-1):
+        while(s_indices[idx] == s):
+            idx += 1
+        out[s+1] = idx
+    out[num_states] = len(s_indices)
