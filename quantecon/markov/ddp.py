@@ -416,7 +416,7 @@ class DiscreteDP(object):
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
             self._lineq_solve = sp.linalg.spsolve
-            self._I = sp.identity(self.num_states)
+            self._I = sp.identity(self.num_states, format='csr')
         else:
             self._lineq_solve = np.linalg.solve
             self._I = np.identity(self.num_states)
