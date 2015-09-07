@@ -139,6 +139,44 @@ def test_ddp_beta_0():
             assert_array_equal(res.v, v_star)
 
 
+def test_ddp_sorting():
+    n, m = 2, 2
+    beta = 0.95
+
+    # Sorted
+    s_indices = [0, 0, 1]
+    a_indices = [0, 1, 0]
+    a_indptr = [0, 2, 3]
+    R = [0, 1, 2]
+    Q = [(1, 0), (1/2, 1/2), (0, 1)]
+    Q_sparse = sparse.csr_matrix(Q)
+
+    # Shuffled
+    s_indices_shuffled = [0, 1, 0]
+    a_indices_shuffled = [0, 0, 1]
+    R_shuffled = [0, 2, 1]
+    Q_shuffled = [(1, 0), (0, 1), (1/2, 1/2)]
+    Q_shuffled_sparse = sparse.csr_matrix(Q_shuffled)
+
+    ddp0 = DiscreteDP(R, Q, beta, s_indices, a_indices)
+    ddp_sparse = DiscreteDP(R, Q_sparse, beta, s_indices, a_indices)
+    ddp_shuffled = DiscreteDP(R_shuffled, Q_shuffled, beta,
+                              s_indices_shuffled, a_indices_shuffled)
+    ddp_shuffled_sparse = DiscreteDP(R_shuffled, Q_shuffled_sparse, beta,
+                                     s_indices_shuffled, a_indices_shuffled)
+
+    for ddp in [ddp0, ddp_sparse, ddp_shuffled, ddp_shuffled_sparse]:
+        assert_array_equal(ddp.s_indices, s_indices)
+        assert_array_equal(ddp.a_indices, a_indices)
+        assert_array_equal(ddp.a_indptr, a_indptr)
+        assert_array_equal(ddp.R, R)
+        if sparse.issparse(ddp.Q):
+            ddp_Q = ddp.Q.toarray()
+        else:
+            ddp_Q = ddp.Q
+        assert_array_equal(ddp_Q, Q)
+
+
 def test_ddp_negative_inf_error():
     n, m = 3, 2
     R = np.array([[0, 1], [0, -np.inf], [-np.inf, -np.inf]])
@@ -169,7 +207,7 @@ def test_ddp_no_feasibile_action_error():
     s_indices = [0, 0, 2, 2]
     a_indices = [0, 1, 0, 1]
     R = [1, 0, 0, 1]
-    Q = [(1/2, 1/2) for i in range(4)]
+    Q = [(1/3, 1/3, 1/3) for i in range(4)]
     beta = 0.95
 
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
