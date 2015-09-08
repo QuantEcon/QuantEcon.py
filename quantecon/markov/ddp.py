@@ -873,6 +873,9 @@ class DPSolveResult(dict):
         else:
             return self.__class__.__name__ + "()"
 
+    def __dir__(self):
+        return self.keys()
+
 
 def _s_wise_max_argmax(a_indices, a_indptr, vals, out_max, out_argmax):
     n = len(out_max)
