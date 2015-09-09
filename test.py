@@ -128,5 +128,12 @@ def solutions_tests(test_dir='solutions/', log_path='solutions-tests.log'):
 
 
 if __name__ == '__main__':
-    #example_tests(*sys.argv[1:])
+    print "-------------------------"
+    print "Running all examples/*.py"
+    print "-------------------------"
+    example_tests(*sys.argv[1:])
+    print
+    print "-----------------------------"
+    print "Running all solutions/*.ipynb"
+    print "-----------------------------"
     solutions_tests(*sys.argv[1:])
