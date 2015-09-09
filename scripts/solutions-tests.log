@@ -1,0 +1,523 @@
+---> Executing 'arellano_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+
+- use IPython.nbformat for read/write/validate public API
+- use IPython.nbformat.vX directly to composing notebooks of a particular version
+
+  """)
+09/09/2015 01:29:36 PM INFO: Reading notebook arellano_solutions.ipynb
+09/09/2015 01:29:37 PM INFO: Running cell:
+%matplotlib inline
+
+09/09/2015 01:29:37 PM INFO: Cell returned
+09/09/2015 01:29:37 PM INFO: Running cell:
+from __future__ import division
+import numpy as np
+import matplotlib.pyplot as plt
+import quantecon as qe
+from quantecon.models import Arellano_Economy
+
+09/09/2015 01:29:39 PM INFO: Cell returned
+09/09/2015 01:29:39 PM INFO: Running cell:
+ae = Arellano_Economy(beta=.953,        # time discount rate
+                        gamma=2.,       # risk aversion
+                        r=0.017,        # international interest rate
+                        rho=.945,       # persistence in output 
+                        eta=0.025,      # st dev of output shock
+                        theta=0.282,    # prob of regaining access 
+                        ny=21,          # number of points in y grid
+                        nB=251,         # number of points in B grid
+                        tol=1e-8,       # error tolerance in iteration
+                        maxit=10000)
+
+09/09/2015 01:29:56 PM INFO: Cell returned
+09/09/2015 01:29:56 PM INFO: Running cell:
+
+# Create "Y High" and "Y Low" values as 5% devs from mean
+high, low = np.mean(ae.ygrid)*1.05, np.mean(ae.ygrid)*.95
+iy_high, iy_low = (np.searchsorted(ae.ygrid, x) for x in (high, low))
+
+fig, ax = plt.subplots(figsize=(10, 6.5))
+ax.set_title("Bond price schedule $q(y, B')$")
+
+# Extract a suitable plot grid
+x = []
+q_low = []
+q_high = []
+for i in range(ae.nB):
+    b = ae.Bgrid[i]
+    if -0.35 <= b <= 0:  # To match fig 3 of Arellano
+        x.append(b)
+        q_low.append(ae.Q[iy_low, i])
+        q_high.append(ae.Q[iy_high, i])
+ax.plot(x, q_high, label=r"$y_H$", lw=2, alpha=0.7)
+ax.plot(x, q_low, label=r"$y_L$", lw=2, alpha=0.7)
+ax.set_xlabel(r"$B'$")
+ax.legend(loc='upper left', frameon=False)
+plt.show()
+
+09/09/2015 01:29:57 PM INFO: Cell returned
+09/09/2015 01:29:57 PM INFO: Running cell:
+
+# Create "Y High" and "Y Low" values as 5% devs from mean
+high, low = np.mean(ae.ygrid)*1.05, np.mean(ae.ygrid)*.95
+iy_high, iy_low = (np.searchsorted(ae.ygrid, x) for x in (high, low))
+
+fig, ax = plt.subplots(figsize=(10, 6.5))
+ax.set_title("Value Functions")
+ax.plot(ae.Bgrid, ae.V[iy_high], label=r"$y_H$", lw=2, alpha=0.7)
+ax.plot(ae.Bgrid, ae.V[iy_low], label=r"$y_L$", lw=2, alpha=0.7)
+ax.legend(loc='upper left')
+ax.set_xlabel(r"$B$")
+ax.set_ylabel(r"$V(y, B)$")
+ax.set_xlim(ae.Bgrid.min(), ae.Bgrid.max())
+plt.show()
+
+09/09/2015 01:29:58 PM INFO: Cell returned
+09/09/2015 01:29:58 PM INFO: Running cell:
+
+xx, yy = ae.Bgrid, ae.ygrid
+zz = ae.default_prob
+
+# Create figure
+fig, ax = plt.subplots(figsize=(10, 6.5))
+fig.suptitle("Probability of Default")
+hm = ax.pcolormesh(xx, yy, zz)
+cax = fig.add_axes([.92, .1, .02, .8])
+fig.colorbar(hm, cax=cax)
+ax.axis([xx.min(), 0.05, yy.min(), yy.max()])
+ax.set_xlabel(r"$B'$")
+ax.set_ylabel(r"$y$")
+plt.show()
+
+09/09/2015 01:29:59 PM INFO: Cell returned
+09/09/2015 01:29:59 PM INFO: Running cell:
+T = 250
+y_vec, B_vec, q_vec, default_vec = ae.simulate(T)
+
+# Pick up default start and end dates
+start_end_pairs = []
+i = 0
+while i < len(default_vec):
+    if default_vec[i] == 0:
+        i += 1
+    else:
+        # If we get to here we're in default
+        start_default = i
+        while i < len(default_vec) and default_vec[i] == 1:
+            i += 1
+        end_default = i - 1
+        start_end_pairs.append((start_default, end_default))
+    
+plot_series = y_vec, B_vec, q_vec
+titles = 'output', 'foreign assets', 'bond price'
+
+fig, axes = plt.subplots(len(plot_series), 1, figsize=(10, 12))
+p_args = {'lw': 2, 'alpha': 0.7}
+fig.subplots_adjust(hspace=0.3)
+
+for ax, series, title in zip(axes, plot_series, titles):
+    # determine suitable y limits
+    s_max, s_min = max(series), min(series)
+    s_range = s_max - s_min
+    y_max = s_max + s_range * 0.1
+    y_min = s_min - s_range * 0.1
+    ax.set_ylim(y_min, y_max)
+    for pair in start_end_pairs:
+        ax.fill_between(pair, (y_min, y_min), (y_max, y_max), color='k', alpha=0.3)
+        
+    ax.grid()
+    ax.set_title(title)
+    ax.plot(range(T), series, **p_args)
+    ax.set_xlabel(r"time")
+
+plt.show()
+
+09/09/2015 01:30:01 PM INFO: Cell returned
+09/09/2015 01:30:01 PM INFO: Running cell:
+
+
+09/09/2015 01:30:01 PM INFO: Cell returned
+09/09/2015 01:30:01 PM INFO: Shutdown kernel
+---> END 'arellano_solutions.ipynb' <---
+
+---> Executing 'asset_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+
+- use IPython.nbformat for read/write/validate public API
+- use IPython.nbformat.vX directly to composing notebooks of a particular version
+
+  """)
+09/09/2015 01:30:02 PM INFO: Reading notebook asset_solutions.ipynb
+09/09/2015 01:30:03 PM INFO: Running cell:
+%matplotlib inline
+
+09/09/2015 01:30:03 PM INFO: Cell returned
+09/09/2015 01:30:03 PM INFO: Running cell:
+from __future__ import division  # Omit for Python 3.x
+import numpy as np
+import matplotlib.pyplot as plt
+from quantecon.models import AssetPrices
+
+09/09/2015 01:30:05 PM INFO: Cell returned
+09/09/2015 01:30:05 PM INFO: Running cell:
+# == Define primitives == #
+n = 5
+P = 0.0125 * np.ones((n, n))
+P += np.diag(0.95 - 0.0125 * np.ones(5))
+s = np.array([1.05, 1.025, 1.0, 0.975, 0.95])
+gamma = 2.0
+beta = 0.94
+zeta = 1.0
+
+ap = AssetPrices(beta, P, s, gamma)
+
+v = ap.tree_price()
+print("Lucas Tree Prices: ", v)
+
+v_consol = ap.consol_price(zeta)
+print("Consol Bond Prices: ", v_consol)
+
+P_tilde = P * s**(1-gamma)
+temp = beta * P_tilde.dot(v) + beta * P_tilde.dot(np.ones(n))
+print("Should be 0: ",  v - temp)
+
+p_s = 150.0
+w_bar, w_bars = ap.call_option(zeta, p_s, T = [10,20,30])
+
+
+09/09/2015 01:30:05 PM INFO: Cell returned
+09/09/2015 01:30:05 PM INFO: Running cell:
+
+
+09/09/2015 01:30:05 PM INFO: Cell returned
+09/09/2015 01:30:05 PM INFO: Shutdown kernel
+---> END 'asset_solutions.ipynb' <---
+
+---> Executing 'career_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+
+- use IPython.nbformat for read/write/validate public API
+- use IPython.nbformat.vX directly to composing notebooks of a particular version
+
+  """)
+09/09/2015 01:30:06 PM INFO: Reading notebook career_solutions.ipynb
+09/09/2015 01:30:07 PM INFO: Running cell:
+%matplotlib inline
+
+09/09/2015 01:30:07 PM INFO: Cell returned
+09/09/2015 01:30:07 PM INFO: Running cell:
+import numpy as np
+import matplotlib.pyplot as plt
+from quantecon import DiscreteRV, compute_fixed_point
+from quantecon.models import CareerWorkerProblem
+
+09/09/2015 01:30:09 PM INFO: Cell returned
+09/09/2015 01:30:09 PM INFO: Running cell:
+wp = CareerWorkerProblem()
+v_init = np.ones((wp.N, wp.N))*100
+v = compute_fixed_point(wp.bellman_operator, v_init, verbose=False)
+optimal_policy = wp.get_greedy(v)
+F = DiscreteRV(wp.F_probs)
+G = DiscreteRV(wp.G_probs)
+
+def gen_path(T=20):
+    i = j = 0  
+    theta_index = []
+    epsilon_index = []
+    for t in range(T):
+        if optimal_policy[i, j] == 1:    # Stay put
+            pass
+        elif optimal_policy[i, j] == 2:  # New job
+            j = int(G.draw())
+        else:                            # New life
+            i, j  = int(F.draw()), int(G.draw())
+        theta_index.append(i)
+        epsilon_index.append(j)
+    return wp.theta[theta_index], wp.epsilon[epsilon_index]
+
+theta_path, epsilon_path = gen_path()
+
+fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+for ax in axes:
+    ax.plot(epsilon_path, label='epsilon')
+    ax.plot(theta_path, label='theta')
+    ax.legend(loc='lower right')
+
+plt.show()
+
+
+
+09/09/2015 01:30:12 PM INFO: Cell returned
+09/09/2015 01:30:12 PM INFO: Running cell:
+
+wp = CareerWorkerProblem()
+v_init = np.ones((wp.N, wp.N))*100
+v = compute_fixed_point(wp.bellman_operator, v_init)
+optimal_policy = wp.get_greedy(v)
+F = DiscreteRV(wp.F_probs)
+G = DiscreteRV(wp.G_probs)
+
+def gen_first_passage_time():
+    t = 0
+    i = j = 0
+    while 1:
+        if optimal_policy[i, j] == 1:    # Stay put
+            return t
+        elif optimal_policy[i, j] == 2:  # New job
+            j = int(G.draw())
+        else:                            # New life
+            i, j  = int(F.draw()), int(G.draw())
+        t += 1
+
+M = 25000 # Number of samples
+samples = np.empty(M)
+for i in range(M): 
+    samples[i] = gen_first_passage_time()
+print(np.median(samples))
+
+
+09/09/2015 01:30:15 PM INFO: Cell returned
+09/09/2015 01:30:15 PM INFO: Running cell:
+from matplotlib import cm
+
+wp = CareerWorkerProblem()
+v_init = np.ones((wp.N, wp.N))*100
+v = compute_fixed_point(wp.bellman_operator, v_init)
+optimal_policy = wp.get_greedy(v)
+
+fig, ax = plt.subplots(figsize=(6,6))
+tg, eg = np.meshgrid(wp.theta, wp.epsilon)
+lvls=(0.5, 1.5, 2.5, 3.5)
+ax.contourf(tg, eg, optimal_policy.T, levels=lvls, cmap=cm.winter, alpha=0.5)
+ax.contour(tg, eg, optimal_policy.T, colors='k', levels=lvls, linewidths=2)
+ax.set_xlabel('theta', fontsize=14)
+ax.set_ylabel('epsilon', fontsize=14)
+ax.text(1.8, 2.5, 'new life', fontsize=14)
+ax.text(4.5, 2.5, 'new job', fontsize=14, rotation='vertical')
+ax.text(4.0, 4.5, 'stay put', fontsize=14)
+
+
+
+09/09/2015 01:30:17 PM INFO: Cell returned
+09/09/2015 01:30:17 PM INFO: Shutdown kernel
+---> END 'career_solutions.ipynb' <---
+
+---> Executing 'estspec_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+
+- use IPython.nbformat for read/write/validate public API
+- use IPython.nbformat.vX directly to composing notebooks of a particular version
+
+  """)
+09/09/2015 01:30:18 PM INFO: Reading notebook estspec_solutions.ipynb
+09/09/2015 01:30:19 PM INFO: Running cell:
+%matplotlib inline
+
+09/09/2015 01:30:19 PM INFO: Cell returned
+09/09/2015 01:30:19 PM INFO: Running cell:
+import numpy as np
+import matplotlib.pyplot as plt
+from quantecon import ARMA, periodogram, ar_periodogram
+
+09/09/2015 01:30:22 PM INFO: Cell returned
+09/09/2015 01:30:22 PM INFO: Running cell:
+
+## Data
+n = 400
+phi = 0.5
+theta = 0, -0.8
+lp = ARMA(phi, theta)
+X = lp.simulation(ts_length=n)
+
+fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+
+for i, wl in enumerate((15, 55, 175)):  # window lengths
+    
+    x, y = periodogram(X)
+    ax[i].plot(x, y, 'b-', lw=2, alpha=0.5, label='periodogram')
+
+    x_sd, y_sd = lp.spectral_density(two_pi=False, res=120)
+    ax[i].plot(x_sd, y_sd, 'r-', lw=2, alpha=0.8, label='spectral density')
+
+    x, y_smoothed = periodogram(X, window='hamming', window_len=wl)
+    ax[i].plot(x, y_smoothed, 'k-', lw=2, label='smoothed periodogram')
+
+    ax[i].legend()
+    ax[i].set_title('window length = {}'.format(wl))
+
+
+09/09/2015 01:30:23 PM INFO: Cell returned
+09/09/2015 01:30:23 PM INFO: Running cell:
+lp = ARMA(-0.9)
+wl = 65
+
+
+fig, ax = plt.subplots(3, 1, figsize=(10,12))
+
+for i in range(3):
+    X = lp.simulation(ts_length=150)
+    ax[i].set_xlim(0, np.pi)
+
+    x_sd, y_sd = lp.spectral_density(two_pi=False, res=180)
+    ax[i].semilogy(x_sd, y_sd, 'r-', lw=2, alpha=0.75, label='spectral density')
+
+    x, y_smoothed = periodogram(X, window='hamming', window_len=wl)
+    ax[i].semilogy(x, y_smoothed, 'k-', lw=2, alpha=0.75, label='standard smoothed periodogram')
+
+    x, y_ar = ar_periodogram(X, window='hamming', window_len=wl)
+    ax[i].semilogy(x, y_ar, 'b-', lw=2, alpha=0.75, label='AR smoothed periodogram')
+
+    ax[i].legend(loc='upper left')
+
+
+
+
+09/09/2015 01:30:27 PM INFO: Cell returned
+09/09/2015 01:30:27 PM INFO: Shutdown kernel
+---> END 'estspec_solutions.ipynb' <---
+
+---> Executing 'finite_mc_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+
+- use IPython.nbformat for read/write/validate public API
+- use IPython.nbformat.vX directly to composing notebooks of a particular version
+
+  """)
+09/09/2015 01:30:28 PM INFO: Reading notebook finite_mc_solutions.ipynb
+09/09/2015 01:30:29 PM INFO: Running cell:
+%matplotlib inline
+
+09/09/2015 01:30:29 PM INFO: Cell returned
+09/09/2015 01:30:29 PM INFO: Running cell:
+from __future__ import print_function, division  # Omit for Python 3.x
+import numpy as np
+import matplotlib.pyplot as plt
+from quantecon import mc_compute_stationary, mc_sample_path
+
+
+09/09/2015 01:30:30 PM INFO: Cell returned
+09/09/2015 01:30:30 PM INFO: Running cell:
+
+alpha = beta = 0.1
+N = 10000
+p = beta / (alpha + beta)
+
+P = ((1 - alpha, alpha),   # Careful: P and p are distinct
+     (beta, 1 - beta))
+P = np.array(P)
+
+fig, ax = plt.subplots(figsize=(9, 6))
+ax.set_ylim(-0.25, 0.25)
+ax.grid()
+ax.hlines(0, 0, N, lw=2, alpha=0.6)  # Horizonal line at zero
+
+for x0, col in ((0, 'blue'), (1, 'green')):
+    # == Generate time series for worker that starts at x0 == #
+    X = mc_sample_path(P, x0, N)
+    # == Compute fraction of time spent unemployed, for each n == #
+    X_bar = (X == 0).cumsum() / (1 + np.arange(N, dtype=float)) 
+    # == Plot == #
+    ax.fill_between(range(N), np.zeros(N), X_bar - p, color=col, alpha=0.1)
+    ax.plot(X_bar - p, color=col, label=r'$X_0 = \, {} $'.format(x0))
+    ax.plot(X_bar - p, 'k-', alpha=0.6)  # Overlay in black--make lines clearer
+
+ax.legend(loc='upper right')
+
+
+
+09/09/2015 01:30:31 PM INFO: Cell returned
+09/09/2015 01:30:31 PM INFO: Running cell:
+%%file web_graph_data.txt
+a -> d;
+a -> f;
+b -> j;
+b -> k;
+b -> m;
+c -> c;
+c -> g;
+c -> j;
+c -> m;
+d -> f;
+d -> h;
+d -> k;
+e -> d;
+e -> h;
+e -> l;
+f -> a;
+f -> b;
+f -> j;
+f -> l;
+g -> b;
+g -> j;
+h -> d;
+h -> g;
+h -> l;
+h -> m;
+i -> g;
+i -> h;
+i -> n;
+j -> e;
+j -> i;
+j -> k;
+k -> n;
+l -> m;
+m -> g;
+n -> c;
+n -> j;
+n -> m;
+
+
+09/09/2015 01:30:31 PM INFO: Cell returned
+09/09/2015 01:30:31 PM INFO: Running cell:
+"""
+Return list of pages, ordered by rank
+"""
+import numpy as np
+from operator import itemgetter
+import re
+
+infile = 'web_graph_data.txt'
+alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
+n = 14 # Total number of web pages (nodes)
+
+# == Create a matrix Q indicating existence of links == #
+#  * Q[i, j] = 1 if there is a link from i to j
+#  * Q[i, j] = 0 otherwise
+Q = np.zeros((n, n), dtype=int)
+f = open(infile, 'r')
+edges = f.readlines()
+f.close()
+for edge in edges:
+    from_node, to_node = re.findall('\w', edge)
+    i, j = alphabet.index(from_node), alphabet.index(to_node)
+    Q[i, j] = 1
+# == Create the corresponding Markov matrix P == #
+P = np.empty((n, n))
+for i in range(n):
+    P[i,:] = Q[i,:] / Q[i,:].sum()
+# == Compute the stationary distribution r == #
+r = mc_compute_stationary(P)[0]
+ranked_pages = {alphabet[i] : r[i] for i in range(n)}
+# == Print solution, sorted from highest to lowest rank == #
+print('Rankings\n ***')
+for name, rank in sorted(ranked_pages.items(), key=itemgetter(1), reverse=1):
+    print('{0}: {1:.4}'.format(name, rank))
+
+
+
+09/09/2015 01:30:32 PM INFO: Cell returned
+09/09/2015 01:30:32 PM INFO: Running cell:
+
+
+09/09/2015 01:30:32 PM INFO: Cell returned
+09/09/2015 01:30:32 PM INFO: Running cell:
+
+
+09/09/2015 01:30:32 PM INFO: Cell returned
+09/09/2015 01:30:32 PM INFO: Running cell:
+
+
+09/09/2015 01:30:32 PM INFO: Cell returned
+09/09/2015 01:30:32 PM INFO: Shutdown kernel
