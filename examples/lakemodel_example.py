@@ -4,11 +4,11 @@ Created on Fri Feb 27 18:08:44 2015
 
 Author: David Evans
 
-Example Usage of LakeModel.py
+Example Usage of LakeModel in quantecon.models
 """
 import numpy as np
 import matplotlib.pyplot as plt
-import LakeModel
+from quantecon.models import LakeModel, LakeModelAgent, LakeModel_Equilibrium
 
 import pandas as pd
 pd.set_option('display.mpl_style', 'default') # Make the graphs a bit prettier
@@ -24,7 +24,7 @@ e0 = 0.92
 u0 = 1-e0
 T = 50
 
-LM = LakeModel.LakeModel(lamb,alpha,b,d)
+LM = LakeModel(lamb,alpha,b,d)
 
 #Find steady state
 xbar = LM.find_steady_state()
@@ -65,7 +65,7 @@ plt.savefig('example_rate_path.png')
 #Simulate a single agent
 T = 5000
 
-A = LakeModel.LakeModelAgent(lamb,alpha)
+A = LakeModelAgent(lamb,alpha)
 pi_bar = A.compute_ergodic().flatten()
 
 sHist = np.hstack(A.simulate(1,T))
@@ -106,7 +106,7 @@ pdf /= pdf.sum()
 w = (w[1:] + w[:1])/2
 
 #Find the quilibirum
-LME = LakeModel.LakeModel_Equilibrium(alpha_q,gamma,0.99,2.00,pdf,w)
+LME = LakeModel_Equilibrium(alpha_q,gamma,0.99,2.00,pdf,w)
 
 #possible levels of unemployment insurance
 cvec = np.linspace(1.,75,25)
