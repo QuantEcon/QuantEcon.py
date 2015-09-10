@@ -16,9 +16,9 @@
 ---END 'beta-binomial.py'---
 ---Executing 'bifurcation_diagram.py'---
 ---END 'bifurcation_diagram.py'---
+---Executing 'binom_df.py'---
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:387: UserWarning: matplotlib is currently using a non-GUI backend, so cannot show the figure
   "matplotlib is currently using a non-GUI backend, "
----Executing 'binom_df.py'---
 ---END 'binom_df.py'---
 ---Executing 'bisection.py'---
 ---END 'bisection.py'---
@@ -26,13 +26,13 @@
 ---END 'boxplot_example.py'---
 ---Executing 'career_vf_plot.py'---
 ---END 'career_vf_plot.py'---
+---Executing 'cauchy_samples.py'---
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/numpy/core/_methods.py:59: RuntimeWarning: Mean of empty slice.
   warnings.warn("Mean of empty slice.", RuntimeWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/numpy/core/_methods.py:71: RuntimeWarning: invalid value encountered in double_scalars
   ret = ret.dtype.type(ret / rcount)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:387: UserWarning: matplotlib is currently using a non-GUI backend, so cannot show the figure
   "matplotlib is currently using a non-GUI backend, "
----Executing 'cauchy_samples.py'---
 ---END 'cauchy_samples.py'---
 ---Executing 'chaos_class.py'---
 ---END 'chaos_class.py'---
@@ -68,12 +68,6 @@
 ---END 'illustrates_lln.py'---
 ---Executing 'jv_test.py'---
 ---END 'jv_test.py'---
----Executing 'lakemodel.py'---
----END 'lakemodel.py'---
-Traceback (most recent call last):
-  File "_lakemodel_example.py", line 13, in <module>
-    import LakeModel
-ImportError: No module named LakeModel
 ---Executing 'lakemodel_example.py'---
 ---END 'lakemodel_example.py'---
 ---Executing 'lin_interp_3d_plot.py'---
@@ -112,6 +106,7 @@ ImportError: No module named LakeModel
 ---END 'oligopoly.py'---
 ---Executing 'optgrowth_v0.py'---
 ---END 'optgrowth_v0.py'---
+---Executing 'paths_and_hist.py'---
 Traceback (most recent call last):
   File "_paths_and_hist.py", line 49, in <module>
     axes[1].hist(sample, bins=16, normed=True, orientation='horizontal', alpha=0.5)
@@ -120,7 +115,6 @@ Traceback (most recent call last):
   File "/home/matthewmckay/anaconda/lib/python2.7/site-packages/numpy/lib/function_base.py", line 176, in histogram
     'max must be larger than min in range parameter.')
 AttributeError: max must be larger than min in range parameter.
----Executing 'paths_and_hist.py'---
 ---END 'paths_and_hist.py'---
 ---Executing 'paths_and_stationarity.py'---
 ---END 'paths_and_stationarity.py'---
@@ -148,12 +142,13 @@ AttributeError: max must be larger than min in range parameter.
 ---END 'pylab_eg2.py'---
 ---Executing 'qm_plot.py'---
 ---END 'qm_plot.py'---
+---Executing 'qs.py'---
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/matplotlib/figure.py:387: UserWarning: matplotlib is currently using a non-GUI backend, so cannot show the figure
   "matplotlib is currently using a non-GUI backend, "
----Executing 'qs.py'---
 ---END 'qs.py'---
 ---Executing 'quadmap_class.py'---
 ---END 'quadmap_class.py'---
+---Executing 'robust_monopolist.py'---
 Traceback (most recent call last):
   File "_robust_monopolist.py", line 132, in <module>
     Po, Fo, do = optimal_lq.stationary_values()
@@ -162,7 +157,6 @@ Traceback (most recent call last):
   File "/home/matthewmckay/anaconda/lib/python2.7/site-packages/quantecon/matrix_eqn.py", line 197, in solve_discrete_riccati
     raise ValueError(fail_msg.format(i))
 ValueError: Convergence failed after 501 iterations.
----Executing 'robust_monopolist.py'---
 ---END 'robust_monopolist.py'---
 ---Executing 'sine2.py'---
 ---END 'sine2.py'---
