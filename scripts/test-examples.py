@@ -74,7 +74,10 @@ def example_tests(test_dir='examples/', log_path='../scripts/example-tests.log')
                 sys.stdout.flush()
     #-Report-#
     print "[examples/*.py] Passed %i/%i: " %(len(passed), len(test_files))
-    print "Failed Files:\n\t" + '\n\t'.join(failed)
+    if len(failed) == 0:
+    	print "Failed Files:\n\t" + "\n\tNone"
+    else:
+    	print "Failed Files:\n\t" + '\n\t'.join(failed)
     print ">> See %s for details" % log_path
     os.chdir('../')
     return passed, failed
