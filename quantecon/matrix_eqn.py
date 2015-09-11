@@ -116,12 +116,12 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
         k x k array.
     B : array_like(float, ndim=2)
         k x n array
-    N : array_like(float, ndim=2)
-        n x k array
-    R : array_like(float, ndim=2)
-        n x n, should be symmetric and positive definite
     Q : array_like(float, ndim=2)
         k x k, should be symmetric and non-negative definite
+    R : array_like(float, ndim=2)
+        n x n, should be symmetric and positive definite
+    N : array_like(float, ndim=2)
+        n x k array
     tolerance : scalar(float), optional(default=1e-10)
         The tolerance level for convergence
     max_iter : scalar(int), optional(default=500)
