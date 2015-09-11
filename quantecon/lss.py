@@ -46,14 +46,13 @@ def simulate_linear_model(A, x0, v, ts_length):
     A = np.asarray(A)
     n = A.shape[0]
     x = np.empty((n, ts_length))
-    
     x[:, 0] = x0
     for t in range(ts_length-1):
         # x[:, t+1] = A.dot(x[:, t]) + v[:, t]
         for i in range(n):
-            x[i, t+1] = v[i, t]
+            x[i, t+1] = v[i, t]                   #Shock
             for j in range(n):
-                x[i, t+1] += A[i, j] * x[j, t]
+                x[i, t+1] += A[i, j] * x[j, t]   #Dot Product
     return x
 
 if numba_installed:
@@ -98,8 +97,16 @@ class LinearStateSpace(object):
 
     def __init__(self, A, C, G, H=None, mu_0=None, Sigma_0=None):
         self.A, self.G, self.C = list(map(self.convert, (A, G, C)))
-        self.k, self.n = self.G.shape
+        #-Check Input Shapes-#
+        ni,nj = self.A.shape
+        if ni != nj:
+            raise ValueError("Matrix A (shape: %s) needs to be square" % (self.A.shape))
+        if ni != self.C.shape[0]:
+            raise ValueError("Matrix C (shape: %s) does not have compatible dimensions with A. It should be shape: %s" % (self.C.shape, (ni,1)))
         self.m = self.C.shape[1]
+        self.k, self.n = self.G.shape
+        if self.n != ni:
+            raise ValueError("Matrix G (shape: %s) does not have compatible dimensions with A (%s)"%(self.G.shape, self.A.shape))
         if H is None:
             self.H = None
             self.l = None
