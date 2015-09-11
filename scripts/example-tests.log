@@ -107,14 +107,6 @@
 ---Executing 'optgrowth_v0.py'---
 ---END 'optgrowth_v0.py'---
 ---Executing 'paths_and_hist.py'---
-Traceback (most recent call last):
-  File "_paths_and_hist.py", line 49, in <module>
-    axes[1].hist(sample, bins=16, normed=True, orientation='horizontal', alpha=0.5)
-  File "/home/matthewmckay/anaconda/lib/python2.7/site-packages/matplotlib/axes/_axes.py", line 5678, in hist
-    m, bins = np.histogram(x[i], bins, weights=w[i], **hist_kwargs)
-  File "/home/matthewmckay/anaconda/lib/python2.7/site-packages/numpy/lib/function_base.py", line 176, in histogram
-    'max must be larger than min in range parameter.')
-AttributeError: max must be larger than min in range parameter.
 ---END 'paths_and_hist.py'---
 ---Executing 'paths_and_stationarity.py'---
 ---END 'paths_and_stationarity.py'---
@@ -156,7 +148,7 @@ Traceback (most recent call last):
     P = solve_discrete_riccati(A0, B0, R, Q, N)
   File "/home/matthewmckay/anaconda/lib/python2.7/site-packages/quantecon/matrix_eqn.py", line 197, in solve_discrete_riccati
     raise ValueError(fail_msg.format(i))
-ValueError: Convergence failed after 501 iterations.
+ValueError: Convergence failed after 5001 iterations.
 ---END 'robust_monopolist.py'---
 ---Executing 'sine2.py'---
 ---END 'sine2.py'---
