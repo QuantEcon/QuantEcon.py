@@ -28,7 +28,7 @@ def probvec(m, k, random_state=None):
 
     Returns
     -------
-    ndarray(float, ndim=2)
+    x : ndarray(float, ndim=2)
         Array of shape (m, k) containing probability vectors as rows.
 
     Examples
@@ -38,14 +38,37 @@ def probvec(m, k, random_state=None):
            [ 0.43772774,  0.34763084,  0.21464142]])
 
     """
-    x = np.empty((m, k+1))
-
     random_state = check_random_state(random_state)
     r = random_state.random_sample(size=(m, k-1))
 
     r.sort(axis=-1)
-    x[:, 0], x[:, 1:k], x[:, k] = 0, r, 1
-    return np.diff(x, axis=-1)
+    x = np.empty((m, k))
+    _diff(r, out=x)
+
+    return x
+
+
+@jit(nopython=True)
+def _diff(r, out):
+    """
+    Store in `out` the differences `r[i, 0]`, `r[i, 1] - r[i, 0]`, ...,
+    `r[i, n-1] - r[i, n-2]`, `1 - r[i, n-1]`.
+
+    Parameters
+    ----------
+    r : ndarray(float, ndim=2)
+        Shape (m, n)
+
+    out : ndarray(float, ndim=2)
+        Shape (m, n+1)
+
+    """
+    m, n = r.shape
+    for i in range(m):
+        out[i, 0] = r[i, 0]
+        for j in range(1, n):
+            out[i, j] = r[i, j] - r[i, j-1]
+        out[i, n] = 1 - r[i, n-1]
 
 
 def sample_without_replacement(n, k, num_trials=None, random_state=None):
