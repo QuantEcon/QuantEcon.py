@@ -42,7 +42,10 @@ def solutions_tests(test_dir='solutions/', log_path='../scripts/solutions-tests.
                     sys.stdout.flush()
     #-Report-#
     print "[solutions/*.py] Passed %i/%i: " %(len(passed), len(test_files))
-    print "Failed Notebooks:\n\t" + '\n\t'.join(failed)
+    if len(failed) == 0:
+    	print "Failed Notebooks:\n\tNone"
+    else:
+    	print "Failed Notebooks:\n\t" + '\n\t'.join(failed)
     print ">> See %s for details" % log_path
     os.chdir('../')
     return passed, failed  

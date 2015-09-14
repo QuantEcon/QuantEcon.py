@@ -56,6 +56,7 @@ def example_tests(test_dir='examples/', log_path='../scripts/example-tests.log')
             print("Checking program %s (%s/%s) ..."%(fname,i,len(test_files)))
             with RedirectStdStreams(stdout=f, stderr=f):
                 print("---Executing '%s'---" % fname)
+                sys.stdout.flush()
                 #-Generate tmp File-#
                 tmpfl = "_" + fname
                 fl = open(tmpfl,'w')
@@ -70,9 +71,13 @@ def example_tests(test_dir='examples/', log_path='../scripts/example-tests.log')
                 #-Remove tmp file-#
                 os.remove(tmpfl)
                 print("---END '%s'---" % fname)
+                sys.stdout.flush()
     #-Report-#
     print "[examples/*.py] Passed %i/%i: " %(len(passed), len(test_files))
-    print "Failed Files:\n\t" + '\n\t'.join(failed)
+    if len(failed) == 0:
+    	print "Failed Files:\n\tNone"
+    else:
+    	print "Failed Files:\n\t" + '\n\t'.join(failed)
     print ">> See %s for details" % log_path
     os.chdir('../')
     return passed, failed

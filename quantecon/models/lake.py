@@ -7,10 +7,11 @@ Author: David Evans
 Provides a class call LakeModel that simulates the dynamics of unemployment and 
 employment. 
 """
+
 import numpy as np
 from scipy.stats import norm
 from scipy.optimize import brentq
-import quantecon
+import quantecon as qe
 
 class LakeModel(object):
     r"""
@@ -177,7 +178,7 @@ class LakeModelAgent(object):
         
         pibar(1d-array) : the ergodic distribution of P
         '''
-        return quantecon.mc_compute_stationary(self.P)
+        return qe.mc_compute_stationary(self.P)
         
     def simulate(self,s0,T):
         r'''
@@ -196,7 +197,7 @@ class LakeModelAgent(object):
         sHist(iterator) : history of employment(s==0) and unemployment(s==1)
         '''
         pi0 = np.arange(2) == s0
-        return quantecon.mc_sample_path(self.P,pi0,T)
+        return qe.mc_sample_path(self.P,pi0,T)
             
             
 class LakeModel_Equilibrium(object):
