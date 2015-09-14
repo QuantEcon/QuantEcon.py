@@ -3,12 +3,7 @@
 install:
 	python setup.py install
 
-test-all:
-	test
-	@echo
-	test-examples 
-	@echo
-	test-solutions
+test-all: test test-examples test-solutions
 
 test:
 	@echo "Running nosetests on test suite ..."
