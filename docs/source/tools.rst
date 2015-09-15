@@ -7,13 +7,11 @@ Tools
    tools/arma
    tools/cartesian
    tools/ce_util
-   tools/common_messages
    tools/compute_fp
    tools/discrete_rv
    tools/distributions
    tools/ecdf
    tools/estspec
-   tools/external
    tools/graph_tools
    tools/gridtools
    tools/ivp
@@ -27,4 +25,3 @@ Tools
    tools/quadsums
    tools/rank_nullspace
    tools/robustlq
-   tools/timing
