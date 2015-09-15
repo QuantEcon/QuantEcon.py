@@ -6,6 +6,6 @@ Markov
 
    markov/approximation
    markov/core
+   markov/ddp
    markov/gth_solve
    markov/random
-   markov/ddp
