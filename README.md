@@ -26,6 +26,10 @@ at a terminal prompt
 [![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master)](https://travis-ci.org/QuantEcon/QuantEcon.py)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 
+#### Current ReadTheDocs Status:
+[![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](https://readthedocs.org/projects/quanteconpy/?badge=latest)
+
+
 ## Additional Links
 
 1. [Project Coordinators](http://quantecon.org/about/#people)
