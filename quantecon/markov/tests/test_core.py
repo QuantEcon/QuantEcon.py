@@ -267,6 +267,21 @@ def test_simulate_init_array_num_reps():
     assert_array_equal(X[:, 0], init*num_reps)
 
 
+def test_simulate_init_type():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    seed = 0
+    ts_length = 3
+    init = 0  # int
+    X = mc.simulate(ts_length, init=init, random_state=seed)
+
+    inits_np_int = [t(init) for t in [np.int32, np.int64]]
+    for init in inits_np_int:
+        X_np_int = mc.simulate(ts_length, init=init, random_state=seed)
+        assert_array_equal(X_np_int, X)
+
+
 def test_simulate_dense_vs_sparse():
     n = 5
     a = 1/3
