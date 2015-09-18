@@ -41,18 +41,18 @@ def solutions_tests(test_dir='solutions/', log_path='../scripts/solutions-tests.
                     print
                     sys.stdout.flush()
     #-Report-#
-    print "[solutions/*.py] Passed %i/%i: " %(len(passed), len(test_files))
+    print("[solutions/*.py] Passed %i/%i: " %(len(passed), len(test_files)))
     if len(failed) == 0:
-    	print "Failed Notebooks:\n\tNone"
+    	print("Failed Notebooks:\n\tNone")
     else:
-    	print "Failed Notebooks:\n\t" + '\n\t'.join(failed)
-    print ">> See %s for details" % log_path
+    	print("Failed Notebooks:\n\t" + '\n\t'.join(failed))
+    print(">> See %s for details" % log_path)
     os.chdir('../')
     return passed, failed  
 
 
 if __name__ == '__main__':
-    print "-----------------------------"
-    print "Running all solutions/*.ipynb"
-    print "-----------------------------"
+    print("-----------------------------")
+    print("Running all solutions/*.ipynb")
+    print("-----------------------------")
     solutions_tests(*sys.argv[1:])
