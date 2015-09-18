@@ -267,6 +267,21 @@ def test_simulate_init_array_num_reps():
     assert_array_equal(X[:, 0], init*num_reps)
 
 
+def test_simulate_init_type():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    seed = 0
+    ts_length = 3
+    init = 0  # int
+    X = mc.simulate(ts_length, init=init, random_state=seed)
+
+    inits_np_int = [t(init) for t in [np.int32, np.int64]]
+    for init in inits_np_int:
+        X_np_int = mc.simulate(ts_length, init=init, random_state=seed)
+        assert_array_equal(X_np_int, X)
+
+
 def test_simulate_dense_vs_sparse():
     n = 5
     a = 1/3
@@ -391,6 +406,18 @@ def test_raises_value_error_non_sum_one():
     P = np.array([[0.4, 0.6], [0.2, 0.9]])
     assert_raises(ValueError, MarkovChain, P)
     assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
+
+
+def test_raises_value_error_simulate_init_out_of_range():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    n = mc.n
+    ts_length = 3
+    assert_raises(ValueError, mc.simulate, ts_length, init=n)
+    assert_raises(ValueError, mc.simulate, ts_length, init=-(n+1))
+    assert_raises(ValueError, mc.simulate, ts_length, init=[0, n])
+    assert_raises(ValueError, mc.simulate, ts_length, init=[0, -(n+1)])
 
 
 if __name__ == '__main__':
