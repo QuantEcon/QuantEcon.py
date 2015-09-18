@@ -408,6 +408,18 @@ def test_raises_value_error_non_sum_one():
     assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
 
 
+def test_raises_value_error_simulate_init_out_of_range():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    n = mc.n
+    ts_length = 3
+    assert_raises(ValueError, mc.simulate, ts_length, init=n)
+    assert_raises(ValueError, mc.simulate, ts_length, init=-(n+1))
+    assert_raises(ValueError, mc.simulate, ts_length, init=[0, n])
+    assert_raises(ValueError, mc.simulate, ts_length, init=[0, -(n+1)])
+
+
 if __name__ == '__main__':
     import sys
     import nose
