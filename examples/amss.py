@@ -79,7 +79,7 @@ class Planners_Allocation_Bellman(object):
             Vfnew,policies = self.fit_policy_function(PF)
             diff = np.abs((Vf(xgrid)-Vfnew(xgrid))/Vf(xgrid)).max()
             
-            print diff
+            print(diff)
             Vf = Vfnew
             
         #store value function policies and Bellman Equations
