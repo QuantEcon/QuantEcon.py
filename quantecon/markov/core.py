@@ -85,6 +85,7 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 
 """
 from __future__ import division
+import numbers
 import numpy as np
 from scipy import sparse
 from fractions import gcd
@@ -362,7 +363,7 @@ class MarkovChain(object):
                 k = num_reps
             if init is None:
                 init_states = random_state.randint(self.n, size=k)
-            elif isinstance(init, int):
+            elif isinstance(init, numbers.Integral):
                 init_states = np.ones(k, dtype=int) * init
             else:
                 raise ValueError(
@@ -526,7 +527,7 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     """
     random_state = check_random_state(random_state)
 
-    if isinstance(init, int):
+    if isinstance(init, numbers.Integral):
         X_0 = init
     else:
         cdf0 = np.cumsum(init)
