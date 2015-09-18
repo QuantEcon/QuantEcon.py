@@ -221,7 +221,7 @@ class Planners_Allocation_Bellman(object):
             for s in range(S):
                 diff = max(diff, np.abs((Vf[s](xgrid)-Vfnew[s](xgrid))/Vf[s](xgrid)).max() )
             
-            print diff
+            print(diff)
             Vf = Vfnew
             
         #store value function policies and Bellman Equations
