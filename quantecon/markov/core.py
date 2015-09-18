@@ -349,10 +349,18 @@ class MarkovChain(object):
         random_state = check_random_state(random_state)
         dim = 1  # Dimension of the returned array: 1 or 2
 
+        msg_out_or_range = 'index {init} is out of the state space'
+
         try:
             k = len(init)  # init is an array
             dim = 2
             init_states = np.asarray(init, dtype=int)
+            # Check init_states are in the state space
+            if (init_states >= self.n).any() or (init_states < -self.n).any():
+                idx = np.where(
+                    (init_states >= self.n) + (init_states < -self.n)
+                )[0][0]
+                raise ValueError(msg_out_or_range.format(init=idx))
             if num_reps is not None:
                 k *= num_reps
                 init_states = np.tile(init_states, num_reps)
@@ -364,6 +372,9 @@ class MarkovChain(object):
             if init is None:
                 init_states = random_state.randint(self.n, size=k)
             elif isinstance(init, numbers.Integral):
+                # Check init is in the state space
+                if init >= self.n or init < -self.n:
+                    raise ValueError(msg_out_or_range.format(init=init))
                 init_states = np.ones(k, dtype=int) * init
             else:
                 raise ValueError(
