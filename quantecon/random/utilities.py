@@ -123,7 +123,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     r = random_state.random_sample(size=(m, k))
 
     result = np.empty((m, k), dtype=int)  # Output array
-    pool = np.empty((m, n), dtype=int)  # Temporary array
+    pool = np.empty(n, dtype=int)  # Temporary array
     _sample_without_replacement(n, k, m, r, pool, out=result)
 
     if num_trials is None:
@@ -145,8 +145,8 @@ def _sample_without_replacement(n, k, m, r, pool, out):
     r : ndarray(float, ndim=2)
         Array containing random numbers in [0, 1). Shape (m, k).
 
-    pool : ndarray(int, ndim=2)
-        Temporary array. Shape (m, n).
+    pool : ndarray(int, ndim=1)
+        Temporary array. Shape (n,).
 
     out : ndarray(int, ndim=2)
         Output array. Shape (m, k).
@@ -154,10 +154,8 @@ def _sample_without_replacement(n, k, m, r, pool, out):
     """
     for i in range(m):
         for j in range(n):
-            pool[i, j] = j
-
-    for i in range(m):
+            pool[j] = j
         for j in range(k):
             idx = int(np.floor(r[i, j] * (n-j)))  # np.floor returns a float
-            out[i, j] = pool[i, idx]
-            pool[i, idx] = pool[i, n-j-1]
+            out[i, j] = pool[idx]
+            pool[idx] = pool[n-j-1]
