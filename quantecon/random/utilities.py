@@ -124,16 +124,14 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     # Logic taken from random.sample in the standard library
     result = np.empty((m, k), dtype=int)
-    pool = np.empty((m, n), dtype=int)
+    pool = np.empty(n, dtype=int)
     for i in range(m):
         for j in range(n):
-            pool[i, j] = j
-
-    for i in range(m):
+            pool[j] = j
         for j in range(k):
             idx = int(np.floor(r[i, j] * (n-j)))  # np.floor returns a float
-            result[i, j] = pool[i, idx]
-            pool[i, idx] = pool[i, n-j-1]
+            result[i, j] = pool[idx]
+            pool[idx] = pool[n-j-1]
 
     if num_trials is None:
         return result[0]
