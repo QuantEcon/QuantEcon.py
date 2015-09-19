@@ -122,25 +122,40 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     random_state = check_random_state(random_state)
     r = random_state.random_sample(size=(m, k))
 
-    # Logic taken from random.sample in the standard library
-    result = np.empty((m, k), dtype=int)
-    pool = np.empty((m, n), dtype=int)
-    for i in range(m):
-        for j in range(n):
-            pool[i, j] = j
-
-    for i in range(m):
-        for j in range(k):
-            idx = int(np.floor(r[i, j] * (n-j)))  # np.floor returns a float
-            result[i, j] = pool[i, idx]
-            pool[i, idx] = pool[i, n-j-1]
+    result = np.empty((m, k), dtype=int)  # Output array
+    pool = np.empty(n, dtype=int)  # Temporary array
+    _sample_without_replacement(n, k, m, r, pool, out=result)
 
     if num_trials is None:
         return result[0]
     else:
         return result
 
-if numba_installed:
-    docs = sample_without_replacement.__doc__
-    sample_without_replacement = jit(sample_without_replacement)
-    sample_without_replacement.__doc__ = docs
+
+@jit(nopython=True)
+def _sample_without_replacement(n, k, m, r, pool, out):
+    """
+    Main body of sample_without_replacement.
+    Logic taken from random.sample in the standard library.
+
+    Parameters
+    ----------
+    n, k, m : scalar(int)
+
+    r : ndarray(float, ndim=2)
+        Array containing random numbers in [0, 1). Shape (m, k).
+
+    pool : ndarray(int, ndim=1)
+        Temporary array. Shape (n,).
+
+    out : ndarray(int, ndim=2)
+        Output array. Shape (m, k).
+
+    """
+    for i in range(m):
+        for j in range(n):
+            pool[j] = j
+        for j in range(k):
+            idx = int(np.floor(r[i, j] * (n-j)))  # np.floor returns a float
+            out[i, j] = pool[idx]
+            pool[idx] = pool[n-j-1]
