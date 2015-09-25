@@ -1,4 +1,4 @@
-"""
+r"""
 Filename: ddp.py
 
 Author: Daisuke Oyama
@@ -141,7 +141,7 @@ class DiscreteDP(object):
 
        with parameters:
 
-       * length L reward vector R,
+       * length L reward vector `R`,
        * L x n transition probability array `Q`,
        * discount factor `beta`,
        * length L array `s_indices`, and
@@ -451,8 +451,8 @@ class DiscreteDP(object):
 
     def RQ_sigma(self, sigma):
         """
-        Given a policy `sigma`, return the reward vector R_sigma and the
-        transition probability matrix Q_sigma.
+        Given a policy `sigma`, return the reward vector `R_sigma` and
+        the transition probability matrix `Q_sigma`.
 
         Parameters
         ----------
@@ -483,7 +483,7 @@ class DiscreteDP(object):
     def bellman_operator(self, v, Tv=None, sigma=None):
         """
         The Bellman operator, which computes and returns the updated
-        value function Tv for a value function v.
+        value function `Tv` for a value function `v`.
 
         Parameters
         ----------
@@ -538,7 +538,7 @@ class DiscreteDP(object):
             Value function vector, of length n.
 
         sigma : ndarray(int, ndim=1), optional(default=None)
-            Optional output array for sigma.
+            Optional output array for `sigma`.
 
         Returns
         -------
@@ -820,7 +820,7 @@ class DiscreteDP(object):
         Returns
         -------
         mc : MarkovChain
-            Controlled Markov Chain.
+            Controlled Markov chain.
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)
