@@ -708,12 +708,12 @@ class DiscreteDP(object):
         sigma = self.compute_greedy(v)
 
         res = DPSolveResult(v=v,
-                             sigma=sigma,
-                             num_iter=num_iter,
-                             mc=self.controlled_mc(sigma),
-                             method='value iteration',
-                             epsilon=epsilon,
-                             max_iter=max_iter)
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='value iteration',
+                            epsilon=epsilon,
+                            max_iter=max_iter)
 
         return res
 
@@ -745,11 +745,11 @@ class DiscreteDP(object):
         num_iter = i + 1
 
         res = DPSolveResult(v=v_sigma,
-                             sigma=sigma,
-                             num_iter=num_iter,
-                             mc=self.controlled_mc(sigma),
-                             method='policy iteration',
-                             max_iter=max_iter)
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='policy iteration',
+                            max_iter=max_iter)
 
         return res
 
@@ -798,13 +798,13 @@ class DiscreteDP(object):
         num_iter = i + 1
 
         res = DPSolveResult(v=v,
-                             sigma=sigma,
-                             num_iter=num_iter,
-                             mc=self.controlled_mc(sigma),
-                             method='modified policy iteration',
-                             epsilon=epsilon,
-                             max_iter=max_iter,
-                             k=k)
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='modified policy iteration',
+                            epsilon=epsilon,
+                            max_iter=max_iter,
+                            k=k)
 
         return res
 
