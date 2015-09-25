@@ -192,17 +192,21 @@ class Kalman(object):
         if K_infinity is None:
             S, K_infinity = self.stationary_values()
         # == compute and return coefficients == #
-        coeffs = [np.identity(self.ss.k)]
+        coeffs = []
         i = 1
         if coeff_type == 'ma':
-            P = A
+            coeffs.append(np.identity(self.ss.k))
+            P_mat = A
+            P = np.copy(P_mat)  # Create a copy
         elif coeff_type == 'var':
-            P = A - dot(K_infinity, G)
+            coeffs.append(dot(G, K_infinity))
+            P_mat = A - dot(K_infinity, G)
+            P = np.copy(P_mat)  # Create a copy
         else:
             raise ValueError("Unknown coefficient type")
         while i <= j:
             coeffs.append(dot(dot(G, P), K_infinity))
-            P = dot(P, P)
+            P = dot(P, P_mat)
             i += 1
         return coeffs
 
