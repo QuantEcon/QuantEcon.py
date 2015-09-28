@@ -197,7 +197,7 @@ class Kalman(object):
         if coeff_type == 'ma':
             coeffs.append(np.identity(self.ss.k))
             P_mat = A
-            P = np.copy(P_mat)  # Create a copy
+            P = np.identity(self.ss.n)  # Create a copy
         elif coeff_type == 'var':
             coeffs.append(dot(G, K_infinity))
             P_mat = A - dot(K_infinity, G)
