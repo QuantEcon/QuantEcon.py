@@ -1,24 +1,32 @@
 ---> Executing 'arellano_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:42:10 PM INFO: Reading notebook arellano_solutions.ipynb
-09/11/2015 03:42:11 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:43:38 AM INFO: Reading notebook arellano_solutions.ipynb
+09/30/2015 11:43:38 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:42:12 PM INFO: Cell returned
-09/11/2015 03:42:12 PM INFO: Running cell:
+09/30/2015 11:43:39 AM INFO: Cell returned
+09/30/2015 11:43:39 AM INFO: Running cell:
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 import quantecon as qe
 from quantecon.models import Arellano_Economy
 
-09/11/2015 03:42:15 PM INFO: Cell returned
-09/11/2015 03:42:15 PM INFO: Running cell:
+09/30/2015 11:43:39 AM INFO: Cell returned
+09/30/2015 11:43:39 AM INFO: Running cell:
 ae = Arellano_Economy(beta=.953,        # time discount rate
                         gamma=2.,       # risk aversion
                         r=0.017,        # international interest rate
@@ -30,8 +38,8 @@ ae = Arellano_Economy(beta=.953,        # time discount rate
                         tol=1e-8,       # error tolerance in iteration
                         maxit=10000)
 
-09/11/2015 03:42:30 PM INFO: Cell returned
-09/11/2015 03:42:30 PM INFO: Running cell:
+09/30/2015 11:43:47 AM INFO: Cell returned
+09/30/2015 11:43:47 AM INFO: Running cell:
 
 # Create "Y High" and "Y Low" values as 5% devs from mean
 high, low = np.mean(ae.ygrid)*1.05, np.mean(ae.ygrid)*.95
@@ -56,8 +64,8 @@ ax.set_xlabel(r"$B'$")
 ax.legend(loc='upper left', frameon=False)
 plt.show()
 
-09/11/2015 03:42:31 PM INFO: Cell returned
-09/11/2015 03:42:31 PM INFO: Running cell:
+09/30/2015 11:43:47 AM INFO: Cell returned
+09/30/2015 11:43:47 AM INFO: Running cell:
 
 # Create "Y High" and "Y Low" values as 5% devs from mean
 high, low = np.mean(ae.ygrid)*1.05, np.mean(ae.ygrid)*.95
@@ -73,8 +81,8 @@ ax.set_ylabel(r"$V(y, B)$")
 ax.set_xlim(ae.Bgrid.min(), ae.Bgrid.max())
 plt.show()
 
-09/11/2015 03:42:32 PM INFO: Cell returned
-09/11/2015 03:42:32 PM INFO: Running cell:
+09/30/2015 11:43:48 AM INFO: Cell returned
+09/30/2015 11:43:48 AM INFO: Running cell:
 
 xx, yy = ae.Bgrid, ae.ygrid
 zz = ae.default_prob
@@ -90,8 +98,8 @@ ax.set_xlabel(r"$B'$")
 ax.set_ylabel(r"$y$")
 plt.show()
 
-09/11/2015 03:42:32 PM INFO: Cell returned
-09/11/2015 03:42:32 PM INFO: Running cell:
+09/30/2015 11:43:48 AM INFO: Cell returned
+09/30/2015 11:43:48 AM INFO: Running cell:
 T = 250
 y_vec, B_vec, q_vec, default_vec = ae.simulate(T)
 
@@ -133,34 +141,42 @@ for ax, series, title in zip(axes, plot_series, titles):
 
 plt.show()
 
-09/11/2015 03:42:34 PM INFO: Cell returned
-09/11/2015 03:42:34 PM INFO: Running cell:
+09/30/2015 11:43:49 AM INFO: Cell returned
+09/30/2015 11:43:49 AM INFO: Running cell:
 
 
-09/11/2015 03:42:34 PM INFO: Cell returned
-09/11/2015 03:42:34 PM INFO: Shutdown kernel
+09/30/2015 11:43:49 AM INFO: Cell returned
+09/30/2015 11:43:49 AM INFO: Shutdown kernel
 ---> END 'arellano_solutions.ipynb' <---
 
 ---> Executing 'asset_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:42:35 PM INFO: Reading notebook asset_solutions.ipynb
-09/11/2015 03:42:36 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:43:49 AM INFO: Reading notebook asset_solutions.ipynb
+09/30/2015 11:43:50 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:42:36 PM INFO: Cell returned
-09/11/2015 03:42:36 PM INFO: Running cell:
+09/30/2015 11:43:50 AM INFO: Cell returned
+09/30/2015 11:43:50 AM INFO: Running cell:
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon.models import AssetPrices
 
-09/11/2015 03:42:38 PM INFO: Cell returned
-09/11/2015 03:42:38 PM INFO: Running cell:
+09/30/2015 11:43:51 AM INFO: Cell returned
+09/30/2015 11:43:51 AM INFO: Running cell:
 # == Define primitives == #
 n = 5
 P = 0.0125 * np.ones((n, n))
@@ -186,34 +202,42 @@ p_s = 150.0
 w_bar, w_bars = ap.call_option(zeta, p_s, T = [10,20,30])
 
 
-09/11/2015 03:42:38 PM INFO: Cell returned
-09/11/2015 03:42:38 PM INFO: Running cell:
+09/30/2015 11:43:51 AM INFO: Cell returned
+09/30/2015 11:43:51 AM INFO: Running cell:
 
 
-09/11/2015 03:42:38 PM INFO: Cell returned
-09/11/2015 03:42:38 PM INFO: Shutdown kernel
+09/30/2015 11:43:51 AM INFO: Cell returned
+09/30/2015 11:43:51 AM INFO: Shutdown kernel
 ---> END 'asset_solutions.ipynb' <---
 
 ---> Executing 'career_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:42:39 PM INFO: Reading notebook career_solutions.ipynb
-09/11/2015 03:42:40 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:43:52 AM INFO: Reading notebook career_solutions.ipynb
+09/30/2015 11:43:52 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:42:40 PM INFO: Cell returned
-09/11/2015 03:42:40 PM INFO: Running cell:
+09/30/2015 11:43:53 AM INFO: Cell returned
+09/30/2015 11:43:53 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import DiscreteRV, compute_fixed_point
 from quantecon.models import CareerWorkerProblem
 
-09/11/2015 03:42:42 PM INFO: Cell returned
-09/11/2015 03:42:42 PM INFO: Running cell:
+09/30/2015 11:43:53 AM INFO: Cell returned
+09/30/2015 11:43:53 AM INFO: Running cell:
 wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
 v = compute_fixed_point(wp.bellman_operator, v_init, verbose=False)
@@ -248,8 +272,8 @@ plt.show()
 
 
 
-09/11/2015 03:42:45 PM INFO: Cell returned
-09/11/2015 03:42:45 PM INFO: Running cell:
+09/30/2015 11:43:54 AM INFO: Cell returned
+09/30/2015 11:43:54 AM INFO: Running cell:
 
 wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
@@ -277,8 +301,8 @@ for i in range(M):
 print(np.median(samples))
 
 
-09/11/2015 03:42:53 PM INFO: Cell returned
-09/11/2015 03:42:53 PM INFO: Running cell:
+09/30/2015 11:43:56 AM INFO: Cell returned
+09/30/2015 11:43:56 AM INFO: Running cell:
 from matplotlib import cm
 
 wp = CareerWorkerProblem()
@@ -299,29 +323,310 @@ ax.text(4.0, 4.5, 'stay put', fontsize=14)
 
 
 
-09/11/2015 03:42:57 PM INFO: Cell returned
-09/11/2015 03:42:57 PM INFO: Shutdown kernel
+09/30/2015 11:43:56 AM INFO: Cell returned
+09/30/2015 11:43:56 AM INFO: Shutdown kernel
 ---> END 'career_solutions.ipynb' <---
 
----> Executing 'estspec_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+---> Executing 'discrete_dp_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:42:59 PM INFO: Reading notebook estspec_solutions.ipynb
-09/11/2015 03:43:00 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:43:57 AM INFO: Reading notebook discrete_dp_solutions.ipynb
+09/30/2015 11:43:58 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:43:00 PM INFO: Cell returned
-09/11/2015 03:43:00 PM INFO: Running cell:
+09/30/2015 11:43:58 AM INFO: Cell returned
+09/30/2015 11:43:58 AM INFO: Running cell:
+from __future__ import division, print_function
+import numpy as np
+import scipy.sparse as sparse
+import matplotlib.pyplot as plt
+from quantecon import compute_fixed_point
+from quantecon.markov import DiscreteDP
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+alpha = 0.65
+f = lambda k: k**alpha
+u = np.log
+beta = 0.95
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+grid_max = 2
+grid_size = 1500
+grid = np.linspace(1e-6, grid_max, grid_size)
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+print(grid)
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+# Consumption matrix, with nonpositive consumption included
+C = f(grid).reshape(grid_size, 1) - grid.reshape(1, grid_size)
+
+# State-action indices
+s_indices, a_indices = np.where(C > 0)
+
+# Number of state-action pairs
+L = len(s_indices)
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+print(L)
+print(s_indices)
+print(a_indices)
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+R = u(C[s_indices, a_indices])
+
+09/30/2015 11:43:59 AM INFO: Cell returned
+09/30/2015 11:43:59 AM INFO: Running cell:
+Q = sparse.lil_matrix((L, grid_size))
+Q[np.arange(L), a_indices] = 1
+
+09/30/2015 11:44:03 AM INFO: Cell returned
+09/30/2015 11:44:03 AM INFO: Running cell:
+# data = np.ones(L)
+# indptr = np.arange(L+1)
+# Q = sparse.csr_matrix((data, a_indices, indptr), shape=(L, grid_size))
+
+09/30/2015 11:44:03 AM INFO: Cell returned
+09/30/2015 11:44:03 AM INFO: Running cell:
+ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
+
+09/30/2015 11:44:04 AM INFO: Cell returned
+09/30/2015 11:44:04 AM INFO: Running cell:
+res = ddp.solve(method='policy_iteration')
+v, sigma, num_iter = res.v, res.sigma, res.num_iter
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+num_iter
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+# Optimal consumption in the discrete version
+c = f(grid) - grid[sigma]
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+# Exact solution of the continuous version
+ab = alpha * beta
+c1 = (np.log(1 - ab) + np.log(ab) * ab / (1 - ab)) / (1 - beta)
+c2 = alpha / (1 - ab)
+def v_star(k):
+    return c1 + c2 * np.log(k)
+
+def c_star(k):
+    return (1 - ab) * k**alpha
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+fig, ax = plt.subplots(1, 2, figsize=(14, 4))
+ax[0].set_ylim(-40, -32)
+ax[0].set_xlim(grid[0], grid[-1])
+ax[1].set_xlim(grid[0], grid[-1])
+
+lb0 = 'discrete value function'
+ax[0].plot(grid, v, lw=2, alpha=0.6, label=lb0)
+
+lb0 = 'continuous value function'
+ax[0].plot(grid, v_star(grid), 'k-', lw=1.5, alpha=0.8, label=lb0)
+ax[0].legend(loc='upper left')
+
+lb1 = 'discrete optimal consumption'
+ax[1].plot(grid, c, 'b-', lw=2, alpha=0.6, label=lb1)
+
+lb1 = 'continuous optimal consumption'
+ax[1].plot(grid, c_star(grid), 'k-', lw=1.5, alpha=0.8, label=lb1)
+ax[1].legend(loc='upper left')
+plt.show()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+np.abs(v - v_star(grid)).max()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+np.abs(v - v_star(grid))[1:].max()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+np.abs(c - c_star(grid)).max()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+diff = np.diff(c)
+(diff >= 0).all()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+dec_ind = np.where(diff < 0)[0]
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+len(dec_ind)
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+np.abs(diff[dec_ind]).max()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+(np.diff(v) > 0).all()
+
+09/30/2015 11:44:05 AM INFO: Cell returned
+09/30/2015 11:44:05 AM INFO: Running cell:
+ddp.epsilon = 1e-4
+ddp.max_iter = 500
+res1 = ddp.solve(method='value_iteration')
+
+09/30/2015 11:44:09 AM INFO: Cell returned
+09/30/2015 11:44:09 AM INFO: Running cell:
+res1.num_iter
+
+09/30/2015 11:44:09 AM INFO: Cell returned
+09/30/2015 11:44:09 AM INFO: Running cell:
+np.array_equal(sigma, res1.sigma)
+
+09/30/2015 11:44:09 AM INFO: Cell returned
+09/30/2015 11:44:09 AM INFO: Running cell:
+res2 = ddp.solve(method='modified_policy_iteration')
+
+09/30/2015 11:44:09 AM INFO: Cell returned
+09/30/2015 11:44:09 AM INFO: Running cell:
+res2.num_iter
+
+09/30/2015 11:44:09 AM INFO: Cell returned
+09/30/2015 11:44:09 AM INFO: Running cell:
+np.array_equal(sigma, res2.sigma)
+
+09/30/2015 11:44:09 AM INFO: Cell returned
+09/30/2015 11:44:09 AM INFO: Running cell:
+%timeit ddp.solve(method='value_iteration')
+%timeit ddp.solve(method='policy_iteration')
+%timeit ddp.solve(method='modified_policy_iteration')
+
+09/30/2015 11:44:24 AM INFO: Cell returned
+09/30/2015 11:44:24 AM INFO: Running cell:
+w = 5 * np.log(grid) - 25  # Initial condition
+n = 35
+fig, ax = plt.subplots(figsize=(8,5))
+ax.set_ylim(-40, -20)
+ax.set_xlim(np.min(grid), np.max(grid))
+lb = 'initial condition'
+ax.plot(grid, w, color=plt.cm.jet(0), lw=2, alpha=0.6, label=lb)
+for i in range(n):
+    w = ddp.bellman_operator(w)
+    ax.plot(grid, w, color=plt.cm.jet(i / n), lw=2, alpha=0.6)
+lb = 'true value function'
+ax.plot(grid, v_star(grid), 'k-', lw=2, alpha=0.8, label=lb)
+ax.legend(loc='upper left')
+
+plt.show()
+
+09/30/2015 11:44:24 AM INFO: Cell returned
+09/30/2015 11:44:24 AM INFO: Running cell:
+w = 5 * u(grid) - 25  # Initial condition
+
+fig, ax = plt.subplots(3, 1, figsize=(8, 10))
+true_c = c_star(grid)
+
+for i, n in enumerate((2, 4, 6)):
+    ax[i].set_ylim(0, 1)
+    ax[i].set_xlim(0, 2)
+    ax[i].set_yticks((0, 1))
+    ax[i].set_xticks((0, 2))
+
+    w = 5 * u(grid) - 25  # Initial condition
+    compute_fixed_point(ddp.bellman_operator, w, max_iter=n, print_skip=1)
+    sigma = ddp.compute_greedy(w)  # Policy indices
+    c_policy = f(grid) - grid[sigma]
+
+    ax[i].plot(grid, c_policy, 'b-', lw=2, alpha=0.8,
+               label='approximate optimal consumption policy')
+    ax[i].plot(grid, true_c, 'k-', lw=2, alpha=0.8,
+               label='true optimal consumption policy')
+    ax[i].legend(loc='upper left')
+    ax[i].set_title('{} value function iterations'.format(n))
+
+09/30/2015 11:44:25 AM INFO: Cell returned
+09/30/2015 11:44:25 AM INFO: Running cell:
+discount_factors = (0.9, 0.94, 0.98)
+k_init = 0.1
+
+# Search for the index corresponding to k_init
+k_init_ind = np.searchsorted(grid, k_init)
+
+sample_size = 25
+
+fig, ax = plt.subplots(figsize=(8,5))
+ax.set_xlabel("time")
+ax.set_ylabel("capital")
+ax.set_ylim(0.10, 0.30)
+
+# Create a new instance, not to modify the one used above
+ddp0 = DiscreteDP(R, Q, beta, s_indices, a_indices)
+
+for beta in discount_factors:
+    ddp0.beta = beta
+    res0 = ddp0.solve()
+    k_path_ind = res0.mc.simulate(init=k_init_ind, ts_length=sample_size)
+    k_path = grid[k_path_ind]
+    ax.plot(k_path, 'o-', lw=2, alpha=0.75, label=r'$\beta = {}$'.format(beta))
+
+ax.legend(loc='lower right')
+plt.show()
+
+09/30/2015 11:44:27 AM INFO: Cell returned
+09/30/2015 11:44:27 AM INFO: Running cell:
+
+
+09/30/2015 11:44:27 AM INFO: Cell returned
+09/30/2015 11:44:27 AM INFO: Shutdown kernel
+---> END 'discrete_dp_solutions.ipynb' <---
+
+---> Executing 'estspec_solutions.ipynb' <---
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
+
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
+
+  """)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:44:28 AM INFO: Reading notebook estspec_solutions.ipynb
+09/30/2015 11:44:29 AM INFO: Running cell:
+%matplotlib inline
+
+09/30/2015 11:44:29 AM INFO: Cell returned
+09/30/2015 11:44:29 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import ARMA, periodogram, ar_periodogram
 
-09/11/2015 03:43:02 PM INFO: Cell returned
-09/11/2015 03:43:02 PM INFO: Running cell:
+09/30/2015 11:44:30 AM INFO: Cell returned
+09/30/2015 11:44:30 AM INFO: Running cell:
 
 ## Data
 n = 400
@@ -347,8 +652,8 @@ for i, wl in enumerate((15, 55, 175)):  # window lengths
     ax[i].set_title('window length = {}'.format(wl))
 
 
-09/11/2015 03:43:05 PM INFO: Cell returned
-09/11/2015 03:43:05 PM INFO: Running cell:
+09/30/2015 11:44:31 AM INFO: Cell returned
+09/30/2015 11:44:31 AM INFO: Running cell:
 lp = ARMA(-0.9)
 wl = 65
 
@@ -373,31 +678,39 @@ for i in range(3):
 
 
 
-09/11/2015 03:43:15 PM INFO: Cell returned
-09/11/2015 03:43:15 PM INFO: Shutdown kernel
+09/30/2015 11:44:32 AM INFO: Cell returned
+09/30/2015 11:44:32 AM INFO: Shutdown kernel
 ---> END 'estspec_solutions.ipynb' <---
 
 ---> Executing 'finite_mc_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:43:17 PM INFO: Reading notebook finite_mc_solutions.ipynb
-09/11/2015 03:43:19 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:44:33 AM INFO: Reading notebook finite_mc_solutions.ipynb
+09/30/2015 11:44:33 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:43:19 PM INFO: Cell returned
-09/11/2015 03:43:19 PM INFO: Running cell:
+09/30/2015 11:44:34 AM INFO: Cell returned
+09/30/2015 11:44:34 AM INFO: Running cell:
 from __future__ import print_function, division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import mc_compute_stationary, mc_sample_path
 
 
-09/11/2015 03:43:22 PM INFO: Cell returned
-09/11/2015 03:43:22 PM INFO: Running cell:
+09/30/2015 11:44:34 AM INFO: Cell returned
+09/30/2015 11:44:34 AM INFO: Running cell:
 
 alpha = beta = 0.1
 N = 10000
@@ -426,8 +739,8 @@ ax.legend(loc='upper right')
 
 
 
-09/11/2015 03:43:23 PM INFO: Cell returned
-09/11/2015 03:43:23 PM INFO: Running cell:
+09/30/2015 11:44:35 AM INFO: Cell returned
+09/30/2015 11:44:35 AM INFO: Running cell:
 %%file web_graph_data.txt
 a -> d;
 a -> f;
@@ -468,8 +781,8 @@ n -> j;
 n -> m;
 
 
-09/11/2015 03:43:23 PM INFO: Cell returned
-09/11/2015 03:43:23 PM INFO: Running cell:
+09/30/2015 11:44:35 AM INFO: Cell returned
+09/30/2015 11:44:35 AM INFO: Running cell:
 """
 Return list of pages, ordered by rank
 """
@@ -507,42 +820,50 @@ for name, rank in sorted(ranked_pages.items(), key=itemgetter(1), reverse=1):
 
 
 
-09/11/2015 03:43:24 PM INFO: Cell returned
-09/11/2015 03:43:24 PM INFO: Running cell:
+09/30/2015 11:44:36 AM INFO: Cell returned
+09/30/2015 11:44:36 AM INFO: Running cell:
 
 
-09/11/2015 03:43:24 PM INFO: Cell returned
-09/11/2015 03:43:24 PM INFO: Running cell:
+09/30/2015 11:44:36 AM INFO: Cell returned
+09/30/2015 11:44:36 AM INFO: Running cell:
 
 
-09/11/2015 03:43:24 PM INFO: Cell returned
-09/11/2015 03:43:24 PM INFO: Running cell:
+09/30/2015 11:44:36 AM INFO: Cell returned
+09/30/2015 11:44:36 AM INFO: Running cell:
 
 
-09/11/2015 03:43:24 PM INFO: Cell returned
-09/11/2015 03:43:24 PM INFO: Shutdown kernel
+09/30/2015 11:44:36 AM INFO: Cell returned
+09/30/2015 11:44:36 AM INFO: Shutdown kernel
 ---> END 'finite_mc_solutions.ipynb' <---
 
 ---> Executing 'ifp_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:43:26 PM INFO: Reading notebook ifp_solutions.ipynb
-09/11/2015 03:43:27 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:44:36 AM INFO: Reading notebook ifp_solutions.ipynb
+09/30/2015 11:44:37 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:43:27 PM INFO: Cell returned
-09/11/2015 03:43:27 PM INFO: Running cell:
+09/30/2015 11:44:37 AM INFO: Cell returned
+09/30/2015 11:44:37 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.models import ConsumerProblem
 
-09/11/2015 03:43:29 PM INFO: Cell returned
-09/11/2015 03:43:29 PM INFO: Running cell:
+09/30/2015 11:44:38 AM INFO: Cell returned
+09/30/2015 11:44:38 AM INFO: Running cell:
 cp = ConsumerProblem()
 K = 80
 
@@ -569,8 +890,8 @@ ax.set_ylabel('consumption (low income)')
 ax.legend(loc='upper left')
 plt.show()
 
-09/11/2015 03:43:42 PM INFO: Cell returned
-09/11/2015 03:43:42 PM INFO: Running cell:
+09/30/2015 11:44:44 AM INFO: Cell returned
+09/30/2015 11:44:44 AM INFO: Running cell:
 
 r_vals = np.linspace(0, 0.04, 4)  
 
@@ -586,8 +907,8 @@ ax.set_ylabel('consumption (low income)')
 ax.legend(loc='upper left')
 plt.show()
 
-09/11/2015 03:43:52 PM INFO: Cell returned
-09/11/2015 03:43:52 PM INFO: Running cell:
+09/30/2015 11:44:47 AM INFO: Cell returned
+09/30/2015 11:44:47 AM INFO: Running cell:
 
 from scipy import interp
 from quantecon import mc_sample_path 
@@ -617,8 +938,8 @@ ax.set_xlabel('assets')
 ax.set_xlim(-0.05, 0.75)
 plt.show()
 
-09/11/2015 03:44:00 PM INFO: Cell returned
-09/11/2015 03:44:00 PM INFO: Running cell:
+09/30/2015 11:44:50 AM INFO: Cell returned
+09/30/2015 11:44:50 AM INFO: Running cell:
 
 M = 25
 r_vals = np.linspace(0, 0.04, M)  
@@ -641,31 +962,39 @@ ax.grid(True)
 ax.legend(loc='upper left')
 plt.show()
 
-09/11/2015 03:47:07 PM INFO: Cell returned
-09/11/2015 03:47:07 PM INFO: Shutdown kernel
+09/30/2015 11:46:19 AM INFO: Cell returned
+09/30/2015 11:46:19 AM INFO: Shutdown kernel
 ---> END 'ifp_solutions.ipynb' <---
 
 ---> Executing 'jv_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:47:09 PM INFO: Reading notebook jv_solutions.ipynb
-09/11/2015 03:47:10 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:46:20 AM INFO: Reading notebook jv_solutions.ipynb
+09/30/2015 11:46:21 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:47:10 PM INFO: Cell returned
-09/11/2015 03:47:10 PM INFO: Running cell:
+09/30/2015 11:46:21 AM INFO: Cell returned
+09/30/2015 11:46:21 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 import random
 from quantecon import compute_fixed_point
 from quantecon.models import JvWorker
 
-09/11/2015 03:47:12 PM INFO: Cell returned
-09/11/2015 03:47:12 PM INFO: Running cell:
+09/30/2015 11:46:23 AM INFO: Cell returned
+09/30/2015 11:46:23 AM INFO: Running cell:
 
 wp = JvWorker(grid_size=25)
 G, pi, F = wp.G, wp.pi, wp.F       # Simplify names
@@ -704,8 +1033,8 @@ for x in plot_grid:
 
 plt.show()
 
-09/11/2015 03:47:46 PM INFO: Cell returned
-09/11/2015 03:47:46 PM INFO: Running cell:
+09/30/2015 11:46:40 AM INFO: Cell returned
+09/30/2015 11:46:40 AM INFO: Running cell:
 
 wp = JvWorker(grid_size=25)
 
@@ -720,31 +1049,39 @@ ax.legend(loc='upper left')
 
 plt.show()
 
-09/11/2015 03:47:47 PM INFO: Cell returned
-09/11/2015 03:47:47 PM INFO: Shutdown kernel
+09/30/2015 11:46:41 AM INFO: Cell returned
+09/30/2015 11:46:41 AM INFO: Shutdown kernel
 ---> END 'jv_solutions.ipynb' <---
 
 ---> Executing 'kalman_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:47:49 PM INFO: Reading notebook kalman_solutions.ipynb
-09/11/2015 03:47:50 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:46:42 AM INFO: Reading notebook kalman_solutions.ipynb
+09/30/2015 11:46:43 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:47:50 PM INFO: Cell returned
-09/11/2015 03:47:50 PM INFO: Running cell:
+09/30/2015 11:46:43 AM INFO: Cell returned
+09/30/2015 11:46:43 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import Kalman
 from quantecon import LinearStateSpace
 from scipy.stats import norm
 
-09/11/2015 03:47:51 PM INFO: Cell returned
-09/11/2015 03:47:51 PM INFO: Running cell:
+09/30/2015 11:46:43 AM INFO: Cell returned
+09/30/2015 11:46:43 AM INFO: Running cell:
 # == parameters == #
 theta = 10  # Constant value of state x_t
 A, C, G, H = 1, 0, 1, 1
@@ -773,8 +1110,8 @@ for i in range(N):
 ax.set_title(r'First %d densities when $\theta = %.1f$' % (N, theta)) 
 ax.legend(loc='upper left')
 
-09/11/2015 03:47:53 PM INFO: Cell returned
-09/11/2015 03:47:53 PM INFO: Running cell:
+09/30/2015 11:46:44 AM INFO: Cell returned
+09/30/2015 11:46:44 AM INFO: Running cell:
 from scipy.integrate import quad
 
 epsilon = 0.1
@@ -806,8 +1143,8 @@ ax.set_xlim(0, T)
 ax.plot(range(T), z) 
 ax.fill_between(range(T), np.zeros(T), z, color="blue", alpha=0.2) 
 
-09/11/2015 03:47:55 PM INFO: Cell returned
-09/11/2015 03:47:55 PM INFO: Running cell:
+09/30/2015 11:46:46 AM INFO: Cell returned
+09/30/2015 11:46:46 AM INFO: Running cell:
 from __future__ import print_function  # Remove for Python 3.x
 from numpy.random import multivariate_normal
 from scipy.linalg import eigvals
@@ -861,24 +1198,35 @@ ax.legend()
 
 
 
-09/11/2015 03:47:56 PM INFO: Cell returned
-09/11/2015 03:47:56 PM INFO: Running cell:
+09/30/2015 11:46:46 AM INFO: Cell returned
+09/30/2015 11:46:46 AM INFO: Running cell:
 
 
-09/11/2015 03:47:56 PM INFO: Cell returned
-09/11/2015 03:47:56 PM INFO: Shutdown kernel
+09/30/2015 11:46:46 AM INFO: Cell returned
+09/30/2015 11:46:46 AM INFO: Shutdown kernel
 ---> END 'kalman_solutions.ipynb' <---
 
 ---> Executing 'lakemodel_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:47:57 PM INFO: Reading notebook lakemodel_solutions.ipynb
-09/11/2015 03:47:57 PM INFO: Running cell:
-%pylab inline
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:46:46 AM INFO: Reading notebook lakemodel_solutions.ipynb
+09/30/2015 11:46:47 AM INFO: Running cell:
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
 from quantecon.models import LakeModel
 
 alpha = 0.012
@@ -891,121 +1239,129 @@ e0 = 0.92
 u0 = 1-e0
 T = 50
 
-09/11/2015 03:47:59 PM INFO: Cell returned
-09/11/2015 03:47:59 PM INFO: Running cell:
+09/30/2015 11:46:48 AM INFO: Cell returned
+09/30/2015 11:46:48 AM INFO: Running cell:
 LM0 = LakeModel(lamb,alpha,b,d)
 x0 = LM0.find_steady_state()# initial conditions
 
-print "Initial Steady State: ", x0
+print("Initial Steady State: %s" % x0)
 
-09/11/2015 03:47:59 PM INFO: Cell returned
-09/11/2015 03:47:59 PM INFO: Running cell:
+09/30/2015 11:46:48 AM INFO: Cell returned
+09/30/2015 11:46:48 AM INFO: Running cell:
 LM1 = LakeModel(0.2,alpha,b,d)
 
-09/11/2015 03:47:59 PM INFO: Cell returned
-09/11/2015 03:47:59 PM INFO: Running cell:
+09/30/2015 11:46:48 AM INFO: Cell returned
+09/30/2015 11:46:48 AM INFO: Running cell:
 xbar = LM1.find_steady_state() # new steady state
-X_path = vstack(LM1.simulate_stock_path(x0*N0,T)) # simulate stocks
-x_path = vstack(LM1.simulate_rate_path(x0,T)) # simulate rates
-print "New Steady State: ", xbar
+X_path = np.vstack(LM1.simulate_stock_path(x0*N0,T)) # simulate stocks
+x_path = np.vstack(LM1.simulate_rate_path(x0,T)) # simulate rates
+print("New Steady State: %s" % xbar)
 
-09/11/2015 03:47:59 PM INFO: Cell returned
-09/11/2015 03:47:59 PM INFO: Running cell:
-figure(figsize=[10,9])
-subplot(3,1,1)
-plot(X_path[:,0])
-title(r'Employment')
-subplot(3,1,2)
-plot(X_path[:,1])
-title(r'Unemployment')
-subplot(3,1,3)
-plot(X_path.sum(1))
-title(r'Labor Force')
+09/30/2015 11:46:48 AM INFO: Cell returned
+09/30/2015 11:46:48 AM INFO: Running cell:
+plt.figure(figsize=[10,9])
+plt.subplot(3,1,1)
+plt.plot(X_path[:,0])
+plt.title(r'Employment')
+plt.subplot(3,1,2)
+plt.plot(X_path[:,1])
+plt.title(r'Unemployment')
+plt.subplot(3,1,3)
+plt.plot(X_path.sum(1))
+plt.title(r'Labor Force')
 
-09/11/2015 03:48:00 PM INFO: Cell returned
-09/11/2015 03:48:00 PM INFO: Running cell:
-figure(figsize=[10,6])
-subplot(2,1,1)
-plot(x_path[:,0])
-hlines(xbar[0],0,T,'r','--')
-title(r'Employment Rate')
-subplot(2,1,2)
-plot(x_path[:,1])
-hlines(xbar[1],0,T,'r','--')
-title(r'Unemployment Rate')
+09/30/2015 11:46:48 AM INFO: Cell returned
+09/30/2015 11:46:48 AM INFO: Running cell:
+plt.figure(figsize=[10,6])
+plt.subplot(2,1,1)
+plt.plot(x_path[:,0])
+plt.hlines(xbar[0],0,T,'r','--')
+plt.title(r'Employment Rate')
+plt.subplot(2,1,2)
+plt.plot(x_path[:,1])
+plt.hlines(xbar[1],0,T,'r','--')
+plt.title(r'Unemployment Rate')
 
-09/11/2015 03:48:01 PM INFO: Cell returned
-09/11/2015 03:48:01 PM INFO: Running cell:
+09/30/2015 11:46:49 AM INFO: Cell returned
+09/30/2015 11:46:49 AM INFO: Running cell:
 bhat = 0.003
 T_hat = 20
 LM1 = LakeModel(lamb,alpha,bhat,d)
 
-09/11/2015 03:48:01 PM INFO: Cell returned
-09/11/2015 03:48:01 PM INFO: Running cell:
-X_path1 = vstack(LM1.simulate_stock_path(x0*N0,T_hat)) # simulate stocks
-x_path1 = vstack(LM1.simulate_rate_path(x0,T_hat)) # simulate rates
+09/30/2015 11:46:49 AM INFO: Cell returned
+09/30/2015 11:46:49 AM INFO: Running cell:
+X_path1 = np.vstack(LM1.simulate_stock_path(x0*N0,T_hat)) # simulate stocks
+x_path1 = np.vstack(LM1.simulate_rate_path(x0,T_hat)) # simulate rates
 
-09/11/2015 03:48:01 PM INFO: Cell returned
-09/11/2015 03:48:01 PM INFO: Running cell:
-X_path2 = vstack(LM0.simulate_stock_path(X_path1[-1,:2],T-T_hat+1)) # simulate stocks
-x_path2 = vstack(LM0.simulate_rate_path(x_path1[-1,:2],T-T_hat+1)) # simulate rates
+09/30/2015 11:46:49 AM INFO: Cell returned
+09/30/2015 11:46:49 AM INFO: Running cell:
+X_path2 = np.vstack(LM0.simulate_stock_path(X_path1[-1,:2],T-T_hat+1)) # simulate stocks
+x_path2 = np.vstack(LM0.simulate_rate_path(x_path1[-1,:2],T-T_hat+1)) # simulate rates
 
-09/11/2015 03:48:01 PM INFO: Cell returned
-09/11/2015 03:48:01 PM INFO: Running cell:
-x_path = vstack([x_path1,x_path2[1:]]) # note [1:] to avoid doubling period 20
-X_path = vstack([X_path1,X_path2[1:]]) # note [1:] to avoid doubling period 20
+09/30/2015 11:46:49 AM INFO: Cell returned
+09/30/2015 11:46:49 AM INFO: Running cell:
+x_path = np.vstack([x_path1,x_path2[1:]]) # note [1:] to avoid doubling period 20
+X_path = np.vstack([X_path1,X_path2[1:]]) # note [1:] to avoid doubling period 20
 
-09/11/2015 03:48:01 PM INFO: Cell returned
-09/11/2015 03:48:01 PM INFO: Running cell:
-figure(figsize=[10,9])
-subplot(3,1,1)
-plot(X_path[:,0])
-title(r'Employment')
-subplot(3,1,2)
-plot(X_path[:,1])
-title(r'Unemployment')
-subplot(3,1,3)
-plot(X_path.sum(1))
-title(r'Labor Force')
+09/30/2015 11:46:49 AM INFO: Cell returned
+09/30/2015 11:46:49 AM INFO: Running cell:
+plt.figure(figsize=[10,9])
+plt.subplot(3,1,1)
+plt.plot(X_path[:,0])
+plt.title(r'Employment')
+plt.subplot(3,1,2)
+plt.plot(X_path[:,1])
+plt.title(r'Unemployment')
+plt.subplot(3,1,3)
+plt.plot(X_path.sum(1))
+plt.title(r'Labor Force')
 
-09/11/2015 03:48:02 PM INFO: Cell returned
-09/11/2015 03:48:02 PM INFO: Running cell:
-figure(figsize=[10,6])
-subplot(2,1,1)
-plot(x_path[:,0])
-hlines(x0[0],0,T,'r','--')
-title(r'Employment Rate')
-subplot(2,1,2)
-plot(x_path[:,1])
-hlines(x0[1],0,T,'r','--')
-title(r'Unemployment Rate')
+09/30/2015 11:46:49 AM INFO: Cell returned
+09/30/2015 11:46:49 AM INFO: Running cell:
+plt.figure(figsize=[10,6])
+plt.subplot(2,1,1)
+plt.plot(x_path[:,0])
+plt.hlines(x0[0],0,T,'r','--')
+plt.title(r'Employment Rate')
+plt.subplot(2,1,2)
+plt.plot(x_path[:,1])
+plt.hlines(x0[1],0,T,'r','--')
+plt.title(r'Unemployment Rate')
 
-09/11/2015 03:48:02 PM INFO: Cell returned
-09/11/2015 03:48:02 PM INFO: Running cell:
+09/30/2015 11:46:50 AM INFO: Cell returned
+09/30/2015 11:46:50 AM INFO: Running cell:
 
 
-09/11/2015 03:48:02 PM INFO: Cell returned
-09/11/2015 03:48:02 PM INFO: Shutdown kernel
+09/30/2015 11:46:50 AM INFO: Cell returned
+09/30/2015 11:46:50 AM INFO: Shutdown kernel
 ---> END 'lakemodel_solutions.ipynb' <---
 
 ---> Executing 'lln_clt_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:48:04 PM INFO: Reading notebook lln_clt_solutions.ipynb
-09/11/2015 03:48:04 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:46:51 AM INFO: Reading notebook lln_clt_solutions.ipynb
+09/30/2015 11:46:52 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:48:05 PM INFO: Cell returned
-09/11/2015 03:48:05 PM INFO: Running cell:
+09/30/2015 11:46:52 AM INFO: Cell returned
+09/30/2015 11:46:52 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 
-09/11/2015 03:48:05 PM INFO: Cell returned
-09/11/2015 03:48:05 PM INFO: Running cell:
+09/30/2015 11:46:52 AM INFO: Cell returned
+09/30/2015 11:46:52 AM INFO: Running cell:
 """
 Illustrates the delta method, a consequence of the central limit theorem.
 """
@@ -1044,8 +1400,8 @@ ax.plot(xgrid, norm.pdf(xgrid, scale=asymptotic_sd), 'k-', lw=2, label=lb)
 ax.legend()
 plt.show()
 
-09/11/2015 03:50:33 PM INFO: Cell returned
-09/11/2015 03:50:33 PM INFO: Running cell:
+09/30/2015 11:46:56 AM INFO: Cell returned
+09/30/2015 11:46:56 AM INFO: Running cell:
 from scipy.stats import uniform, chi2
 from scipy.linalg import inv, sqrtm
 
@@ -1090,30 +1446,38 @@ ax.legend()
 ax.hist(chisq_obs, bins=50, normed=True)
 plt.show()
 
-09/11/2015 03:50:44 PM INFO: Cell returned
-09/11/2015 03:50:44 PM INFO: Shutdown kernel
+09/30/2015 11:47:02 AM INFO: Cell returned
+09/30/2015 11:47:02 AM INFO: Shutdown kernel
 ---> END 'lln_clt_solutions.ipynb' <---
 
 ---> Executing 'lqcontrol_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:50:45 PM INFO: Reading notebook lqcontrol_solutions.ipynb
-09/11/2015 03:50:46 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:04 AM INFO: Reading notebook lqcontrol_solutions.ipynb
+09/30/2015 11:47:05 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:50:47 PM INFO: Cell returned
-09/11/2015 03:50:47 PM INFO: Running cell:
+09/30/2015 11:47:05 AM INFO: Cell returned
+09/30/2015 11:47:05 AM INFO: Running cell:
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import LQ
 
-09/11/2015 03:50:49 PM INFO: Cell returned
-09/11/2015 03:50:49 PM INFO: Running cell:
+09/30/2015 11:47:06 AM INFO: Cell returned
+09/30/2015 11:47:06 AM INFO: Running cell:
 # == Model parameters == #
 r       = 0.05
 beta    = 1 / (1 + r)
@@ -1177,8 +1541,8 @@ axes[1].legend(ncol=1, **legend_args)
 
 plt.show()
 
-09/11/2015 03:50:50 PM INFO: Cell returned
-09/11/2015 03:50:50 PM INFO: Running cell:
+09/30/2015 11:47:06 AM INFO: Cell returned
+09/30/2015 11:47:06 AM INFO: Running cell:
 # == Model parameters == #
 r       = 0.05
 beta    = 1 / (1 + r)
@@ -1275,8 +1639,8 @@ axes[1].legend(ncol=1, **legend_args)
 
 plt.show()
 
-09/11/2015 03:50:51 PM INFO: Cell returned
-09/11/2015 03:50:51 PM INFO: Running cell:
+09/30/2015 11:47:08 AM INFO: Cell returned
+09/30/2015 11:47:08 AM INFO: Running cell:
 # == Model parameters == #
 a0      = 5
 a1      = 0.5
@@ -1333,23 +1697,31 @@ s = r'dynamics with $\gamma = {}$'.format(gamma)
 ax.text(max(time) * 0.6, 1 * q_bar.max(), s, fontsize=14)
 plt.show()
 
-09/11/2015 03:50:52 PM INFO: Cell returned
-09/11/2015 03:50:52 PM INFO: Shutdown kernel
+09/30/2015 11:47:08 AM INFO: Cell returned
+09/30/2015 11:47:08 AM INFO: Shutdown kernel
 ---> END 'lqcontrol_solutions.ipynb' <---
 
 ---> Executing 'lqramsey_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:50:53 PM INFO: Reading notebook lqramsey_solutions.ipynb
-09/11/2015 03:50:54 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:10 AM INFO: Reading notebook lqramsey_solutions.ipynb
+09/30/2015 11:47:10 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:50:55 PM INFO: Cell returned
-09/11/2015 03:50:55 PM INFO: Running cell:
+09/30/2015 11:47:11 AM INFO: Cell returned
+09/30/2015 11:47:11 AM INFO: Running cell:
 import sys
 import os
 import numpy as np
@@ -1359,8 +1731,8 @@ import matplotlib.pyplot as plt
 # to append it to the path so we can import it below
 sys.path.append(os.path.abspath("../examples"))
 
-09/11/2015 03:50:55 PM INFO: Cell returned
-09/11/2015 03:50:55 PM INFO: Running cell:
+09/30/2015 11:47:11 AM INFO: Cell returned
+09/30/2015 11:47:11 AM INFO: Running cell:
 from numpy import array
 from lqramsey import *
 
@@ -1391,29 +1763,37 @@ T = 50
 path = compute_paths(T, economy)
 gen_fig_1(path)
 
-09/11/2015 03:50:59 PM INFO: Cell returned
-09/11/2015 03:50:59 PM INFO: Shutdown kernel
+09/30/2015 11:47:13 AM INFO: Cell returned
+09/30/2015 11:47:13 AM INFO: Shutdown kernel
 ---> END 'lqramsey_solutions.ipynb' <---
 
 ---> Executing 'lss_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:51:00 PM INFO: Reading notebook lss_solutions.ipynb
-09/11/2015 03:51:01 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:14 AM INFO: Reading notebook lss_solutions.ipynb
+09/30/2015 11:47:15 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:51:02 PM INFO: Cell returned
-09/11/2015 03:51:02 PM INFO: Running cell:
+09/30/2015 11:47:15 AM INFO: Cell returned
+09/30/2015 11:47:15 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import LinearStateSpace
 
-09/11/2015 03:51:04 PM INFO: Cell returned
-09/11/2015 03:51:04 PM INFO: Running cell:
+09/30/2015 11:47:16 AM INFO: Cell returned
+09/30/2015 11:47:16 AM INFO: Running cell:
 phi_0, phi_1, phi_2 = 1.1, 0.8, -0.8
 
 A = [[1,     0,     0],
@@ -1433,8 +1813,8 @@ ax.set_xlabel('time')
 ax.set_ylabel(r'$y_t$', fontsize=16)
 plt.show()
 
-09/11/2015 03:51:05 PM INFO: Cell returned
-09/11/2015 03:51:05 PM INFO: Running cell:
+09/30/2015 11:47:17 AM INFO: Cell returned
+09/30/2015 11:47:17 AM INFO: Running cell:
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
 sigma = 0.2
 
@@ -1460,8 +1840,8 @@ ax.set_ylabel(r'$y_t$', fontsize=16)
 plt.show()
 
 
-09/11/2015 03:51:05 PM INFO: Cell returned
-09/11/2015 03:51:05 PM INFO: Running cell:
+09/30/2015 11:47:17 AM INFO: Cell returned
+09/30/2015 11:47:17 AM INFO: Running cell:
 from __future__ import division
 from scipy.stats import norm
 import random
@@ -1509,8 +1889,8 @@ ax.plot(population_means, color='g', lw=2, alpha=0.8, label=r'$G\mu_t$')
 ax.legend(ncol=2)
 plt.show()
 
-09/11/2015 03:51:06 PM INFO: Cell returned
-09/11/2015 03:51:06 PM INFO: Running cell:
+09/30/2015 11:47:18 AM INFO: Cell returned
+09/30/2015 11:47:18 AM INFO: Running cell:
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
 sigma = 0.1
 
@@ -1554,34 +1934,42 @@ for i in range(80):
     ax.plot((T0, T1, T2), (y[T0], y[T1], y[T2],), 'ko', alpha=0.5)
 
 
-09/11/2015 03:51:08 PM INFO: Cell returned
-09/11/2015 03:51:08 PM INFO: Running cell:
+09/30/2015 11:47:19 AM INFO: Cell returned
+09/30/2015 11:47:19 AM INFO: Running cell:
 
 
-09/11/2015 03:51:08 PM INFO: Cell returned
-09/11/2015 03:51:08 PM INFO: Shutdown kernel
+09/30/2015 11:47:19 AM INFO: Cell returned
+09/30/2015 11:47:19 AM INFO: Shutdown kernel
 ---> END 'lss_solutions.ipynb' <---
 
 ---> Executing 'lucas_asset_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:51:10 PM INFO: Reading notebook lucas_asset_solutions.ipynb
-09/11/2015 03:51:10 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:20 AM INFO: Reading notebook lucas_asset_solutions.ipynb
+09/30/2015 11:47:20 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:51:11 PM INFO: Cell returned
-09/11/2015 03:51:11 PM INFO: Running cell:
+09/30/2015 11:47:21 AM INFO: Cell returned
+09/30/2015 11:47:21 AM INFO: Running cell:
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon.models import LucasTree
 
-09/11/2015 03:51:13 PM INFO: Cell returned
-09/11/2015 03:51:13 PM INFO: Running cell:
+09/30/2015 11:47:21 AM INFO: Cell returned
+09/30/2015 11:47:21 AM INFO: Running cell:
 fig, ax = plt.subplots(figsize=(10,7))
 
 ax.set_xlabel(r'$y$', fontsize=16)
@@ -1597,34 +1985,42 @@ for beta in (.95, 0.98):
 ax.legend(loc='upper left')
 ax.set_xlim(min(grid), max(grid))
 
-09/11/2015 03:51:17 PM INFO: Cell returned
-09/11/2015 03:51:17 PM INFO: Running cell:
+09/30/2015 11:47:24 AM INFO: Cell returned
+09/30/2015 11:47:24 AM INFO: Running cell:
 
 
-09/11/2015 03:51:17 PM INFO: Cell returned
-09/11/2015 03:51:17 PM INFO: Shutdown kernel
+09/30/2015 11:47:24 AM INFO: Cell returned
+09/30/2015 11:47:24 AM INFO: Shutdown kernel
 ---> END 'lucas_asset_solutions.ipynb' <---
 
 ---> Executing 'mpe_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:51:17 PM INFO: Reading notebook mpe_solutions.ipynb
-09/11/2015 03:51:18 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:24 AM INFO: Reading notebook mpe_solutions.ipynb
+09/30/2015 11:47:25 AM INFO: Running cell:
 import numpy as np
 import quantecon as qe
 import matplotlib.pyplot as plt
 from numpy import dot
 
-09/11/2015 03:51:21 PM INFO: Cell returned
-09/11/2015 03:51:21 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:51:21 PM INFO: Cell returned
-09/11/2015 03:51:21 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 # == Parameters == #
 a0    = 10.0
 a1    = 2.0
@@ -1655,8 +2051,8 @@ S1 = S2 = W1 = W2 = M1 = M2 = 0.0
 F1, F2, P1, P2 = qe.nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
                        beta=beta)
 
-09/11/2015 03:51:21 PM INFO: Cell returned
-09/11/2015 03:51:21 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 AF = A - B1.dot(F1) - B2.dot(F2)
 n = 20
 x = np.empty((3, n))
@@ -1668,8 +2064,8 @@ q2 = x[2, :]
 q = q1 + q2       # Total output, MPE
 p = a0 - a1 * q   # Price, MPE
 
-09/11/2015 03:51:21 PM INFO: Cell returned
-09/11/2015 03:51:21 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 R = a1
 Q = gamma
 A = B = 1
@@ -1685,8 +2081,8 @@ for i in range(1, n):
     qm[i] = float(x) + q_bar
 pm = a0 - a1 * qm
 
-09/11/2015 03:51:21 PM INFO: Cell returned
-09/11/2015 03:51:21 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 fig, axes = plt.subplots(2, 1, figsize=(9, 9))
 
 ax = axes[0]
@@ -1705,8 +2101,8 @@ ax.set_ylabel("price")
 ax.set_xlabel("time")
 ax.legend(loc='upper right', frameon=0)
 
-09/11/2015 03:51:22 PM INFO: Cell returned
-09/11/2015 03:51:22 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 delta   = 0.02
 D       = np.array([[-1, 0.5], [0.5, -1]])
 b       = np.array([25, 25])
@@ -1715,8 +2111,8 @@ e1 = e2 = np.array([10, 10, 3])
 
 delta_1 = 1 - delta
 
-09/11/2015 03:51:22 PM INFO: Cell returned
-09/11/2015 03:51:22 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 # ==  Create matrices needed to compute the Nash feedback equilibrium == #
 
 A = np.array([[delta_1, 0, -delta_1*b[0]],
@@ -1753,8 +2149,8 @@ W2 = np.array([[0, 0],
 M1 = np.array([[0, 0], [0, D[0, 1] / 2.]])
 M2 = np.copy(M1)
 
-09/11/2015 03:51:22 PM INFO: Cell returned
-09/11/2015 03:51:22 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 F1, F2, P1, P2 = qe.nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2)
 
 print("\nFirm 1's feedback rule:\n")
@@ -1763,8 +2159,8 @@ print(F1)
 print("\nFirm 2's feedback rule:\n")
 print(F2)
 
-09/11/2015 03:51:22 PM INFO: Cell returned
-09/11/2015 03:51:22 PM INFO: Running cell:
+09/30/2015 11:47:27 AM INFO: Cell returned
+09/30/2015 11:47:27 AM INFO: Running cell:
 AF = A - B1.dot(F1) - B2.dot(F2)
 n = 25
 x = np.empty((3, n))
@@ -1779,32 +2175,40 @@ ax.plot(I2, 'g-', lw=2, alpha=0.75, label='inventories, firm 2')
 ax.set_title(r'$\delta = {}$'.format(delta))
 ax.legend()
 
-09/11/2015 03:51:23 PM INFO: Cell returned
-09/11/2015 03:51:23 PM INFO: Running cell:
+09/30/2015 11:47:28 AM INFO: Cell returned
+09/30/2015 11:47:28 AM INFO: Running cell:
 
 
-09/11/2015 03:51:23 PM INFO: Cell returned
-09/11/2015 03:51:23 PM INFO: Shutdown kernel
+09/30/2015 11:47:28 AM INFO: Cell returned
+09/30/2015 11:47:28 AM INFO: Shutdown kernel
 ---> END 'mpe_solutions.ipynb' <---
 
 ---> Executing 'numpy_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:51:24 PM INFO: Reading notebook numpy_solutions.ipynb
-09/11/2015 03:51:25 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:28 AM INFO: Reading notebook numpy_solutions.ipynb
+09/30/2015 11:47:29 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 def p(x, coef):
     X = np.empty(len(coef))
     X[0] = 1
@@ -1812,8 +2216,8 @@ def p(x, coef):
     y = np.cumprod(X)   # y = [1, x, x**2,...]
     return np.dot(coef, y)
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 coef = np.ones(3)
 print(coef)
 print(p(1, coef))
@@ -1821,8 +2225,8 @@ print(p(1, coef))
 q = np.poly1d(coef)
 print(q(1))
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 from numpy import cumsum
 from numpy.random import uniform
 
@@ -1847,14 +2251,14 @@ class discreteRV:
         """
         return self.Q.searchsorted(uniform(0, 1, size=k)) 
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 q = (0.1, 0.9)
 d = discreteRV(q)
 d.q = (0.5, 0.5)
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 """
 Modifies ecdf.py from QuantEcon to add in a plot method
 
@@ -1926,40 +2330,48 @@ class ECDF(object):
         plt.plot(x_vals, f(x_vals))
         plt.show()
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 X = np.random.randn(1000)
 F = ECDF(X)
 F.plot()
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Running cell:
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Running cell:
 
 
-09/11/2015 03:51:26 PM INFO: Cell returned
-09/11/2015 03:51:26 PM INFO: Shutdown kernel
+09/30/2015 11:47:29 AM INFO: Cell returned
+09/30/2015 11:47:29 AM INFO: Shutdown kernel
 ---> END 'numpy_solutions.ipynb' <---
 
 ---> Executing 'odu_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:51:27 PM INFO: Reading notebook odu_solutions.ipynb
-09/11/2015 03:51:28 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:47:31 AM INFO: Reading notebook odu_solutions.ipynb
+09/30/2015 11:47:31 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:51:29 PM INFO: Cell returned
-09/11/2015 03:51:29 PM INFO: Running cell:
+09/30/2015 11:47:32 AM INFO: Cell returned
+09/30/2015 11:47:32 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.models import SearchProblem
 
-09/11/2015 03:51:30 PM INFO: Cell returned
-09/11/2015 03:51:30 PM INFO: Running cell:
+09/30/2015 11:47:33 AM INFO: Cell returned
+09/30/2015 11:47:33 AM INFO: Running cell:
 sp = SearchProblem(pi_grid_size=50)
 
 phi_init = np.ones(len(sp.pi_grid)) 
@@ -1976,8 +2388,8 @@ ax.text(0.42, 1.2, 'reject')
 ax.text(0.7, 1.8, 'accept')
 plt.show()
 
-09/11/2015 03:51:31 PM INFO: Cell returned
-09/11/2015 03:51:31 PM INFO: Running cell:
+09/30/2015 11:47:33 AM INFO: Cell returned
+09/30/2015 11:47:33 AM INFO: Running cell:
 from scipy import interp
 # Set up model and compute the function w_bar
 sp = SearchProblem(pi_grid_size=50, F_a=1, F_b=1)
@@ -2038,19 +2450,27 @@ ax.axvline(change_date, color="red")
 ax.legend()
 plt.show()
 
-09/11/2015 03:53:47 PM INFO: Cell returned
-09/11/2015 03:53:47 PM INFO: Shutdown kernel
+09/30/2015 11:48:47 AM INFO: Cell returned
+09/30/2015 11:48:47 AM INFO: Shutdown kernel
 ---> END 'odu_solutions.ipynb' <---
 
 ---> Executing 'oop_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:53:48 PM INFO: Reading notebook oop_solutions.ipynb
-09/11/2015 03:53:48 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:48:47 AM INFO: Reading notebook oop_solutions.ipynb
+09/30/2015 11:48:48 AM INFO: Running cell:
 class ECDF(object):
 
     def __init__(self, observations):
@@ -2063,8 +2483,8 @@ class ECDF(object):
                 counter += 1
         return counter / len(self.observations)
 
-09/11/2015 03:53:48 PM INFO: Cell returned
-09/11/2015 03:53:48 PM INFO: Running cell:
+09/30/2015 11:48:48 AM INFO: Cell returned
+09/30/2015 11:48:48 AM INFO: Running cell:
 # == test == #
 
 from random import uniform
@@ -2077,8 +2497,8 @@ F.observations = [uniform(0, 1) for i in range(1000)]
 
 print(F(0.5))
 
-09/11/2015 03:53:49 PM INFO: Cell returned
-09/11/2015 03:53:49 PM INFO: Running cell:
+09/30/2015 11:48:48 AM INFO: Cell returned
+09/30/2015 11:48:48 AM INFO: Running cell:
 class Polynomial(object):
 
     def __init__(self, coefficients):
@@ -2109,30 +2529,38 @@ class Polynomial(object):
         self.coefficients = new_coefficients
 
 
-09/11/2015 03:53:49 PM INFO: Cell returned
-09/11/2015 03:53:49 PM INFO: Shutdown kernel
+09/30/2015 11:48:48 AM INFO: Cell returned
+09/30/2015 11:48:48 AM INFO: Shutdown kernel
 ---> END 'oop_solutions.ipynb' <---
 
 ---> Executing 'optgrowth_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:53:50 PM INFO: Reading notebook optgrowth_solutions.ipynb
-09/11/2015 03:53:50 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:48:49 AM INFO: Reading notebook optgrowth_solutions.ipynb
+09/30/2015 11:48:50 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:53:51 PM INFO: Cell returned
-09/11/2015 03:53:51 PM INFO: Running cell:
+09/30/2015 11:48:50 AM INFO: Cell returned
+09/30/2015 11:48:50 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.models import GrowthModel
 
-09/11/2015 03:53:53 PM INFO: Cell returned
-09/11/2015 03:53:53 PM INFO: Running cell:
+09/30/2015 11:48:51 AM INFO: Cell returned
+09/30/2015 11:48:51 AM INFO: Running cell:
 alpha, beta = 0.65, 0.95
 gm = GrowthModel() 
 true_sigma = (1 - alpha * beta) * gm.grid**alpha
@@ -2154,8 +2582,8 @@ for i, n in enumerate((2, 4, 6)):
     ax[i].legend(loc='upper left')
     ax[i].set_title('{} value function iterations'.format(n))
 
-09/11/2015 03:53:55 PM INFO: Cell returned
-09/11/2015 03:53:55 PM INFO: Running cell:
+09/30/2015 11:48:53 AM INFO: Cell returned
+09/30/2015 11:48:53 AM INFO: Running cell:
 from scipy import interp
 
 gm = GrowthModel() 
@@ -2185,31 +2613,39 @@ for beta in discount_factors:
 ax.legend(loc='lower right')
 plt.show()
 
-09/11/2015 03:54:03 PM INFO: Cell returned
-09/11/2015 03:54:03 PM INFO: Shutdown kernel
+09/30/2015 11:48:58 AM INFO: Cell returned
+09/30/2015 11:48:58 AM INFO: Shutdown kernel
 ---> END 'optgrowth_solutions.ipynb' <---
 
 ---> Executing 'pandas_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:05 PM INFO: Reading notebook pandas_solutions.ipynb
-09/11/2015 03:54:06 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:00 AM INFO: Reading notebook pandas_solutions.ipynb
+09/30/2015 11:49:01 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:54:07 PM INFO: Cell returned
-09/11/2015 03:54:07 PM INFO: Running cell:
+09/30/2015 11:49:01 AM INFO: Cell returned
+09/30/2015 11:49:01 AM INFO: Running cell:
 import numpy as np
 import pandas as pd
 import datetime as dt
 import pandas.io.data as web
 import matplotlib.pyplot as plt
 
-09/11/2015 03:54:07 PM INFO: Cell returned
-09/11/2015 03:54:07 PM INFO: Running cell:
+09/30/2015 11:49:01 AM INFO: Cell returned
+09/30/2015 11:49:01 AM INFO: Running cell:
 ticker_list = {'INTC': 'Intel',
                'MSFT': 'Microsoft',
                'IBM': 'IBM',
@@ -2242,19 +2678,27 @@ pc.sort()
 fig, ax = plt.subplots(figsize=(10,8))
 pc.plot(kind='bar', ax=ax)
 
-09/11/2015 03:54:10 PM INFO: Cell returned
-09/11/2015 03:54:10 PM INFO: Shutdown kernel
+09/30/2015 11:49:03 AM INFO: Cell returned
+09/30/2015 11:49:03 AM INFO: Shutdown kernel
 ---> END 'pandas_solutions.ipynb' <---
 
 ---> Executing 'pbe_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:11 PM INFO: Reading notebook pbe_solutions.ipynb
-09/11/2015 03:54:12 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:04 AM INFO: Reading notebook pbe_solutions.ipynb
+09/30/2015 11:49:05 AM INFO: Running cell:
 def factorial(n):
     k = 1
     for i in range(n):
@@ -2263,8 +2707,8 @@ def factorial(n):
 
 factorial(4)
 
-09/11/2015 03:54:12 PM INFO: Cell returned
-09/11/2015 03:54:12 PM INFO: Running cell:
+09/30/2015 11:49:05 AM INFO: Cell returned
+09/30/2015 11:49:05 AM INFO: Running cell:
 from random import uniform
 
 def binomial_rv(n, p):
@@ -2277,8 +2721,8 @@ def binomial_rv(n, p):
 
 binomial_rv(10, 0.5)
 
-09/11/2015 03:54:12 PM INFO: Cell returned
-09/11/2015 03:54:12 PM INFO: Running cell:
+09/30/2015 11:49:05 AM INFO: Cell returned
+09/30/2015 11:49:05 AM INFO: Running cell:
 from __future__ import division  # Omit if using Python 3.x
 from math import sqrt
 
@@ -2295,8 +2739,8 @@ area_estimate = count / n
 
 print(area_estimate * 4)  # dividing by radius**2
 
-09/11/2015 03:54:12 PM INFO: Cell returned
-09/11/2015 03:54:12 PM INFO: Running cell:
+09/30/2015 11:49:05 AM INFO: Cell returned
+09/30/2015 11:49:05 AM INFO: Running cell:
 payoff = 0
 count = 0
 
@@ -2308,12 +2752,12 @@ for i in range(10):
 
 print(payoff)
 
-09/11/2015 03:54:12 PM INFO: Cell returned
-09/11/2015 03:54:12 PM INFO: Running cell:
+09/30/2015 11:49:05 AM INFO: Cell returned
+09/30/2015 11:49:05 AM INFO: Running cell:
 %matplotlib inline  
 
-09/11/2015 03:54:13 PM INFO: Cell returned
-09/11/2015 03:54:13 PM INFO: Running cell:
+09/30/2015 11:49:06 AM INFO: Cell returned
+09/30/2015 11:49:06 AM INFO: Running cell:
 import matplotlib.pyplot as plt
 from random import normalvariate
 
@@ -2328,8 +2772,8 @@ for i in range(ts_length + 1):
 plt.plot(x_values, 'b-')
 
 
-09/11/2015 03:54:13 PM INFO: Cell returned
-09/11/2015 03:54:13 PM INFO: Running cell:
+09/30/2015 11:49:06 AM INFO: Cell returned
+09/30/2015 11:49:06 AM INFO: Running cell:
 alphas = [0.0, 0.8, 0.98]
 ts_length = 200
 
@@ -2342,23 +2786,31 @@ for alpha in alphas:
     plt.plot(x_values, label='alpha = ' + str(alpha))
 plt.legend()
 
-09/11/2015 03:54:13 PM INFO: Cell returned
-09/11/2015 03:54:13 PM INFO: Running cell:
+09/30/2015 11:49:06 AM INFO: Cell returned
+09/30/2015 11:49:06 AM INFO: Running cell:
 
 
-09/11/2015 03:54:13 PM INFO: Cell returned
-09/11/2015 03:54:13 PM INFO: Shutdown kernel
+09/30/2015 11:49:06 AM INFO: Cell returned
+09/30/2015 11:49:06 AM INFO: Shutdown kernel
 ---> END 'pbe_solutions.ipynb' <---
 
 ---> Executing 'py_adv_feat_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:15 PM INFO: Reading notebook py_adv_feat_solutions.ipynb
-09/11/2015 03:54:16 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:07 AM INFO: Reading notebook py_adv_feat_solutions.ipynb
+09/30/2015 11:49:08 AM INFO: Running cell:
 def x(t):
     if t == 0:
         return 0
@@ -2368,12 +2820,12 @@ def x(t):
         return x(t-1) + x(t-2)
 
 
-09/11/2015 03:54:16 PM INFO: Cell returned
-09/11/2015 03:54:16 PM INFO: Running cell:
+09/30/2015 11:49:08 AM INFO: Cell returned
+09/30/2015 11:49:08 AM INFO: Running cell:
 print([x(i) for i in range(10)])
 
-09/11/2015 03:54:16 PM INFO: Cell returned
-09/11/2015 03:54:16 PM INFO: Running cell:
+09/30/2015 11:49:08 AM INFO: Cell returned
+09/30/2015 11:49:08 AM INFO: Running cell:
 def column_iterator(target_file, column_number):
     """A generator function for CSV files.
     When called with a file name target_file (string) and column number 
@@ -2395,8 +2847,8 @@ for date in dates:
         break
     i += 1
 
-09/11/2015 03:54:16 PM INFO: Cell returned
-09/11/2015 03:54:16 PM INFO: Running cell:
+09/30/2015 11:49:08 AM INFO: Cell returned
+09/30/2015 11:49:08 AM INFO: Running cell:
 %%file numbers.txt
 prices
 3
@@ -2405,8 +2857,8 @@ prices
 7
 21
 
-09/11/2015 03:54:16 PM INFO: Cell returned
-09/11/2015 03:54:16 PM INFO: Running cell:
+09/30/2015 11:49:08 AM INFO: Cell returned
+09/30/2015 11:49:08 AM INFO: Running cell:
 f = open('numbers.txt')
 
 total = 0.0 
@@ -2421,64 +2873,72 @@ f.close()
 print(total)
 
 
-09/11/2015 03:54:16 PM INFO: Cell returned
-09/11/2015 03:54:16 PM INFO: Shutdown kernel
+09/30/2015 11:49:08 AM INFO: Cell returned
+09/30/2015 11:49:08 AM INFO: Shutdown kernel
 ---> END 'py_adv_feat_solutions.ipynb' <---
 
 ---> Executing 'pyess_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:17 PM INFO: Reading notebook pyess_solutions.ipynb
-09/11/2015 03:54:18 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:09 AM INFO: Reading notebook pyess_solutions.ipynb
+09/30/2015 11:49:09 AM INFO: Running cell:
 from __future__ import division  # Omit for Python 3.x
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 x_vals = [1, 2, 3]
 y_vals = [1, 1, 1]
 sum([x * y for x, y in zip(x_vals, y_vals)])
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 sum(x * y for x, y in zip(x_vals, y_vals))
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 sum([x % 2 == 0 for x in range(100)])
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 sum(x % 2 == 0 for x in range(100))
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 len([x for x in range(100) if x % 2 == 0])
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 sum([1 for x in range(100) if x % 2 == 0])
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 pairs = ((2, 5), (4, 2), (9, 8), (12, 10))
 sum([x % 2 == 0 and y % 2 == 0 for x, y in pairs])
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 def p(x, coeff):
     return sum(a * x**i for i, a in enumerate(coeff))
 
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:09 AM INFO: Cell returned
+09/30/2015 11:49:09 AM INFO: Running cell:
 p(1, (2, 4))
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:10 AM INFO: Cell returned
+09/30/2015 11:49:10 AM INFO: Running cell:
 def f(string):
     count = 0
     for letter in string:
@@ -2487,8 +2947,8 @@ def f(string):
     return count
 f('The Rain in Spain')
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:10 AM INFO: Cell returned
+09/30/2015 11:49:10 AM INFO: Running cell:
 def f(seq_a, seq_b):
     is_subset = True
     for a in seq_a:
@@ -2501,13 +2961,13 @@ def f(seq_a, seq_b):
 print(f([1, 2], [1, 2, 3]))
 print(f([1, 2, 3], [1, 2]))
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:10 AM INFO: Cell returned
+09/30/2015 11:49:10 AM INFO: Running cell:
 def f(seq_a, seq_b):
     return set(seq_a).issubset(set(seq_b))
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Running cell:
+09/30/2015 11:49:10 AM INFO: Cell returned
+09/30/2015 11:49:10 AM INFO: Running cell:
 def linapprox(f, a, b, n, x):
     """
     Evaluates the piecewise linear interpolant of f at x on the interval 
@@ -2544,33 +3004,41 @@ def linapprox(f, a, b, n, x):
     return f(u) + (x - u) * (f(v) - f(u)) / (v - u)
 
 
-09/11/2015 03:54:18 PM INFO: Cell returned
-09/11/2015 03:54:18 PM INFO: Shutdown kernel
+09/30/2015 11:49:10 AM INFO: Cell returned
+09/30/2015 11:49:10 AM INFO: Shutdown kernel
 ---> END 'pyess_solutions.ipynb' <---
 
 ---> Executing 'ree_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:19 PM INFO: Reading notebook ree_solutions.ipynb
-09/11/2015 03:54:20 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:10 AM INFO: Reading notebook ree_solutions.ipynb
+09/30/2015 11:49:11 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:54:20 PM INFO: Cell returned
-09/11/2015 03:54:20 PM INFO: Running cell:
+09/30/2015 11:49:11 AM INFO: Cell returned
+09/30/2015 11:49:11 AM INFO: Running cell:
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-09/11/2015 03:54:20 PM INFO: Cell returned
-09/11/2015 03:54:20 PM INFO: Running cell:
+09/30/2015 11:49:11 AM INFO: Cell returned
+09/30/2015 11:49:11 AM INFO: Running cell:
 from quantecon import LQ
 
-09/11/2015 03:54:22 PM INFO: Cell returned
-09/11/2015 03:54:22 PM INFO: Running cell:
+09/30/2015 11:49:12 AM INFO: Cell returned
+09/30/2015 11:49:12 AM INFO: Running cell:
 
 # == Model parameters == #
 
@@ -2605,8 +3073,8 @@ print(out1)
 print(out2)
 
 
-09/11/2015 03:54:22 PM INFO: Cell returned
-09/11/2015 03:54:22 PM INFO: Running cell:
+09/30/2015 11:49:12 AM INFO: Cell returned
+09/30/2015 11:49:12 AM INFO: Running cell:
 
 candidates = (
           (94.0886298678, 0.923409232937),
@@ -2634,8 +3102,8 @@ for kappa0, kappa1 in candidates:
 
 
 
-09/11/2015 03:54:22 PM INFO: Cell returned
-09/11/2015 03:54:22 PM INFO: Running cell:
+09/30/2015 11:49:12 AM INFO: Cell returned
+09/30/2015 11:49:12 AM INFO: Running cell:
 
 # == Formulate the planner's LQ problem == #
 
@@ -2656,8 +3124,8 @@ kappa0, kappa1 = -F[1], 1 - F[0]
 print(kappa0, kappa1)
 
 
-09/11/2015 03:54:22 PM INFO: Cell returned
-09/11/2015 03:54:22 PM INFO: Running cell:
+09/30/2015 11:49:12 AM INFO: Cell returned
+09/30/2015 11:49:12 AM INFO: Running cell:
 
 A = np.array([[1, 0], [0, 1]])
 B = np.array([[1], [0]])
@@ -2672,23 +3140,31 @@ m0, m1 = -F[1], 1 - F[0]
 print(m0, m1)
 
 
-09/11/2015 03:54:22 PM INFO: Cell returned
-09/11/2015 03:54:22 PM INFO: Shutdown kernel
+09/30/2015 11:49:12 AM INFO: Cell returned
+09/30/2015 11:49:12 AM INFO: Shutdown kernel
 ---> END 'ree_solutions.ipynb' <---
 
 ---> Executing 'schelling_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:23 PM INFO: Reading notebook schelling_solutions.ipynb
-09/11/2015 03:54:23 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:14 AM INFO: Reading notebook schelling_solutions.ipynb
+09/30/2015 11:49:14 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:54:24 PM INFO: Cell returned
-09/11/2015 03:54:24 PM INFO: Running cell:
+09/30/2015 11:49:15 AM INFO: Cell returned
+09/30/2015 11:49:15 AM INFO: Running cell:
 from random import uniform, seed
 from math import sqrt
 import matplotlib.pyplot as plt
@@ -2784,19 +3260,27 @@ while 1:
 print('Converged, terminating.')
 
 
-09/11/2015 03:54:34 PM INFO: Cell returned
-09/11/2015 03:54:34 PM INFO: Shutdown kernel
+09/30/2015 11:49:20 AM INFO: Cell returned
+09/30/2015 11:49:20 AM INFO: Shutdown kernel
 ---> END 'schelling_solutions.ipynb' <---
 
 ---> Executing 'scipy_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:35 PM INFO: Reading notebook scipy_solutions.ipynb
-09/11/2015 03:54:35 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:21 AM INFO: Reading notebook scipy_solutions.ipynb
+09/30/2015 11:49:22 AM INFO: Running cell:
 def bisect(f, a, b, tol=10e-5):
     """
     Implements the bisection root finding algorithm, assuming that f is a
@@ -2814,26 +3298,34 @@ def bisect(f, a, b, tol=10e-5):
             bisect(f, middle, upper)
 
 
-09/11/2015 03:54:35 PM INFO: Cell returned
-09/11/2015 03:54:35 PM INFO: Running cell:
+09/30/2015 11:49:22 AM INFO: Cell returned
+09/30/2015 11:49:22 AM INFO: Running cell:
 import numpy as np
 f = lambda x: np.sin(4 * (x - 0.25)) + x + x**20 - 1
 
 bisect(f, 0, 1)
 
-09/11/2015 03:54:36 PM INFO: Cell returned
-09/11/2015 03:54:36 PM INFO: Shutdown kernel
+09/30/2015 11:49:22 AM INFO: Cell returned
+09/30/2015 11:49:22 AM INFO: Shutdown kernel
 ---> END 'scipy_solutions.ipynb' <---
 
 ---> Executing 'short_path_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:37 PM INFO: Reading notebook short_path_solutions.ipynb
-09/11/2015 03:54:38 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:23 AM INFO: Reading notebook short_path_solutions.ipynb
+09/30/2015 11:49:24 AM INFO: Running cell:
 %%file graph.txt
 node0, node1 0.04, node8 11.11, node14 72.21
 node1, node46 1247.25, node6 20.59, node13 64.94
@@ -2936,8 +3428,8 @@ node97, node98 0.30
 node98, node99 0.33
 node99, 
 
-09/11/2015 03:54:38 PM INFO: Cell returned
-09/11/2015 03:54:38 PM INFO: Running cell:
+09/30/2015 11:49:24 AM INFO: Cell returned
+09/30/2015 11:49:24 AM INFO: Running cell:
 
 def read_graph(in_file):
     """ Read in the graph from the data file.  The graph is stored
@@ -3010,29 +3502,37 @@ while 1:
         J = next_J
 print_best_path(J, graph)
 
-09/11/2015 03:54:38 PM INFO: Cell returned
-09/11/2015 03:54:38 PM INFO: Shutdown kernel
+09/30/2015 11:49:24 AM INFO: Cell returned
+09/30/2015 11:49:24 AM INFO: Shutdown kernel
 ---> END 'short_path_solutions.ipynb' <---
 
 ---> Executing 'speed_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:40 PM INFO: Reading notebook speed_solutions.ipynb
-09/11/2015 03:54:40 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:24 AM INFO: Reading notebook speed_solutions.ipynb
+09/30/2015 11:49:25 AM INFO: Running cell:
 import matplotlib.pyplot as plt
 import numpy as np
 from numba import jit
 
-09/11/2015 03:54:41 PM INFO: Cell returned
-09/11/2015 03:54:41 PM INFO: Running cell:
+09/30/2015 11:49:26 AM INFO: Cell returned
+09/30/2015 11:49:26 AM INFO: Running cell:
 p, q = 0.1, 0.2  # Prob of leaving low and high state respectively
 
-09/11/2015 03:54:41 PM INFO: Cell returned
-09/11/2015 03:54:41 PM INFO: Running cell:
+09/30/2015 11:49:26 AM INFO: Cell returned
+09/30/2015 11:49:26 AM INFO: Running cell:
 def compute_series(n):
     x = np.empty(n, dtype=int)
     x[0] = 1  # Start in state 1
@@ -3045,35 +3545,35 @@ def compute_series(n):
             x[t] = U[t] > q
     return x
 
-09/11/2015 03:54:41 PM INFO: Cell returned
-09/11/2015 03:54:41 PM INFO: Running cell:
+09/30/2015 11:49:26 AM INFO: Cell returned
+09/30/2015 11:49:26 AM INFO: Running cell:
 n = 100000
 x = compute_series(n)
 print(np.mean(x == 0))  # Fraction of time x is in state 0
 
-09/11/2015 03:54:41 PM INFO: Cell returned
-09/11/2015 03:54:41 PM INFO: Running cell:
+09/30/2015 11:49:26 AM INFO: Cell returned
+09/30/2015 11:49:26 AM INFO: Running cell:
 %timeit compute_series(n)
 
-09/11/2015 03:54:47 PM INFO: Cell returned
-09/11/2015 03:54:47 PM INFO: Running cell:
+09/30/2015 11:49:30 AM INFO: Cell returned
+09/30/2015 11:49:30 AM INFO: Running cell:
 compute_series_numba = jit(compute_series)
 
-09/11/2015 03:54:47 PM INFO: Cell returned
-09/11/2015 03:54:47 PM INFO: Running cell:
+09/30/2015 11:49:30 AM INFO: Cell returned
+09/30/2015 11:49:30 AM INFO: Running cell:
 x = compute_series_numba(n)
 print(np.mean(x == 0))
 
-09/11/2015 03:54:47 PM INFO: Cell returned
-09/11/2015 03:54:47 PM INFO: Running cell:
+09/30/2015 11:49:30 AM INFO: Cell returned
+09/30/2015 11:49:30 AM INFO: Running cell:
 %timeit compute_series_numba(n)
 
-09/11/2015 03:54:49 PM INFO: Cell returned
-09/11/2015 03:54:49 PM INFO: Running cell:
-%load_ext cythonmagic
+09/30/2015 11:49:31 AM INFO: Cell returned
+09/30/2015 11:49:31 AM INFO: Running cell:
+%load_ext Cython
 
-09/11/2015 03:54:50 PM INFO: Cell returned
-09/11/2015 03:54:50 PM INFO: Running cell:
+09/30/2015 11:49:31 AM INFO: Cell returned
+09/30/2015 11:49:31 AM INFO: Running cell:
 %%cython
 import numpy as np
 from numpy cimport int_t, float_t
@@ -3099,41 +3599,49 @@ def compute_series_cy(int n):
             x[t] = U[t] > q
     return np.asarray(x)
 
-09/11/2015 03:54:50 PM INFO: Cell returned
-09/11/2015 03:54:50 PM INFO: Running cell:
+09/30/2015 11:49:31 AM INFO: Cell returned
+09/30/2015 11:49:31 AM INFO: Running cell:
 compute_series_cy(10)
 
-09/11/2015 03:54:50 PM INFO: Cell returned
-09/11/2015 03:54:50 PM INFO: Running cell:
+09/30/2015 11:49:31 AM INFO: Cell returned
+09/30/2015 11:49:31 AM INFO: Running cell:
 x = compute_series_cy(n)
 print(np.mean(x == 0))
 
-09/11/2015 03:54:50 PM INFO: Cell returned
-09/11/2015 03:54:50 PM INFO: Running cell:
+09/30/2015 11:49:31 AM INFO: Cell returned
+09/30/2015 11:49:31 AM INFO: Running cell:
 %timeit compute_series_cy(n)
 
-09/11/2015 03:54:53 PM INFO: Cell returned
-09/11/2015 03:54:53 PM INFO: Shutdown kernel
+09/30/2015 11:49:33 AM INFO: Cell returned
+09/30/2015 11:49:33 AM INFO: Shutdown kernel
 ---> END 'speed_solutions.ipynb' <---
 
 ---> Executing 'statd_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:54:53 PM INFO: Reading notebook statd_solutions.ipynb
-09/11/2015 03:54:54 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:34 AM INFO: Reading notebook statd_solutions.ipynb
+09/30/2015 11:49:35 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:54:55 PM INFO: Cell returned
-09/11/2015 03:54:55 PM INFO: Running cell:
+09/30/2015 11:49:35 AM INFO: Cell returned
+09/30/2015 11:49:35 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 
-09/11/2015 03:54:55 PM INFO: Cell returned
-09/11/2015 03:54:55 PM INFO: Running cell:
+09/30/2015 11:49:35 AM INFO: Cell returned
+09/30/2015 11:49:35 AM INFO: Running cell:
 from scipy.stats import norm, gaussian_kde
 from quantecon import LAE
 
@@ -3167,8 +3675,8 @@ ax.plot(ys, k_est(ys), 'k-', lw=2, alpha=0.6, label='kernel based estimate')
 ax.legend(loc='upper left')
 plt.show()
 
-09/11/2015 03:54:57 PM INFO: Cell returned
-09/11/2015 03:54:57 PM INFO: Running cell:
+09/30/2015 11:49:36 AM INFO: Cell returned
+09/30/2015 11:49:36 AM INFO: Running cell:
 from scipy.stats import lognorm, beta
 
 # == Define parameters == #
@@ -3213,8 +3721,8 @@ for i in range(4):
         ax.plot(ygrid, psi(ygrid), color=g, lw=2, alpha=0.6)
     ax.set_xlabel('capital')
 
-09/11/2015 03:55:05 PM INFO: Cell returned
-09/11/2015 03:55:05 PM INFO: Running cell:
+09/30/2015 11:49:41 AM INFO: Cell returned
+09/30/2015 11:49:41 AM INFO: Running cell:
 n = 20
 k = 5000
 J = 6
@@ -3241,23 +3749,31 @@ for j in range(J):
 
 plt.show()
 
-09/11/2015 03:55:10 PM INFO: Cell returned
-09/11/2015 03:55:10 PM INFO: Shutdown kernel
+09/30/2015 11:49:45 AM INFO: Cell returned
+09/30/2015 11:49:45 AM INFO: Shutdown kernel
 ---> END 'statd_solutions.ipynb' <---
 
 ---> Executing 'uncertainty_traps_solutions.ipynb' <---
-/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbformat.py:13: ShimWarning: The `IPython.nbformat` package has been deprecated. You should import from nbformat instead.
+  "You should import from nbformat instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/nbformat/current.py:19: UserWarning: nbformat.current is deprecated.
 
-- use IPython.nbformat for read/write/validate public API
-- use IPython.nbformat.vX directly to composing notebooks of a particular version
+- use nbformat for read/write/validate public API
+- use nbformat.vX directly to composing notebooks of a particular version
 
   """)
-09/11/2015 03:55:11 PM INFO: Reading notebook uncertainty_traps_solutions.ipynb
-09/11/2015 03:55:12 PM INFO: Running cell:
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/kernel/__init__.py:13: ShimWarning: The `IPython.kernel` package has been deprecated. You should import from ipykernel or jupyter_client instead.
+  "You should import from ipykernel or jupyter_client instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/config.py:13: ShimWarning: The `IPython.config` package has been deprecated. You should import from traitlets.config instead.
+  "You should import from traitlets.config instead.", ShimWarning)
+/home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
+  "You should import from ipython_nbconvert instead.", ShimWarning)
+09/30/2015 11:49:46 AM INFO: Reading notebook uncertainty_traps_solutions.ipynb
+09/30/2015 11:49:46 AM INFO: Running cell:
 %matplotlib inline
 
-09/11/2015 03:55:13 PM INFO: Cell returned
-09/11/2015 03:55:13 PM INFO: Running cell:
+09/30/2015 11:49:47 AM INFO: Cell returned
+09/30/2015 11:49:47 AM INFO: Running cell:
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
@@ -3265,8 +3781,8 @@ import quantecon as qe
 import seaborn as sns
 import itertools
 
-09/11/2015 03:55:14 PM INFO: Cell returned
-09/11/2015 03:55:14 PM INFO: Running cell:
+09/30/2015 11:49:48 AM INFO: Cell returned
+09/30/2015 11:49:48 AM INFO: Running cell:
 palette = itertools.cycle(sns.color_palette())
 econ = qe.models.UncertaintyTrapEcon()
 rho, sig_theta, gx = econ.rho, econ.sig_theta, econ.gx # simplify names
@@ -3283,8 +3799,8 @@ ax.set_ylabel(r"$\gamma'$", fontsize=16)
 ax.grid()
 plt.show()
 
-09/11/2015 03:55:16 PM INFO: Cell returned
-09/11/2015 03:55:16 PM INFO: Running cell:
+09/30/2015 11:49:48 AM INFO: Cell returned
+09/30/2015 11:49:48 AM INFO: Running cell:
 sim_length=2000
 
 mu_vec = np.empty(sim_length)
@@ -3316,16 +3832,16 @@ X, M = econ.gen_aggregates()
 X_vec[-1] = X
 M_vec[-1] = M
 
-09/11/2015 03:55:16 PM INFO: Cell returned
-09/11/2015 03:55:16 PM INFO: Running cell:
+09/30/2015 11:49:48 AM INFO: Cell returned
+09/30/2015 11:49:48 AM INFO: Running cell:
 fig, ax = plt.subplots(figsize=(9, 6))
 ax.plot(range(sim_length), theta_vec, alpha=0.6, lw=2, label=r"$\theta$")
 ax.plot(range(sim_length), mu_vec, alpha=0.6, lw=2, label=r"$\mu$")
 ax.legend(fontsize=16)
 plt.show()
 
-09/11/2015 03:55:17 PM INFO: Cell returned
-09/11/2015 03:55:17 PM INFO: Running cell:
+09/30/2015 11:49:49 AM INFO: Cell returned
+09/30/2015 11:49:49 AM INFO: Running cell:
 fig, axes = plt.subplots(4, 1, figsize=(12, 20))
 # Add some spacing
 fig.subplots_adjust(hspace=0.3)
@@ -3347,11 +3863,11 @@ for ax, vals, name in zip(axes, series, names):
 
 plt.show()
 
-09/11/2015 03:55:19 PM INFO: Cell returned
-09/11/2015 03:55:19 PM INFO: Running cell:
+09/30/2015 11:49:49 AM INFO: Cell returned
+09/30/2015 11:49:49 AM INFO: Running cell:
 
 
-09/11/2015 03:55:19 PM INFO: Cell returned
-09/11/2015 03:55:19 PM INFO: Shutdown kernel
+09/30/2015 11:49:49 AM INFO: Cell returned
+09/30/2015 11:49:49 AM INFO: Shutdown kernel
 ---> END 'uncertainty_traps_solutions.ipynb' <---
 
