@@ -13,20 +13,20 @@
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:43:53 AM INFO: Reading notebook arellano_solutions.ipynb
-10/06/2015 09:43:55 AM INFO: Running cell:
+10/06/2015 10:37:01 AM INFO: Reading notebook arellano_solutions.ipynb
+10/06/2015 10:37:02 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:43:55 AM INFO: Cell returned
-10/06/2015 09:43:55 AM INFO: Running cell:
+10/06/2015 10:37:02 AM INFO: Cell returned
+10/06/2015 10:37:02 AM INFO: Running cell:
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 import quantecon as qe
 from quantecon.models import Arellano_Economy
 
-10/06/2015 09:43:57 AM INFO: Cell returned
-10/06/2015 09:43:57 AM INFO: Running cell:
+10/06/2015 10:37:03 AM INFO: Cell returned
+10/06/2015 10:37:03 AM INFO: Running cell:
 ae = Arellano_Economy(beta=.953,        # time discount rate
                         gamma=2.,       # risk aversion
                         r=0.017,        # international interest rate
@@ -38,8 +38,8 @@ ae = Arellano_Economy(beta=.953,        # time discount rate
                         tol=1e-8,       # error tolerance in iteration
                         maxit=10000)
 
-10/06/2015 09:44:13 AM INFO: Cell returned
-10/06/2015 09:44:13 AM INFO: Running cell:
+10/06/2015 10:37:12 AM INFO: Cell returned
+10/06/2015 10:37:12 AM INFO: Running cell:
 
 # Create "Y High" and "Y Low" values as 5% devs from mean
 high, low = np.mean(ae.ygrid)*1.05, np.mean(ae.ygrid)*.95
@@ -64,8 +64,8 @@ ax.set_xlabel(r"$B'$")
 ax.legend(loc='upper left', frameon=False)
 plt.show()
 
-10/06/2015 09:44:15 AM INFO: Cell returned
-10/06/2015 09:44:15 AM INFO: Running cell:
+10/06/2015 10:37:12 AM INFO: Cell returned
+10/06/2015 10:37:12 AM INFO: Running cell:
 
 # Create "Y High" and "Y Low" values as 5% devs from mean
 high, low = np.mean(ae.ygrid)*1.05, np.mean(ae.ygrid)*.95
@@ -81,8 +81,8 @@ ax.set_ylabel(r"$V(y, B)$")
 ax.set_xlim(ae.Bgrid.min(), ae.Bgrid.max())
 plt.show()
 
-10/06/2015 09:44:16 AM INFO: Cell returned
-10/06/2015 09:44:16 AM INFO: Running cell:
+10/06/2015 10:37:12 AM INFO: Cell returned
+10/06/2015 10:37:12 AM INFO: Running cell:
 
 xx, yy = ae.Bgrid, ae.ygrid
 zz = ae.default_prob
@@ -98,8 +98,8 @@ ax.set_xlabel(r"$B'$")
 ax.set_ylabel(r"$y$")
 plt.show()
 
-10/06/2015 09:44:17 AM INFO: Cell returned
-10/06/2015 09:44:17 AM INFO: Running cell:
+10/06/2015 10:37:13 AM INFO: Cell returned
+10/06/2015 10:37:13 AM INFO: Running cell:
 T = 250
 y_vec, B_vec, q_vec, default_vec = ae.simulate(T)
 
@@ -141,12 +141,12 @@ for ax, series, title in zip(axes, plot_series, titles):
 
 plt.show()
 
-10/06/2015 09:44:20 AM INFO: Cell returned
-10/06/2015 09:44:20 AM INFO: Running cell:
+10/06/2015 10:37:14 AM INFO: Cell returned
+10/06/2015 10:37:14 AM INFO: Running cell:
 
 
-10/06/2015 09:44:20 AM INFO: Cell returned
-10/06/2015 09:44:20 AM INFO: Shutdown kernel
+10/06/2015 10:37:14 AM INFO: Cell returned
+10/06/2015 10:37:14 AM INFO: Shutdown kernel
 ---> END 'arellano_solutions.ipynb' <---
 
 ---> Executing 'asset_solutions.ipynb' <---
@@ -164,19 +164,19 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:44:22 AM INFO: Reading notebook asset_solutions.ipynb
-10/06/2015 09:44:23 AM INFO: Running cell:
+10/06/2015 10:37:15 AM INFO: Reading notebook asset_solutions.ipynb
+10/06/2015 10:37:16 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:44:24 AM INFO: Cell returned
-10/06/2015 09:44:24 AM INFO: Running cell:
+10/06/2015 10:37:16 AM INFO: Cell returned
+10/06/2015 10:37:16 AM INFO: Running cell:
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon.models import AssetPrices
 
-10/06/2015 09:44:26 AM INFO: Cell returned
-10/06/2015 09:44:26 AM INFO: Running cell:
+10/06/2015 10:37:17 AM INFO: Cell returned
+10/06/2015 10:37:17 AM INFO: Running cell:
 # == Define primitives == #
 n = 5
 P = 0.0125 * np.ones((n, n))
@@ -202,12 +202,12 @@ p_s = 150.0
 w_bar, w_bars = ap.call_option(zeta, p_s, T = [10,20,30])
 
 
-10/06/2015 09:44:27 AM INFO: Cell returned
-10/06/2015 09:44:27 AM INFO: Running cell:
+10/06/2015 10:37:17 AM INFO: Cell returned
+10/06/2015 10:37:17 AM INFO: Running cell:
 
 
-10/06/2015 09:44:27 AM INFO: Cell returned
-10/06/2015 09:44:27 AM INFO: Shutdown kernel
+10/06/2015 10:37:17 AM INFO: Cell returned
+10/06/2015 10:37:17 AM INFO: Shutdown kernel
 ---> END 'asset_solutions.ipynb' <---
 
 ---> Executing 'career_solutions.ipynb' <---
@@ -225,19 +225,19 @@ w_bar, w_bars = ap.call_option(zeta, p_s, T = [10,20,30])
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:44:29 AM INFO: Reading notebook career_solutions.ipynb
-10/06/2015 09:44:30 AM INFO: Running cell:
+10/06/2015 10:37:18 AM INFO: Reading notebook career_solutions.ipynb
+10/06/2015 10:37:18 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:44:31 AM INFO: Cell returned
-10/06/2015 09:44:31 AM INFO: Running cell:
+10/06/2015 10:37:18 AM INFO: Cell returned
+10/06/2015 10:37:18 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import DiscreteRV, compute_fixed_point
 from quantecon.models import CareerWorkerProblem
 
-10/06/2015 09:44:33 AM INFO: Cell returned
-10/06/2015 09:44:33 AM INFO: Running cell:
+10/06/2015 10:37:19 AM INFO: Cell returned
+10/06/2015 10:37:19 AM INFO: Running cell:
 wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
 v = compute_fixed_point(wp.bellman_operator, v_init, verbose=False)
@@ -272,8 +272,8 @@ plt.show()
 
 
 
-10/06/2015 09:44:38 AM INFO: Cell returned
-10/06/2015 09:44:38 AM INFO: Running cell:
+10/06/2015 10:37:20 AM INFO: Cell returned
+10/06/2015 10:37:20 AM INFO: Running cell:
 
 wp = CareerWorkerProblem()
 v_init = np.ones((wp.N, wp.N))*100
@@ -301,8 +301,8 @@ for i in range(M):
 print(np.median(samples))
 
 
-10/06/2015 09:44:42 AM INFO: Cell returned
-10/06/2015 09:44:42 AM INFO: Running cell:
+10/06/2015 10:37:22 AM INFO: Cell returned
+10/06/2015 10:37:22 AM INFO: Running cell:
 from matplotlib import cm
 
 wp = CareerWorkerProblem()
@@ -323,8 +323,8 @@ ax.text(4.0, 4.5, 'stay put', fontsize=14)
 
 
 
-10/06/2015 09:44:44 AM INFO: Cell returned
-10/06/2015 09:44:44 AM INFO: Shutdown kernel
+10/06/2015 10:37:23 AM INFO: Cell returned
+10/06/2015 10:37:23 AM INFO: Shutdown kernel
 ---> END 'career_solutions.ipynb' <---
 
 ---> Executing 'discrete_dp_solutions.ipynb' <---
@@ -342,12 +342,12 @@ ax.text(4.0, 4.5, 'stay put', fontsize=14)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:44:47 AM INFO: Reading notebook discrete_dp_solutions.ipynb
-10/06/2015 09:44:48 AM INFO: Running cell:
+10/06/2015 10:37:24 AM INFO: Reading notebook discrete_dp_solutions.ipynb
+10/06/2015 10:37:25 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:44:49 AM INFO: Cell returned
-10/06/2015 09:44:49 AM INFO: Running cell:
+10/06/2015 10:37:25 AM INFO: Cell returned
+10/06/2015 10:37:25 AM INFO: Running cell:
 from __future__ import division, print_function
 import numpy as np
 import scipy.sparse as sparse
@@ -355,25 +355,25 @@ import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.markov import DiscreteDP
 
-10/06/2015 09:44:50 AM INFO: Cell returned
-10/06/2015 09:44:50 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 alpha = 0.65
 f = lambda k: k**alpha
 u = np.log
 beta = 0.95
 
-10/06/2015 09:44:50 AM INFO: Cell returned
-10/06/2015 09:44:50 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 grid_max = 2
 grid_size = 1500
 grid = np.linspace(1e-6, grid_max, grid_size)
 
-10/06/2015 09:44:50 AM INFO: Cell returned
-10/06/2015 09:44:50 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 print(grid)
 
-10/06/2015 09:44:50 AM INFO: Cell returned
-10/06/2015 09:44:50 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 # Consumption matrix, with nonpositive consumption included
 C = f(grid).reshape(grid_size, 1) - grid.reshape(1, grid_size)
 
@@ -383,47 +383,47 @@ s_indices, a_indices = np.where(C > 0)
 # Number of state-action pairs
 L = len(s_indices)
 
-10/06/2015 09:44:50 AM INFO: Cell returned
-10/06/2015 09:44:50 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 print(L)
 print(s_indices)
 print(a_indices)
 
-10/06/2015 09:44:50 AM INFO: Cell returned
-10/06/2015 09:44:50 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 R = u(C[s_indices, a_indices])
 
-10/06/2015 09:44:51 AM INFO: Cell returned
-10/06/2015 09:44:51 AM INFO: Running cell:
+10/06/2015 10:37:26 AM INFO: Cell returned
+10/06/2015 10:37:26 AM INFO: Running cell:
 Q = sparse.lil_matrix((L, grid_size))
 Q[np.arange(L), a_indices] = 1
 
-10/06/2015 09:44:54 AM INFO: Cell returned
-10/06/2015 09:44:54 AM INFO: Running cell:
+10/06/2015 10:37:28 AM INFO: Cell returned
+10/06/2015 10:37:28 AM INFO: Running cell:
 # data = np.ones(L)
 # indptr = np.arange(L+1)
 # Q = sparse.csr_matrix((data, a_indices, indptr), shape=(L, grid_size))
 
-10/06/2015 09:44:54 AM INFO: Cell returned
-10/06/2015 09:44:54 AM INFO: Running cell:
+10/06/2015 10:37:28 AM INFO: Cell returned
+10/06/2015 10:37:28 AM INFO: Running cell:
 ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
 
-10/06/2015 09:44:56 AM INFO: Cell returned
-10/06/2015 09:44:56 AM INFO: Running cell:
+10/06/2015 10:37:29 AM INFO: Cell returned
+10/06/2015 10:37:29 AM INFO: Running cell:
 res = ddp.solve(method='policy_iteration')
 v, sigma, num_iter = res.v, res.sigma, res.num_iter
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:29 AM INFO: Cell returned
+10/06/2015 10:37:29 AM INFO: Running cell:
 num_iter
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:29 AM INFO: Cell returned
+10/06/2015 10:37:29 AM INFO: Running cell:
 # Optimal consumption in the discrete version
 c = f(grid) - grid[sigma]
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:29 AM INFO: Cell returned
+10/06/2015 10:37:29 AM INFO: Running cell:
 # Exact solution of the continuous version
 ab = alpha * beta
 c1 = (np.log(1 - ab) + np.log(ab) * ab / (1 - ab)) / (1 - beta)
@@ -434,8 +434,8 @@ def v_star(k):
 def c_star(k):
     return (1 - ab) * k**alpha
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:29 AM INFO: Cell returned
+10/06/2015 10:37:29 AM INFO: Running cell:
 fig, ax = plt.subplots(1, 2, figsize=(14, 4))
 ax[0].set_ylim(-40, -32)
 ax[0].set_xlim(grid[0], grid[-1])
@@ -456,73 +456,73 @@ ax[1].plot(grid, c_star(grid), 'k-', lw=1.5, alpha=0.8, label=lb1)
 ax[1].legend(loc='upper left')
 plt.show()
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 np.abs(v - v_star(grid)).max()
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 np.abs(v - v_star(grid))[1:].max()
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 np.abs(c - c_star(grid)).max()
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 diff = np.diff(c)
 (diff >= 0).all()
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:57 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 dec_ind = np.where(diff < 0)[0]
 
-10/06/2015 09:44:57 AM INFO: Cell returned
-10/06/2015 09:44:58 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 len(dec_ind)
 
-10/06/2015 09:44:58 AM INFO: Cell returned
-10/06/2015 09:44:58 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 np.abs(diff[dec_ind]).max()
 
-10/06/2015 09:44:58 AM INFO: Cell returned
-10/06/2015 09:44:58 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 (np.diff(v) > 0).all()
 
-10/06/2015 09:44:58 AM INFO: Cell returned
-10/06/2015 09:44:58 AM INFO: Running cell:
+10/06/2015 10:37:30 AM INFO: Cell returned
+10/06/2015 10:37:30 AM INFO: Running cell:
 ddp.epsilon = 1e-4
 ddp.max_iter = 500
 res1 = ddp.solve(method='value_iteration')
 
-10/06/2015 09:45:02 AM INFO: Cell returned
-10/06/2015 09:45:02 AM INFO: Running cell:
+10/06/2015 10:37:33 AM INFO: Cell returned
+10/06/2015 10:37:33 AM INFO: Running cell:
 res1.num_iter
 
-10/06/2015 09:45:02 AM INFO: Cell returned
-10/06/2015 09:45:02 AM INFO: Running cell:
+10/06/2015 10:37:33 AM INFO: Cell returned
+10/06/2015 10:37:33 AM INFO: Running cell:
 np.array_equal(sigma, res1.sigma)
 
-10/06/2015 09:45:02 AM INFO: Cell returned
-10/06/2015 09:45:02 AM INFO: Running cell:
+10/06/2015 10:37:33 AM INFO: Cell returned
+10/06/2015 10:37:33 AM INFO: Running cell:
 res2 = ddp.solve(method='modified_policy_iteration')
 
-10/06/2015 09:45:03 AM INFO: Cell returned
-10/06/2015 09:45:03 AM INFO: Running cell:
+10/06/2015 10:37:33 AM INFO: Cell returned
+10/06/2015 10:37:33 AM INFO: Running cell:
 res2.num_iter
 
-10/06/2015 09:45:03 AM INFO: Cell returned
-10/06/2015 09:45:03 AM INFO: Running cell:
+10/06/2015 10:37:33 AM INFO: Cell returned
+10/06/2015 10:37:33 AM INFO: Running cell:
 np.array_equal(sigma, res2.sigma)
 
-10/06/2015 09:45:03 AM INFO: Cell returned
-10/06/2015 09:45:03 AM INFO: Running cell:
+10/06/2015 10:37:33 AM INFO: Cell returned
+10/06/2015 10:37:33 AM INFO: Running cell:
 %timeit ddp.solve(method='value_iteration')
 %timeit ddp.solve(method='policy_iteration')
 %timeit ddp.solve(method='modified_policy_iteration')
 
-10/06/2015 09:45:24 AM INFO: Cell returned
-10/06/2015 09:45:24 AM INFO: Running cell:
+10/06/2015 10:37:55 AM INFO: Cell returned
+10/06/2015 10:37:55 AM INFO: Running cell:
 w = 5 * np.log(grid) - 25  # Initial condition
 n = 35
 fig, ax = plt.subplots(figsize=(8,5))
@@ -539,8 +539,8 @@ ax.legend(loc='upper left')
 
 plt.show()
 
-10/06/2015 09:45:24 AM INFO: Cell returned
-10/06/2015 09:45:24 AM INFO: Running cell:
+10/06/2015 10:37:55 AM INFO: Cell returned
+10/06/2015 10:37:55 AM INFO: Running cell:
 w = 5 * u(grid) - 25  # Initial condition
 
 fig, ax = plt.subplots(3, 1, figsize=(8, 10))
@@ -564,8 +564,8 @@ for i, n in enumerate((2, 4, 6)):
     ax[i].legend(loc='upper left')
     ax[i].set_title('{} value function iterations'.format(n))
 
-10/06/2015 09:45:25 AM INFO: Cell returned
-10/06/2015 09:45:25 AM INFO: Running cell:
+10/06/2015 10:37:56 AM INFO: Cell returned
+10/06/2015 10:37:56 AM INFO: Running cell:
 discount_factors = (0.9, 0.94, 0.98)
 k_init = 0.1
 
@@ -592,12 +592,12 @@ for beta in discount_factors:
 ax.legend(loc='lower right')
 plt.show()
 
-10/06/2015 09:45:29 AM INFO: Cell returned
-10/06/2015 09:45:29 AM INFO: Running cell:
+10/06/2015 10:37:58 AM INFO: Cell returned
+10/06/2015 10:37:58 AM INFO: Running cell:
 
 
-10/06/2015 09:45:29 AM INFO: Cell returned
-10/06/2015 09:45:29 AM INFO: Shutdown kernel
+10/06/2015 10:37:58 AM INFO: Cell returned
+10/06/2015 10:37:58 AM INFO: Shutdown kernel
 ---> END 'discrete_dp_solutions.ipynb' <---
 
 ---> Executing 'estspec_solutions.ipynb' <---
@@ -615,18 +615,18 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:45:30 AM INFO: Reading notebook estspec_solutions.ipynb
-10/06/2015 09:45:31 AM INFO: Running cell:
+10/06/2015 10:37:59 AM INFO: Reading notebook estspec_solutions.ipynb
+10/06/2015 10:38:00 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:45:32 AM INFO: Cell returned
-10/06/2015 09:45:32 AM INFO: Running cell:
+10/06/2015 10:38:00 AM INFO: Cell returned
+10/06/2015 10:38:00 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import ARMA, periodogram, ar_periodogram
 
-10/06/2015 09:45:33 AM INFO: Cell returned
-10/06/2015 09:45:33 AM INFO: Running cell:
+10/06/2015 10:38:01 AM INFO: Cell returned
+10/06/2015 10:38:01 AM INFO: Running cell:
 
 ## Data
 n = 400
@@ -652,8 +652,8 @@ for i, wl in enumerate((15, 55, 175)):  # window lengths
     ax[i].set_title('window length = {}'.format(wl))
 
 
-10/06/2015 09:45:34 AM INFO: Cell returned
-10/06/2015 09:45:34 AM INFO: Running cell:
+10/06/2015 10:38:01 AM INFO: Cell returned
+10/06/2015 10:38:01 AM INFO: Running cell:
 lp = ARMA(-0.9)
 wl = 65
 
@@ -678,8 +678,8 @@ for i in range(3):
 
 
 
-10/06/2015 09:45:37 AM INFO: Cell returned
-10/06/2015 09:45:37 AM INFO: Shutdown kernel
+10/06/2015 10:38:03 AM INFO: Cell returned
+10/06/2015 10:38:03 AM INFO: Shutdown kernel
 ---> END 'estspec_solutions.ipynb' <---
 
 ---> Executing 'finite_mc_solutions.ipynb' <---
@@ -697,20 +697,20 @@ for i in range(3):
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:45:38 AM INFO: Reading notebook finite_mc_solutions.ipynb
-10/06/2015 09:45:39 AM INFO: Running cell:
+10/06/2015 10:38:04 AM INFO: Reading notebook finite_mc_solutions.ipynb
+10/06/2015 10:38:05 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:45:39 AM INFO: Cell returned
-10/06/2015 09:45:39 AM INFO: Running cell:
+10/06/2015 10:38:05 AM INFO: Cell returned
+10/06/2015 10:38:05 AM INFO: Running cell:
 from __future__ import print_function, division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import mc_compute_stationary, mc_sample_path
 
 
-10/06/2015 09:45:41 AM INFO: Cell returned
-10/06/2015 09:45:41 AM INFO: Running cell:
+10/06/2015 10:38:06 AM INFO: Cell returned
+10/06/2015 10:38:06 AM INFO: Running cell:
 
 alpha = beta = 0.1
 N = 10000
@@ -739,8 +739,8 @@ ax.legend(loc='upper right')
 
 
 
-10/06/2015 09:45:42 AM INFO: Cell returned
-10/06/2015 09:45:42 AM INFO: Running cell:
+10/06/2015 10:38:07 AM INFO: Cell returned
+10/06/2015 10:38:07 AM INFO: Running cell:
 %%file web_graph_data.txt
 a -> d;
 a -> f;
@@ -781,8 +781,8 @@ n -> j;
 n -> m;
 
 
-10/06/2015 09:45:42 AM INFO: Cell returned
-10/06/2015 09:45:42 AM INFO: Running cell:
+10/06/2015 10:38:07 AM INFO: Cell returned
+10/06/2015 10:38:07 AM INFO: Running cell:
 """
 Return list of pages, ordered by rank
 """
@@ -820,20 +820,20 @@ for name, rank in sorted(ranked_pages.items(), key=itemgetter(1), reverse=1):
 
 
 
-10/06/2015 09:45:43 AM INFO: Cell returned
-10/06/2015 09:45:43 AM INFO: Running cell:
+10/06/2015 10:38:07 AM INFO: Cell returned
+10/06/2015 10:38:07 AM INFO: Running cell:
 
 
-10/06/2015 09:45:43 AM INFO: Cell returned
-10/06/2015 09:45:43 AM INFO: Running cell:
+10/06/2015 10:38:07 AM INFO: Cell returned
+10/06/2015 10:38:07 AM INFO: Running cell:
 
 
-10/06/2015 09:45:43 AM INFO: Cell returned
-10/06/2015 09:45:43 AM INFO: Running cell:
+10/06/2015 10:38:07 AM INFO: Cell returned
+10/06/2015 10:38:07 AM INFO: Running cell:
 
 
-10/06/2015 09:45:43 AM INFO: Cell returned
-10/06/2015 09:45:43 AM INFO: Shutdown kernel
+10/06/2015 10:38:07 AM INFO: Cell returned
+10/06/2015 10:38:07 AM INFO: Shutdown kernel
 ---> END 'finite_mc_solutions.ipynb' <---
 
 ---> Executing 'ifp_solutions.ipynb' <---
@@ -851,19 +851,19 @@ for name, rank in sorted(ranked_pages.items(), key=itemgetter(1), reverse=1):
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:45:44 AM INFO: Reading notebook ifp_solutions.ipynb
-10/06/2015 09:45:45 AM INFO: Running cell:
+10/06/2015 10:38:08 AM INFO: Reading notebook ifp_solutions.ipynb
+10/06/2015 10:38:09 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:45:45 AM INFO: Cell returned
-10/06/2015 09:45:45 AM INFO: Running cell:
+10/06/2015 10:38:09 AM INFO: Cell returned
+10/06/2015 10:38:09 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.models import ConsumerProblem
 
-10/06/2015 09:45:47 AM INFO: Cell returned
-10/06/2015 09:45:47 AM INFO: Running cell:
+10/06/2015 10:38:10 AM INFO: Cell returned
+10/06/2015 10:38:10 AM INFO: Running cell:
 cp = ConsumerProblem()
 K = 80
 
@@ -890,8 +890,8 @@ ax.set_ylabel('consumption (low income)')
 ax.legend(loc='upper left')
 plt.show()
 
-10/06/2015 09:45:57 AM INFO: Cell returned
-10/06/2015 09:45:57 AM INFO: Running cell:
+10/06/2015 10:38:17 AM INFO: Cell returned
+10/06/2015 10:38:17 AM INFO: Running cell:
 
 r_vals = np.linspace(0, 0.04, 4)  
 
@@ -907,8 +907,8 @@ ax.set_ylabel('consumption (low income)')
 ax.legend(loc='upper left')
 plt.show()
 
-10/06/2015 09:46:03 AM INFO: Cell returned
-10/06/2015 09:46:03 AM INFO: Running cell:
+10/06/2015 10:38:21 AM INFO: Cell returned
+10/06/2015 10:38:21 AM INFO: Running cell:
 
 from scipy import interp
 from quantecon import mc_sample_path 
@@ -938,8 +938,8 @@ ax.set_xlabel('assets')
 ax.set_xlim(-0.05, 0.75)
 plt.show()
 
-10/06/2015 09:46:07 AM INFO: Cell returned
-10/06/2015 09:46:07 AM INFO: Running cell:
+10/06/2015 10:38:24 AM INFO: Cell returned
+10/06/2015 10:38:24 AM INFO: Running cell:
 
 M = 25
 r_vals = np.linspace(0, 0.04, M)  
@@ -962,8 +962,8 @@ ax.grid(True)
 ax.legend(loc='upper left')
 plt.show()
 
-10/06/2015 09:47:51 AM INFO: Cell returned
-10/06/2015 09:47:51 AM INFO: Shutdown kernel
+10/06/2015 10:39:58 AM INFO: Cell returned
+10/06/2015 10:39:58 AM INFO: Shutdown kernel
 ---> END 'ifp_solutions.ipynb' <---
 
 ---> Executing 'jv_solutions.ipynb' <---
@@ -981,20 +981,20 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:47:52 AM INFO: Reading notebook jv_solutions.ipynb
-10/06/2015 09:47:53 AM INFO: Running cell:
+10/06/2015 10:40:00 AM INFO: Reading notebook jv_solutions.ipynb
+10/06/2015 10:40:00 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:47:53 AM INFO: Cell returned
-10/06/2015 09:47:53 AM INFO: Running cell:
+10/06/2015 10:40:00 AM INFO: Cell returned
+10/06/2015 10:40:00 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 import random
 from quantecon import compute_fixed_point
 from quantecon.models import JvWorker
 
-10/06/2015 09:47:54 AM INFO: Cell returned
-10/06/2015 09:47:54 AM INFO: Running cell:
+10/06/2015 10:40:02 AM INFO: Cell returned
+10/06/2015 10:40:02 AM INFO: Running cell:
 
 wp = JvWorker(grid_size=25)
 G, pi, F = wp.G, wp.pi, wp.F       # Simplify names
@@ -1033,8 +1033,8 @@ for x in plot_grid:
 
 plt.show()
 
-10/06/2015 09:48:10 AM INFO: Cell returned
-10/06/2015 09:48:10 AM INFO: Running cell:
+10/06/2015 10:40:20 AM INFO: Cell returned
+10/06/2015 10:40:20 AM INFO: Running cell:
 
 wp = JvWorker(grid_size=25)
 
@@ -1049,8 +1049,8 @@ ax.legend(loc='upper left')
 
 plt.show()
 
-10/06/2015 09:48:10 AM INFO: Cell returned
-10/06/2015 09:48:10 AM INFO: Shutdown kernel
+10/06/2015 10:40:20 AM INFO: Cell returned
+10/06/2015 10:40:20 AM INFO: Shutdown kernel
 ---> END 'jv_solutions.ipynb' <---
 
 ---> Executing 'kalman_solutions.ipynb' <---
@@ -1068,20 +1068,20 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:11 AM INFO: Reading notebook kalman_solutions.ipynb
-10/06/2015 09:48:12 AM INFO: Running cell:
+10/06/2015 10:40:21 AM INFO: Reading notebook kalman_solutions.ipynb
+10/06/2015 10:40:22 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:12 AM INFO: Cell returned
-10/06/2015 09:48:12 AM INFO: Running cell:
+10/06/2015 10:40:22 AM INFO: Cell returned
+10/06/2015 10:40:22 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import Kalman
 from quantecon import LinearStateSpace
 from scipy.stats import norm
 
-10/06/2015 09:48:13 AM INFO: Cell returned
-10/06/2015 09:48:13 AM INFO: Running cell:
+10/06/2015 10:40:23 AM INFO: Cell returned
+10/06/2015 10:40:23 AM INFO: Running cell:
 # == parameters == #
 theta = 10  # Constant value of state x_t
 A, C, G, H = 1, 0, 1, 1
@@ -1110,8 +1110,8 @@ for i in range(N):
 ax.set_title(r'First %d densities when $\theta = %.1f$' % (N, theta)) 
 ax.legend(loc='upper left')
 
-10/06/2015 09:48:14 AM INFO: Cell returned
-10/06/2015 09:48:14 AM INFO: Running cell:
+10/06/2015 10:40:24 AM INFO: Cell returned
+10/06/2015 10:40:24 AM INFO: Running cell:
 from scipy.integrate import quad
 
 epsilon = 0.1
@@ -1143,8 +1143,8 @@ ax.set_xlim(0, T)
 ax.plot(range(T), z) 
 ax.fill_between(range(T), np.zeros(T), z, color="blue", alpha=0.2) 
 
-10/06/2015 09:48:16 AM INFO: Cell returned
-10/06/2015 09:48:16 AM INFO: Running cell:
+10/06/2015 10:40:25 AM INFO: Cell returned
+10/06/2015 10:40:25 AM INFO: Running cell:
 from __future__ import print_function  # Remove for Python 3.x
 from numpy.random import multivariate_normal
 from scipy.linalg import eigvals
@@ -1198,12 +1198,12 @@ ax.legend()
 
 
 
-10/06/2015 09:48:16 AM INFO: Cell returned
-10/06/2015 09:48:16 AM INFO: Running cell:
+10/06/2015 10:40:25 AM INFO: Cell returned
+10/06/2015 10:40:25 AM INFO: Running cell:
 
 
-10/06/2015 09:48:16 AM INFO: Cell returned
-10/06/2015 09:48:16 AM INFO: Shutdown kernel
+10/06/2015 10:40:25 AM INFO: Cell returned
+10/06/2015 10:40:25 AM INFO: Shutdown kernel
 ---> END 'kalman_solutions.ipynb' <---
 
 ---> Executing 'lakemodel_solutions.ipynb' <---
@@ -1221,8 +1221,8 @@ ax.legend()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:17 AM INFO: Reading notebook lakemodel_solutions.ipynb
-10/06/2015 09:48:18 AM INFO: Running cell:
+10/06/2015 10:40:26 AM INFO: Reading notebook lakemodel_solutions.ipynb
+10/06/2015 10:40:26 AM INFO: Running cell:
 %matplotlib inline
 
 import numpy as np
@@ -1239,26 +1239,26 @@ e0 = 0.92
 u0 = 1-e0
 T = 50
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:27 AM INFO: Cell returned
+10/06/2015 10:40:27 AM INFO: Running cell:
 LM0 = LakeModel(lamb,alpha,b,d)
 x0 = LM0.find_steady_state()# initial conditions
 
 print("Initial Steady State: %s" % x0)
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:27 AM INFO: Cell returned
+10/06/2015 10:40:27 AM INFO: Running cell:
 LM1 = LakeModel(0.2,alpha,b,d)
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:27 AM INFO: Cell returned
+10/06/2015 10:40:27 AM INFO: Running cell:
 xbar = LM1.find_steady_state() # new steady state
 X_path = np.vstack(LM1.simulate_stock_path(x0*N0,T)) # simulate stocks
 x_path = np.vstack(LM1.simulate_rate_path(x0,T)) # simulate rates
 print("New Steady State: %s" % xbar)
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:27 AM INFO: Cell returned
+10/06/2015 10:40:27 AM INFO: Running cell:
 plt.figure(figsize=[10,9])
 plt.subplot(3,1,1)
 plt.plot(X_path[:,0])
@@ -1270,8 +1270,8 @@ plt.subplot(3,1,3)
 plt.plot(X_path.sum(1))
 plt.title(r'Labor Force')
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:28 AM INFO: Cell returned
+10/06/2015 10:40:28 AM INFO: Running cell:
 plt.figure(figsize=[10,6])
 plt.subplot(2,1,1)
 plt.plot(x_path[:,0])
@@ -1282,29 +1282,29 @@ plt.plot(x_path[:,1])
 plt.hlines(xbar[1],0,T,'r','--')
 plt.title(r'Unemployment Rate')
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:28 AM INFO: Cell returned
+10/06/2015 10:40:28 AM INFO: Running cell:
 bhat = 0.003
 T_hat = 20
 LM1 = LakeModel(lamb,alpha,bhat,d)
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:28 AM INFO: Cell returned
+10/06/2015 10:40:28 AM INFO: Running cell:
 X_path1 = np.vstack(LM1.simulate_stock_path(x0*N0,T_hat)) # simulate stocks
 x_path1 = np.vstack(LM1.simulate_rate_path(x0,T_hat)) # simulate rates
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:28 AM INFO: Cell returned
+10/06/2015 10:40:28 AM INFO: Running cell:
 X_path2 = np.vstack(LM0.simulate_stock_path(X_path1[-1,:2],T-T_hat+1)) # simulate stocks
 x_path2 = np.vstack(LM0.simulate_rate_path(x_path1[-1,:2],T-T_hat+1)) # simulate rates
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:28 AM INFO: Cell returned
+10/06/2015 10:40:28 AM INFO: Running cell:
 x_path = np.vstack([x_path1,x_path2[1:]]) # note [1:] to avoid doubling period 20
 X_path = np.vstack([X_path1,X_path2[1:]]) # note [1:] to avoid doubling period 20
 
-10/06/2015 09:48:19 AM INFO: Cell returned
-10/06/2015 09:48:19 AM INFO: Running cell:
+10/06/2015 10:40:28 AM INFO: Cell returned
+10/06/2015 10:40:28 AM INFO: Running cell:
 plt.figure(figsize=[10,9])
 plt.subplot(3,1,1)
 plt.plot(X_path[:,0])
@@ -1316,8 +1316,8 @@ plt.subplot(3,1,3)
 plt.plot(X_path.sum(1))
 plt.title(r'Labor Force')
 
-10/06/2015 09:48:20 AM INFO: Cell returned
-10/06/2015 09:48:20 AM INFO: Running cell:
+10/06/2015 10:40:29 AM INFO: Cell returned
+10/06/2015 10:40:29 AM INFO: Running cell:
 plt.figure(figsize=[10,6])
 plt.subplot(2,1,1)
 plt.plot(x_path[:,0])
@@ -1328,12 +1328,12 @@ plt.plot(x_path[:,1])
 plt.hlines(x0[1],0,T,'r','--')
 plt.title(r'Unemployment Rate')
 
-10/06/2015 09:48:20 AM INFO: Cell returned
-10/06/2015 09:48:20 AM INFO: Running cell:
+10/06/2015 10:40:29 AM INFO: Cell returned
+10/06/2015 10:40:29 AM INFO: Running cell:
 
 
-10/06/2015 09:48:20 AM INFO: Cell returned
-10/06/2015 09:48:20 AM INFO: Shutdown kernel
+10/06/2015 10:40:29 AM INFO: Cell returned
+10/06/2015 10:40:29 AM INFO: Shutdown kernel
 ---> END 'lakemodel_solutions.ipynb' <---
 
 ---> Executing 'lln_clt_solutions.ipynb' <---
@@ -1351,17 +1351,17 @@ plt.title(r'Unemployment Rate')
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:22 AM INFO: Reading notebook lln_clt_solutions.ipynb
-10/06/2015 09:48:22 AM INFO: Running cell:
+10/06/2015 10:40:30 AM INFO: Reading notebook lln_clt_solutions.ipynb
+10/06/2015 10:40:31 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:22 AM INFO: Cell returned
-10/06/2015 09:48:22 AM INFO: Running cell:
+10/06/2015 10:40:31 AM INFO: Cell returned
+10/06/2015 10:40:31 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 
-10/06/2015 09:48:22 AM INFO: Cell returned
-10/06/2015 09:48:22 AM INFO: Running cell:
+10/06/2015 10:40:31 AM INFO: Cell returned
+10/06/2015 10:40:31 AM INFO: Running cell:
 """
 Illustrates the delta method, a consequence of the central limit theorem.
 """
@@ -1400,8 +1400,8 @@ ax.plot(xgrid, norm.pdf(xgrid, scale=asymptotic_sd), 'k-', lw=2, label=lb)
 ax.legend()
 plt.show()
 
-10/06/2015 09:48:26 AM INFO: Cell returned
-10/06/2015 09:48:26 AM INFO: Running cell:
+10/06/2015 10:40:35 AM INFO: Cell returned
+10/06/2015 10:40:35 AM INFO: Running cell:
 from scipy.stats import uniform, chi2
 from scipy.linalg import inv, sqrtm
 
@@ -1446,8 +1446,8 @@ ax.legend()
 ax.hist(chisq_obs, bins=50, normed=True)
 plt.show()
 
-10/06/2015 09:48:32 AM INFO: Cell returned
-10/06/2015 09:48:32 AM INFO: Shutdown kernel
+10/06/2015 10:40:40 AM INFO: Cell returned
+10/06/2015 10:40:40 AM INFO: Shutdown kernel
 ---> END 'lln_clt_solutions.ipynb' <---
 
 ---> Executing 'lqcontrol_solutions.ipynb' <---
@@ -1465,19 +1465,19 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:33 AM INFO: Reading notebook lqcontrol_solutions.ipynb
-10/06/2015 09:48:34 AM INFO: Running cell:
+10/06/2015 10:40:41 AM INFO: Reading notebook lqcontrol_solutions.ipynb
+10/06/2015 10:40:42 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:34 AM INFO: Cell returned
-10/06/2015 09:48:34 AM INFO: Running cell:
+10/06/2015 10:40:42 AM INFO: Cell returned
+10/06/2015 10:40:42 AM INFO: Running cell:
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import LQ
 
-10/06/2015 09:48:35 AM INFO: Cell returned
-10/06/2015 09:48:35 AM INFO: Running cell:
+10/06/2015 10:40:44 AM INFO: Cell returned
+10/06/2015 10:40:44 AM INFO: Running cell:
 # == Model parameters == #
 r       = 0.05
 beta    = 1 / (1 + r)
@@ -1541,8 +1541,8 @@ axes[1].legend(ncol=1, **legend_args)
 
 plt.show()
 
-10/06/2015 09:48:35 AM INFO: Cell returned
-10/06/2015 09:48:35 AM INFO: Running cell:
+10/06/2015 10:40:44 AM INFO: Cell returned
+10/06/2015 10:40:44 AM INFO: Running cell:
 # == Model parameters == #
 r       = 0.05
 beta    = 1 / (1 + r)
@@ -1639,8 +1639,8 @@ axes[1].legend(ncol=1, **legend_args)
 
 plt.show()
 
-10/06/2015 09:48:36 AM INFO: Cell returned
-10/06/2015 09:48:36 AM INFO: Running cell:
+10/06/2015 10:40:45 AM INFO: Cell returned
+10/06/2015 10:40:45 AM INFO: Running cell:
 # == Model parameters == #
 a0      = 5
 a1      = 0.5
@@ -1697,8 +1697,8 @@ s = r'dynamics with $\gamma = {}$'.format(gamma)
 ax.text(max(time) * 0.6, 1 * q_bar.max(), s, fontsize=14)
 plt.show()
 
-10/06/2015 09:48:36 AM INFO: Cell returned
-10/06/2015 09:48:36 AM INFO: Shutdown kernel
+10/06/2015 10:40:46 AM INFO: Cell returned
+10/06/2015 10:40:46 AM INFO: Shutdown kernel
 ---> END 'lqcontrol_solutions.ipynb' <---
 
 ---> Executing 'lqramsey_solutions.ipynb' <---
@@ -1716,12 +1716,12 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:37 AM INFO: Reading notebook lqramsey_solutions.ipynb
-10/06/2015 09:48:38 AM INFO: Running cell:
+10/06/2015 10:40:47 AM INFO: Reading notebook lqramsey_solutions.ipynb
+10/06/2015 10:40:47 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:38 AM INFO: Cell returned
-10/06/2015 09:48:38 AM INFO: Running cell:
+10/06/2015 10:40:48 AM INFO: Cell returned
+10/06/2015 10:40:48 AM INFO: Running cell:
 import sys
 import os
 import numpy as np
@@ -1731,8 +1731,8 @@ import matplotlib.pyplot as plt
 # to append it to the path so we can import it below
 sys.path.append(os.path.abspath("../examples"))
 
-10/06/2015 09:48:38 AM INFO: Cell returned
-10/06/2015 09:48:38 AM INFO: Running cell:
+10/06/2015 10:40:48 AM INFO: Cell returned
+10/06/2015 10:40:48 AM INFO: Running cell:
 from numpy import array
 from lqramsey import *
 
@@ -1763,8 +1763,8 @@ T = 50
 path = compute_paths(T, economy)
 gen_fig_1(path)
 
-10/06/2015 09:48:40 AM INFO: Cell returned
-10/06/2015 09:48:40 AM INFO: Shutdown kernel
+10/06/2015 10:40:50 AM INFO: Cell returned
+10/06/2015 10:40:50 AM INFO: Shutdown kernel
 ---> END 'lqramsey_solutions.ipynb' <---
 
 ---> Executing 'lss_solutions.ipynb' <---
@@ -1782,18 +1782,18 @@ gen_fig_1(path)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:41 AM INFO: Reading notebook lss_solutions.ipynb
-10/06/2015 09:48:42 AM INFO: Running cell:
+10/06/2015 10:40:51 AM INFO: Reading notebook lss_solutions.ipynb
+10/06/2015 10:40:52 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:42 AM INFO: Cell returned
-10/06/2015 09:48:42 AM INFO: Running cell:
+10/06/2015 10:40:53 AM INFO: Cell returned
+10/06/2015 10:40:53 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import LinearStateSpace
 
-10/06/2015 09:48:43 AM INFO: Cell returned
-10/06/2015 09:48:43 AM INFO: Running cell:
+10/06/2015 10:40:54 AM INFO: Cell returned
+10/06/2015 10:40:54 AM INFO: Running cell:
 phi_0, phi_1, phi_2 = 1.1, 0.8, -0.8
 
 A = [[1,     0,     0],
@@ -1813,8 +1813,8 @@ ax.set_xlabel('time')
 ax.set_ylabel(r'$y_t$', fontsize=16)
 plt.show()
 
-10/06/2015 09:48:43 AM INFO: Cell returned
-10/06/2015 09:48:43 AM INFO: Running cell:
+10/06/2015 10:40:54 AM INFO: Cell returned
+10/06/2015 10:40:54 AM INFO: Running cell:
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
 sigma = 0.2
 
@@ -1840,8 +1840,8 @@ ax.set_ylabel(r'$y_t$', fontsize=16)
 plt.show()
 
 
-10/06/2015 09:48:43 AM INFO: Cell returned
-10/06/2015 09:48:43 AM INFO: Running cell:
+10/06/2015 10:40:54 AM INFO: Cell returned
+10/06/2015 10:40:54 AM INFO: Running cell:
 from __future__ import division
 from scipy.stats import norm
 import random
@@ -1889,8 +1889,8 @@ ax.plot(population_means, color='g', lw=2, alpha=0.8, label=r'$G\mu_t$')
 ax.legend(ncol=2)
 plt.show()
 
-10/06/2015 09:48:44 AM INFO: Cell returned
-10/06/2015 09:48:44 AM INFO: Running cell:
+10/06/2015 10:40:55 AM INFO: Cell returned
+10/06/2015 10:40:55 AM INFO: Running cell:
 phi_1, phi_2, phi_3, phi_4 = 0.5, -0.2, 0, 0.5
 sigma = 0.1
 
@@ -1934,12 +1934,12 @@ for i in range(80):
     ax.plot((T0, T1, T2), (y[T0], y[T1], y[T2],), 'ko', alpha=0.5)
 
 
-10/06/2015 09:48:45 AM INFO: Cell returned
-10/06/2015 09:48:45 AM INFO: Running cell:
+10/06/2015 10:40:56 AM INFO: Cell returned
+10/06/2015 10:40:56 AM INFO: Running cell:
 
 
-10/06/2015 09:48:45 AM INFO: Cell returned
-10/06/2015 09:48:45 AM INFO: Shutdown kernel
+10/06/2015 10:40:56 AM INFO: Cell returned
+10/06/2015 10:40:56 AM INFO: Shutdown kernel
 ---> END 'lss_solutions.ipynb' <---
 
 ---> Executing 'lucas_asset_solutions.ipynb' <---
@@ -1957,19 +1957,19 @@ for i in range(80):
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:46 AM INFO: Reading notebook lucas_asset_solutions.ipynb
-10/06/2015 09:48:46 AM INFO: Running cell:
+10/06/2015 10:40:57 AM INFO: Reading notebook lucas_asset_solutions.ipynb
+10/06/2015 10:40:58 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:46 AM INFO: Cell returned
-10/06/2015 09:48:46 AM INFO: Running cell:
+10/06/2015 10:40:58 AM INFO: Cell returned
+10/06/2015 10:40:58 AM INFO: Running cell:
 from __future__ import division  # Omit for Python 3.x
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon.models import LucasTree
 
-10/06/2015 09:48:47 AM INFO: Cell returned
-10/06/2015 09:48:47 AM INFO: Running cell:
+10/06/2015 10:40:59 AM INFO: Cell returned
+10/06/2015 10:40:59 AM INFO: Running cell:
 fig, ax = plt.subplots(figsize=(10,7))
 
 ax.set_xlabel(r'$y$', fontsize=16)
@@ -1985,12 +1985,12 @@ for beta in (.95, 0.98):
 ax.legend(loc='upper left')
 ax.set_xlim(min(grid), max(grid))
 
-10/06/2015 09:48:49 AM INFO: Cell returned
-10/06/2015 09:48:49 AM INFO: Running cell:
+10/06/2015 10:41:01 AM INFO: Cell returned
+10/06/2015 10:41:01 AM INFO: Running cell:
 
 
-10/06/2015 09:48:49 AM INFO: Cell returned
-10/06/2015 09:48:49 AM INFO: Shutdown kernel
+10/06/2015 10:41:01 AM INFO: Cell returned
+10/06/2015 10:41:01 AM INFO: Shutdown kernel
 ---> END 'lucas_asset_solutions.ipynb' <---
 
 ---> Executing 'mpe_solutions.ipynb' <---
@@ -2008,19 +2008,19 @@ ax.set_xlim(min(grid), max(grid))
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:50 AM INFO: Reading notebook mpe_solutions.ipynb
-10/06/2015 09:48:51 AM INFO: Running cell:
+10/06/2015 10:41:03 AM INFO: Reading notebook mpe_solutions.ipynb
+10/06/2015 10:41:03 AM INFO: Running cell:
 import numpy as np
 import quantecon as qe
 import matplotlib.pyplot as plt
 from numpy import dot
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:04 AM INFO: Cell returned
+10/06/2015 10:41:04 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:04 AM INFO: Cell returned
+10/06/2015 10:41:04 AM INFO: Running cell:
 # == Parameters == #
 a0    = 10.0
 a1    = 2.0
@@ -2051,8 +2051,8 @@ S1 = S2 = W1 = W2 = M1 = M2 = 0.0
 F1, F2, P1, P2 = qe.nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
                        beta=beta)
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:04 AM INFO: Cell returned
+10/06/2015 10:41:04 AM INFO: Running cell:
 AF = A - B1.dot(F1) - B2.dot(F2)
 n = 20
 x = np.empty((3, n))
@@ -2064,8 +2064,8 @@ q2 = x[2, :]
 q = q1 + q2       # Total output, MPE
 p = a0 - a1 * q   # Price, MPE
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:04 AM INFO: Cell returned
+10/06/2015 10:41:04 AM INFO: Running cell:
 R = a1
 Q = gamma
 A = B = 1
@@ -2081,8 +2081,8 @@ for i in range(1, n):
     qm[i] = float(x) + q_bar
 pm = a0 - a1 * qm
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:04 AM INFO: Cell returned
+10/06/2015 10:41:04 AM INFO: Running cell:
 fig, axes = plt.subplots(2, 1, figsize=(9, 9))
 
 ax = axes[0]
@@ -2101,8 +2101,8 @@ ax.set_ylabel("price")
 ax.set_xlabel("time")
 ax.legend(loc='upper right', frameon=0)
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:05 AM INFO: Cell returned
+10/06/2015 10:41:05 AM INFO: Running cell:
 delta   = 0.02
 D       = np.array([[-1, 0.5], [0.5, -1]])
 b       = np.array([25, 25])
@@ -2111,8 +2111,8 @@ e1 = e2 = np.array([10, 10, 3])
 
 delta_1 = 1 - delta
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:05 AM INFO: Cell returned
+10/06/2015 10:41:05 AM INFO: Running cell:
 # ==  Create matrices needed to compute the Nash feedback equilibrium == #
 
 A = np.array([[delta_1, 0, -delta_1*b[0]],
@@ -2149,8 +2149,8 @@ W2 = np.array([[0, 0],
 M1 = np.array([[0, 0], [0, D[0, 1] / 2.]])
 M2 = np.copy(M1)
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:05 AM INFO: Cell returned
+10/06/2015 10:41:05 AM INFO: Running cell:
 F1, F2, P1, P2 = qe.nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2)
 
 print("\nFirm 1's feedback rule:\n")
@@ -2159,8 +2159,8 @@ print(F1)
 print("\nFirm 2's feedback rule:\n")
 print(F2)
 
-10/06/2015 09:48:52 AM INFO: Cell returned
-10/06/2015 09:48:52 AM INFO: Running cell:
+10/06/2015 10:41:05 AM INFO: Cell returned
+10/06/2015 10:41:05 AM INFO: Running cell:
 AF = A - B1.dot(F1) - B2.dot(F2)
 n = 25
 x = np.empty((3, n))
@@ -2175,12 +2175,12 @@ ax.plot(I2, 'g-', lw=2, alpha=0.75, label='inventories, firm 2')
 ax.set_title(r'$\delta = {}$'.format(delta))
 ax.legend()
 
-10/06/2015 09:48:53 AM INFO: Cell returned
-10/06/2015 09:48:53 AM INFO: Running cell:
+10/06/2015 10:41:05 AM INFO: Cell returned
+10/06/2015 10:41:05 AM INFO: Running cell:
 
 
-10/06/2015 09:48:53 AM INFO: Cell returned
-10/06/2015 09:48:53 AM INFO: Shutdown kernel
+10/06/2015 10:41:05 AM INFO: Cell returned
+10/06/2015 10:41:05 AM INFO: Shutdown kernel
 ---> END 'mpe_solutions.ipynb' <---
 
 ---> Executing 'numpy_solutions.ipynb' <---
@@ -2198,17 +2198,17 @@ ax.legend()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:54 AM INFO: Reading notebook numpy_solutions.ipynb
-10/06/2015 09:48:54 AM INFO: Running cell:
+10/06/2015 10:41:06 AM INFO: Reading notebook numpy_solutions.ipynb
+10/06/2015 10:41:07 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 def p(x, coef):
     X = np.empty(len(coef))
     X[0] = 1
@@ -2216,8 +2216,8 @@ def p(x, coef):
     y = np.cumprod(X)   # y = [1, x, x**2,...]
     return np.dot(coef, y)
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 coef = np.ones(3)
 print(coef)
 print(p(1, coef))
@@ -2225,8 +2225,8 @@ print(p(1, coef))
 q = np.poly1d(coef)
 print(q(1))
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 from numpy import cumsum
 from numpy.random import uniform
 
@@ -2251,14 +2251,14 @@ class discreteRV:
         """
         return self.Q.searchsorted(uniform(0, 1, size=k)) 
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 q = (0.1, 0.9)
 d = discreteRV(q)
 d.q = (0.5, 0.5)
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 """
 Modifies ecdf.py from QuantEcon to add in a plot method
 
@@ -2330,18 +2330,18 @@ class ECDF(object):
         plt.plot(x_vals, f(x_vals))
         plt.show()
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 X = np.random.randn(1000)
 F = ECDF(X)
 F.plot()
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Running cell:
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Running cell:
 
 
-10/06/2015 09:48:55 AM INFO: Cell returned
-10/06/2015 09:48:55 AM INFO: Shutdown kernel
+10/06/2015 10:41:07 AM INFO: Cell returned
+10/06/2015 10:41:07 AM INFO: Shutdown kernel
 ---> END 'numpy_solutions.ipynb' <---
 
 ---> Executing 'odu_solutions.ipynb' <---
@@ -2359,19 +2359,19 @@ F.plot()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:48:56 AM INFO: Reading notebook odu_solutions.ipynb
-10/06/2015 09:48:57 AM INFO: Running cell:
+10/06/2015 10:41:09 AM INFO: Reading notebook odu_solutions.ipynb
+10/06/2015 10:41:09 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:48:57 AM INFO: Cell returned
-10/06/2015 09:48:57 AM INFO: Running cell:
+10/06/2015 10:41:09 AM INFO: Cell returned
+10/06/2015 10:41:09 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.models import SearchProblem
 
-10/06/2015 09:48:58 AM INFO: Cell returned
-10/06/2015 09:48:58 AM INFO: Running cell:
+10/06/2015 10:41:10 AM INFO: Cell returned
+10/06/2015 10:41:10 AM INFO: Running cell:
 sp = SearchProblem(pi_grid_size=50)
 
 phi_init = np.ones(len(sp.pi_grid)) 
@@ -2388,8 +2388,8 @@ ax.text(0.42, 1.2, 'reject')
 ax.text(0.7, 1.8, 'accept')
 plt.show()
 
-10/06/2015 09:48:58 AM INFO: Cell returned
-10/06/2015 09:48:58 AM INFO: Running cell:
+10/06/2015 10:41:11 AM INFO: Cell returned
+10/06/2015 10:41:11 AM INFO: Running cell:
 from scipy import interp
 # Set up model and compute the function w_bar
 sp = SearchProblem(pi_grid_size=50, F_a=1, F_b=1)
@@ -2450,8 +2450,8 @@ ax.axvline(change_date, color="red")
 ax.legend()
 plt.show()
 
-10/06/2015 09:50:10 AM INFO: Cell returned
-10/06/2015 09:50:10 AM INFO: Shutdown kernel
+10/06/2015 10:42:22 AM INFO: Cell returned
+10/06/2015 10:42:22 AM INFO: Shutdown kernel
 ---> END 'odu_solutions.ipynb' <---
 
 ---> Executing 'oop_solutions.ipynb' <---
@@ -2469,8 +2469,8 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:11 AM INFO: Reading notebook oop_solutions.ipynb
-10/06/2015 09:50:11 AM INFO: Running cell:
+10/06/2015 10:42:23 AM INFO: Reading notebook oop_solutions.ipynb
+10/06/2015 10:42:24 AM INFO: Running cell:
 class ECDF(object):
 
     def __init__(self, observations):
@@ -2483,8 +2483,8 @@ class ECDF(object):
                 counter += 1
         return counter / len(self.observations)
 
-10/06/2015 09:50:11 AM INFO: Cell returned
-10/06/2015 09:50:11 AM INFO: Running cell:
+10/06/2015 10:42:24 AM INFO: Cell returned
+10/06/2015 10:42:24 AM INFO: Running cell:
 # == test == #
 
 from random import uniform
@@ -2497,8 +2497,8 @@ F.observations = [uniform(0, 1) for i in range(1000)]
 
 print(F(0.5))
 
-10/06/2015 09:50:11 AM INFO: Cell returned
-10/06/2015 09:50:11 AM INFO: Running cell:
+10/06/2015 10:42:24 AM INFO: Cell returned
+10/06/2015 10:42:24 AM INFO: Running cell:
 class Polynomial(object):
 
     def __init__(self, coefficients):
@@ -2529,8 +2529,8 @@ class Polynomial(object):
         self.coefficients = new_coefficients
 
 
-10/06/2015 09:50:11 AM INFO: Cell returned
-10/06/2015 09:50:11 AM INFO: Shutdown kernel
+10/06/2015 10:42:24 AM INFO: Cell returned
+10/06/2015 10:42:24 AM INFO: Shutdown kernel
 ---> END 'oop_solutions.ipynb' <---
 
 ---> Executing 'optgrowth_solutions.ipynb' <---
@@ -2548,19 +2548,19 @@ class Polynomial(object):
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:12 AM INFO: Reading notebook optgrowth_solutions.ipynb
-10/06/2015 09:50:13 AM INFO: Running cell:
+10/06/2015 10:42:25 AM INFO: Reading notebook optgrowth_solutions.ipynb
+10/06/2015 10:42:25 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:50:13 AM INFO: Cell returned
-10/06/2015 09:50:13 AM INFO: Running cell:
+10/06/2015 10:42:25 AM INFO: Cell returned
+10/06/2015 10:42:25 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 from quantecon import compute_fixed_point
 from quantecon.models import GrowthModel
 
-10/06/2015 09:50:14 AM INFO: Cell returned
-10/06/2015 09:50:14 AM INFO: Running cell:
+10/06/2015 10:42:26 AM INFO: Cell returned
+10/06/2015 10:42:26 AM INFO: Running cell:
 alpha, beta = 0.65, 0.95
 gm = GrowthModel() 
 true_sigma = (1 - alpha * beta) * gm.grid**alpha
@@ -2582,8 +2582,8 @@ for i, n in enumerate((2, 4, 6)):
     ax[i].legend(loc='upper left')
     ax[i].set_title('{} value function iterations'.format(n))
 
-10/06/2015 09:50:15 AM INFO: Cell returned
-10/06/2015 09:50:15 AM INFO: Running cell:
+10/06/2015 10:42:27 AM INFO: Cell returned
+10/06/2015 10:42:27 AM INFO: Running cell:
 from scipy import interp
 
 gm = GrowthModel() 
@@ -2613,8 +2613,8 @@ for beta in discount_factors:
 ax.legend(loc='lower right')
 plt.show()
 
-10/06/2015 09:50:20 AM INFO: Cell returned
-10/06/2015 09:50:20 AM INFO: Shutdown kernel
+10/06/2015 10:42:32 AM INFO: Cell returned
+10/06/2015 10:42:32 AM INFO: Shutdown kernel
 ---> END 'optgrowth_solutions.ipynb' <---
 
 ---> Executing 'pandas_solutions.ipynb' <---
@@ -2632,20 +2632,20 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:21 AM INFO: Reading notebook pandas_solutions.ipynb
-10/06/2015 09:50:21 AM INFO: Running cell:
+10/06/2015 10:42:33 AM INFO: Reading notebook pandas_solutions.ipynb
+10/06/2015 10:42:34 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:50:22 AM INFO: Cell returned
-10/06/2015 09:50:22 AM INFO: Running cell:
+10/06/2015 10:42:34 AM INFO: Cell returned
+10/06/2015 10:42:34 AM INFO: Running cell:
 import numpy as np
 import pandas as pd
 import datetime as dt
 import pandas.io.data as web
 import matplotlib.pyplot as plt
 
-10/06/2015 09:50:22 AM INFO: Cell returned
-10/06/2015 09:50:22 AM INFO: Running cell:
+10/06/2015 10:42:34 AM INFO: Cell returned
+10/06/2015 10:42:34 AM INFO: Running cell:
 ticker_list = {'INTC': 'Intel',
                'MSFT': 'Microsoft',
                'IBM': 'IBM',
@@ -2678,8 +2678,8 @@ pc.sort()
 fig, ax = plt.subplots(figsize=(10,8))
 pc.plot(kind='bar', ax=ax)
 
-10/06/2015 09:50:24 AM INFO: Cell returned
-10/06/2015 09:50:24 AM INFO: Shutdown kernel
+10/06/2015 10:42:37 AM INFO: Cell returned
+10/06/2015 10:42:37 AM INFO: Shutdown kernel
 ---> END 'pandas_solutions.ipynb' <---
 
 ---> Executing 'pbe_solutions.ipynb' <---
@@ -2697,8 +2697,8 @@ pc.plot(kind='bar', ax=ax)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:25 AM INFO: Reading notebook pbe_solutions.ipynb
-10/06/2015 09:50:26 AM INFO: Running cell:
+10/06/2015 10:42:39 AM INFO: Reading notebook pbe_solutions.ipynb
+10/06/2015 10:42:39 AM INFO: Running cell:
 def factorial(n):
     k = 1
     for i in range(n):
@@ -2707,8 +2707,8 @@ def factorial(n):
 
 factorial(4)
 
-10/06/2015 09:50:26 AM INFO: Cell returned
-10/06/2015 09:50:26 AM INFO: Running cell:
+10/06/2015 10:42:39 AM INFO: Cell returned
+10/06/2015 10:42:39 AM INFO: Running cell:
 from random import uniform
 
 def binomial_rv(n, p):
@@ -2721,8 +2721,8 @@ def binomial_rv(n, p):
 
 binomial_rv(10, 0.5)
 
-10/06/2015 09:50:26 AM INFO: Cell returned
-10/06/2015 09:50:26 AM INFO: Running cell:
+10/06/2015 10:42:39 AM INFO: Cell returned
+10/06/2015 10:42:39 AM INFO: Running cell:
 from __future__ import division  # Omit if using Python 3.x
 from math import sqrt
 
@@ -2739,8 +2739,8 @@ area_estimate = count / n
 
 print(area_estimate * 4)  # dividing by radius**2
 
-10/06/2015 09:50:26 AM INFO: Cell returned
-10/06/2015 09:50:26 AM INFO: Running cell:
+10/06/2015 10:42:39 AM INFO: Cell returned
+10/06/2015 10:42:39 AM INFO: Running cell:
 payoff = 0
 count = 0
 
@@ -2752,12 +2752,12 @@ for i in range(10):
 
 print(payoff)
 
-10/06/2015 09:50:26 AM INFO: Cell returned
-10/06/2015 09:50:26 AM INFO: Running cell:
+10/06/2015 10:42:40 AM INFO: Cell returned
+10/06/2015 10:42:40 AM INFO: Running cell:
 %matplotlib inline  
 
-10/06/2015 09:50:26 AM INFO: Cell returned
-10/06/2015 09:50:26 AM INFO: Running cell:
+10/06/2015 10:42:40 AM INFO: Cell returned
+10/06/2015 10:42:40 AM INFO: Running cell:
 import matplotlib.pyplot as plt
 from random import normalvariate
 
@@ -2772,8 +2772,8 @@ for i in range(ts_length + 1):
 plt.plot(x_values, 'b-')
 
 
-10/06/2015 09:50:27 AM INFO: Cell returned
-10/06/2015 09:50:27 AM INFO: Running cell:
+10/06/2015 10:42:40 AM INFO: Cell returned
+10/06/2015 10:42:40 AM INFO: Running cell:
 alphas = [0.0, 0.8, 0.98]
 ts_length = 200
 
@@ -2786,12 +2786,12 @@ for alpha in alphas:
     plt.plot(x_values, label='alpha = ' + str(alpha))
 plt.legend()
 
-10/06/2015 09:50:27 AM INFO: Cell returned
-10/06/2015 09:50:27 AM INFO: Running cell:
+10/06/2015 10:42:40 AM INFO: Cell returned
+10/06/2015 10:42:40 AM INFO: Running cell:
 
 
-10/06/2015 09:50:27 AM INFO: Cell returned
-10/06/2015 09:50:27 AM INFO: Shutdown kernel
+10/06/2015 10:42:40 AM INFO: Cell returned
+10/06/2015 10:42:40 AM INFO: Shutdown kernel
 ---> END 'pbe_solutions.ipynb' <---
 
 ---> Executing 'py_adv_feat_solutions.ipynb' <---
@@ -2809,8 +2809,8 @@ plt.legend()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:28 AM INFO: Reading notebook py_adv_feat_solutions.ipynb
-10/06/2015 09:50:28 AM INFO: Running cell:
+10/06/2015 10:42:41 AM INFO: Reading notebook py_adv_feat_solutions.ipynb
+10/06/2015 10:42:42 AM INFO: Running cell:
 def x(t):
     if t == 0:
         return 0
@@ -2820,12 +2820,12 @@ def x(t):
         return x(t-1) + x(t-2)
 
 
-10/06/2015 09:50:28 AM INFO: Cell returned
-10/06/2015 09:50:28 AM INFO: Running cell:
+10/06/2015 10:42:42 AM INFO: Cell returned
+10/06/2015 10:42:42 AM INFO: Running cell:
 print([x(i) for i in range(10)])
 
-10/06/2015 09:50:28 AM INFO: Cell returned
-10/06/2015 09:50:28 AM INFO: Running cell:
+10/06/2015 10:42:42 AM INFO: Cell returned
+10/06/2015 10:42:42 AM INFO: Running cell:
 def column_iterator(target_file, column_number):
     """A generator function for CSV files.
     When called with a file name target_file (string) and column number 
@@ -2847,8 +2847,8 @@ for date in dates:
         break
     i += 1
 
-10/06/2015 09:50:28 AM INFO: Cell returned
-10/06/2015 09:50:28 AM INFO: Running cell:
+10/06/2015 10:42:42 AM INFO: Cell returned
+10/06/2015 10:42:42 AM INFO: Running cell:
 %%file numbers.txt
 prices
 3
@@ -2857,8 +2857,8 @@ prices
 7
 21
 
-10/06/2015 09:50:28 AM INFO: Cell returned
-10/06/2015 09:50:28 AM INFO: Running cell:
+10/06/2015 10:42:42 AM INFO: Cell returned
+10/06/2015 10:42:42 AM INFO: Running cell:
 f = open('numbers.txt')
 
 total = 0.0 
@@ -2873,8 +2873,8 @@ f.close()
 print(total)
 
 
-10/06/2015 09:50:28 AM INFO: Cell returned
-10/06/2015 09:50:28 AM INFO: Shutdown kernel
+10/06/2015 10:42:42 AM INFO: Cell returned
+10/06/2015 10:42:42 AM INFO: Shutdown kernel
 ---> END 'py_adv_feat_solutions.ipynb' <---
 
 ---> Executing 'pyess_solutions.ipynb' <---
@@ -2892,53 +2892,53 @@ print(total)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:29 AM INFO: Reading notebook pyess_solutions.ipynb
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Reading notebook pyess_solutions.ipynb
+10/06/2015 10:42:43 AM INFO: Running cell:
 from __future__ import division  # Omit for Python 3.x
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 x_vals = [1, 2, 3]
 y_vals = [1, 1, 1]
 sum([x * y for x, y in zip(x_vals, y_vals)])
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 sum(x * y for x, y in zip(x_vals, y_vals))
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 sum([x % 2 == 0 for x in range(100)])
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 sum(x % 2 == 0 for x in range(100))
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 len([x for x in range(100) if x % 2 == 0])
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 sum([1 for x in range(100) if x % 2 == 0])
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 pairs = ((2, 5), (4, 2), (9, 8), (12, 10))
 sum([x % 2 == 0 and y % 2 == 0 for x, y in pairs])
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 def p(x, coeff):
     return sum(a * x**i for i, a in enumerate(coeff))
 
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 p(1, (2, 4))
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 def f(string):
     count = 0
     for letter in string:
@@ -2947,8 +2947,8 @@ def f(string):
     return count
 f('The Rain in Spain')
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 def f(seq_a, seq_b):
     is_subset = True
     for a in seq_a:
@@ -2961,13 +2961,13 @@ def f(seq_a, seq_b):
 print(f([1, 2], [1, 2, 3]))
 print(f([1, 2, 3], [1, 2]))
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 def f(seq_a, seq_b):
     return set(seq_a).issubset(set(seq_b))
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Running cell:
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Running cell:
 def linapprox(f, a, b, n, x):
     """
     Evaluates the piecewise linear interpolant of f at x on the interval 
@@ -3004,8 +3004,8 @@ def linapprox(f, a, b, n, x):
     return f(u) + (x - u) * (f(v) - f(u)) / (v - u)
 
 
-10/06/2015 09:50:30 AM INFO: Cell returned
-10/06/2015 09:50:30 AM INFO: Shutdown kernel
+10/06/2015 10:42:43 AM INFO: Cell returned
+10/06/2015 10:42:43 AM INFO: Shutdown kernel
 ---> END 'pyess_solutions.ipynb' <---
 
 ---> Executing 'ree_solutions.ipynb' <---
@@ -3023,22 +3023,22 @@ def linapprox(f, a, b, n, x):
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:31 AM INFO: Reading notebook ree_solutions.ipynb
-10/06/2015 09:50:31 AM INFO: Running cell:
+10/06/2015 10:42:44 AM INFO: Reading notebook ree_solutions.ipynb
+10/06/2015 10:42:45 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Running cell:
+10/06/2015 10:42:45 AM INFO: Cell returned
+10/06/2015 10:42:45 AM INFO: Running cell:
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Running cell:
+10/06/2015 10:42:45 AM INFO: Cell returned
+10/06/2015 10:42:45 AM INFO: Running cell:
 from quantecon import LQ
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Running cell:
+10/06/2015 10:42:46 AM INFO: Cell returned
+10/06/2015 10:42:46 AM INFO: Running cell:
 
 # == Model parameters == #
 
@@ -3073,8 +3073,8 @@ print(out1)
 print(out2)
 
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Running cell:
+10/06/2015 10:42:46 AM INFO: Cell returned
+10/06/2015 10:42:46 AM INFO: Running cell:
 
 candidates = (
           (94.0886298678, 0.923409232937),
@@ -3102,8 +3102,8 @@ for kappa0, kappa1 in candidates:
 
 
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Running cell:
+10/06/2015 10:42:46 AM INFO: Cell returned
+10/06/2015 10:42:46 AM INFO: Running cell:
 
 # == Formulate the planner's LQ problem == #
 
@@ -3124,8 +3124,8 @@ kappa0, kappa1 = -F[1], 1 - F[0]
 print(kappa0, kappa1)
 
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Running cell:
+10/06/2015 10:42:46 AM INFO: Cell returned
+10/06/2015 10:42:46 AM INFO: Running cell:
 
 A = np.array([[1, 0], [0, 1]])
 B = np.array([[1], [0]])
@@ -3140,8 +3140,8 @@ m0, m1 = -F[1], 1 - F[0]
 print(m0, m1)
 
 
-10/06/2015 09:50:32 AM INFO: Cell returned
-10/06/2015 09:50:32 AM INFO: Shutdown kernel
+10/06/2015 10:42:46 AM INFO: Cell returned
+10/06/2015 10:42:46 AM INFO: Shutdown kernel
 ---> END 'ree_solutions.ipynb' <---
 
 ---> Executing 'schelling_solutions.ipynb' <---
@@ -3159,12 +3159,12 @@ print(m0, m1)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:33 AM INFO: Reading notebook schelling_solutions.ipynb
-10/06/2015 09:50:34 AM INFO: Running cell:
+10/06/2015 10:42:47 AM INFO: Reading notebook schelling_solutions.ipynb
+10/06/2015 10:42:47 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:50:34 AM INFO: Cell returned
-10/06/2015 09:50:34 AM INFO: Running cell:
+10/06/2015 10:42:47 AM INFO: Cell returned
+10/06/2015 10:42:47 AM INFO: Running cell:
 from random import uniform, seed
 from math import sqrt
 import matplotlib.pyplot as plt
@@ -3260,8 +3260,8 @@ while 1:
 print('Converged, terminating.')
 
 
-10/06/2015 09:50:40 AM INFO: Cell returned
-10/06/2015 09:50:40 AM INFO: Shutdown kernel
+10/06/2015 10:42:53 AM INFO: Cell returned
+10/06/2015 10:42:53 AM INFO: Shutdown kernel
 ---> END 'schelling_solutions.ipynb' <---
 
 ---> Executing 'scipy_solutions.ipynb' <---
@@ -3279,8 +3279,8 @@ print('Converged, terminating.')
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:41 AM INFO: Reading notebook scipy_solutions.ipynb
-10/06/2015 09:50:41 AM INFO: Running cell:
+10/06/2015 10:42:54 AM INFO: Reading notebook scipy_solutions.ipynb
+10/06/2015 10:42:55 AM INFO: Running cell:
 def bisect(f, a, b, tol=10e-5):
     """
     Implements the bisection root finding algorithm, assuming that f is a
@@ -3298,15 +3298,15 @@ def bisect(f, a, b, tol=10e-5):
             bisect(f, middle, upper)
 
 
-10/06/2015 09:50:41 AM INFO: Cell returned
-10/06/2015 09:50:41 AM INFO: Running cell:
+10/06/2015 10:42:55 AM INFO: Cell returned
+10/06/2015 10:42:55 AM INFO: Running cell:
 import numpy as np
 f = lambda x: np.sin(4 * (x - 0.25)) + x + x**20 - 1
 
 bisect(f, 0, 1)
 
-10/06/2015 09:50:41 AM INFO: Cell returned
-10/06/2015 09:50:41 AM INFO: Shutdown kernel
+10/06/2015 10:42:55 AM INFO: Cell returned
+10/06/2015 10:42:55 AM INFO: Shutdown kernel
 ---> END 'scipy_solutions.ipynb' <---
 
 ---> Executing 'short_path_solutions.ipynb' <---
@@ -3324,8 +3324,8 @@ bisect(f, 0, 1)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:42 AM INFO: Reading notebook short_path_solutions.ipynb
-10/06/2015 09:50:43 AM INFO: Running cell:
+10/06/2015 10:42:56 AM INFO: Reading notebook short_path_solutions.ipynb
+10/06/2015 10:42:56 AM INFO: Running cell:
 %%file graph.txt
 node0, node1 0.04, node8 11.11, node14 72.21
 node1, node46 1247.25, node6 20.59, node13 64.94
@@ -3428,8 +3428,8 @@ node97, node98 0.30
 node98, node99 0.33
 node99, 
 
-10/06/2015 09:50:43 AM INFO: Cell returned
-10/06/2015 09:50:43 AM INFO: Running cell:
+10/06/2015 10:42:56 AM INFO: Cell returned
+10/06/2015 10:42:56 AM INFO: Running cell:
 
 def read_graph(in_file):
     """ Read in the graph from the data file.  The graph is stored
@@ -3502,8 +3502,8 @@ while 1:
         J = next_J
 print_best_path(J, graph)
 
-10/06/2015 09:50:43 AM INFO: Cell returned
-10/06/2015 09:50:43 AM INFO: Shutdown kernel
+10/06/2015 10:42:56 AM INFO: Cell returned
+10/06/2015 10:42:56 AM INFO: Shutdown kernel
 ---> END 'short_path_solutions.ipynb' <---
 
 ---> Executing 'speed_solutions.ipynb' <---
@@ -3521,18 +3521,18 @@ print_best_path(J, graph)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:44 AM INFO: Reading notebook speed_solutions.ipynb
-10/06/2015 09:50:45 AM INFO: Running cell:
+10/06/2015 10:42:57 AM INFO: Reading notebook speed_solutions.ipynb
+10/06/2015 10:42:58 AM INFO: Running cell:
 import matplotlib.pyplot as plt
 import numpy as np
 from numba import jit
 
-10/06/2015 09:50:45 AM INFO: Cell returned
-10/06/2015 09:50:45 AM INFO: Running cell:
+10/06/2015 10:42:58 AM INFO: Cell returned
+10/06/2015 10:42:58 AM INFO: Running cell:
 p, q = 0.1, 0.2  # Prob of leaving low and high state respectively
 
-10/06/2015 09:50:45 AM INFO: Cell returned
-10/06/2015 09:50:45 AM INFO: Running cell:
+10/06/2015 10:42:58 AM INFO: Cell returned
+10/06/2015 10:42:58 AM INFO: Running cell:
 def compute_series(n):
     x = np.empty(n, dtype=int)
     x[0] = 1  # Start in state 1
@@ -3545,35 +3545,35 @@ def compute_series(n):
             x[t] = U[t] > q
     return x
 
-10/06/2015 09:50:45 AM INFO: Cell returned
-10/06/2015 09:50:45 AM INFO: Running cell:
+10/06/2015 10:42:58 AM INFO: Cell returned
+10/06/2015 10:42:58 AM INFO: Running cell:
 n = 100000
 x = compute_series(n)
 print(np.mean(x == 0))  # Fraction of time x is in state 0
 
-10/06/2015 09:50:45 AM INFO: Cell returned
-10/06/2015 09:50:45 AM INFO: Running cell:
+10/06/2015 10:42:58 AM INFO: Cell returned
+10/06/2015 10:42:58 AM INFO: Running cell:
 %timeit compute_series(n)
 
-10/06/2015 09:50:48 AM INFO: Cell returned
-10/06/2015 09:50:48 AM INFO: Running cell:
+10/06/2015 10:43:02 AM INFO: Cell returned
+10/06/2015 10:43:02 AM INFO: Running cell:
 compute_series_numba = jit(compute_series)
 
-10/06/2015 09:50:48 AM INFO: Cell returned
-10/06/2015 09:50:48 AM INFO: Running cell:
+10/06/2015 10:43:02 AM INFO: Cell returned
+10/06/2015 10:43:02 AM INFO: Running cell:
 x = compute_series_numba(n)
 print(np.mean(x == 0))
 
-10/06/2015 09:50:49 AM INFO: Cell returned
-10/06/2015 09:50:49 AM INFO: Running cell:
+10/06/2015 10:43:03 AM INFO: Cell returned
+10/06/2015 10:43:03 AM INFO: Running cell:
 %timeit compute_series_numba(n)
 
-10/06/2015 09:50:57 AM INFO: Cell returned
-10/06/2015 09:50:57 AM INFO: Running cell:
+10/06/2015 10:43:03 AM INFO: Cell returned
+10/06/2015 10:43:03 AM INFO: Running cell:
 %load_ext cythonmagic
 
-10/06/2015 09:50:57 AM INFO: Cell returned
-10/06/2015 09:50:57 AM INFO: Running cell:
+10/06/2015 10:43:03 AM INFO: Cell returned
+10/06/2015 10:43:03 AM INFO: Running cell:
 %%cython
 import numpy as np
 from numpy cimport int_t, float_t
@@ -3599,19 +3599,19 @@ def compute_series_cy(int n):
             x[t] = U[t] > q
     return np.asarray(x)
 
-10/06/2015 09:50:57 AM INFO: Cell returned
-10/06/2015 09:50:57 AM INFO: Running cell:
+10/06/2015 10:43:03 AM INFO: Cell returned
+10/06/2015 10:43:03 AM INFO: Running cell:
 compute_series_cy(10)
 
-10/06/2015 09:50:57 AM INFO: Cell raised uncaught exception: 
+10/06/2015 10:43:03 AM INFO: Cell raised uncaught exception: 
 [1;31m---------------------------------------------------------------------------[0m
 [1;31mNameError[0m                                 Traceback (most recent call last)
 [1;32m<ipython-input-11-33a9e71d8bad>[0m in [0;36m<module>[1;34m()[0m
 [1;32m----> 1[1;33m [0mcompute_series_cy[0m[1;33m([0m[1;36m10[0m[1;33m)[0m[1;33m[0m[0m
 [0m
 [1;31mNameError[0m: name 'compute_series_cy' is not defined
-10/06/2015 09:50:57 AM INFO: Shutdown kernel
-10/06/2015 09:50:57 AM WARNING: Exiting with nonzero exit status
+10/06/2015 10:43:03 AM INFO: Shutdown kernel
+10/06/2015 10:43:04 AM WARNING: Exiting with nonzero exit status
 ---> END 'speed_solutions.ipynb' <---
 
 ---> Executing 'statd_solutions.ipynb' <---
@@ -3629,17 +3629,17 @@ compute_series_cy(10)
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:50:57 AM INFO: Reading notebook statd_solutions.ipynb
-10/06/2015 09:50:58 AM INFO: Running cell:
+10/06/2015 10:43:05 AM INFO: Reading notebook statd_solutions.ipynb
+10/06/2015 10:43:06 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:50:58 AM INFO: Cell returned
-10/06/2015 09:50:58 AM INFO: Running cell:
+10/06/2015 10:43:06 AM INFO: Cell returned
+10/06/2015 10:43:06 AM INFO: Running cell:
 import numpy as np
 import matplotlib.pyplot as plt
 
-10/06/2015 09:50:58 AM INFO: Cell returned
-10/06/2015 09:50:58 AM INFO: Running cell:
+10/06/2015 10:43:06 AM INFO: Cell returned
+10/06/2015 10:43:06 AM INFO: Running cell:
 from scipy.stats import norm, gaussian_kde
 from quantecon import LAE
 
@@ -3673,8 +3673,8 @@ ax.plot(ys, k_est(ys), 'k-', lw=2, alpha=0.6, label='kernel based estimate')
 ax.legend(loc='upper left')
 plt.show()
 
-10/06/2015 09:50:59 AM INFO: Cell returned
-10/06/2015 09:50:59 AM INFO: Running cell:
+10/06/2015 10:43:07 AM INFO: Cell returned
+10/06/2015 10:43:07 AM INFO: Running cell:
 from scipy.stats import lognorm, beta
 
 # == Define parameters == #
@@ -3719,8 +3719,8 @@ for i in range(4):
         ax.plot(ygrid, psi(ygrid), color=g, lw=2, alpha=0.6)
     ax.set_xlabel('capital')
 
-10/06/2015 09:51:04 AM INFO: Cell returned
-10/06/2015 09:51:04 AM INFO: Running cell:
+10/06/2015 10:43:13 AM INFO: Cell returned
+10/06/2015 10:43:13 AM INFO: Running cell:
 n = 20
 k = 5000
 J = 6
@@ -3747,8 +3747,8 @@ for j in range(J):
 
 plt.show()
 
-10/06/2015 09:51:07 AM INFO: Cell returned
-10/06/2015 09:51:07 AM INFO: Shutdown kernel
+10/06/2015 10:43:16 AM INFO: Cell returned
+10/06/2015 10:43:16 AM INFO: Shutdown kernel
 ---> END 'statd_solutions.ipynb' <---
 
 ---> Executing 'uncertainty_traps_solutions.ipynb' <---
@@ -3766,12 +3766,12 @@ plt.show()
   "You should import from traitlets.config instead.", ShimWarning)
 /home/matthewmckay/anaconda/lib/python2.7/site-packages/IPython/nbconvert.py:13: ShimWarning: The `IPython.nbconvert` package has been deprecated. You should import from ipython_nbconvert instead.
   "You should import from ipython_nbconvert instead.", ShimWarning)
-10/06/2015 09:51:08 AM INFO: Reading notebook uncertainty_traps_solutions.ipynb
-10/06/2015 09:51:08 AM INFO: Running cell:
+10/06/2015 10:43:17 AM INFO: Reading notebook uncertainty_traps_solutions.ipynb
+10/06/2015 10:43:18 AM INFO: Running cell:
 %matplotlib inline
 
-10/06/2015 09:51:09 AM INFO: Cell returned
-10/06/2015 09:51:09 AM INFO: Running cell:
+10/06/2015 10:43:19 AM INFO: Cell returned
+10/06/2015 10:43:19 AM INFO: Running cell:
 from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
@@ -3779,8 +3779,8 @@ import quantecon as qe
 import seaborn as sns
 import itertools
 
-10/06/2015 09:51:09 AM INFO: Cell returned
-10/06/2015 09:51:09 AM INFO: Running cell:
+10/06/2015 10:43:19 AM INFO: Cell returned
+10/06/2015 10:43:19 AM INFO: Running cell:
 palette = itertools.cycle(sns.color_palette())
 econ = qe.models.UncertaintyTrapEcon()
 rho, sig_theta, gx = econ.rho, econ.sig_theta, econ.gx # simplify names
@@ -3797,8 +3797,8 @@ ax.set_ylabel(r"$\gamma'$", fontsize=16)
 ax.grid()
 plt.show()
 
-10/06/2015 09:51:10 AM INFO: Cell returned
-10/06/2015 09:51:10 AM INFO: Running cell:
+10/06/2015 10:43:20 AM INFO: Cell returned
+10/06/2015 10:43:20 AM INFO: Running cell:
 sim_length=2000
 
 mu_vec = np.empty(sim_length)
@@ -3830,16 +3830,16 @@ X, M = econ.gen_aggregates()
 X_vec[-1] = X
 M_vec[-1] = M
 
-10/06/2015 09:51:10 AM INFO: Cell returned
-10/06/2015 09:51:10 AM INFO: Running cell:
+10/06/2015 10:43:20 AM INFO: Cell returned
+10/06/2015 10:43:20 AM INFO: Running cell:
 fig, ax = plt.subplots(figsize=(9, 6))
 ax.plot(range(sim_length), theta_vec, alpha=0.6, lw=2, label=r"$\theta$")
 ax.plot(range(sim_length), mu_vec, alpha=0.6, lw=2, label=r"$\mu$")
 ax.legend(fontsize=16)
 plt.show()
 
-10/06/2015 09:51:11 AM INFO: Cell returned
-10/06/2015 09:51:11 AM INFO: Running cell:
+10/06/2015 10:43:21 AM INFO: Cell returned
+10/06/2015 10:43:21 AM INFO: Running cell:
 fig, axes = plt.subplots(4, 1, figsize=(12, 20))
 # Add some spacing
 fig.subplots_adjust(hspace=0.3)
@@ -3861,11 +3861,11 @@ for ax, vals, name in zip(axes, series, names):
 
 plt.show()
 
-10/06/2015 09:51:11 AM INFO: Cell returned
-10/06/2015 09:51:11 AM INFO: Running cell:
+10/06/2015 10:43:22 AM INFO: Cell returned
+10/06/2015 10:43:22 AM INFO: Running cell:
 
 
-10/06/2015 09:51:11 AM INFO: Cell returned
-10/06/2015 09:51:11 AM INFO: Shutdown kernel
+10/06/2015 10:43:22 AM INFO: Cell returned
+10/06/2015 10:43:22 AM INFO: Shutdown kernel
 ---> END 'uncertainty_traps_solutions.ipynb' <---
 
