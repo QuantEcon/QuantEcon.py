@@ -89,26 +89,36 @@ class Kalman(object):
         This function takes the linear state space system
         that is an input to the Kalman class and it converts
         that system to the time-invariant whitener represenation
-        given by (NOTE: FIX NOTATION LATER)
+        given by
 
-            x_{t+1}^* = A x + C v
-            a = G x
+            \tilde{x}_{t+1}^* = \tilde{A} \tilde{x} + \tilde{C} v
+            a = \tilde{G} \tilde{x}
 
         where
 
-            x_t = [x+{t}, \hat{x}_{t}, v_{t}]
+            \tilde{x}_t = [x+{t}, \hat{x}_{t}, v_{t}]
 
         and
 
-            A = [A  0    0
-                 KG A-KG KH
-                 0  0    0]
+            \tilde{A} = [A  0    0
+                         KG A-KG KH
+                         0  0    0]
 
-            C = [C 0
-                 0 0
-                 0 I]
+            \tilde{C} = [C 0
+                         0 0
+                         0 I]
 
-            G = [G -G H]
+            \tilde{G} = [G -G H]
+
+        with A, C, G, H coming from the linear state space system 
+        that defines the Kalman instance
+
+
+        Returns
+        -------
+        whitened_lss : LinearStateSpace
+            This is the linear state space system that represents
+            the whitened system
         """
         # Check for steady state Sigma and K
         if self.K_infinity is None:
