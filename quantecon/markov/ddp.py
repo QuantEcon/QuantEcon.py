@@ -30,9 +30,9 @@ For a policy function :math:`\sigma`, let :math:`r_{\sigma}` and
 matrix for :math:`\sigma`, which are defined by :math:`r_{\sigma}(s) =
 r(s, \sigma(s))` and :math:`Q_{\sigma}(s, s') = q(s'|s, \sigma(s))`,
 respectively. The policy value function :math:`v_{\sigma}` for
-:math`\sigma` is defined by
+:math:`\sigma` is defined by
 
-..math::
+.. math::
 
     v_{\sigma}(s) = \sum_{t=0}^{\infty}
                     \beta^t (Q_{\sigma}^t r_{\sigma})(s)
@@ -45,7 +45,7 @@ v(s)` for all :math:`s \in S`.
 
 The *Bellman equation* is written as
 
-..math::
+.. math::
 
     v(s) = \max_{a \in A(s)} r(s, a)
            + \beta \sum_{s' \in S} q(s'|s, a) v(s') \quad (s \in S).
@@ -53,7 +53,7 @@ The *Bellman equation* is written as
 The *Bellman operator* :math:`T` is defined by the right hand side of
 the Bellman equation:
 
-..math::
+.. math::
 
     (T v)(s) = \max_{a \in A(s)} r(s, a)
                + \beta \sum_{s' \in S} q(s'|s, a) v(s') \quad (s \in S).
@@ -61,7 +61,7 @@ the Bellman equation:
 For a policy function :math:`\sigma`, the operator :math:`T_{\sigma}` is
 defined by
 
-..math::
+.. math::
 
     (T_{\sigma} v)(s) = r(s, \sigma(s))
                         + \beta \sum_{s' \in S} q(s'|s, \sigma(s)) v(s')
@@ -117,7 +117,7 @@ from ..util import numba_installed, jit
 
 
 class DiscreteDP(object):
-    """
+    r"""
     Class for dealing with a discrete dynamic program.
 
     There are two ways to represent the data for instantiating a
