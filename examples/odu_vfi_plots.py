@@ -9,7 +9,7 @@ from matplotlib import cm
 from scipy.interpolate import LinearNDInterpolator
 import numpy as np
 from quantecon import compute_fixed_point
-from quantecon.models import SearchProblem
+from odu import SearchProblem
 
 
 sp = SearchProblem(w_grid_size=100, pi_grid_size=100)
