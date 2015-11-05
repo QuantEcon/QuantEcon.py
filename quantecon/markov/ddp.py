@@ -297,7 +297,7 @@ class DiscreteDP(object):
             raise ValueError('R must be 1- or 2-dimensional')
 
         msg_dimension = 'dimensions of R and Q must be either 1 and 2, ' \
-                        'of 2 and 3'
+                        'or 2 and 3'
         msg_shape = 'shapes of R and Q must be either (n, m) and (n, m, n), ' \
                     'or (L,) and (L, n)'
 
