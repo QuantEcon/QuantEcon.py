@@ -4,7 +4,7 @@ Created on Fri Feb 27 18:08:44 2015
 
 Author: David Evans
 
-Example Usage of LakeModel in quantecon.models
+Example Usage of LakeModel
 """
 import numpy as np
 import matplotlib.pyplot as plt
