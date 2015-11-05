@@ -11,7 +11,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 from matplotlib import cm
 import quantecon as qe
-from quantecon.models import CareerWorkerProblem
+from career import CareerWorkerProblem
 
 # === solve for the value function === #
 wp = CareerWorkerProblem()

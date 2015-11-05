@@ -1,7 +1,7 @@
 
 from __future__ import division  # Omit for Python 3.x
 import matplotlib.pyplot as plt
-from quantecon.models import LucasTree
+from lucastree import LucasTree
 
 fig, ax = plt.subplots()
 

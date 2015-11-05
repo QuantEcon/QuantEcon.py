@@ -8,7 +8,7 @@ Example Usage of LakeModel in quantecon.models
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from quantecon.models import LakeModel, LakeModelAgent, LakeModel_Equilibrium
+from lake import LakeModel, LakeModelAgent, LakeModel_Equilibrium
 
 import pandas as pd
 pd.set_option('display.mpl_style', 'default') # Make the graphs a bit prettier
@@ -99,7 +99,7 @@ gamma = 1.
 logw_dist = norm(np.log(20.),1)
 w = np.linspace(0.,175,201)# wage grid
 
-#compute probability of each wage level 
+#compute probability of each wage level
 cdf = logw_dist.cdf(np.log(w))
 pdf = cdf[1:]-cdf[:-1]
 pdf /= pdf.sum()
