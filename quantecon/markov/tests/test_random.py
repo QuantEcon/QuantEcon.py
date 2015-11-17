@@ -81,6 +81,16 @@ def test_random_stochastic_matrix_dense_vs_sparse():
     assert_array_equal(P_dense, P_sparse.toarray())
 
 
+def test_random_stochastic_matrix_k_1():
+    n, k = 3, 1
+    P_dense = random_stochastic_matrix(n, k, sparse=False)
+    P_sparse = random_stochastic_matrix(n, k, sparse=True)
+    assert_array_equal(P_dense[P_dense != 0], np.ones(n))
+    assert_array_equal(P_sparse.data, np.ones(n))
+    for P in [P_dense, P_sparse]:
+        assert_array_almost_equal_nulp(P.sum(axis=1), np.ones(n))
+
+
 class TestRandomDiscreteDP:
     def setUp(self):
         self.num_states, self.num_actions = 5, 4
