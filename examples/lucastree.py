@@ -40,7 +40,7 @@ import numpy as np
 from scipy import interp
 from scipy.stats import lognorm
 from scipy.integrate import fixed_quad
-from ..compute_fp import compute_fixed_point
+from quantecon import compute_fixed_point
 
 
 class LucasTree(object):

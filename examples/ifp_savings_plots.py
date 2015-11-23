@@ -8,7 +8,7 @@ LastModified: 11/08/2013
 
 from matplotlib import pyplot as plt
 from quantecon import compute_fixed_point
-from quantecon.models import ConsumerProblem
+from ifp import ConsumerProblem
 
 # === solve for optimal consumption === #
 m = ConsumerProblem(r=0.03, grid_max=4)

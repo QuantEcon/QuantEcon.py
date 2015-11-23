@@ -12,10 +12,10 @@ def write_version_py(filename=None):
     """
     doc = "\"\"\"\nThis is a VERSION file and should NOT be manually altered\n\"\"\""
     doc += "\nversion = '%s'" % VERSION
-    
+
     if not filename:
         filename = os.path.join(os.path.dirname(__file__), 'quantecon', 'version.py')
-    
+
     fl = open(filename, 'w')
     try:
         fl.write(doc)
@@ -30,12 +30,12 @@ write_version_py()  # This is a file used to control the qe.__version__ attribut
 DESCRIPTION = "QuantEcon is a package to support all forms of quantitative economic modelling."       #'Core package of the QuantEcon library'
 
 LONG_DESCRIPTION = """
-**QuantEcon** is an organization run by economists for economists with the aim of coordinating 
-distributed development of high quality open source code for all forms of quantitative economic modelling. 
+**QuantEcon** is an organization run by economists for economists with the aim of coordinating
+distributed development of high quality open source code for all forms of quantitative economic modelling.
 
 The project website is located at `http://quantecon.org/ <http://quantecon.org/>`_. This website provides
-more information with regards to the **quantecon** library, documentation, in addition to some resources 
-in regards to how you can use and/or contribute to the package. 
+more information with regards to the **quantecon** library, documentation, in addition to some resources
+in regards to how you can use and/or contribute to the package.
 
 The **quantecon** Package
 -------------------------
@@ -68,7 +68,7 @@ Current Build and Coverage Status
 Additional Links
 ----------------
 
-1. `QuantEcon Course Website <http://quant-econ.net>`_ 
+1. `QuantEcon Course Website <http://quant-econ.net>`_
 
 """
 
@@ -93,9 +93,7 @@ CLASSIFIERS = [
 
 setup(name='quantecon',
       packages=['quantecon',
-                'quantecon.markov', 
-                'quantecon.models',
-                'quantecon.models.solow', 
+                'quantecon.markov',  
                 'quantecon.random',
                 'quantecon.tests',
                 'quantecon.util',
