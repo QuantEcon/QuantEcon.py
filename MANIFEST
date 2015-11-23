@@ -38,6 +38,7 @@ quantecon/models/asset_pricing.py
 quantecon/models/career.py
 quantecon/models/ifp.py
 quantecon/models/jv.py
+quantecon/models/lake.py
 quantecon/models/lucastree.py
 quantecon/models/odu.py
 quantecon/models/optgrowth.py

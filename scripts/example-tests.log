@@ -2,6 +2,12 @@
 ---END '3dplot.py'---
 ---Executing '3dvec.py'---
 ---END '3dvec.py'---
+---Executing 'aiyagari_compute_equilibrium.py'---
+---END 'aiyagari_compute_equilibrium.py'---
+---Executing 'aiyagari_compute_policy.py'---
+---END 'aiyagari_compute_policy.py'---
+---Executing 'aiyagari_household.py'---
+---END 'aiyagari_household.py'---
 ---Executing 'amss.py'---
 ---END 'amss.py'---
 ---Executing 'amss_figures.py'---
@@ -58,6 +64,8 @@
 ---END 'evans_sargent_plot1.py'---
 ---Executing 'evans_sargent_plot2.py'---
 ---END 'evans_sargent_plot2.py'---
+---Executing 'finite_dp_og_example.py'---
+---END 'finite_dp_og_example.py'---
 ---Executing 'gaussian_contours.py'---
 ---END 'gaussian_contours.py'---
 ---Executing 'ifp_savings_plots.py'---
@@ -148,7 +156,7 @@ Traceback (most recent call last):
     P = solve_discrete_riccati(A0, B0, R, Q, N)
   File "/home/matthewmckay/anaconda/lib/python2.7/site-packages/quantecon/matrix_eqn.py", line 197, in solve_discrete_riccati
     raise ValueError(fail_msg.format(i))
-ValueError: Convergence failed after 5001 iterations.
+ValueError: Convergence failed after 501 iterations.
 ---END 'robust_monopolist.py'---
 ---Executing 'sine2.py'---
 ---END 'sine2.py'---
