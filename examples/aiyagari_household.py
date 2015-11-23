@@ -1,7 +1,10 @@
+"""
+Created on Wed Sep 23 17:00:17 EDT 2015
+@authors: John Stachurski, Thomas Sargent
+"""
 
 import numpy as np
 from numba import jit
-
 
 class Household(object):
     """
@@ -34,6 +37,7 @@ class Household(object):
                 a_max=18,
                 a_size=200):
         
+        # Store values, set up grids over a and z
         self.r, self.w, self.beta = r, w, beta
         self.a_min, self.a_max, self.a_size = a_min, a_max, a_size
     
@@ -44,13 +48,19 @@ class Household(object):
         self.a_vals = np.linspace(a_min, a_max, a_size)
         self.n = a_size * self.z_size
 
+        # Build the array Q
         self.Q = np.zeros((self.n, a_size, self.n))
         self.build_Q()
 
+        # Build the array R
         self.R = np.empty((self.n, a_size))
         self.build_R()
 
     def set_prices(self, r, w):
+        """
+        Use this method to reset prices.  Calling the method will trigger a 
+        re-build of R.
+        """
         self.r, self.w = r, w 
         self.build_R()
 
@@ -61,6 +71,8 @@ class Household(object):
         self.R.fill(-np.inf)
         populate_R(self.R, self.a_size, self.z_size, self.a_vals, self.z_vals, self.r, self.w)
 
+
+# Do the hard work using JIT-ed functions
 
 @jit(nopython=True)
 def populate_R(R, a_size, z_size, a_vals, z_vals, r, w):

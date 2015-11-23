@@ -1,3 +1,7 @@
+"""
+Created on Wed Sep 23 17:00:17 EDT 2015
+@authors: John Stachurski, Thomas Sargent
+"""
 
 import numpy as np
 import quantecon as qe
@@ -24,11 +28,11 @@ def prices_to_capital_stock(am, r):
     """
     Map prices to the induced level of capital stock.
     
-    Paramters:
+    Parameters:
     ----------
     
-    am : AiyagariModel
-        An instance of an Aiyagari economy
+    am : Household
+        An instance of an aiyagari_household.Household 
     r : float
         The interest rate
     """
