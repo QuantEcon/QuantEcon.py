@@ -2,7 +2,6 @@
 Import the main names to top level.
 """
 
-from . import models as models
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
 from .ecdf import ECDF
