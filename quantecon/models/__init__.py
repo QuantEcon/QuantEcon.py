@@ -1,1 +1,1 @@
-raise ImportError("The quantecon.models subpackage has been migrated to the QuantEcon.applications (https://github.com/QuantEcon/QuantEcon.applications)")
+raise ImportError("The code previously contained in the quantecon.models subpackage has been migrated to the QuantEcon.applications (https://github.com/QuantEcon/QuantEcon.applications) repo")
