@@ -8,6 +8,7 @@ specified vector of probabilities.
 
 """
 
+import numpy as np
 from numpy import cumsum
 from numpy.random import uniform
 
@@ -31,7 +32,7 @@ class DiscreteRV(object):
     """
 
     def __init__(self, q):
-        self._q = q
+        self._q = np.asarray(q)
         self.Q = cumsum(q)
 
     def __repr__(self):
@@ -54,7 +55,7 @@ class DiscreteRV(object):
         Setter method for q.
 
         """
-        self._q = val
+        self._q = np.asarray(val)
         self.Q = cumsum(val)
 
     def draw(self, k=1):
