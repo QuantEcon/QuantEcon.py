@@ -4,7 +4,7 @@ import os
 #-Write Versions File-#
 #~~~~~~~~~~~~~~~~~~~~~#
 
-VERSION = '0.2.2'
+VERSION = '0.3.0'
 
 def write_version_py(filename=None):
     """
@@ -94,11 +94,11 @@ CLASSIFIERS = [
 setup(name='quantecon',
       packages=['quantecon',
                 'quantecon.markov', 
-                'quantecon.models',
-                'quantecon.models.solow', 
                 'quantecon.random',
                 'quantecon.tests',
                 'quantecon.util',
+                #-Deprecated-#
+                'quantecon.models',
                 ],
       version=VERSION,
       description=DESCRIPTION,

@@ -2,7 +2,11 @@
 Import the main names to top level.
 """
 
-from . import models as models
+try:
+	import numba
+except:
+	raise ImportError("Cannot import numba from current anaconda distribution. Please run `conda install numba` to install the latest version.")
+
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
 from .ecdf import ECDF
