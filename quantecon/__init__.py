@@ -28,7 +28,7 @@ from .markov import mc_compute_stationary, mc_sample_path 							#Imports that S
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from . import quad as quad
-from .util import searchsorted, fetch_nb_dependancies
+from .util import searchsorted, fetch_nb_dependencies
 
 #Add Version Attribute
 from .version import version as __version__

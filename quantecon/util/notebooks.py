@@ -9,7 +9,7 @@ Note
 Files on the REMOTE Github Server can be organised into folders but they will end up at the root level of
 when downloaded as a support File
 
-"https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependancies/mpi/something.py" --> ./somthing.py
+"https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./somthing.py
 
 TODO
 ----
@@ -26,9 +26,9 @@ import requests
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
 RAW = "raw"
 BRANCH = "master"
-DEPS = "dependancies"          #Hard Coded Dependancies Folder on QuantEcon.notebooks
+DEPS = "dependencies"          #Hard Coded Dependencies Folder on QuantEcon.notebooks
 
-def fetch_nb_dependancies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, verbose=True):
+def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, verbose=True):
     """
     Retrieve raw files from QuantEcon.notebooks Github repo
     
