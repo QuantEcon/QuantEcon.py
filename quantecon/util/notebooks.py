@@ -19,8 +19,8 @@ TODO
 
 """
 
-from invoke import run, task
 import os
+import requests
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
@@ -61,5 +61,7 @@ def fetch_nb_dependancies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, v
                 fl = directory+"/"+fl
             if verbose: print("Fetching file: %s"%fl)
             url = "/".join([repo,raw,branch,deps,fl])
-            run("wget %s"%url)
+            r = requests.get(url)
+            with open(fl, "wb") as fl:
+                fl.write(r.content)
 
