@@ -16,7 +16,6 @@ econ.net <http://quant-econ.net>`_.
    :maxdepth: 2
 
    markov
-   models
    random
    tools
    util
