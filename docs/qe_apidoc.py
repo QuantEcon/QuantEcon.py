@@ -20,7 +20,7 @@ two toctrees, one for models and one for tools.
 Examples
 --------
 $ python qe_apidoc.py  # generates the two separate directories
-$ python qe_apidoc.py  foo_bar  # generates the two separate directories
+$ python qe_apidoc.py foo_bar  # generates the two separate directories
 $ python qe_apidoc.py single  # generates the single directory
 
 
@@ -44,6 +44,15 @@ module_template = """{mod_name}
 {equals}
 
 .. automodule:: quantecon.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
+game_theory_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.game_theory.{mod_name}
     :members:
     :undoc-members:
     :show-inheritance:
@@ -101,10 +110,10 @@ QuantEcon documentation
 =======================
 
 The `quantecon` python library consists of a number of modules which
-includes economic models (models), markov chains (markov), random 
-generation utilities (random), a collection of tools (tools), 
-and other utilities (util) which are 
-mainly used by developers internal to the package. 
+includes economic models (models), markov chains (markov), random
+generation utilities (random), a collection of tools (tools),
+and other utilities (util) which are
+mainly used by developers internal to the package.
 
 The models section, for example, contains implementations of standard
 models, many of which are discussed in lectures on the website `quant-
@@ -113,6 +122,7 @@ econ.net <http://quant-econ.net>`_.
 .. toctree::
    :maxdepth: 2
 
+   game_theory
    markov
    random
    tools
@@ -173,6 +183,12 @@ def all_auto():
 
 
 def model_tool():
+    # list file names with game_theory
+    game_theory_files = glob("../quantecon/game_theory/[a-z0-9]*.py")
+    game_theory = list(map(lambda x: x.split('/')[-1][:-3], game_theory_files))
+    # Alphabetize
+    game_theory.sort()
+
     # list file names with markov
     markov_files = glob("../quantecon/markov/[a-z0-9]*.py")
     markov = list(map(lambda x: x.split('/')[-1][:-3], markov_files))
@@ -191,23 +207,30 @@ def model_tool():
     # Alphabetize
     tools.remove("version")
     tools.sort()
-    
+
     # list file names of utilities
     util_files = glob("../quantecon/util/[a-z0-9]*.py")
     util = list(map(lambda x: x.split('/')[-1][:-3], util_files))
     # Alphabetize
     util.sort()
 
-    for folder in ["markov","random","tools","util"]:
+    for folder in ["game_theory", "markov", "random", "tools", "util"]:
         if not os.path.exists(source_join(folder)):
             os.makedirs(source_join(folder))
+
+    # Write file for each game_theory file
+    for mod in game_theory:
+        new_path = os.path.join("source", "game_theory", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(game_theory_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each markov file
     for mod in markov:
         new_path = os.path.join("source", "markov", mod + ".rst")
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
-            f.write(markov_module_template.format(mod_name=mod, equals=equals)) 
+            f.write(markov_module_template.format(mod_name=mod, equals=equals))
 
     # Write file for each random file
     for mod in random:
@@ -234,18 +257,20 @@ def model_tool():
     with open(source_join("index.rst"), "w") as index:
         index.write(split_index_template)
 
+    gt = "game_theory/" + "\n   game_theory/".join(game_theory)
     mark = "markov/" + "\n   markov/".join(markov)
     rand = "random/" + "\n   random/".join(random)
     tlz = "tools/" + "\n   tools/".join(tools)
     utls = "util/" + "\n   util/".join(util)
     #-TocTree-#
-    toc_tree_list = {"markov":mark,
+    toc_tree_list = {"game_theory": gt,
+                     "markov": mark,
                      "tools": tlz,
-                     "random":rand,
-                     "util":utls,
+                     "random": rand,
+                     "util": utls,
                      }
 
-    for f_name in ("markov","random","tools","util"):
+    for f_name in ("game_theory", "markov", "random", "tools", "util"):
         with open(source_join(f_name + ".rst"), "w") as f:
             temp = split_file_template.format(name=f_name.capitalize(),
                                               equals="="*len(f_name),
