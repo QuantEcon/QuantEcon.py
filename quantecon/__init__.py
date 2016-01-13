@@ -9,6 +9,8 @@ except:
 
 #-Modules-#
 from . import game_theory
+from . import quad
+from . import random
 
 #-Objects-#
 from .compute_fp import compute_fixed_point
@@ -32,8 +34,7 @@ from .markov import mc_compute_stationary, mc_sample_path 												#Imports t
 #<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
-from . import quad as quad
 from .util import searchsorted, fetch_nb_dependencies
 
-#Add Version Attribute
+#-Add Version Attribute-#
 from .version import version as __version__
