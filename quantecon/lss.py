@@ -141,7 +141,7 @@ class LinearStateSpace(object):
         well formed 2D NumPy arrays
 
         """
-        return np.atleast_2d(np.asarray(x, dtype='float32'))
+        return np.atleast_2d(np.asarray(x, dtype='float'))
 
     def simulate(self, ts_length=100):
         """
