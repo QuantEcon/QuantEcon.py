@@ -8,6 +8,7 @@ except:
 	raise ImportError("Cannot import numba from current anaconda distribution. Please run `conda install numba` to install the latest version.")
 
 #-Modules-#
+from . import distributions
 from . import quad
 from . import random
 
