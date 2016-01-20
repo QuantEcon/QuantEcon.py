@@ -295,7 +295,10 @@ class Player(object):
         """
         payoff_vector = self.payoff_vector(opponents_actions)
         if payoff_perturbation is not None:
-            payoff_vector += payoff_perturbation
+            try:
+                payoff_vector += payoff_perturbation
+            except TypeError:  # type mismatch
+                payoff_vector = payoff_vector + payoff_perturbation
 
         if tie_breaking == 'smallest':
             best_response = np.argmax(payoff_vector)

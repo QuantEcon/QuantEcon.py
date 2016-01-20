@@ -59,6 +59,9 @@ class TestPlayer_1opponent:
         eq_(self.player.best_response([2/3, 1/3],
                                       payoff_perturbation=[0, 0.1]),
             1)
+        eq_(self.player.best_response([2, 1],  # int
+                                      payoff_perturbation=[0, 0.1]),
+            1)
 
     def test_is_best_response_against_pure(self):
         ok_(self.player.is_best_response(0, 0))
