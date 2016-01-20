@@ -100,7 +100,7 @@ class LQ(object):
 
     def __init__(self, Q, R, A, B, C=None, N=None, beta=1, T=None, Rf=None):
         # == Make sure all matrices can be treated as 2D arrays == #
-        converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float32'))
+        converter = lambda X: np.atleast_2d(np.asarray(X, dtype='float'))
         self.A, self.B, self.Q, self.R, self.N = list(map(converter,
                                                           (A, B, Q, R, N)))
         # == Record dimensions == #
@@ -123,7 +123,7 @@ class LQ(object):
         if T:
             # == Model is finite horizon == #
             self.T = T
-            self.Rf = np.asarray(Rf, dtype='float32')
+            self.Rf = np.asarray(Rf, dtype='float')
             self.P = self.Rf
             self.d = 0
         else:
