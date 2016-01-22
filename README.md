@@ -70,7 +70,13 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+#### Ver. 0.3.1 (22-January-2016)
+
+1. Adds the ``quantecon/game_theory/`` sub package
+2. Updates api for using ``distributions`` as a module ``qe.distributions``
+
 #### Ver. 0.3
 
 1. Removes ``quantecon/models`` subpackage and the collection of code examples. Code has been migrated to the [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) repository.
 2. Adds a utility for fetching notebook dependencies from [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) to support community contributed notebooks.
+

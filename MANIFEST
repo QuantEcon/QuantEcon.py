@@ -26,6 +26,8 @@ quantecon/quadsums.py
 quantecon/rank_nullspace.py
 quantecon/robustlq.py
 quantecon/version.py
+quantecon/game_theory/__init__.py
+quantecon/game_theory/normal_form_game.py
 quantecon/markov/__init__.py
 quantecon/markov/approximation.py
 quantecon/markov/core.py
