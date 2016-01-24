@@ -306,6 +306,21 @@ def test_normalformgame_setitem_1p():
     eq_(g.players[0].payoff_array[0], 10)
 
 
+# Test __repre__ #
+
+def test_player_repr():
+    nums_actions = (2, 3, 4)
+    payoff_arrays = [
+        np.arange(np.prod(nums_actions[0:i])).reshape(nums_actions[0:i])
+        for i in range(1, len(nums_actions)+1)
+    ]
+    players = [Player(payoff_array) for payoff_array in payoff_arrays]
+
+    for player in players:
+        player_new = eval(repr(player))
+        assert_array_equal(player_new.payoff_array, player.payoff_array)
+
+
 # Invalid inputs #
 
 @raises(ValueError)

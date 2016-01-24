@@ -175,12 +175,18 @@ class Player(object):
         self.tol = 1e-8
 
     def __repr__(self):
-        N = self.num_opponents + 1
-        s = 'Player in a {N}-player normal form game'.format(N=N)
-        return s
+        # From numpy.matrix.__repr__
+        # Print also dtype, except for int64, float64
+        s = repr(self.payoff_array).replace('array', 'Player')
+        l = s.splitlines()
+        for i in range(1, len(l)):
+            if l[i]:
+                l[i] = ' ' + l[i]
+        return '\n'.join(l)
 
     def __str__(self):
-        s = self.__repr__()
+        N = self.num_opponents + 1
+        s = 'Player in a {N}-player normal form game'.format(N=N)
         s += ' with payoff array:\n'
         s += np.array2string(self.payoff_array, separator=', ')
         return s
@@ -591,15 +597,6 @@ class NormalFormGame(object):
                 return False
 
         return True
-
-
-def _payoff_array2string(payoff_array, class_name=None):
-    prefix, suffix = '', ''
-    if class_name is not None:
-        prefix = class_name + '('
-        suffix = ')'
-    s = np.array2string(payoff_array, separator=', ', prefix=prefix)
-    return prefix + s + suffix
 
 
 def _payoff_profile_array2string(payoff_profile_array, class_name=None):
