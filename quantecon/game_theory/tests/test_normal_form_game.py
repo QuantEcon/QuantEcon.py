@@ -323,6 +323,13 @@ def test_normalformgame_invalid_input_players_num_inconsistent():
 
 
 @raises(ValueError)
+def test_normalformgame_invalid_input_players_dtype_inconsistent():
+    p0 = Player(np.zeros((2, 2), dtype=int))
+    p1 = Player(np.zeros((2, 2), dtype=float))
+    g = NormalFormGame([p0, p1])
+
+
+@raises(ValueError)
 def test_normalformgame_invalid_input_nosquare_matrix():
     g = NormalFormGame(np.zeros((2, 3)))
 
