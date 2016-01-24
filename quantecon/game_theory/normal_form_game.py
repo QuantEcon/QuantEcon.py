@@ -517,12 +517,12 @@ class NormalFormGame(object):
         except TypeError:
             raise TypeError('index must be a tuple')
 
-        payoff_profile = [
-            player.payoff_array[
-                tuple(action_profile[i:]) + tuple(action_profile[:i])
-            ]
-            for i, player in enumerate(self.players)
-        ]
+        payoff_profile = np.empty(self.N, dtype=self.dtype)
+        for i, player in enumerate(self.players):
+            payoff_profile[i] = \
+                player.payoff_array[
+                    tuple(action_profile[i:]) + tuple(action_profile[:i])
+                ]
 
         return payoff_profile
 
