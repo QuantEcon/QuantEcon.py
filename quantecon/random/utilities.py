@@ -38,6 +38,10 @@ def probvec(m, k, random_state=None):
            [ 0.43772774,  0.34763084,  0.21464142]])
 
     """
+    if k == 1:
+        return np.ones((m, k))
+
+    # if k >= 2
     random_state = check_random_state(random_state)
     r = random_state.random_sample(size=(m, k-1))
 

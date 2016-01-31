@@ -81,5 +81,5 @@ def _fill_tauchen(x, P, n, rho, sigma, half_step):
             std_norm_cdf((x[n - 1] - rho * x[i] - half_step) / sigma)
         for j in range(1, n - 1):
             z = x[j] - rho * x[i]
-            P[i, j] = (std_norm_cdf((z + half_step) / sigma) - std_norm_cdf(
-                (z - half_step) / sigma))
+            P[i, j] = (std_norm_cdf((z + half_step) / sigma) -
+                       std_norm_cdf((z - half_step) / sigma))

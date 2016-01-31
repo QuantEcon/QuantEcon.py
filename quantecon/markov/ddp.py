@@ -1,4 +1,4 @@
-"""
+r"""
 Filename: ddp.py
 
 Author: Daisuke Oyama
@@ -23,16 +23,16 @@ A discrete dynamic program consists of the following components:
   \Delta(S)`, where :math:`q(s'|s, a)` is the probability that the state
   in the next period is :math:`s'` when the current state is :math:`s`
   and the action chosen is :math:`a`; and
-* discount factor :math:`\beta \in [0, 1)`.
+* discount factor :math:`0 \leq \beta < 1`.
 
 For a policy function :math:`\sigma`, let :math:`r_{\sigma}` and
 :math:`Q_{\sigma}` be the reward vector and the transition probability
 matrix for :math:`\sigma`, which are defined by :math:`r_{\sigma}(s) =
 r(s, \sigma(s))` and :math:`Q_{\sigma}(s, s') = q(s'|s, \sigma(s))`,
 respectively. The policy value function :math:`v_{\sigma}` for
-:math`\sigma` is defined by
+:math:`\sigma` is defined by
 
-..math::
+.. math::
 
     v_{\sigma}(s) = \sum_{t=0}^{\infty}
                     \beta^t (Q_{\sigma}^t r_{\sigma})(s)
@@ -45,7 +45,7 @@ v(s)` for all :math:`s \in S`.
 
 The *Bellman equation* is written as
 
-..math::
+.. math::
 
     v(s) = \max_{a \in A(s)} r(s, a)
            + \beta \sum_{s' \in S} q(s'|s, a) v(s') \quad (s \in S).
@@ -53,7 +53,7 @@ The *Bellman equation* is written as
 The *Bellman operator* :math:`T` is defined by the right hand side of
 the Bellman equation:
 
-..math::
+.. math::
 
     (T v)(s) = \max_{a \in A(s)} r(s, a)
                + \beta \sum_{s' \in S} q(s'|s, a) v(s') \quad (s \in S).
@@ -61,7 +61,7 @@ the Bellman equation:
 For a policy function :math:`\sigma`, the operator :math:`T_{\sigma}` is
 defined by
 
-..math::
+.. math::
 
     (T_{\sigma} v)(s) = r(s, \sigma(s))
                         + \beta \sum_{s' \in S} q(s'|s, \sigma(s)) v(s')
@@ -117,7 +117,7 @@ from ..util import numba_installed, jit
 
 
 class DiscreteDP(object):
-    """
+    r"""
     Class for dealing with a discrete dynamic program.
 
     There are two ways to represent the data for instantiating a
@@ -141,7 +141,7 @@ class DiscreteDP(object):
 
        with parameters:
 
-       * length L reward vector R,
+       * length L reward vector `R`,
        * L x n transition probability array `Q`,
        * discount factor `beta`,
        * length L array `s_indices`, and
@@ -165,7 +165,7 @@ class DiscreteDP(object):
         Transition probability array.
 
     beta : scalar(float)
-        Discount factor. Must be in [0, 1).
+        Discount factor. Must be 0 <= beta < 1.
 
     s_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the states.
@@ -297,7 +297,7 @@ class DiscreteDP(object):
             raise ValueError('R must be 1- or 2-dimensional')
 
         msg_dimension = 'dimensions of R and Q must be either 1 and 2, ' \
-                        'of 2 and 3'
+                        'or 2 and 3'
         msg_shape = 'shapes of R and Q must be either (n, m) and (n, m, n), ' \
                     'or (L,) and (L, n)'
 
@@ -451,8 +451,8 @@ class DiscreteDP(object):
 
     def RQ_sigma(self, sigma):
         """
-        Given a policy `sigma`, return the reward vector R_sigma and the
-        transition probability matrix Q_sigma.
+        Given a policy `sigma`, return the reward vector `R_sigma` and
+        the transition probability matrix `Q_sigma`.
 
         Parameters
         ----------
@@ -483,7 +483,7 @@ class DiscreteDP(object):
     def bellman_operator(self, v, Tv=None, sigma=None):
         """
         The Bellman operator, which computes and returns the updated
-        value function Tv for a value function v.
+        value function `Tv` for a value function `v`.
 
         Parameters
         ----------
@@ -538,7 +538,7 @@ class DiscreteDP(object):
             Value function vector, of length n.
 
         sigma : ndarray(int, ndim=1), optional(default=None)
-            Optional output array for sigma.
+            Optional output array for `sigma`.
 
         Returns
         -------
@@ -708,12 +708,12 @@ class DiscreteDP(object):
         sigma = self.compute_greedy(v)
 
         res = DPSolveResult(v=v,
-                             sigma=sigma,
-                             num_iter=num_iter,
-                             mc=self.controlled_mc(sigma),
-                             method='value iteration',
-                             epsilon=epsilon,
-                             max_iter=max_iter)
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='value iteration',
+                            epsilon=epsilon,
+                            max_iter=max_iter)
 
         return res
 
@@ -745,11 +745,11 @@ class DiscreteDP(object):
         num_iter = i + 1
 
         res = DPSolveResult(v=v_sigma,
-                             sigma=sigma,
-                             num_iter=num_iter,
-                             mc=self.controlled_mc(sigma),
-                             method='policy iteration',
-                             max_iter=max_iter)
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='policy iteration',
+                            max_iter=max_iter)
 
         return res
 
@@ -798,13 +798,13 @@ class DiscreteDP(object):
         num_iter = i + 1
 
         res = DPSolveResult(v=v,
-                             sigma=sigma,
-                             num_iter=num_iter,
-                             mc=self.controlled_mc(sigma),
-                             method='modified policy iteration',
-                             epsilon=epsilon,
-                             max_iter=max_iter,
-                             k=k)
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='modified policy iteration',
+                            epsilon=epsilon,
+                            max_iter=max_iter,
+                            k=k)
 
         return res
 
@@ -820,7 +820,7 @@ class DiscreteDP(object):
         Returns
         -------
         mc : MarkovChain
-            Controlled Markov Chain.
+            Controlled Markov chain.
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)

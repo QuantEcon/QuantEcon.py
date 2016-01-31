@@ -9,6 +9,7 @@ from textwrap import dedent
 import numpy as np
 from numpy import dot
 from scipy.linalg import inv
+from quantecon.lss import LinearStateSpace
 from quantecon.matrix_eqn import solve_discrete_riccati
 
 
@@ -82,6 +83,70 @@ class Kalman(object):
           - dimension of observation equation : {k}
         """
         return dedent(m.format(n=self.ss.n, k=self.ss.k))
+
+    def whitener_lss(self):
+        r"""
+        This function takes the linear state space system
+        that is an input to the Kalman class and it converts
+        that system to the time-invariant whitener represenation
+        given by
+
+            \tilde{x}_{t+1}^* = \tilde{A} \tilde{x} + \tilde{C} v
+            a = \tilde{G} \tilde{x}
+
+        where
+
+            \tilde{x}_t = [x+{t}, \hat{x}_{t}, v_{t}]
+
+        and
+
+            \tilde{A} = [A  0    0
+                         KG A-KG KH
+                         0  0    0]
+
+            \tilde{C} = [C 0
+                         0 0
+                         0 I]
+
+            \tilde{G} = [G -G H]
+
+        with A, C, G, H coming from the linear state space system 
+        that defines the Kalman instance
+
+
+        Returns
+        -------
+        whitened_lss : LinearStateSpace
+            This is the linear state space system that represents
+            the whitened system
+        """
+        # Check for steady state Sigma and K
+        if self.K_infinity is None:
+            Sig, K = self.stationary_values()
+            self.Sigma_infinity = Sig
+            self.K_infinity = K
+        else:
+            K = self.K_infinity
+
+        # Get the matrix sizes
+        n, k, m, l = self.ss.n, self.ss.k, self.ss.m, self.ss.l
+        A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
+
+        Atil = np.vstack([np.hstack([A, np.zeros((n, n)), np.zeros((n, l))]),
+                          np.hstack([dot(K, G), A-dot(K, G), dot(K, H)]),
+                          np.zeros((l, 2*n + l))])
+
+        Ctil = np.vstack([np.hstack([C, np.zeros((n, l))]),
+                          np.zeros((n, m+l)),
+                          np.hstack([np.zeros((l, m)), np.eye(l)])])
+
+        Gtil = np.hstack([G, -G, H])
+
+        whitened_lss = LinearStateSpace(Atil, Ctil, Gtil)
+        self.whitened_lss = whitened_lss
+
+        return whitened_lss
+
 
     def prior_to_filtered(self, y):
         r"""
@@ -192,17 +257,21 @@ class Kalman(object):
         if K_infinity is None:
             S, K_infinity = self.stationary_values()
         # == compute and return coefficients == #
-        coeffs = [np.identity(self.ss.k)]
+        coeffs = []
         i = 1
         if coeff_type == 'ma':
-            P = A
+            coeffs.append(np.identity(self.ss.k))
+            P_mat = A
+            P = np.identity(self.ss.n)  # Create a copy
         elif coeff_type == 'var':
-            P = A - dot(K_infinity, G)
+            coeffs.append(dot(G, K_infinity))
+            P_mat = A - dot(K_infinity, G)
+            P = np.copy(P_mat)  # Create a copy
         else:
             raise ValueError("Unknown coefficient type")
         while i <= j:
             coeffs.append(dot(dot(G, P), K_infinity))
-            P = dot(P, P)
+            P = dot(P, P_mat)
             i += 1
         return coeffs
 

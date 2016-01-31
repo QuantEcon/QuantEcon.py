@@ -141,7 +141,7 @@ class LinearStateSpace(object):
         well formed 2D NumPy arrays
 
         """
-        return np.atleast_2d(np.asarray(x, dtype='float32'))
+        return np.atleast_2d(np.asarray(x, dtype='float'))
 
     def simulate(self, ts_length=100):
         """
@@ -336,3 +336,42 @@ class LinearStateSpace(object):
         S_y = self.G.dot(S_x)
 
         return S_x, S_y
+
+    def impulse_response(self, j=5):
+        """
+        Pulls off the imuplse response coefficients to a shock
+        in w_{t} for x and y
+
+        Important to note: We are uninterested in the shocks to
+        v for this method
+
+        * x coefficients are C, AC, A^2 C...
+        * y coefficients are GC, GAC, GA^2C...
+
+        Parameters
+        ----------
+        j : Scalar(int)
+            Number of coefficients that we want
+
+        Returns
+        -------
+        xcoef : list(array_like(float, 2))
+            The coefficients for x
+        ycoef : list(array_like(float, 2))
+            The coefficients for y
+        """
+        # Pull out matrices
+        A, C, G, H = self.A, self.C, self.G, self.H
+        Apower = np.copy(A)
+
+        # Create room for coefficients
+        xcoef = [C]
+        ycoef = [np.dot(G, C)]
+
+        for i in range(j):
+            xcoef.append(np.dot(Apower, C))
+            ycoef.append(np.dot(G, np.dot(Apower, C)))
+            Apower = np.dot(Apower, A)
+
+        return xcoef, ycoef
+
