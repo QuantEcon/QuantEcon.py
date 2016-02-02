@@ -501,14 +501,17 @@ class NormalFormGame(object):
         return payoff_profile_array
 
     def __repr__(self):
-        s = '{N}-player NormalFormGame'.format(N=self.N)
-        return s
+        s = '<{nums_actions} {N}-player NormalFormGame of dtype {dtype}>'
+        return s.format(nums_actions=_nums_actions2string(self.nums_actions),
+                        N=self.N,
+                        dtype=self.dtype)
 
     def __str__(self):
-        s = self.__repr__()
+        s = '{nums_actions} {N}-player NormalFormGame'
         s += ' with payoff profile array:\n'
         s += _payoff_profile_array2string(self.payoff_profile_array)
-        return s
+        return s.format(nums_actions=_nums_actions2string(self.nums_actions),
+                        N=self.N)
 
     def __getitem__(self, action_profile):
         if self.N == 1:  # Trivial game with 1 player
@@ -597,6 +600,14 @@ class NormalFormGame(object):
                 return False
 
         return True
+
+
+def _nums_actions2string(nums_actions):
+    if len(nums_actions) == 1:
+        s = '{0}-action'.format(nums_actions[0])
+    else:
+        s = 'x'.join(map(str, nums_actions))
+    return s
 
 
 def _payoff_profile_array2string(payoff_profile_array, class_name=None):
