@@ -507,11 +507,9 @@ class NormalFormGame(object):
                         dtype=self.dtype)
 
     def __str__(self):
-        s = '{nums_actions} {N}-player NormalFormGame'
-        s += ' with payoff profile array:\n'
+        s = '{N}-player NormalFormGame with payoff profile array:\n'
         s += _payoff_profile_array2string(self.payoff_profile_array)
-        return s.format(nums_actions=_nums_actions2string(self.nums_actions),
-                        N=self.N)
+        return s.format(N=self.N)
 
     def __getitem__(self, action_profile):
         if self.N == 1:  # Trivial game with 1 player
