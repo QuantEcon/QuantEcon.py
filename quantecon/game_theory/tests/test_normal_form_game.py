@@ -306,6 +306,21 @@ def test_normalformgame_setitem_1p():
     eq_(g.players[0].payoff_array[0], 10)
 
 
+# Test __repre__ #
+
+def test_player_repr():
+    nums_actions = (2, 3, 4)
+    payoff_arrays = [
+        np.arange(np.prod(nums_actions[0:i])).reshape(nums_actions[0:i])
+        for i in range(1, len(nums_actions)+1)
+    ]
+    players = [Player(payoff_array) for payoff_array in payoff_arrays]
+
+    for player in players:
+        player_new = eval(repr(player))
+        assert_array_equal(player_new.payoff_array, player.payoff_array)
+
+
 # Invalid inputs #
 
 @raises(ValueError)
@@ -319,6 +334,13 @@ def test_normalformgame_invalid_input_players_shape_inconsistent():
 def test_normalformgame_invalid_input_players_num_inconsistent():
     p0 = Player(np.zeros((2, 2, 2)))
     p1 = Player(np.zeros((2, 2, 2)))
+    g = NormalFormGame([p0, p1])
+
+
+@raises(ValueError)
+def test_normalformgame_invalid_input_players_dtype_inconsistent():
+    p0 = Player(np.zeros((2, 2), dtype=int))
+    p1 = Player(np.zeros((2, 2), dtype=float))
     g = NormalFormGame([p0, p1])
 
 

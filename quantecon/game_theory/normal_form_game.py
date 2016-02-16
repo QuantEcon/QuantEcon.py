@@ -158,6 +158,9 @@ class Player(object):
     num_opponents : scalar(int)
         The number of opponent players.
 
+    dtype : dtype
+        Data type of the elements of `payoff_array`.
+
     """
     def __init__(self, payoff_array):
         self.payoff_array = np.asarray(payoff_array)
@@ -167,16 +170,23 @@ class Player(object):
 
         self.num_opponents = self.payoff_array.ndim - 1
         self.num_actions = self.payoff_array.shape[0]
+        self.dtype = self.payoff_array.dtype
 
         self.tol = 1e-8
 
     def __repr__(self):
-        N = self.num_opponents + 1
-        s = 'Player in a {N}-player normal form game'.format(N=N)
-        return s
+        # From numpy.matrix.__repr__
+        # Print also dtype, except for int64, float64
+        s = repr(self.payoff_array).replace('array', 'Player')
+        l = s.splitlines()
+        for i in range(1, len(l)):
+            if l[i]:
+                l[i] = ' ' + l[i]
+        return '\n'.join(l)
 
     def __str__(self):
-        s = self.__repr__()
+        N = self.num_opponents + 1
+        s = 'Player in a {N}-player normal form game'.format(N=N)
         s += ' with payoff array:\n'
         s += np.array2string(self.payoff_array, separator=', ')
         return s
@@ -377,6 +387,11 @@ class NormalFormGame(object):
         game will be a symmetric two-player game where the payoff matrix
         of each player is given by the input matrix.
 
+    dtype : data-type, optional(default=None)
+        Relevant only when `data` is an array of integers. Data type of
+        the players' payoff arrays. If not supplied, default to
+        numpy.float64.
+
     Attributes
     ----------
     players : tuple(Player)
@@ -389,13 +404,15 @@ class NormalFormGame(object):
         Tuple of the numbers of actions, one for each player.
 
     """
-    def __init__(self, data):
+    def __init__(self, data, dtype=None):
         # data represents an array_like of Players
         if hasattr(data, '__getitem__') and isinstance(data[0], Player):
             N = len(data)
 
             # Check that the shapes of the payoff arrays are consistent
+            # and the dtypes coincide
             shape_0 = data[0].payoff_array.shape
+            dtype_0 = data[0].payoff_array.dtype
             for i in range(1, N):
                 shape = data[i].payoff_array.shape
                 if not (
@@ -405,8 +422,14 @@ class NormalFormGame(object):
                     raise ValueError(
                         'shapes of payoff arrays must be consistent'
                     )
+                dtype = data[i].payoff_array.dtype
+                if dtype != dtype_0:
+                    raise ValueError(
+                        'dtypes of payoff arrays must coincide'
+                    )
 
             self.players = tuple(data)
+            self.dtype = dtype_0
 
         # data represents action sizes or a payoff array
         else:
@@ -416,6 +439,7 @@ class NormalFormGame(object):
                 # Trivial game consisting of one player
                 N = 1
                 self.players = (Player(np.zeros(data)),)
+                self.dtype = data.dtype
 
             elif data.ndim == 1:  # data represents action sizes
                 N = data.size
@@ -423,9 +447,11 @@ class NormalFormGame(object):
                 # with payoff_arrays filled with zeros
                 # Payoff values set via __setitem__
                 self.players = tuple(
-                    Player(np.zeros(tuple(data[i:]) + tuple(data[:i])))
+                    Player(np.zeros(tuple(data[i:]) + tuple(data[:i]),
+                                    dtype=dtype))
                     for i in range(N)
                 )
+                self.dtype = self.players[0].payoff_array.dtype
 
             elif data.ndim == 2 and data.shape[1] >= 2:
                 # data represents a payoff array for symmetric two-player game
@@ -437,6 +463,7 @@ class NormalFormGame(object):
                     )
                 N = 2
                 self.players = tuple(Player(data) for i in range(N))
+                self.dtype = data.dtype
 
             else:  # data represents a payoff array
                 # data must be of shape (n_0, ..., n_{N-1}, N),
@@ -454,6 +481,7 @@ class NormalFormGame(object):
                                                         list(range(i)))
                     ) for i in range(N)
                 )
+                self.dtype = data.dtype
 
         self.N = N  # Number of players
         self.nums_actions = tuple(
@@ -463,8 +491,7 @@ class NormalFormGame(object):
     @property
     def payoff_profile_array(self):
         N = self.N
-        dtype = \
-            np.result_type(*(player.payoff_array for player in self.players))
+        dtype = self.dtype
         payoff_profile_array = \
             np.empty(self.players[0].payoff_array.shape + (N,), dtype=dtype)
         for i, player in enumerate(self.players):
@@ -474,14 +501,15 @@ class NormalFormGame(object):
         return payoff_profile_array
 
     def __repr__(self):
-        s = '{N}-player NormalFormGame'.format(N=self.N)
-        return s
+        s = '<{nums_actions} {N}-player NormalFormGame of dtype {dtype}>'
+        return s.format(nums_actions=_nums_actions2string(self.nums_actions),
+                        N=self.N,
+                        dtype=self.dtype)
 
     def __str__(self):
-        s = self.__repr__()
-        s += ' with payoff profile array:\n'
+        s = '{N}-player NormalFormGame with payoff profile array:\n'
         s += _payoff_profile_array2string(self.payoff_profile_array)
-        return s
+        return s.format(N=self.N)
 
     def __getitem__(self, action_profile):
         if self.N == 1:  # Trivial game with 1 player
@@ -496,12 +524,12 @@ class NormalFormGame(object):
         except TypeError:
             raise TypeError('index must be a tuple')
 
-        payoff_profile = [
-            player.payoff_array[
-                tuple(action_profile[i:]) + tuple(action_profile[:i])
-            ]
-            for i, player in enumerate(self.players)
-        ]
+        payoff_profile = np.empty(self.N, dtype=self.dtype)
+        for i, player in enumerate(self.players):
+            payoff_profile[i] = \
+                player.payoff_array[
+                    tuple(action_profile[i:]) + tuple(action_profile[:i])
+                ]
 
         return payoff_profile
 
@@ -572,13 +600,12 @@ class NormalFormGame(object):
         return True
 
 
-def _payoff_array2string(payoff_array, class_name=None):
-    prefix, suffix = '', ''
-    if class_name is not None:
-        prefix = class_name + '('
-        suffix = ')'
-    s = np.array2string(payoff_array, separator=', ', prefix=prefix)
-    return prefix + s + suffix
+def _nums_actions2string(nums_actions):
+    if len(nums_actions) == 1:
+        s = '{0}-action'.format(nums_actions[0])
+    else:
+        s = 'x'.join(map(str, nums_actions))
+    return s
 
 
 def _payoff_profile_array2string(payoff_profile_array, class_name=None):
