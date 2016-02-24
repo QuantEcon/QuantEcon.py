@@ -1,7 +1,6 @@
 # Thank you for the writeup given by dan-blanchard at https://gist.github.com/dan-blanchard/7045057
 language: python
 python:
-  - 2.7
   - 3.5
 
 notifications:
