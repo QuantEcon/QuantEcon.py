@@ -23,8 +23,10 @@ before_install:
   - conda update --yes conda
   #- sudo rm -rf /dev/shm
   #- sudo ln -s /run/shm /dev/shm
+
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda #Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba)
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba
+    # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
   - pip install coveralls coverage
   - python setup.py install
   - cp quantecon/tests/matplotlibrc .
