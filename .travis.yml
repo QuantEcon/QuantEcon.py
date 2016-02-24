@@ -1,4 +1,9 @@
+# Travis Configuration for QuantEcon.py
+#
 # Thank you for the writeup given by dan-blanchard at https://gist.github.com/dan-blanchard/7045057
+#
+
+sudo: false        #Use new Container Infrastructure
 language: python
 python:
   - 3.5
