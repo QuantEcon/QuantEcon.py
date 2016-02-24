@@ -21,8 +21,8 @@ before_install:
   - ./miniconda.sh -b -p /home/travis/miniconda
   - export PATH=/home/travis/miniconda/bin:$PATH
   - conda update --yes conda
-  - sudo rm -rf /dev/shm
-  - sudo ln -s /run/shm /dev/shm
+  #- sudo rm -rf /dev/shm
+  #- sudo ln -s /run/shm /dev/shm
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda #Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba)
   - pip install coveralls coverage
