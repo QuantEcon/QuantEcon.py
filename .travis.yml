@@ -1,4 +1,9 @@
+# Travis Configuration for QuantEcon.py
+#
 # Thank you for the writeup given by dan-blanchard at https://gist.github.com/dan-blanchard/7045057
+#
+
+sudo: false        #Use new Container Infrastructure
 language: python
 python:
   - 3.5
@@ -16,13 +21,13 @@ before_install:
   - ./miniconda.sh -b -p /home/travis/miniconda
   - export PATH=/home/travis/miniconda/bin:$PATH
   - conda update --yes conda
-  - sudo rm -rf /dev/shm
-  - sudo ln -s /run/shm /dev/shm
+  #- sudo rm -rf /dev/shm
+  #- sudo ln -s /run/shm /dev/shm
+
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba
-  # Get packages that we can't get directly from conda
+    # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
   - pip install coveralls coverage
-  # - conda install --yes -c dan_blanchard python-coveralls nose-cov
   - python setup.py install
   - cp quantecon/tests/matplotlibrc .
 
