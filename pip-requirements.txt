@@ -1,6 +1,6 @@
-# These are the required packages for the quant-econ package to build
+# These are the required packages for the quantecon package to build
 
-Sphinx
+sphinx
 
 ipython
 
@@ -19,3 +19,5 @@ statsmodels
 sympy
 
 numba
+
+requests
