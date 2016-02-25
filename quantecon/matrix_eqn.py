@@ -7,9 +7,9 @@ equations.  Currently has functionality to solve:
 * Lyapunov Equations
 * Ricatti Equations
 
-TODO: See issue 47 on github repository, should add support for
+TODO: 1. See issue 47 on github repository, should add support for
       Sylvester equations
-
+      2. Fix warnings from checking conditioning of matrices
 """
 from __future__ import division
 import numpy as np
@@ -17,9 +17,6 @@ import warnings
 from numpy import dot
 from numpy.linalg import solve
 from scipy.linalg import solve_discrete_lyapunov as sp_solve_discrete_lyapunov
-
-# == Suppress warnings from checking conditioning of matrices == #
-warnings.simplefilter("ignore", RuntimeWarning)
 
 
 def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
