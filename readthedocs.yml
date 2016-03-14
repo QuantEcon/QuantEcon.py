@@ -1,1 +1,2 @@
-requirements_file: pip-requirements.txt
+conda:
+    file: environment.yml
