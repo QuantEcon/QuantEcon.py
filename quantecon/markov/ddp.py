@@ -775,14 +775,15 @@ class DiscreteDP(object):
         u = np.empty(self.num_states)
         sigma = np.empty(self.num_states, dtype=int)
 
+        try:
+            tol = epsilon * (1-self.beta) / self.beta
+        except ZeroDivisionError:  # Raised if beta = 0
+            tol = np.inf
+
         for i in range(max_iter):
             # Policy improvement
             self.bellman_operator(v, Tv=u, sigma=sigma)
             diff = u - v
-            try:
-                tol = epsilon * (1-self.beta) / self.beta
-            except ZeroDivisionError:  # Raised if beta = 0
-                tol = np.inf
             if span(diff) < tol:
                 v[:] = u + midrange(diff) * self.beta / (1 - self.beta)
                 break
