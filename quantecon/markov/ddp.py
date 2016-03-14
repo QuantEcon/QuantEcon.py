@@ -180,9 +180,6 @@ class DiscreteDP(object):
     num_states : scalar(int)
         Number of states.
 
-    num_actions : scalar(int)
-        Number of actions.
-
     num_sa_pairs : scalar(int)
         Number of feasible state-action pairs (or those that yield
         finite rewards).
@@ -322,7 +319,6 @@ class DiscreteDP(object):
 
             self.s_indices = np.asarray(s_indices)
             self.a_indices = np.asarray(a_indices)
-            self.num_actions = self.a_indices.max() + 1
 
             if _has_sorted_sa_indices(self.s_indices, self.a_indices):
                 a_indptr = np.empty(self.num_states+1, dtype=int)
@@ -372,12 +368,12 @@ class DiscreteDP(object):
         else:  # Not self._sa_pair
             if self.R.ndim != 2:
                 raise ValueError(msg_dimension)
-            self.num_states, self.num_actions = self.R.shape
+            n, m = self.R.shape
 
-            if self.Q.shape != \
-               (self.num_states, self.num_actions, self.num_states):
+            if self.Q.shape != (n, m, n):
                 raise ValueError(msg_shape)
 
+            self.num_states = n
             self.s_indices, self.a_indices = None, None
             self.num_sa_pairs = (self.R > -np.inf).sum()
 
@@ -385,9 +381,8 @@ class DiscreteDP(object):
             def s_wise_max(vals, out=None, out_argmax=None):
                 """
                 Return the vector max_a vals(s, a), where vals is represented
-                by a 2-dimensional ndarray of shape (self.num_states,
-                self.num_actions). Stored in out, which must be of length
-                self.num_states.
+                by a 2-dimensional ndarray of shape (n, m). Stored in out,
+                which must be of length self.num_states.
                 out and out_argmax must be of length self.num_states; dtype of
                 out_argmax must be int.
 
