@@ -28,9 +28,10 @@ RAW = "raw"
 BRANCH = "master"
 DEPS = "dependencies"          #Hard Coded Dependencies Folder on QuantEcon.notebooks
 
-def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, verbose=True):
+
+def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, overwrite=False, verbose=True):
     """
-    Retrieve raw files from QuantEcon.notebooks Github repo
+    Retrieve raw files from QuantEcon.notebooks or any other Github repo
     
     Parameters
     ----------
@@ -40,6 +41,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, v
     repo        str, optional(default=REPO)
     branch      str, optional(default=BRANCH)
     deps        str, optional(default=DEPS)
+    overwrite   bool, optional(default=False)
     verbose     bool, optional(default=True)
 
     TODO
@@ -59,7 +61,15 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, deps=DEPS, v
         for fl in files[directory]:
             if directory != "":
                 fl = directory+"/"+fl
+            #-Check for Local Copy of File (Default Behaviour is to Skip)-#
+            if not overwrite:
+                if os.path.isfile(fl):
+                    if verbose: print("A file named %s already exists in the specified directory ... skipping download."%fl)
+                    continue
+            else:
+                if verbose: print("Overwriting file %s ..."%fl)
             if verbose: print("Fetching file: %s"%fl)
+            #-Get file in OS agnostic way using requests-#
             url = "/".join([repo,raw,branch,deps,fl])
             r = requests.get(url)
             with open(fl, "wb") as fl:
