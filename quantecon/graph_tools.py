@@ -27,6 +27,10 @@ class DiGraph(object):
     weighted : bool, optional(default=False)
         Whether to treat `adj_matrix` as a weighted adjacency matrix.
 
+    node_labels : array_like(ndim=1, default=None)
+        Array_like of length n containing the label associated with each
+        node. If None, the labels default to integers 0 through n-1.
+
     Attributes
     ----------
     csgraph : scipy.sparse.csr_matrix
@@ -70,7 +74,7 @@ class DiGraph(object):
 
     """
 
-    def __init__(self, adj_matrix, weighted=False):
+    def __init__(self, adj_matrix, weighted=False, node_labels=None):
         if weighted:
             dtype = None
         else:
@@ -83,6 +87,10 @@ class DiGraph(object):
 
         self.n = n  # Number of nodes
 
+        self._node_labels = None
+        if node_labels is not None:
+            self.node_labels = node_labels
+
         self._num_scc = None
         self._scc_proj = None
         self._sink_scc_labels = None
@@ -94,6 +102,21 @@ class DiGraph(object):
 
     def __str__(self):
         return "Directed Graph:\n  - n(number of nodes): {n}".format(n=self.n)
+
+    @property
+    def node_labels(self):
+        return self._node_labels
+
+    @node_labels.setter
+    def node_labels(self, values):
+        if len(values) != self.n:
+                raise ValueError('node_labels must be of length n')
+        self._node_labels = np.asarray(values)
+
+    def label_nodes(self, list_of_components):
+        if self.node_labels is not None:
+            return [self.node_labels[c] for c in list_of_components]
+        return list_of_components
 
     def _find_scc(self):
         """
@@ -169,21 +192,41 @@ class DiGraph(object):
     def num_sink_strongly_connected_components(self):
         return len(self.sink_scc_labels)
 
-    @property
-    def strongly_connected_components(self):
+    # strongly_connected_components
+    def _get_strongly_connected_components(self):
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
             return [np.where(self.scc_proj == k)[0]
                     for k in range(self.num_strongly_connected_components)]
 
+    def get_strongly_connected_components(self, return_labels=True):
+        if return_labels:
+            return self.label_nodes(self._get_strongly_connected_components())
+        return self._get_strongly_connected_components()
+
     @property
-    def sink_strongly_connected_components(self):
+    def strongly_connected_components(self):
+        return self.get_strongly_connected_components()
+
+    # sink_strongly_connected_components
+    def _get_sink_strongly_connected_components(self):
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
             return [np.where(self.scc_proj == k)[0]
                     for k in self.sink_scc_labels.tolist()]
+
+    def get_sink_strongly_connected_components(self, return_labels=True):
+        if return_labels:
+            return self.label_nodes(
+                self._get_sink_strongly_connected_components()
+            )
+        return self._get_sink_strongly_connected_components()
+
+    @property
+    def sink_strongly_connected_components(self):
+        return self.get_sink_strongly_connected_components()
 
     def _compute_period(self):
         """
@@ -255,13 +298,22 @@ class DiGraph(object):
     def is_aperiodic(self):
         return (self.period == 1)
 
-    @property
-    def cyclic_components(self):
+    # cyclic_components
+    def _get_cyclic_components(self):
         if self.is_aperiodic:
             return [np.arange(self.n)]
         else:
             return [np.where(self._cyclic_components_proj == k)[0]
                     for k in range(self.period)]
+
+    def get_cyclic_components(self, return_labels=True):
+        if return_labels:
+            return self.label_nodes(self._get_cyclic_components())
+        return self._get_cyclic_components()
+
+    @property
+    def cyclic_components(self):
+        return self.get_cyclic_components()
 
     def subgraph(self, nodes):
         """
@@ -271,7 +323,7 @@ class DiGraph(object):
         Parameters
         ----------
         nodes : array_like(int, ndim=1)
-           Array of nodes.
+           Array of node indices.
 
         Returns
         -------
@@ -282,7 +334,13 @@ class DiGraph(object):
         adj_matrix = self.csgraph[nodes, :][:, nodes]
 
         weighted = True  # To copy the dtype
-        return DiGraph(adj_matrix, weighted=weighted)
+
+        if self.node_labels is not None:
+            node_labels = self.node_labels[nodes]
+        else:
+            node_labels = None
+
+        return DiGraph(adj_matrix, weighted=weighted, node_labels=node_labels)
 
 
 def _csr_matrix_indices(S):
