@@ -275,7 +275,7 @@ def model_tool():
             m_name = f_name
             if f_name == "game_theory":
                 f_name = "Game Theory"                                             #Produce Nicer Title for Game Theory Module
-            if f_name = "util":
+            if f_name == "util":
                 f_name = "Utilities"            #Produce Nicer Title for Utilities Module
             temp = split_file_template.format(name=f_name.capitalize(),
                                               equals="="*len(f_name),
