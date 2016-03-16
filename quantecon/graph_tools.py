@@ -42,16 +42,18 @@ class DiGraph(object):
     num_strongly_connected_components : int
         The number of the strongly connected components.
 
-    strongly_connected_components : list(ndarray(int))
+    strongly_connected_components : list(ndarray)
         List of numpy arrays containing the strongly connected
-        components.
+        components. Equivalent to calling the method
+        `get_strongly_connected_components`.
 
     num_sink_strongly_connected_components : int
         The number of the sink strongly connected components.
 
-    sink_strongly_connected_components : list(ndarray(int))
+    sink_strongly_connected_components : list(ndarray)
         List of numpy arrays containing the sink strongly connected
-        components.
+        components. Equivalent to calling the method
+        `get_sink_strongly_connected_components`.
 
     is_aperiodic : bool
         Indicate whether the digraph is aperiodic.
@@ -60,8 +62,9 @@ class DiGraph(object):
         The period of the digraph. Defined only for a strongly connected
         digraph.
 
-    cyclic_components : list(ndarray(int))
+    cyclic_components : list(ndarray)
         List of numpy arrays containing the cyclic components.
+        Equivalent to calling the method `get_cyclic_components`.
 
     References
     ----------
@@ -341,6 +344,34 @@ class DiGraph(object):
             node_labels = None
 
         return DiGraph(adj_matrix, weighted=weighted, node_labels=node_labels)
+
+
+_get_method_docstr = \
+"""
+Return a list of numpy arrays containing the {components}.
+
+Parameters
+----------
+return_labels : bool(optional, default=True)
+    Whether to annotate the returned nodes with `node_labels`.
+
+Returns
+-------
+list(ndarray)
+    If `return_labels=True`, and if `node_labels` is not None,
+    each ndarray contains the node labels, and the node indices
+    (integers) otherwise.
+
+"""
+
+DiGraph.get_strongly_connected_components.__doc__ = \
+    _get_method_docstr.format(components='strongly connected components')
+
+DiGraph.get_sink_strongly_connected_components.__doc__ = \
+    _get_method_docstr.format(components='sink strongly connected components')
+
+DiGraph.get_cyclic_components.__doc__ = \
+    _get_method_docstr.format(components='cyclic components')
 
 
 def _csr_matrix_indices(S):
