@@ -1,4 +1,4 @@
-Game_theory
+Game theory
 ===========
 
 .. toctree::

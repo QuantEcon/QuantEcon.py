@@ -272,9 +272,12 @@ def model_tool():
 
     for f_name in ("game_theory", "markov", "random", "tools", "util"):
         with open(source_join(f_name + ".rst"), "w") as f:
+            m_name = f_name
+            if f_name == "game_theory":
+                f_name = "Game Theory"                                             #Produce Nicer Title for Game Theory Module
             temp = split_file_template.format(name=f_name.capitalize(),
                                               equals="="*len(f_name),
-                                              files=toc_tree_list[f_name])
+                                              files=toc_tree_list[m_name])
             f.write(temp)
 
 if __name__ == '__main__':
