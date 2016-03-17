@@ -252,7 +252,7 @@ class MarkovChain(object):
         return self.digraph.sink_strongly_connected_components
 
     def get_recurrent_classes(self, return_values):
-        return self.digraph.sink_strongly_connected_components(
+        return self.digraph.get_sink_strongly_connected_components(
             return_labels=return_values
         )
 
@@ -293,7 +293,9 @@ class MarkovChain(object):
                 'Not defined for a reducible Markov chain'
             )
         else:
-            return self.digraph.cyclic_components(return_labels=return_values)
+            return self.digraph.get_cyclic_components(
+                return_labels=return_values
+            )
 
     def _compute_stationary(self):
         """
@@ -444,7 +446,7 @@ class MarkovChain(object):
             )
 
         # Annotate states
-        if self.state_values is not None:
+        if return_values and (self.state_values is not None):
             X = self.state_values[X]
 
         if dim == 1:
