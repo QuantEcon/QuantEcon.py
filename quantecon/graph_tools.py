@@ -98,9 +98,8 @@ class DiGraph(object):
 
         self.n = n  # Number of nodes
 
-        self._node_labels = None
-        if node_labels is not None:
-            self.node_labels = node_labels
+        # Call the setter method
+        self.node_labels = node_labels
 
         self._num_scc = None
         self._scc_proj = None
@@ -120,9 +119,12 @@ class DiGraph(object):
 
     @node_labels.setter
     def node_labels(self, values):
-        if len(values) != self.n:
-                raise ValueError('node_labels must be of length n')
-        self._node_labels = np.asarray(values)
+        if values is None:
+            self._node_labels = None
+        else:
+            if len(values) != self.n:
+                    raise ValueError('node_labels must be of length n')
+            self._node_labels = np.asarray(values)
 
     def _find_scc(self):
         """
