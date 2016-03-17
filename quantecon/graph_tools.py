@@ -12,6 +12,16 @@ from scipy.sparse import csgraph
 from fractions import gcd
 
 
+# Decorator for get_*_components methods
+def annotate_nodes(func):
+    def new_func(self, return_labels=True):
+        list_of_components, return_labels = func(self, return_labels)
+        if return_labels and (self.node_labels is not None):
+            return [self.node_labels[c] for c in list_of_components]
+        return list_of_components
+    return new_func
+
+
 class DiGraph(object):
     r"""
     Class for a directed graph. It stores useful information about the
@@ -42,18 +52,16 @@ class DiGraph(object):
     num_strongly_connected_components : int
         The number of the strongly connected components.
 
-    strongly_connected_components : list(ndarray)
-        List of numpy arrays containing the strongly connected
-        components. Equivalent to calling the method
-        `get_strongly_connected_components`.
+    strongly_connected_components : list(ndarray(int))
+        List of numpy arrays containing the indices of the strongly
+        connected components.
 
     num_sink_strongly_connected_components : int
         The number of the sink strongly connected components.
 
-    sink_strongly_connected_components : list(ndarray)
-        List of numpy arrays containing the sink strongly connected
-        components. Equivalent to calling the method
-        `get_sink_strongly_connected_components`.
+    sink_strongly_connected_components : list(ndarray(int))
+        List of numpy arrays containing the indices of the sink strongly
+        connected components.
 
     is_aperiodic : bool
         Indicate whether the digraph is aperiodic.
@@ -62,9 +70,9 @@ class DiGraph(object):
         The period of the digraph. Defined only for a strongly connected
         digraph.
 
-    cyclic_components : list(ndarray)
-        List of numpy arrays containing the cyclic components.
-        Equivalent to calling the method `get_cyclic_components`.
+    cyclic_components : list(ndarray(int))
+        List of numpy arrays containing the indices of the cyclic
+        components.
 
     References
     ----------
@@ -195,41 +203,29 @@ class DiGraph(object):
     def num_sink_strongly_connected_components(self):
         return len(self.sink_scc_labels)
 
-    # strongly_connected_components
-    def _get_strongly_connected_components(self):
+    @property
+    def strongly_connected_components(self):
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
             return [np.where(self.scc_proj == k)[0]
                     for k in range(self.num_strongly_connected_components)]
 
-    def get_strongly_connected_components(self, return_labels=True):
-        if return_labels:
-            return self.label_nodes(self._get_strongly_connected_components())
-        return self._get_strongly_connected_components()
+    @annotate_nodes
+    def get_strongly_connected_components(self, return_labels):
+        return self.strongly_connected_components, return_labels
 
     @property
-    def strongly_connected_components(self):
-        return self.get_strongly_connected_components()
-
-    # sink_strongly_connected_components
-    def _get_sink_strongly_connected_components(self):
+    def sink_strongly_connected_components(self):
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
             return [np.where(self.scc_proj == k)[0]
                     for k in self.sink_scc_labels.tolist()]
 
-    def get_sink_strongly_connected_components(self, return_labels=True):
-        if return_labels:
-            return self.label_nodes(
-                self._get_sink_strongly_connected_components()
-            )
-        return self._get_sink_strongly_connected_components()
-
-    @property
-    def sink_strongly_connected_components(self):
-        return self.get_sink_strongly_connected_components()
+    @annotate_nodes
+    def get_sink_strongly_connected_components(self, return_labels):
+        return self.sink_strongly_connected_components, return_labels
 
     def _compute_period(self):
         """
@@ -301,22 +297,17 @@ class DiGraph(object):
     def is_aperiodic(self):
         return (self.period == 1)
 
-    # cyclic_components
-    def _get_cyclic_components(self):
+    @property
+    def cyclic_components(self):
         if self.is_aperiodic:
             return [np.arange(self.n)]
         else:
             return [np.where(self._cyclic_components_proj == k)[0]
                     for k in range(self.period)]
 
-    def get_cyclic_components(self, return_labels=True):
-        if return_labels:
-            return self.label_nodes(self._get_cyclic_components())
-        return self._get_cyclic_components()
-
-    @property
-    def cyclic_components(self):
-        return self.get_cyclic_components()
+    @annotate_nodes
+    def get_cyclic_components(self, return_labels):
+        return self.cyclic_components, return_labels
 
     def subgraph(self, nodes):
         """
