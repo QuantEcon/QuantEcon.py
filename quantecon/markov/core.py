@@ -108,6 +108,11 @@ class MarkovChain(object):
     P : array_like or scipy sparse matrix (float, ndim=2)
         The transition matrix.  Must be of shape n x n.
 
+    state_values : array_like(ndim=1, default=None)
+        Array_like of length n containing the values associated with
+        each states. If None, the values default to integers 0 through
+        n-1.
+
     Attributes
     ----------
     P : ndarray or scipy.sparse.csr_matrix (float, ndim=2)
@@ -149,7 +154,7 @@ class MarkovChain(object):
 
     """
 
-    def __init__(self, P):
+    def __init__(self, P, state_values=None):
         if sparse.issparse(P):  # Sparse matrix
             self.P = sparse.csr_matrix(P)
             self.is_sparse = True
@@ -180,6 +185,9 @@ class MarkovChain(object):
         if not np.allclose(row_sums, np.ones(self.n)):
             raise ValueError('The rows of P must sum to 1')
 
+        # Call the setter method
+        self._state_values = state_values
+
         # To analyze the structure of P as a directed graph
         self._digraph = None
 
@@ -200,9 +208,22 @@ class MarkovChain(object):
         return str(self.__repr__)
 
     @property
+    def state_values(self):
+        return self._state_values
+
+    @state_values.setter
+    def state_values(self, values):
+        if values is None:
+            self._state_values = None
+        else:
+            if len(values) != self.n:
+                    raise ValueError('state_values must be of length n')
+            self._state_values = np.asarray(values)
+
+    @property
     def digraph(self):
         if self._digraph is None:
-            self._digraph = DiGraph(self.P)
+            self._digraph = DiGraph(self.P, node_labels=self.state_values)
         return self._digraph
 
     @property
@@ -217,6 +238,11 @@ class MarkovChain(object):
     def communication_classes(self):
         return self.digraph.strongly_connected_components
 
+    def get_communication_classes(self, return_values):
+        return self.digraph.get_strongly_connected_components(
+            return_labels=return_values
+        )
+
     @property
     def num_recurrent_classes(self):
         return self.digraph.num_sink_strongly_connected_components
@@ -224,6 +250,11 @@ class MarkovChain(object):
     @property
     def recurrent_classes(self):
         return self.digraph.sink_strongly_connected_components
+
+    def get_recurrent_classes(self, return_values):
+        return self.digraph.sink_strongly_connected_components(
+            return_labels=return_values
+        )
 
     @property
     def is_aperiodic(self):
@@ -255,6 +286,14 @@ class MarkovChain(object):
             )
         else:
             return self.digraph.cyclic_components
+
+    def get_cyclic_classes(self, return_values):
+        if not self.is_irreducible:
+            raise NotImplementedError(
+                'Not defined for a reducible Markov chain'
+            )
+        else:
+            return self.digraph.cyclic_components(return_labels=return_values)
 
     def _compute_stationary(self):
         """
@@ -311,7 +350,8 @@ class MarkovChain(object):
             self._cdfs1d = cdfs1d
         return self._cdfs1d
 
-    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
+    def simulate(self, ts_length, init=None, num_reps=None, return_values=True,
+                 random_state=None):
         """
         Simulate time series of state transitions.
 
@@ -328,6 +368,9 @@ class MarkovChain(object):
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
+        return_values : bool(optional, default=True)
+            Whether to annotate the returned states with state_values.
+
         random_state : scalar(int) or np.random.RandomState,
                        optional(default=None)
             Random seed (integer) or np.random.RandomState instance to
@@ -337,13 +380,15 @@ class MarkovChain(object):
 
         Returns
         -------
-        X : ndarray(int, ndim=1 or 2)
+        X : ndarray(ndim=1 or 2)
             Array containing the sample path(s), of shape (ts_length,)
             if init is a scalar (integer) or None and num_reps is None;
             of shape (k, ts_length) otherwise, where k = len(init) if
             (init, num_reps) = (array, None), k = num_reps if (init,
             num_reps) = (int or None, int), and k = len(init)*num_reps
-            if (init, num_reps) = (array, int).
+            if (init, num_reps) = (array, int). If return_values=True,
+            and if state_values is not None, the array elements are the
+            state values, and the state indices (integers) otherwise.
 
         """
         random_state = check_random_state(random_state)
@@ -397,6 +442,10 @@ class MarkovChain(object):
                 self.cdfs1d, self.P.indices, self.P.indptr, init_states,
                 random_values, out=X
             )
+
+        # Annotate states
+        if self.state_values is not None:
+            X = self.state_values[X]
 
         if dim == 1:
             return X[0]
@@ -488,6 +537,34 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
 if numba_installed:
     _generate_sample_paths_sparse = \
         jit(nopython=True)(_generate_sample_paths_sparse)
+
+
+_get_method_docstr = \
+"""
+Return a list of numpy arrays containing the {classes}.
+
+Parameters
+----------
+return_values : bool(optional, default=True)
+    Whether to annotate the returned states with `state_values`.
+
+Returns
+-------
+list(ndarray)
+    If `return_values=True`, and if `state_values` is not None,
+    each ndarray contains the state values, and the state indices
+    (integers) otherwise.
+
+"""
+
+MarkovChain.get_communication_classes.__doc__ = \
+    _get_method_docstr.format(classes='communication classes')
+
+MarkovChain.get_recurrent_classes.__doc__ = \
+    _get_method_docstr.format(classes='recurrent classes')
+
+MarkovChain.get_cyclic_classes.__doc__ = \
+    _get_method_docstr.format(classes='cyclic classes')
 
 
 def mc_compute_stationary(P):
