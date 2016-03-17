@@ -1,5 +1,5 @@
 """
-Tests for mc_tools.py
+Tests for markov/core.py
 
 Functions
 ---------
@@ -379,6 +379,83 @@ def test_mc_sample_path_lln():
     frequency_1 = mc_sample_path(P, init=init, sample_size=sample_size,
                                  random_state=seed).mean()
     ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
+
+
+class TestMCStateValues:
+    def setUp(self):
+        self.state_values = np.array([[0, 1], [2, 3], [4, 5]])
+
+        self.mc_reducible_dict = {
+            'mc': MarkovChain([[1, 0, 0], [1, 0, 0], [0, 0, 1]],
+                              state_values=self.state_values),
+            'coms': [[0], [1], [2]],
+            'recs': [[0], [2]]
+        }
+
+        self.mc_periodic_dict = {
+            'mc': MarkovChain([[0, 1, 0], [0, 0, 1], [1, 0, 0]],
+                              state_values=self.state_values),
+            'cycs': [[0], [1], [2]]
+        }
+
+    def test_com_rec_classes(self):
+        mc = self.mc_reducible_dict['mc']
+        coms = self.mc_reducible_dict['coms']
+        recs = self.mc_reducible_dict['recs']
+        methods = ['get_communication_classes',
+                   'get_recurrent_classes']
+        for method, classes_ind in zip(methods, [coms, recs]):
+            for return_values in [True, False]:
+                if return_values:
+                    classes = [self.state_values[i] for i in classes_ind]
+                    key = lambda x: x[0, 0]
+                else:
+                    classes = classes_ind
+                    key = lambda x: x[0]
+                list_of_array_equal(
+                    sorted(getattr(mc, method)(return_values), key=key),
+                    sorted(classes, key=key)
+                )
+
+    def test_cyc_classes(self):
+        mc = self.mc_periodic_dict['mc']
+        cycs = self.mc_periodic_dict['cycs']
+        methods = ['get_cyclic_classes']
+        for method, classes_ind in zip(methods, [cycs]):
+            for return_values in [True, False]:
+                if return_values:
+                    classes = [self.state_values[i] for i in classes_ind]
+                    key = lambda x: x[0, 0]
+                else:
+                    classes = classes_ind
+                    key = lambda x: x[0]
+                list_of_array_equal(
+                    sorted(getattr(mc, method)(return_values), key=key),
+                    sorted(classes, key=key)
+                )
+
+    def test_simulate(self):
+        # Deterministic mc
+        mc = self.mc_periodic_dict['mc']
+        ts_length = 6
+
+        init = 0
+        for return_values in [True, False]:
+            X = mc.simulate(ts_length, init=init, return_values=return_values)
+            X_expected = np.arange(init, init+ts_length)%mc.n
+            if return_values:
+                X_expected = self.state_values[X_expected]
+            assert_array_equal(X, X_expected)
+
+        inits = [1, 2]
+        for return_values in [True, False]:
+            X = mc.simulate(ts_length, init=inits, return_values=return_values)
+            X_expected = np.array(
+                [np.arange(init, init+ts_length)%mc.n for init in inits]
+            )
+            if return_values:
+                X_expected = self.state_values[X_expected]
+            assert_array_equal(X, X_expected)
 
 
 @raises(ValueError)
