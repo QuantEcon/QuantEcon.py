@@ -124,11 +124,6 @@ class DiGraph(object):
                 raise ValueError('node_labels must be of length n')
         self._node_labels = np.asarray(values)
 
-    def label_nodes(self, list_of_components):
-        if self.node_labels is not None:
-            return [self.node_labels[c] for c in list_of_components]
-        return list_of_components
-
     def _find_scc(self):
         """
         Set ``self._num_scc`` and ``self._scc_proj``
