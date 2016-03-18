@@ -109,6 +109,7 @@ Programming, Wiley-Interscience, 2005.
 
 """
 from __future__ import division
+import warnings
 import numpy as np
 import scipy.sparse as sp
 
@@ -165,7 +166,7 @@ class DiscreteDP(object):
         Transition probability array.
 
     beta : scalar(float)
-        Discount factor. Must be 0 <= beta < 1.
+        Discount factor. Must be in [0, 1].
 
     s_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the states.
@@ -189,6 +190,13 @@ class DiscreteDP(object):
 
     max_iter : scalar(int), default=250
         Default value for the maximum number of iterations.
+
+    Notes
+    -----
+    DiscreteDP accepts beta=1 for convenience. In this case, infinite
+    horizon solution methods are disabled, and the instance is then seen
+    as merely an object carrying the Bellman operator, which may be used
+    for backward induction for finite horizon problems.
 
     Examples
     --------
@@ -401,8 +409,12 @@ class DiscreteDP(object):
         # Check that for every state, at least one action is feasible
         self._check_action_feasibility()
 
-        if not (0 <= beta < 1):
-            raise ValueError('beta must be in [0, 1)')
+        if not (0 <= beta <= 1):
+            raise ValueError('beta must be in [0, 1]')
+        if beta == 1:
+            msg = 'infinite horizon solution methods are disabled with beta=1'
+            warnings.warn(msg)
+            self._error_msg_no_discounting = 'method invalid for beta=1'
         self.beta = beta
 
         self.epsilon = 1e-3
@@ -561,6 +573,9 @@ class DiscreteDP(object):
             Value vector of `sigma`, of length n.
 
         """
+        if self.beta == 1:
+            raise NotImplementedError(self._error_msg_no_discounting)
+
         # Solve (I - beta * Q_sigma) v = R_sigma for v
         R_sigma, Q_sigma = self.RQ_sigma(sigma)
         b = R_sigma
@@ -678,6 +693,9 @@ class DiscreteDP(object):
         `solve` method.
 
         """
+        if self.beta == 1:
+            raise NotImplementedError(self._error_msg_no_discounting)
+
         if max_iter is None:
             max_iter = self.max_iter
         if epsilon is None:
@@ -718,6 +736,9 @@ class DiscreteDP(object):
         `solve` method.
 
         """
+        if self.beta == 1:
+            raise NotImplementedError(self._error_msg_no_discounting)
+
         if max_iter is None:
             max_iter = self.max_iter
 
@@ -755,6 +776,9 @@ class DiscreteDP(object):
         the `solve` method.
 
         """
+        if self.beta == 1:
+            raise NotImplementedError(self._error_msg_no_discounting)
+
         if max_iter is None:
             max_iter = self.max_iter
         if epsilon is None:
