@@ -395,27 +395,30 @@ class TestMCStateValues:
         self.mc_periodic_dict = {
             'mc': MarkovChain([[0, 1, 0], [0, 0, 1], [1, 0, 0]],
                               state_values=self.state_values),
+            'coms': [[0, 1, 2]],
+            'recs': [[0, 1, 2]],
             'cycs': [[0], [1], [2]]
         }
 
     def test_com_rec_classes(self):
-        mc = self.mc_reducible_dict['mc']
-        coms = self.mc_reducible_dict['coms']
-        recs = self.mc_reducible_dict['recs']
-        methods = ['get_communication_classes',
-                   'get_recurrent_classes']
-        for method, classes_ind in zip(methods, [coms, recs]):
-            for return_values in [True, False]:
-                if return_values:
-                    classes = [self.state_values[i] for i in classes_ind]
-                    key = lambda x: x[0, 0]
-                else:
-                    classes = classes_ind
-                    key = lambda x: x[0]
-                list_of_array_equal(
-                    sorted(getattr(mc, method)(return_values), key=key),
-                    sorted(classes, key=key)
-                )
+        for mc_dict in [self.mc_reducible_dict, self.mc_periodic_dict]:
+            mc = mc_dict['mc']
+            coms = mc_dict['coms']
+            recs = mc_dict['recs']
+            methods = ['get_communication_classes',
+                       'get_recurrent_classes']
+            for method, classes_ind in zip(methods, [coms, recs]):
+                for return_values in [True, False]:
+                    if return_values:
+                        classes = [self.state_values[i] for i in classes_ind]
+                        key = lambda x: x[0, 0]
+                    else:
+                        classes = classes_ind
+                        key = lambda x: x[0]
+                    list_of_array_equal(
+                        sorted(getattr(mc, method)(return_values), key=key),
+                        sorted(classes, key=key)
+                    )
 
     def test_cyc_classes(self):
         mc = self.mc_periodic_dict['mc']
