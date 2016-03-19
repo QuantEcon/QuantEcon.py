@@ -186,7 +186,7 @@ class MarkovChain(object):
             raise ValueError('The rows of P must sum to 1')
 
         # Call the setter method
-        self._state_values = state_values
+        self.state_values = state_values
 
         # To analyze the structure of P as a directed graph
         self._digraph = None

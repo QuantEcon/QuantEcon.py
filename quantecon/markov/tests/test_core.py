@@ -383,18 +383,19 @@ def test_mc_sample_path_lln():
 
 class TestMCStateValues:
     def setUp(self):
-        self.state_values = np.array([[0, 1], [2, 3], [4, 5]])
+        state_values = [[0, 1], [2, 3], [4, 5]]  # Pass python list
+        self.state_values = np.array(state_values)
 
         self.mc_reducible_dict = {
             'mc': MarkovChain([[1, 0, 0], [1, 0, 0], [0, 0, 1]],
-                              state_values=self.state_values),
+                              state_values=state_values),
             'coms': [[0], [1], [2]],
             'recs': [[0], [2]]
         }
 
         self.mc_periodic_dict = {
             'mc': MarkovChain([[0, 1, 0], [0, 0, 1], [1, 0, 0]],
-                              state_values=self.state_values),
+                              state_values=state_values),
             'coms': [[0, 1, 2]],
             'recs': [[0, 1, 2]],
             'cycs': [[0], [1], [2]]
