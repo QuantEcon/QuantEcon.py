@@ -86,14 +86,14 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 """
 from __future__ import division
 import numbers
+from fractions import gcd
 import numpy as np
 from scipy import sparse
-from fractions import gcd
+from numba import jit
+
 from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
-
-# -Check if Numba is Available- #
-from ..util import searchsorted, check_random_state, numba_installed, jit
+from ..util import searchsorted, check_random_state
 
 
 class MarkovChain(object):
@@ -455,6 +455,7 @@ class MarkovChain(object):
             return X
 
 
+@jit(nopython=True)
 def _generate_sample_paths(P_cdfs, init_states, random_values, out):
     """
     Generate num_reps sample paths of length ts_length, where num_reps =
@@ -478,7 +479,7 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
 
     Notes
     -----
-    This routine is jit-complied if the module Numba is vailable.
+    This routine is jit-complied by Numba.
 
     """
     num_reps, ts_length = out.shape
@@ -488,10 +489,8 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
         for t in range(ts_length-1):
             out[i, t+1] = searchsorted(P_cdfs[out[i, t]], random_values[i, t])
 
-if numba_installed:
-    _generate_sample_paths = jit(nopython=True)(_generate_sample_paths)
 
-
+@jit(nopython=True)
 def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
                                   random_values, out):
     """
@@ -524,7 +523,7 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
 
     Notes
     -----
-    This routine is jit-complied if the module Numba is vailable.
+    This routine is jit-complied by Numba.
 
     """
     num_reps, ts_length = out.shape
@@ -535,10 +534,6 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
             k = searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
                              random_values[i, t])
             out[i, t+1] = indices[indptr[out[i, t]]+k]
-
-if numba_installed:
-    _generate_sample_paths_sparse = \
-        jit(nopython=True)(_generate_sample_paths_sparse)
 
 
 _get_method_docstr = \
