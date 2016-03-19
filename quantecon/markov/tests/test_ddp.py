@@ -213,6 +213,30 @@ def test_ddp_no_feasibile_action_error():
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
 
 
+def test_ddp_beta_1_not_implemented_error():
+    n, m = 3, 2
+    R = np.array([[0, 1], [1, 0], [0, 1]])
+    Q = np.empty((n, m, n))
+    Q[:] = 1/n
+    beta = 1
+
+    ddp0 = DiscreteDP(R, Q, beta)
+    s_indices, a_indices = np.where(R > -np.inf)
+    R_sa = R[s_indices, a_indices]
+    Q_sa = Q[s_indices, a_indices]
+    ddp1 = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
+    Q_sa_sp = sparse.csr_matrix(Q_sa)
+    ddp2 = DiscreteDP(R_sa, Q_sa_sp, beta, s_indices, a_indices)
+
+    solution_methods = \
+        ['value_iteration', 'policy_iteration', 'modified_policy_iteration']
+
+    for ddp in [ddp0, ddp1, ddp2]:
+        assert_raises(NotImplementedError, ddp.evaluate_policy, np.zeros(n))
+        for method in solution_methods:
+            assert_raises(NotImplementedError, getattr(ddp, method))
+
+
 if __name__ == '__main__':
     import sys
     import nose
