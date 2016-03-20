@@ -420,6 +420,14 @@ class TestMCStateValues:
                         sorted(getattr(mc, method)(return_values), key=key),
                         sorted(classes, key=key)
                     )
+                # Check that the default of return_values is True
+                classes = [self.state_values[i] for i in classes_ind]
+                key = lambda x: x[0, 0]
+                list_of_array_equal(
+                    sorted(getattr(mc, method)(), key=key),
+                    sorted(classes, key=key)
+                )
+
 
     def test_cyc_classes(self):
         mc = self.mc_periodic_dict['mc']
@@ -437,6 +445,14 @@ class TestMCStateValues:
                     sorted(getattr(mc, method)(return_values), key=key),
                     sorted(classes, key=key)
                 )
+            # Check that the default of return_values is True
+            classes = [self.state_values[i] for i in classes_ind]
+            key = lambda x: x[0, 0]
+            list_of_array_equal(
+                sorted(getattr(mc, method)(), key=key),
+                sorted(classes, key=key)
+            )
+
 
     def test_simulate(self):
         # Deterministic mc

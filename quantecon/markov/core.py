@@ -238,7 +238,7 @@ class MarkovChain(object):
     def communication_classes(self):
         return self.digraph.strongly_connected_components
 
-    def get_communication_classes(self, return_values):
+    def get_communication_classes(self, return_values=True):
         return self.digraph.get_strongly_connected_components(
             return_labels=return_values
         )
@@ -251,7 +251,7 @@ class MarkovChain(object):
     def recurrent_classes(self):
         return self.digraph.sink_strongly_connected_components
 
-    def get_recurrent_classes(self, return_values):
+    def get_recurrent_classes(self, return_values=True):
         return self.digraph.get_sink_strongly_connected_components(
             return_labels=return_values
         )
@@ -287,7 +287,7 @@ class MarkovChain(object):
         else:
             return self.digraph.cyclic_components
 
-    def get_cyclic_classes(self, return_values):
+    def get_cyclic_classes(self, return_values=True):
         if not self.is_irreducible:
             raise NotImplementedError(
                 'Not defined for a reducible Markov chain'
