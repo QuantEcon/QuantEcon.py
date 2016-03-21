@@ -896,7 +896,6 @@ class DPSolveResult(dict):
     def __dir__(self):
         return self.keys()
 
-
 def backward_induction(ddp, T, v_term=None):
     r"""
     Solve by backward induction a :math:`T`-period finite horizon
