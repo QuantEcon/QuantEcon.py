@@ -111,10 +111,9 @@ Programming, Wiley-Interscience, 2005.
 from __future__ import division
 import numpy as np
 import scipy.sparse as sp
+from numba import jit
 
 from .core import MarkovChain
-from ..util import numba_installed, jit
-
 
 class DiscreteDP(object):
     r"""
@@ -873,6 +872,7 @@ class DPSolveResult(dict):
         return self.keys()
 
 
+@jit(nopython=True)
 def _s_wise_max_argmax(a_indices, a_indptr, vals, out_max, out_argmax):
     n = len(out_max)
     for i in range(n):
@@ -884,10 +884,8 @@ def _s_wise_max_argmax(a_indices, a_indptr, vals, out_max, out_argmax):
             out_max[i] = vals[m]
             out_argmax[i] = a_indices[m]
 
-if numba_installed:
-    _s_wise_max_argmax = jit(nopython=True)(_s_wise_max_argmax)
 
-
+@jit(nopython=True)
 def _s_wise_max(a_indices, a_indptr, vals, out_max):
     n = len(out_max)
     for i in range(n):
@@ -898,19 +896,14 @@ def _s_wise_max(a_indices, a_indptr, vals, out_max):
                     m = j
             out_max[i] = vals[m]
 
-if numba_installed:
-    _s_wise_max = jit(nopython=True)(_s_wise_max)
 
-
+@jit(nopython=True)
 def _find_indices(a_indices, a_indptr, sigma, out):
     n = len(sigma)
     for i in range(n):
         for j in range(a_indptr[i], a_indptr[i+1]):
             if sigma[i] == a_indices[j]:
                 out[i] = j
-
-if numba_installed:
-    _find_indices = jit(nopython=True)(_find_indices)
 
 
 @jit(nopython=True)
