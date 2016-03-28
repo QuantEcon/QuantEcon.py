@@ -37,9 +37,10 @@ class DiGraph(object):
     weighted : bool, optional(default=False)
         Whether to treat `adj_matrix` as a weighted adjacency matrix.
 
-    node_labels : array_like(ndim=1, default=None)
-        Array_like of length n containing the label associated with each
-        node. If None, the labels default to integers 0 through n-1.
+    node_labels : array_like(default=None)
+        Array_like of length n containing the labels associated with the
+        states, which must be homogeneous in type. If None, the labels
+        default to integers 0 through n-1.
 
     Attributes
     ----------
@@ -122,9 +123,16 @@ class DiGraph(object):
         if values is None:
             self._node_labels = None
         else:
-            if len(values) != self.n:
-                    raise ValueError('node_labels must be of length n')
-            self._node_labels = np.asarray(values)
+            values = np.asarray(values)
+            if (values.ndim < 1) or (values.shape[0] != self.n):
+                raise ValueError(
+                    'node_labels must be an array_like of length n'
+                )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in node_labels must be homogeneous in type'
+                )
+            self._node_labels = values
 
     def _find_scc(self):
         """

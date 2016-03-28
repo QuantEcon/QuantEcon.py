@@ -108,10 +108,10 @@ class MarkovChain(object):
     P : array_like or scipy sparse matrix (float, ndim=2)
         The transition matrix.  Must be of shape n x n.
 
-    state_values : array_like(ndim=1, default=None)
-        Array_like of length n containing the values associated with
-        each states. If None, the values default to integers 0 through
-        n-1.
+    state_values : array_like(default=None)
+        Array_like of length n containing the values associated with the
+        states, which must be homogeneous in type. If None, the values
+        default to integers 0 through n-1.
 
     Attributes
     ----------
@@ -216,9 +216,16 @@ class MarkovChain(object):
         if values is None:
             self._state_values = None
         else:
-            if len(values) != self.n:
-                    raise ValueError('state_values must be of length n')
-            self._state_values = np.asarray(values)
+            values = np.asarray(values)
+            if (values.ndim < 1) or (values.shape[0] != self.n):
+                raise ValueError(
+                    'state_values must be an array_like of length n'
+                )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in state_values must be homogeneous in type'
+                )
+            self._state_values = values
 
     @property
     def digraph(self):

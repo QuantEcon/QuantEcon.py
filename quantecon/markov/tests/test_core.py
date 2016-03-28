@@ -517,6 +517,12 @@ def test_raises_value_error_simulate_init_out_of_range():
     assert_raises(ValueError, mc.simulate, ts_length, init=[0, -(n+1)])
 
 
+def test_raises_non_homogeneous_state_values():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    state_values = [(0, 1), 2]
+    assert_raises(ValueError, MarkovChain, P, state_values=state_values)
+
+
 if __name__ == '__main__':
     import sys
     import nose

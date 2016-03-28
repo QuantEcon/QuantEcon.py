@@ -7,7 +7,7 @@ Tests for graph_tools.py
 """
 import sys
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_raises
 import nose
 from nose.tools import eq_, ok_, raises
 
@@ -286,6 +286,12 @@ def test_node_labels_subgraph():
 def test_raises_value_error_non_sym():
     """Test with non symmetric input"""
     g = DiGraph(np.array([[0.4, 0.6]]))
+
+
+def test_raises_non_homogeneous_node_labels():
+    adj_matrix = [[1, 0], [0, 1]]
+    node_labels = [(0, 1), 2]
+    assert_raises(ValueError, DiGraph, adj_matrix, node_labels=node_labels)
 
 
 if __name__ == '__main__':
