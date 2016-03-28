@@ -227,6 +227,44 @@ class MarkovChain(object):
                 )
             self._state_values = values
 
+    def get_index(self, value):
+        """
+        Return the index of the given value in state_values.
+
+        Parameters
+        ----------
+        value
+            Value to get the index for.
+
+        Returns
+        -------
+        idx : int
+            Index of the value.
+
+        """
+        error_msg = 'value {0} not found'.format(repr(value))
+
+        if self.state_values is None:
+            if isinstance(value, numbers.Integral) and (0 <= value < self.n):
+                return value
+            else:
+                raise ValueError(error_msg)
+
+        # if self.state_values is not None:
+        if self.state_values.ndim == 1:
+            try:
+                idx = np.where(self.state_values == value)[0][0]
+                return idx
+            except IndexError:
+                raise ValueError(error_msg)
+        else:
+            idx = 0
+            while idx < self.n:
+                if np.array_equal(self.state_values[idx], value):
+                    return idx
+                idx += 1
+            raise ValueError(error_msg)
+
     @property
     def digraph(self):
         if self._digraph is None:

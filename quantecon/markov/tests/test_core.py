@@ -428,7 +428,6 @@ class TestMCStateValues:
                     sorted(classes, key=key)
                 )
 
-
     def test_cyc_classes(self):
         mc = self.mc_periodic_dict['mc']
         cycs = self.mc_periodic_dict['cycs']
@@ -453,7 +452,6 @@ class TestMCStateValues:
                 sorted(classes, key=key)
             )
 
-
     def test_simulate(self):
         # Deterministic mc
         mc = self.mc_periodic_dict['mc']
@@ -476,6 +474,24 @@ class TestMCStateValues:
             if return_values:
                 X_expected = self.state_values[X_expected]
             assert_array_equal(X, X_expected)
+
+
+def test_get_index():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    eq_(mc.get_index(0), 0)
+    eq_(mc.get_index(1), 1)
+    assert_raises(ValueError, mc.get_index, 2)
+
+    mc.state_values = [1, 2]
+    eq_(mc.get_index(1), 0)
+    eq_(mc.get_index(2), 1)
+    assert_raises(ValueError, mc.get_index, 0)
+
+    mc.state_values = [[1, 2], [3, 4]]
+    eq_(mc.get_index([1, 2]), 0)
+    assert_raises(ValueError, mc.get_index, 1)
 
 
 @raises(ValueError)
