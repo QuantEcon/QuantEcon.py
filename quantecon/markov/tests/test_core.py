@@ -483,15 +483,20 @@ def test_get_index():
     eq_(mc.get_index(0), 0)
     eq_(mc.get_index(1), 1)
     assert_raises(ValueError, mc.get_index, 2)
+    assert_array_equal(mc.get_index([1, 0]), [1, 0])
+    assert_raises(ValueError, mc.get_index, [[1]])
 
     mc.state_values = [1, 2]
     eq_(mc.get_index(1), 0)
     eq_(mc.get_index(2), 1)
     assert_raises(ValueError, mc.get_index, 0)
+    assert_array_equal(mc.get_index([2, 1]), [1, 0])
+    assert_raises(ValueError, mc.get_index, [[1]])
 
     mc.state_values = [[1, 2], [3, 4]]
     eq_(mc.get_index([1, 2]), 0)
     assert_raises(ValueError, mc.get_index, 1)
+    assert_array_equal(mc.get_index([[3, 4], [1, 2]]), [1, 0])
 
 
 @raises(ValueError)

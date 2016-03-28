@@ -229,7 +229,43 @@ class MarkovChain(object):
 
     def get_index(self, value):
         """
-        Return the index of the given value in state_values.
+        Return the index (or indices) of the given value (or values) in
+        `state_values`.
+
+        Parameters
+        ----------
+        value
+            Value(s) to get the index (indices) for.
+
+        Returns
+        -------
+        idx : int or ndarray(int)
+            Index of `value` if `value` is a single state value; array
+            of indices if `value` is an array_like of state values.
+
+        """
+        if self.state_values is None:
+            state_values_ndim = 1
+        else:
+            state_values_ndim = self.state_values.ndim
+
+        values = np.asarray(value)
+
+        if values.ndim <= state_values_ndim - 1:
+            return self._get_index(value)
+        elif values.ndim == state_values_ndim:  # array of values
+            k = values.shape[0]
+            idx = np.empty(k, dtype=int)
+            for i in range(k):
+                idx[i] = self._get_index(values[i])
+            return idx
+        else:
+            raise ValueError('invalid value')
+
+
+    def _get_index(self, value):
+        """
+        Return the index of the given value in `state_values`.
 
         Parameters
         ----------
@@ -239,10 +275,10 @@ class MarkovChain(object):
         Returns
         -------
         idx : int
-            Index of the value.
+            Index of `value`.
 
         """
-        error_msg = 'value {0} not found'.format(repr(value))
+        error_msg = 'value {0} not found'.format(value)
 
         if self.state_values is None:
             if isinstance(value, numbers.Integral) and (0 <= value < self.n):
