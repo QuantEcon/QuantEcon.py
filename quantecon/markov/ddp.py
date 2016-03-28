@@ -897,6 +897,72 @@ class DPSolveResult(dict):
         return self.keys()
 
 
+def backward_induction(ddp, T, v_T=None):
+    r"""
+    Solve by backward induction a :math:`T`-period finite horizon
+    discrete dynamic program with stationary reward and transition
+    probability functions :math:`r` and :math:`q` and discount factor
+    :math:`\beta \in [0, 1]`.
+
+    The optimal value functions :math:`v^*_0, \ldots, v^*_T` and policy
+    functions :math:`\sigma^*_0, \ldots, \sigma^*_{T-1}` are obtained by
+    :math:`v^*_T = v_T`, and
+
+    .. math::
+
+        v^*_{t-1}(s) = \max_{a \in A(s)} r(s, a) +
+            \beta \sum_{s' \in S} q(s'|s, a) v^*_t(s')
+            \quad (s \in S)
+
+    and
+
+    .. math::
+
+        \sigma^*_{t-1}(s) \in \operatorname*{arg\,max}_{a \in A(s)}
+            r(s, a) + \beta \sum_{s' \in S} q(s'|s, a) v^*_t(s')
+            \quad (s \in S)
+
+    for :math:`t = T, \ldots, 1`, where the terminal value function
+    :math:`v_T` is exogenously given.
+
+    Parameters
+    ----------
+    ddp : DiscreteDP
+        DiscreteDP instance storing reward array `R`, transition
+        probability array `Q`, and discount factor `beta`.
+
+    T : scalar(int)
+        Number of decision periods.
+
+    v_T : array_like(float, ndim=1), optional(default=None)
+        Terminal value function, of length equal to n (the number of
+        states). If None, it defaults to the vector of zeros.
+
+    Returns
+    -------
+    vs : ndarray(float, ndim=2)
+        Array of shape (T+1, n) where `vs[t]` contains the optimal
+        value function at period `t = 0, ..., T`.
+
+    sigmas : ndarray(float, ndim=2)
+        Array of shape (T, n) where `sigmas[t]` contains the optimal
+        policy function at period `t = 0, ..., T-1`.
+
+    """
+    n = ddp.num_states
+    vs = np.empty((T+1, n))
+    sigmas = np.empty((T, n), dtype=int)
+
+    if v_T is None:
+        v_T = np.zeros(n)
+    vs[T] = v_T
+
+    for t in range(T, 0, -1):
+        ddp.bellman_operator(vs[t], Tv=vs[t-1], sigma=sigmas[t-1])
+
+    return vs, sigmas
+
+
 @jit(nopython=True)
 def _s_wise_max_argmax(a_indices, a_indptr, vals, out_max, out_argmax):
     n = len(out_max)
