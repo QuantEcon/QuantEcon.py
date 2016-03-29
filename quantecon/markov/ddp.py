@@ -40,8 +40,8 @@ respectively. The policy value function :math:`v_{\sigma}` for
 
 The *optimal value function* :math:`v^*` is the function such that
 :math:`v^*(s) = \max_{\sigma} v_{\sigma}(s)` for all :math:`s \in S`. A
-policy function :math:`\sigma^*` is *optimal* if :math:`v_{\sigma}(s) =
-v(s)` for all :math:`s \in S`.
+policy function :math:`\sigma^*` is *optimal* if :math:`v_{\sigma^*}(s)
+= v^*(s)` for all :math:`s \in S`.
 
 The *Bellman equation* is written as
 
