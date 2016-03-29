@@ -457,22 +457,24 @@ class TestMCStateValues:
         mc = self.mc_periodic_dict['mc']
         ts_length = 6
 
-        init = 0
-        for return_values in [True, False]:
-            X = mc.simulate(ts_length, init=init, return_values=return_values)
-            X_expected = np.arange(init, init+ts_length)%mc.n
-            if return_values:
-                X_expected = self.state_values[X_expected]
+        methods = ['simulate', 'simulate_values']
+
+        init_idx = 0
+        inits = [init_idx, self.state_values[init_idx]]
+        path = np.arange(init_idx, init_idx+ts_length)%mc.n
+        paths = [path, self.state_values[path]]
+        for method, init, X_expected in zip(methods, inits, paths):
+            X = getattr(mc, method)(ts_length, init)
             assert_array_equal(X, X_expected)
 
-        inits = [1, 2]
-        for return_values in [True, False]:
-            X = mc.simulate(ts_length, init=inits, return_values=return_values)
-            X_expected = np.array(
-                [np.arange(init, init+ts_length)%mc.n for init in inits]
-            )
-            if return_values:
-                X_expected = self.state_values[X_expected]
+        init_idx = [1, 2]
+        inits = [init_idx, self.state_values[init_idx]]
+        path = np.array(
+            [np.arange(i, i+ts_length)%mc.n for i in init_idx]
+        )
+        paths = [path, self.state_values[path]]
+        for method, init, X_expected in zip(methods, inits, paths):
+            X = getattr(mc, method)(ts_length, init)
             assert_array_equal(X, X_expected)
 
 

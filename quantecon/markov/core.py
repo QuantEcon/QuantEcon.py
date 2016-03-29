@@ -433,8 +433,7 @@ class MarkovChain(object):
             self._cdfs1d = cdfs1d
         return self._cdfs1d
 
-    def simulate(self, ts_length, init=None, num_reps=None, return_values=True,
-                 random_state=None):
+    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
         """
         Simulate time series of state transitions.
 
@@ -451,9 +450,6 @@ class MarkovChain(object):
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        return_values : bool(optional, default=True)
-            Whether to annotate the returned states with state_values.
-
         random_state : scalar(int) or np.random.RandomState,
                        optional(default=None)
             Random seed (integer) or np.random.RandomState instance to
@@ -469,9 +465,7 @@ class MarkovChain(object):
             of shape (k, ts_length) otherwise, where k = len(init) if
             (init, num_reps) = (array, None), k = num_reps if (init,
             num_reps) = (int or None, int), and k = len(init)*num_reps
-            if (init, num_reps) = (array, int). If return_values=True,
-            and if state_values is not None, the array elements are the
-            state values, and the state indices (integers) otherwise.
+            if (init, num_reps) = (array, int).
 
         """
         random_state = check_random_state(random_state)
@@ -526,14 +520,52 @@ class MarkovChain(object):
                 random_values, out=X
             )
 
-        # Annotate states
-        if return_values and (self.state_values is not None):
-            X = self.state_values[X]
-
         if dim == 1:
             return X[0]
         else:
             return X
+
+    def simulate_values(self, ts_length, init_value=None, num_reps=None,
+                        random_state=None):
+        """
+        Simulate time series of state transitions, but return the values
+        in `state_values` instead of the state indices.
+
+        Parameters
+        ----------
+        ts_length : scalar(int)
+            Length of each simulation.
+
+        init_value : scalar or array_like, optional(default=None)
+            Initial state values(s). If None, the initial state is
+            randomly drawn.
+
+        num_reps : scalar(int), optional(default=None)
+            Number of repetitions of simulation.
+
+        random_state : scalar(int) or np.random.RandomState,
+                       optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to
+            set the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState
+            is used.
+
+        Returns
+        -------
+        X : ndarray(ndim=1 or 2)
+            Array containing the state values of the sample path(s). See
+            the `simulate` method for more information.
+
+        """
+        init_idx = self.get_index(init_value)
+        X = self.simulate(ts_length, init=init_idx, num_reps=num_reps,
+                          random_state=random_state)
+
+        # Annotate states
+        if self.state_values is not None:
+            X = self.state_values[X]
+
+        return X
 
 
 @jit(nopython=True)
