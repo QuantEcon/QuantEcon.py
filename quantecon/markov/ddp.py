@@ -944,7 +944,7 @@ def backward_induction(ddp, T, v_T=None):
         Array of shape (T+1, n) where `vs[t]` contains the optimal
         value function at period `t = 0, ..., T`.
 
-    sigmas : ndarray(float, ndim=2)
+    sigmas : ndarray(int, ndim=2)
         Array of shape (T, n) where `sigmas[t]` contains the optimal
         policy function at period `t = 0, ..., T-1`.
 
