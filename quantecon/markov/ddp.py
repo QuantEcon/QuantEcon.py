@@ -897,7 +897,7 @@ class DPSolveResult(dict):
         return self.keys()
 
 
-def backward_induction(ddp, T, v_T=None):
+def backward_induction(ddp, T, v_term=None):
     r"""
     Solve by backward induction a :math:`T`-period finite horizon
     discrete dynamic program with stationary reward and transition
@@ -934,7 +934,7 @@ def backward_induction(ddp, T, v_T=None):
     T : scalar(int)
         Number of decision periods.
 
-    v_T : array_like(float, ndim=1), optional(default=None)
+    v_term : array_like(float, ndim=1), optional(default=None)
         Terminal value function, of length equal to n (the number of
         states). If None, it defaults to the vector of zeros.
 
@@ -953,9 +953,9 @@ def backward_induction(ddp, T, v_T=None):
     vs = np.empty((T+1, n))
     sigmas = np.empty((T, n), dtype=int)
 
-    if v_T is None:
-        v_T = np.zeros(n)
-    vs[T, :] = v_T
+    if v_term is None:
+        v_term = np.zeros(n)
+    vs[T, :] = v_term
 
     for t in range(T, 0, -1):
         ddp.bellman_operator(vs[t, :], Tv=vs[t-1, :], sigma=sigmas[t-1, :])
