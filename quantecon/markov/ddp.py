@@ -955,10 +955,10 @@ def backward_induction(ddp, T, v_T=None):
 
     if v_T is None:
         v_T = np.zeros(n)
-    vs[T] = v_T
+    vs[T, :] = v_T
 
     for t in range(T, 0, -1):
-        ddp.bellman_operator(vs[t], Tv=vs[t-1], sigma=sigmas[t-1])
+        ddp.bellman_operator(vs[t, :], Tv=vs[t-1, :], sigma=sigmas[t-1, :])
 
     return vs, sigmas
 
