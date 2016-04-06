@@ -12,7 +12,7 @@ import scipy.sparse as sparse
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
 from nose.tools import eq_, ok_
 
-from quantecon.markov import DiscreteDP
+from quantecon.markov import DiscreteDP, backward_induction
 
 
 class TestDiscreteDP:
@@ -177,6 +177,43 @@ def test_ddp_sorting():
         assert_array_equal(ddp_Q, Q)
 
 
+class TestFiniteHorizon:
+    def setUp(self):
+        # From Puterman 2005, Section 3.2, Section 4.6.1
+        # "single-product stochastic inventory control"
+        s_indices = [0, 0, 0, 0, 1, 1, 1, 2, 2, 3]
+        a_indices = [0, 1, 2, 3, 0, 1, 2, 0, 1, 0]
+        R = [ 0., -1., -2., -5.,  5.,  0., -3.,  6., -1.,  5.]
+        Q = [[ 1.  ,  0.  ,  0.  ,  0.  ],
+             [ 0.75,  0.25,  0.  ,  0.  ],
+             [ 0.25,  0.5 ,  0.25,  0.  ],
+             [ 0.  ,  0.25,  0.5 ,  0.25],
+             [ 0.75,  0.25,  0.  ,  0.  ],
+             [ 0.25,  0.5 ,  0.25,  0.  ],
+             [ 0.  ,  0.25,  0.5 ,  0.25],
+             [ 0.25,  0.5 ,  0.25,  0.  ],
+             [ 0.  ,  0.25,  0.5 ,  0.25],
+             [ 0.  ,  0.25,  0.5 ,  0.25]]
+        beta = 1
+        self.ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
+
+    def test_backward_induction(self):
+        T = 3
+        # v_T = np.zeors(self.ddp.n)
+        vs_expected = [[67/16, 129/16, 194/16, 227/16],
+                       [2, 25/4, 10, 21/2],
+                       [0, 5, 6, 5],
+                       [0, 0, 0, 0]]
+        sigmas_expected = [[3, 0, 0, 0],
+                           [2, 0, 0, 0],
+                           [0, 0, 0, 0]]
+
+        vs, sigmas = backward_induction(self.ddp, T)
+
+        assert_allclose(vs, vs_expected)
+        assert_array_equal(sigmas, sigmas_expected)
+
+
 def test_ddp_negative_inf_error():
     n, m = 3, 2
     R = np.array([[0, 1], [0, -np.inf], [-np.inf, -np.inf]])
@@ -211,6 +248,30 @@ def test_ddp_no_feasibile_action_error():
     beta = 0.95
 
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+
+
+def test_ddp_beta_1_not_implemented_error():
+    n, m = 3, 2
+    R = np.array([[0, 1], [1, 0], [0, 1]])
+    Q = np.empty((n, m, n))
+    Q[:] = 1/n
+    beta = 1
+
+    ddp0 = DiscreteDP(R, Q, beta)
+    s_indices, a_indices = np.where(R > -np.inf)
+    R_sa = R[s_indices, a_indices]
+    Q_sa = Q[s_indices, a_indices]
+    ddp1 = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
+    Q_sa_sp = sparse.csr_matrix(Q_sa)
+    ddp2 = DiscreteDP(R_sa, Q_sa_sp, beta, s_indices, a_indices)
+
+    solution_methods = \
+        ['value_iteration', 'policy_iteration', 'modified_policy_iteration']
+
+    for ddp in [ddp0, ddp1, ddp2]:
+        assert_raises(NotImplementedError, ddp.evaluate_policy, np.zeros(n))
+        for method in solution_methods:
+            assert_raises(NotImplementedError, getattr(ddp, method))
 
 
 if __name__ == '__main__':
