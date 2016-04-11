@@ -236,16 +236,19 @@ def test_node_labels_connected_components():
     sccs = [[0], [1], [2]]
     sink_sccs = [[0], [2]]
 
-    methods = ['get_strongly_connected_components',
-               'get_sink_strongly_connected_components']
-    for method, components_ind in zip(methods, [sccs, sink_sccs]):
-        for return_labels in [True, False]:
-            if return_labels:
-                components = [node_labels[i] for i in components_ind]
-            else:
+    properties = ['strongly_connected_components',
+                  'sink_strongly_connected_components']
+    suffix = '_indices'
+    for prop0, components_ind in zip(properties, [sccs, sink_sccs]):
+        for return_indices in [True, False]:
+            if return_indices:
                 components = components_ind
+                prop = prop0 + suffix
+            else:
+                components = [node_labels[i] for i in components_ind]
+                prop = prop0
             list_of_array_equal(
-                sorted(getattr(g, method)(return_labels), key=lambda x: x[0]),
+                sorted(getattr(g, prop), key=lambda x: x[0]),
                 sorted(components, key=lambda x: x[0])
             )
 
@@ -257,15 +260,18 @@ def test_node_labels_cyclic_components():
 
     cyclic_components = [[0], [1]]
 
-    methods = ['get_cyclic_components']
-    for method, components_ind in zip(methods, [cyclic_components]):
-        for return_labels in [True, False]:
-            if return_labels:
-                components = [node_labels[i] for i in components_ind]
-            else:
+    properties = ['cyclic_components']
+    suffix = '_indices'
+    for prop0, components_ind in zip(properties, [cyclic_components]):
+        for return_indices in [True, False]:
+            if return_indices:
                 components = components_ind
+                prop = prop0 + suffix
+            else:
+                components = [node_labels[i] for i in components_ind]
+                prop = prop0
             list_of_array_equal(
-                sorted(getattr(g, method)(return_labels), key=lambda x: x[0]),
+                sorted(getattr(g, prop), key=lambda x: x[0]),
                 sorted(components, key=lambda x: x[0])
             )
 

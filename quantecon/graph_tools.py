@@ -12,11 +12,11 @@ from scipy.sparse import csgraph
 from fractions import gcd
 
 
-# Decorator for get_*_components methods
+# Decorator for *_components properties
 def annotate_nodes(func):
-    def new_func(self, return_labels=True):
-        list_of_components, return_labels = func(self, return_labels)
-        if return_labels and (self.node_labels is not None):
+    def new_func(self):
+        list_of_components = func(self)
+        if self.node_labels is not None:
             return [self.node_labels[c] for c in list_of_components]
         return list_of_components
     return new_func
@@ -39,7 +39,7 @@ class DiGraph(object):
 
     node_labels : array_like(default=None)
         Array_like of length n containing the labels associated with the
-        states, which must be homogeneous in type. If None, the labels
+        nodes, which must be homogeneous in type. If None, the labels
         default to integers 0 through n-1.
 
     Attributes
@@ -53,16 +53,26 @@ class DiGraph(object):
     num_strongly_connected_components : int
         The number of the strongly connected components.
 
-    strongly_connected_components : list(ndarray(int))
+    strongly_connected_components_indices : list(ndarray(int))
         List of numpy arrays containing the indices of the strongly
         connected components.
+
+    strongly_connected_components : list(ndarray)
+        List of numpy arrays containing the strongly connected
+        components, where the nodes are annotated with their labels (if
+        `node_labels` is not None).
 
     num_sink_strongly_connected_components : int
         The number of the sink strongly connected components.
 
-    sink_strongly_connected_components : list(ndarray(int))
+    sink_strongly_connected_components_indices : list(ndarray(int))
         List of numpy arrays containing the indices of the sink strongly
         connected components.
+
+    sink_strongly_connected_components : list(ndarray)
+        List of numpy arrays containing the sink strongly connected
+        components, where the nodes are annotated with their labels (if
+        `node_labels` is not None).
 
     is_aperiodic : bool
         Indicate whether the digraph is aperiodic.
@@ -71,9 +81,14 @@ class DiGraph(object):
         The period of the digraph. Defined only for a strongly connected
         digraph.
 
-    cyclic_components : list(ndarray(int))
+    cyclic_components_indices : list(ndarray(int))
         List of numpy arrays containing the indices of the cyclic
         components.
+
+    cyclic_components : list(ndarray)
+        List of numpy arrays containing the cyclic components, where the
+        nodes are annotated with their labels (if `node_labels` is not
+        None).
 
     References
     ----------
@@ -209,28 +224,30 @@ class DiGraph(object):
         return len(self.sink_scc_labels)
 
     @property
-    def strongly_connected_components(self):
+    def strongly_connected_components_indices(self):
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
             return [np.where(self.scc_proj == k)[0]
                     for k in range(self.num_strongly_connected_components)]
 
+    @property
     @annotate_nodes
-    def get_strongly_connected_components(self, return_labels):
-        return self.strongly_connected_components, return_labels
+    def strongly_connected_components(self):
+        return self.strongly_connected_components_indices
 
     @property
-    def sink_strongly_connected_components(self):
+    def sink_strongly_connected_components_indices(self):
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
             return [np.where(self.scc_proj == k)[0]
                     for k in self.sink_scc_labels.tolist()]
 
+    @property
     @annotate_nodes
-    def get_sink_strongly_connected_components(self, return_labels):
-        return self.sink_strongly_connected_components, return_labels
+    def sink_strongly_connected_components(self):
+        return self.sink_strongly_connected_components_indices
 
     def _compute_period(self):
         """
@@ -303,16 +320,17 @@ class DiGraph(object):
         return (self.period == 1)
 
     @property
-    def cyclic_components(self):
+    def cyclic_components_indices(self):
         if self.is_aperiodic:
             return [np.arange(self.n)]
         else:
             return [np.where(self._cyclic_components_proj == k)[0]
                     for k in range(self.period)]
 
+    @property
     @annotate_nodes
-    def get_cyclic_components(self, return_labels):
-        return self.cyclic_components, return_labels
+    def cyclic_components(self,):
+        return self.cyclic_components_indices
 
     def subgraph(self, nodes):
         """
@@ -340,34 +358,6 @@ class DiGraph(object):
             node_labels = None
 
         return DiGraph(adj_matrix, weighted=weighted, node_labels=node_labels)
-
-
-_get_method_docstr = \
-"""
-Return a list of numpy arrays containing the {components}.
-
-Parameters
-----------
-return_labels : bool(optional, default=True)
-    Whether to annotate the returned nodes with `node_labels`.
-
-Returns
--------
-list(ndarray)
-    If `return_labels=True`, and if `node_labels` is not None,
-    each ndarray contains the node labels, and the node indices
-    (integers) otherwise.
-
-"""
-
-DiGraph.get_strongly_connected_components.__doc__ = \
-    _get_method_docstr.format(components='strongly connected components')
-
-DiGraph.get_sink_strongly_connected_components.__doc__ = \
-    _get_method_docstr.format(components='sink strongly connected components')
-
-DiGraph.get_cyclic_components.__doc__ = \
-    _get_method_docstr.format(components='cyclic components')
 
 
 def _csr_matrix_indices(S):
