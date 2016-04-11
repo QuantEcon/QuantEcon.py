@@ -406,51 +406,43 @@ class TestMCStateValues:
             mc = mc_dict['mc']
             coms = mc_dict['coms']
             recs = mc_dict['recs']
-            methods = ['get_communication_classes',
-                       'get_recurrent_classes']
-            for method, classes_ind in zip(methods, [coms, recs]):
-                for return_values in [True, False]:
-                    if return_values:
-                        classes = [self.state_values[i] for i in classes_ind]
-                        key = lambda x: x[0, 0]
-                    else:
+            properties = ['communication_classes',
+                          'recurrent_classes']
+            suffix = '_indices'
+            for prop0, classes_ind in zip(properties, [coms, recs]):
+                for return_indices in [True, False]:
+                    if return_indices:
                         classes = classes_ind
+                        prop = prop0 + suffix
                         key = lambda x: x[0]
+                    else:
+                        classes = [self.state_values[i] for i in classes_ind]
+                        prop = prop0
+                        key = lambda x: x[0, 0]
                     list_of_array_equal(
-                        sorted(getattr(mc, method)(return_values), key=key),
+                        sorted(getattr(mc, prop), key=key),
                         sorted(classes, key=key)
                     )
-                # Check that the default of return_values is True
-                classes = [self.state_values[i] for i in classes_ind]
-                key = lambda x: x[0, 0]
-                list_of_array_equal(
-                    sorted(getattr(mc, method)(), key=key),
-                    sorted(classes, key=key)
-                )
 
     def test_cyc_classes(self):
         mc = self.mc_periodic_dict['mc']
         cycs = self.mc_periodic_dict['cycs']
-        methods = ['get_cyclic_classes']
-        for method, classes_ind in zip(methods, [cycs]):
-            for return_values in [True, False]:
-                if return_values:
-                    classes = [self.state_values[i] for i in classes_ind]
-                    key = lambda x: x[0, 0]
-                else:
+        properties = ['cyclic_classes']
+        suffix = '_indices'
+        for prop0, classes_ind in zip(properties, [cycs]):
+            for return_indices in [True, False]:
+                if return_indices:
                     classes = classes_ind
+                    prop = prop0 + suffix
                     key = lambda x: x[0]
+                else:
+                    classes = [self.state_values[i] for i in classes_ind]
+                    prop = prop0
+                    key = lambda x: x[0, 0]
                 list_of_array_equal(
-                    sorted(getattr(mc, method)(return_values), key=key),
+                    sorted(getattr(mc, prop), key=key),
                     sorted(classes, key=key)
                 )
-            # Check that the default of return_values is True
-            classes = [self.state_values[i] for i in classes_ind]
-            key = lambda x: x[0, 0]
-            list_of_array_equal(
-                sorted(getattr(mc, method)(), key=key),
-                sorted(classes, key=key)
-            )
 
     def test_simulate(self):
         # Deterministic mc

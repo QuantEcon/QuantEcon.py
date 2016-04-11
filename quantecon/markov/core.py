@@ -128,14 +128,26 @@ class MarkovChain(object):
     num_communication_classes : int
         The number of the communication classes.
 
-    communication_classes : list(ndarray(int))
-        List of numpy arrays containing the communication classes.
+    communication_classes_indices : list(ndarray(int))
+        List of numpy arrays containing the indices of the communication
+        classes.
+
+    communication_classes : list(ndarray)
+        List of numpy arrays containing the communication classes, where
+        the states are annotated with their values (if `state_values` is
+        not None).
 
     num_recurrent_classes : int
         The number of the recurrent classes.
 
-    recurrent_classes : list(ndarray(int))
-        List of numpy arrays containing the recurrent classes.
+    recurrent_classes_indices : list(ndarray(int))
+        List of numpy arrays containing the indices of the recurrent
+        classes.
+
+    recurrent_classes : list(ndarray)
+        List of numpy arrays containing the recurrent classes, where the
+        states are annotated with their values (if `state_values` is not
+        None).
 
     is_aperiodic : bool
         Indicate whether the Markov chain is aperiodic.
@@ -143,9 +155,14 @@ class MarkovChain(object):
     period : int
         The period of the Markov chain.
 
-    cyclic_classes : list(ndarray(int))
-        List of numpy arrays containing the cyclic classes. Defined only
-        when the Markov chain is irreducible.
+    cyclic_classes_indices : list(ndarray(int))
+        List of numpy arrays containing the indices of the cyclic
+        classes. Defined only when the Markov chain is irreducible.
+
+    cyclic_classes : list(ndarray)
+        List of numpy arrays containing the cyclic classes, where the
+        states are annotated with their values (if `state_values` is not
+        None). Defined only when the Markov chain is irreducible.
 
     Notes
     -----
@@ -316,26 +333,24 @@ class MarkovChain(object):
         return self.digraph.num_strongly_connected_components
 
     @property
+    def communication_classes_indices(self):
+        return self.digraph.strongly_connected_components_indices
+
+    @property
     def communication_classes(self):
         return self.digraph.strongly_connected_components
-
-    def get_communication_classes(self, return_values=True):
-        return self.digraph.get_strongly_connected_components(
-            return_labels=return_values
-        )
 
     @property
     def num_recurrent_classes(self):
         return self.digraph.num_sink_strongly_connected_components
 
     @property
+    def recurrent_classes_indices(self):
+        return self.digraph.sink_strongly_connected_components_indices
+
+    @property
     def recurrent_classes(self):
         return self.digraph.sink_strongly_connected_components
-
-    def get_recurrent_classes(self, return_values=True):
-        return self.digraph.get_sink_strongly_connected_components(
-            return_labels=return_values
-        )
 
     @property
     def is_aperiodic(self):
@@ -368,15 +383,14 @@ class MarkovChain(object):
         else:
             return self.digraph.cyclic_components
 
-    def get_cyclic_classes(self, return_values=True):
+    @property
+    def cyclic_classes_indices(self):
         if not self.is_irreducible:
             raise NotImplementedError(
                 'Not defined for a reducible Markov chain'
             )
         else:
-            return self.digraph.get_cyclic_components(
-                return_labels=return_values
-            )
+            return self.digraph.cyclic_components_indices
 
     def _compute_stationary(self):
         """
@@ -650,34 +664,6 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
             k = searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
                              random_values[i, t])
             out[i, t+1] = indices[indptr[out[i, t]]+k]
-
-
-_get_method_docstr = \
-"""
-Return a list of numpy arrays containing the {classes}.
-
-Parameters
-----------
-return_values : bool(optional, default=True)
-    Whether to annotate the returned states with `state_values`.
-
-Returns
--------
-list(ndarray)
-    If `return_values=True`, and if `state_values` is not None,
-    each ndarray contains the state values, and the state indices
-    (integers) otherwise.
-
-"""
-
-MarkovChain.get_communication_classes.__doc__ = \
-    _get_method_docstr.format(classes='communication classes')
-
-MarkovChain.get_recurrent_classes.__doc__ = \
-    _get_method_docstr.format(classes='recurrent classes')
-
-MarkovChain.get_cyclic_classes.__doc__ = \
-    _get_method_docstr.format(classes='cyclic classes')
 
 
 def mc_compute_stationary(P):
