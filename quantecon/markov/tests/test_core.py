@@ -449,7 +449,7 @@ class TestMCStateValues:
         mc = self.mc_periodic_dict['mc']
         ts_length = 6
 
-        methods = ['simulate', 'simulate_values']
+        methods = ['simulate_indices', 'simulate']
 
         init_idx = 0
         inits = [init_idx, self.state_values[init_idx]]

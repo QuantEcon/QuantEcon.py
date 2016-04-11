@@ -447,9 +447,11 @@ class MarkovChain(object):
             self._cdfs1d = cdfs1d
         return self._cdfs1d
 
-    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
+    def simulate_indices(self, ts_length, init=None, num_reps=None,
+                         random_state=None):
         """
-        Simulate time series of state transitions.
+        Simulate time series of state transitions, where state indices
+        are returned.
 
         Parameters
         ----------
@@ -539,18 +541,17 @@ class MarkovChain(object):
         else:
             return X
 
-    def simulate_values(self, ts_length, init_value=None, num_reps=None,
-                        random_state=None):
+    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
         """
-        Simulate time series of state transitions, but return the values
-        in `state_values` instead of the state indices.
+        Simulate time series of state transitions, where the states are
+        annotated with their values (if `state_values` is not None).
 
         Parameters
         ----------
         ts_length : scalar(int)
             Length of each simulation.
 
-        init_value : scalar or array_like, optional(default=None)
+        init : scalar or array_like, optional(default=None)
             Initial state values(s). If None, the initial state is
             randomly drawn.
 
@@ -571,12 +572,12 @@ class MarkovChain(object):
             the `simulate` method for more information.
 
         """
-        if init_value is not None:
-            init_idx = self.get_index(init_value)
+        if init is not None:
+            init_idx = self.get_index(init)
         else:
             init_idx = None
-        X = self.simulate(ts_length, init=init_idx, num_reps=num_reps,
-                          random_state=random_state)
+        X = self.simulate_indices(ts_length, init=init_idx, num_reps=num_reps,
+                                  random_state=random_state)
 
         # Annotate states
         if self.state_values is not None:
