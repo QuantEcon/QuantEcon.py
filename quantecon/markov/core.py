@@ -557,7 +557,10 @@ class MarkovChain(object):
             the `simulate` method for more information.
 
         """
-        init_idx = self.get_index(init_value)
+        if init_value is not None:
+            init_idx = self.get_index(init_value)
+        else:
+            init_idx = None
         X = self.simulate(ts_length, init=init_idx, num_reps=num_reps,
                           random_state=random_state)
 
