@@ -477,6 +477,15 @@ class TestMCStateValues:
             X = getattr(mc, method)(ts_length, init)
             assert_array_equal(X, X_expected)
 
+        inits = [None, None]
+        seed = 1234  # init will be 2
+        init_idx = 2
+        path = np.arange(init_idx, init_idx+ts_length)%mc.n
+        paths = [path, self.state_values[path]]
+        for method, init, X_expected in zip(methods, inits, paths):
+            X = getattr(mc, method)(ts_length, init, random_state=seed)
+            assert_array_equal(X, X_expected)
+
 
 def test_get_index():
     P = [[0.4, 0.6], [0.2, 0.8]]
