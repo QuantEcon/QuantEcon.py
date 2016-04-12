@@ -86,14 +86,14 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 """
 from __future__ import division
 import numbers
+from fractions import gcd
 import numpy as np
 from scipy import sparse
-from fractions import gcd
+from numba import jit
+
 from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
-
-# -Check if Numba is Available- #
-from ..util import searchsorted, check_random_state, numba_installed, jit
+from ..util import searchsorted, check_random_state
 
 
 class MarkovChain(object):
@@ -107,6 +107,11 @@ class MarkovChain(object):
     ----------
     P : array_like or scipy sparse matrix (float, ndim=2)
         The transition matrix.  Must be of shape n x n.
+
+    state_values : array_like(default=None)
+        Array_like of length n containing the values associated with the
+        states, which must be homogeneous in type. If None, the values
+        default to integers 0 through n-1.
 
     Attributes
     ----------
@@ -123,14 +128,26 @@ class MarkovChain(object):
     num_communication_classes : int
         The number of the communication classes.
 
-    communication_classes : list(ndarray(int))
-        List of numpy arrays containing the communication classes.
+    communication_classes_indices : list(ndarray(int))
+        List of numpy arrays containing the indices of the communication
+        classes.
+
+    communication_classes : list(ndarray)
+        List of numpy arrays containing the communication classes, where
+        the states are annotated with their values (if `state_values` is
+        not None).
 
     num_recurrent_classes : int
         The number of the recurrent classes.
 
-    recurrent_classes : list(ndarray(int))
-        List of numpy arrays containing the recurrent classes.
+    recurrent_classes_indices : list(ndarray(int))
+        List of numpy arrays containing the indices of the recurrent
+        classes.
+
+    recurrent_classes : list(ndarray)
+        List of numpy arrays containing the recurrent classes, where the
+        states are annotated with their values (if `state_values` is not
+        None).
 
     is_aperiodic : bool
         Indicate whether the Markov chain is aperiodic.
@@ -138,9 +155,14 @@ class MarkovChain(object):
     period : int
         The period of the Markov chain.
 
-    cyclic_classes : list(ndarray(int))
-        List of numpy arrays containing the cyclic classes. Defined only
-        when the Markov chain is irreducible.
+    cyclic_classes_indices : list(ndarray(int))
+        List of numpy arrays containing the indices of the cyclic
+        classes. Defined only when the Markov chain is irreducible.
+
+    cyclic_classes : list(ndarray)
+        List of numpy arrays containing the cyclic classes, where the
+        states are annotated with their values (if `state_values` is not
+        None). Defined only when the Markov chain is irreducible.
 
     Notes
     -----
@@ -149,7 +171,7 @@ class MarkovChain(object):
 
     """
 
-    def __init__(self, P):
+    def __init__(self, P, state_values=None):
         if sparse.issparse(P):  # Sparse matrix
             self.P = sparse.csr_matrix(P)
             self.is_sparse = True
@@ -180,6 +202,9 @@ class MarkovChain(object):
         if not np.allclose(row_sums, np.ones(self.n)):
             raise ValueError('The rows of P must sum to 1')
 
+        # Call the setter method
+        self.state_values = state_values
+
         # To analyze the structure of P as a directed graph
         self._digraph = None
 
@@ -200,9 +225,103 @@ class MarkovChain(object):
         return str(self.__repr__)
 
     @property
+    def state_values(self):
+        return self._state_values
+
+    @state_values.setter
+    def state_values(self, values):
+        if values is None:
+            self._state_values = None
+        else:
+            values = np.asarray(values)
+            if (values.ndim < 1) or (values.shape[0] != self.n):
+                raise ValueError(
+                    'state_values must be an array_like of length n'
+                )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in state_values must be homogeneous in type'
+                )
+            self._state_values = values
+
+    def get_index(self, value):
+        """
+        Return the index (or indices) of the given value (or values) in
+        `state_values`.
+
+        Parameters
+        ----------
+        value
+            Value(s) to get the index (indices) for.
+
+        Returns
+        -------
+        idx : int or ndarray(int)
+            Index of `value` if `value` is a single state value; array
+            of indices if `value` is an array_like of state values.
+
+        """
+        if self.state_values is None:
+            state_values_ndim = 1
+        else:
+            state_values_ndim = self.state_values.ndim
+
+        values = np.asarray(value)
+
+        if values.ndim <= state_values_ndim - 1:
+            return self._get_index(value)
+        elif values.ndim == state_values_ndim:  # array of values
+            k = values.shape[0]
+            idx = np.empty(k, dtype=int)
+            for i in range(k):
+                idx[i] = self._get_index(values[i])
+            return idx
+        else:
+            raise ValueError('invalid value')
+
+
+    def _get_index(self, value):
+        """
+        Return the index of the given value in `state_values`.
+
+        Parameters
+        ----------
+        value
+            Value to get the index for.
+
+        Returns
+        -------
+        idx : int
+            Index of `value`.
+
+        """
+        error_msg = 'value {0} not found'.format(value)
+
+        if self.state_values is None:
+            if isinstance(value, numbers.Integral) and (0 <= value < self.n):
+                return value
+            else:
+                raise ValueError(error_msg)
+
+        # if self.state_values is not None:
+        if self.state_values.ndim == 1:
+            try:
+                idx = np.where(self.state_values == value)[0][0]
+                return idx
+            except IndexError:
+                raise ValueError(error_msg)
+        else:
+            idx = 0
+            while idx < self.n:
+                if np.array_equal(self.state_values[idx], value):
+                    return idx
+                idx += 1
+            raise ValueError(error_msg)
+
+    @property
     def digraph(self):
         if self._digraph is None:
-            self._digraph = DiGraph(self.P)
+            self._digraph = DiGraph(self.P, node_labels=self.state_values)
         return self._digraph
 
     @property
@@ -214,12 +333,20 @@ class MarkovChain(object):
         return self.digraph.num_strongly_connected_components
 
     @property
+    def communication_classes_indices(self):
+        return self.digraph.strongly_connected_components_indices
+
+    @property
     def communication_classes(self):
         return self.digraph.strongly_connected_components
 
     @property
     def num_recurrent_classes(self):
         return self.digraph.num_sink_strongly_connected_components
+
+    @property
+    def recurrent_classes_indices(self):
+        return self.digraph.sink_strongly_connected_components_indices
 
     @property
     def recurrent_classes(self):
@@ -255,6 +382,15 @@ class MarkovChain(object):
             )
         else:
             return self.digraph.cyclic_components
+
+    @property
+    def cyclic_classes_indices(self):
+        if not self.is_irreducible:
+            raise NotImplementedError(
+                'Not defined for a reducible Markov chain'
+            )
+        else:
+            return self.digraph.cyclic_components_indices
 
     def _compute_stationary(self):
         """
@@ -311,9 +447,11 @@ class MarkovChain(object):
             self._cdfs1d = cdfs1d
         return self._cdfs1d
 
-    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
+    def simulate_indices(self, ts_length, init=None, num_reps=None,
+                         random_state=None):
         """
-        Simulate time series of state transitions.
+        Simulate time series of state transitions, where state indices
+        are returned.
 
         Parameters
         ----------
@@ -337,7 +475,7 @@ class MarkovChain(object):
 
         Returns
         -------
-        X : ndarray(int, ndim=1 or 2)
+        X : ndarray(ndim=1 or 2)
             Array containing the sample path(s), of shape (ts_length,)
             if init is a scalar (integer) or None and num_reps is None;
             of shape (k, ts_length) otherwise, where k = len(init) if
@@ -349,7 +487,7 @@ class MarkovChain(object):
         random_state = check_random_state(random_state)
         dim = 1  # Dimension of the returned array: 1 or 2
 
-        msg_out_or_range = 'index {init} is out of the state space'
+        msg_out_of_range = 'index {init} is out of the state space'
 
         try:
             k = len(init)  # init is an array
@@ -360,7 +498,7 @@ class MarkovChain(object):
                 idx = np.where(
                     (init_states >= self.n) + (init_states < -self.n)
                 )[0][0]
-                raise ValueError(msg_out_or_range.format(init=idx))
+                raise ValueError(msg_out_of_range.format(init=idx))
             if num_reps is not None:
                 k *= num_reps
                 init_states = np.tile(init_states, num_reps)
@@ -374,7 +512,7 @@ class MarkovChain(object):
             elif isinstance(init, numbers.Integral):
                 # Check init is in the state space
                 if init >= self.n or init < -self.n:
-                    raise ValueError(msg_out_or_range.format(init=init))
+                    raise ValueError(msg_out_of_range.format(init=init))
                 init_states = np.ones(k, dtype=int) * init
             else:
                 raise ValueError(
@@ -403,7 +541,52 @@ class MarkovChain(object):
         else:
             return X
 
+    def simulate(self, ts_length, init=None, num_reps=None, random_state=None):
+        """
+        Simulate time series of state transitions, where the states are
+        annotated with their values (if `state_values` is not None).
 
+        Parameters
+        ----------
+        ts_length : scalar(int)
+            Length of each simulation.
+
+        init : scalar or array_like, optional(default=None)
+            Initial state values(s). If None, the initial state is
+            randomly drawn.
+
+        num_reps : scalar(int), optional(default=None)
+            Number of repetitions of simulation.
+
+        random_state : scalar(int) or np.random.RandomState,
+                       optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to
+            set the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState
+            is used.
+
+        Returns
+        -------
+        X : ndarray(ndim=1 or 2)
+            Array containing the state values of the sample path(s). See
+            the `simulate` method for more information.
+
+        """
+        if init is not None:
+            init_idx = self.get_index(init)
+        else:
+            init_idx = None
+        X = self.simulate_indices(ts_length, init=init_idx, num_reps=num_reps,
+                                  random_state=random_state)
+
+        # Annotate states
+        if self.state_values is not None:
+            X = self.state_values[X]
+
+        return X
+
+
+@jit(nopython=True)
 def _generate_sample_paths(P_cdfs, init_states, random_values, out):
     """
     Generate num_reps sample paths of length ts_length, where num_reps =
@@ -427,7 +610,7 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
 
     Notes
     -----
-    This routine is jit-complied if the module Numba is vailable.
+    This routine is jit-complied by Numba.
 
     """
     num_reps, ts_length = out.shape
@@ -437,10 +620,8 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
         for t in range(ts_length-1):
             out[i, t+1] = searchsorted(P_cdfs[out[i, t]], random_values[i, t])
 
-if numba_installed:
-    _generate_sample_paths = jit(nopython=True)(_generate_sample_paths)
 
-
+@jit(nopython=True)
 def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
                                   random_values, out):
     """
@@ -473,7 +654,7 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
 
     Notes
     -----
-    This routine is jit-complied if the module Numba is vailable.
+    This routine is jit-complied by Numba.
 
     """
     num_reps, ts_length = out.shape
@@ -484,10 +665,6 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
             k = searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
                              random_values[i, t])
             out[i, t+1] = indices[indptr[out[i, t]]+k]
-
-if numba_installed:
-    _generate_sample_paths_sparse = \
-        jit(nopython=True)(_generate_sample_paths_sparse)
 
 
 def mc_compute_stationary(P):

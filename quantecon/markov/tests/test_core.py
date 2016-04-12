@@ -1,5 +1,5 @@
 """
-Tests for mc_tools.py
+Tests for markov/core.py
 
 Functions
 ---------
@@ -381,6 +381,127 @@ def test_mc_sample_path_lln():
     ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
+class TestMCStateValues:
+    def setUp(self):
+        state_values = [[0, 1], [2, 3], [4, 5]]  # Pass python list
+        self.state_values = np.array(state_values)
+
+        self.mc_reducible_dict = {
+            'mc': MarkovChain([[1, 0, 0], [1, 0, 0], [0, 0, 1]],
+                              state_values=state_values),
+            'coms': [[0], [1], [2]],
+            'recs': [[0], [2]]
+        }
+
+        self.mc_periodic_dict = {
+            'mc': MarkovChain([[0, 1, 0], [0, 0, 1], [1, 0, 0]],
+                              state_values=state_values),
+            'coms': [[0, 1, 2]],
+            'recs': [[0, 1, 2]],
+            'cycs': [[0], [1], [2]]
+        }
+
+    def test_com_rec_classes(self):
+        for mc_dict in [self.mc_reducible_dict, self.mc_periodic_dict]:
+            mc = mc_dict['mc']
+            coms = mc_dict['coms']
+            recs = mc_dict['recs']
+            properties = ['communication_classes',
+                          'recurrent_classes']
+            suffix = '_indices'
+            for prop0, classes_ind in zip(properties, [coms, recs]):
+                for return_indices in [True, False]:
+                    if return_indices:
+                        classes = classes_ind
+                        prop = prop0 + suffix
+                        key = lambda x: x[0]
+                    else:
+                        classes = [self.state_values[i] for i in classes_ind]
+                        prop = prop0
+                        key = lambda x: x[0, 0]
+                    list_of_array_equal(
+                        sorted(getattr(mc, prop), key=key),
+                        sorted(classes, key=key)
+                    )
+
+    def test_cyc_classes(self):
+        mc = self.mc_periodic_dict['mc']
+        cycs = self.mc_periodic_dict['cycs']
+        properties = ['cyclic_classes']
+        suffix = '_indices'
+        for prop0, classes_ind in zip(properties, [cycs]):
+            for return_indices in [True, False]:
+                if return_indices:
+                    classes = classes_ind
+                    prop = prop0 + suffix
+                    key = lambda x: x[0]
+                else:
+                    classes = [self.state_values[i] for i in classes_ind]
+                    prop = prop0
+                    key = lambda x: x[0, 0]
+                list_of_array_equal(
+                    sorted(getattr(mc, prop), key=key),
+                    sorted(classes, key=key)
+                )
+
+    def test_simulate(self):
+        # Deterministic mc
+        mc = self.mc_periodic_dict['mc']
+        ts_length = 6
+
+        methods = ['simulate_indices', 'simulate']
+
+        init_idx = 0
+        inits = [init_idx, self.state_values[init_idx]]
+        path = np.arange(init_idx, init_idx+ts_length)%mc.n
+        paths = [path, self.state_values[path]]
+        for method, init, X_expected in zip(methods, inits, paths):
+            X = getattr(mc, method)(ts_length, init)
+            assert_array_equal(X, X_expected)
+
+        init_idx = [1, 2]
+        inits = [init_idx, self.state_values[init_idx]]
+        path = np.array(
+            [np.arange(i, i+ts_length)%mc.n for i in init_idx]
+        )
+        paths = [path, self.state_values[path]]
+        for method, init, X_expected in zip(methods, inits, paths):
+            X = getattr(mc, method)(ts_length, init)
+            assert_array_equal(X, X_expected)
+
+        inits = [None, None]
+        seed = 1234  # init will be 2
+        init_idx = 2
+        path = np.arange(init_idx, init_idx+ts_length)%mc.n
+        paths = [path, self.state_values[path]]
+        for method, init, X_expected in zip(methods, inits, paths):
+            X = getattr(mc, method)(ts_length, init, random_state=seed)
+            assert_array_equal(X, X_expected)
+
+
+def test_get_index():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+
+    eq_(mc.get_index(0), 0)
+    eq_(mc.get_index(1), 1)
+    assert_raises(ValueError, mc.get_index, 2)
+    assert_array_equal(mc.get_index([1, 0]), [1, 0])
+    assert_raises(ValueError, mc.get_index, [[1]])
+
+    mc.state_values = [1, 2]
+    eq_(mc.get_index(1), 0)
+    eq_(mc.get_index(2), 1)
+    assert_raises(ValueError, mc.get_index, 0)
+    assert_array_equal(mc.get_index([2, 1]), [1, 0])
+    assert_raises(ValueError, mc.get_index, [[1]])
+
+    mc.state_values = [[1, 2], [3, 4]]
+    eq_(mc.get_index([1, 2]), 0)
+    assert_raises(ValueError, mc.get_index, 1)
+    assert_array_equal(mc.get_index([[3, 4], [1, 2]]), [1, 0])
+
+
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
@@ -418,6 +539,12 @@ def test_raises_value_error_simulate_init_out_of_range():
     assert_raises(ValueError, mc.simulate, ts_length, init=-(n+1))
     assert_raises(ValueError, mc.simulate, ts_length, init=[0, n])
     assert_raises(ValueError, mc.simulate, ts_length, init=[0, -(n+1)])
+
+
+def test_raises_non_homogeneous_state_values():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    state_values = [(0, 1), 2]
+    assert_raises(ValueError, MarkovChain, P, state_values=state_values)
 
 
 if __name__ == '__main__':
