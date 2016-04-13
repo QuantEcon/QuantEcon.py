@@ -22,7 +22,8 @@ class TestTauchen(unittest.TestCase):
         self.m = np.random.random_integers(4)
         self.tol = 1e-12
 
-        self.x, self.P = tauchen(self.rho, self.sigma_u, self.m, self.n)
+        mc = tauchen(self.rho, self.sigma_u, self.m, self.n)
+        self.x, self.P = mc.state_values, mc.P
 
     def tearDown(self):
         del self.x

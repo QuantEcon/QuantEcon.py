@@ -10,6 +10,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 """
 
 from math import erfc, sqrt
+from .core import MarkovChain
 
 import numpy as np
 from numba import njit
@@ -17,13 +18,13 @@ from numba import njit
 
 def tauchen(rho, sigma_u, m=3, n=7):
     """
-    Computes the Markov matrix associated with a discretized version of
+    Computes a Markov chain associated with a discretized version of
     the linear Gaussian AR(1) process
 
         y_{t+1} = rho * y_t + u_{t+1}
 
-    according to Tauchen's method.  Here {u_t} is an iid Gaussian
-    process with zero mean.
+    using Tauchen's method.  Here {u_t} is an iid Gaussian process with zero
+    mean.
 
     Parameters
     ----------
@@ -39,11 +40,9 @@ def tauchen(rho, sigma_u, m=3, n=7):
     Returns
     -------
 
-    x : array_like(float, ndim=1)
-        The state space of the discretized process
-    P : array_like(float, ndim=2)
-        The Markov transition matrix where P[i, j] is the probability
-        of transitioning from x[i] to x[j]
+    mc : MarkovChain
+        An instance of the MarkovChain class that stores the transition 
+        matrix and state values returned by the discretization method
 
     """
 
@@ -65,7 +64,8 @@ def tauchen(rho, sigma_u, m=3, n=7):
 
     _fill_tauchen(x, P, n, rho, sigma_u, half_step)
 
-    return x, P
+    mc = MarkovChain(P, state_values=x)
+    return mc
 
 
 @njit
