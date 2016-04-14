@@ -16,7 +16,7 @@ from numba import jit
 # ----------------- #
 
 @jit(nopython=True)
-def _searchsorted(a, v):
+def searchsorted(a, v):
     """
     Custom version of np.searchsorted. Return the largest index `i` such
     that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `v[n-1] <=
