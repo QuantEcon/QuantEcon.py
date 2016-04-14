@@ -116,7 +116,6 @@ from numba import jit
 
 from .core import MarkovChain
 
-
 class DiscreteDP(object):
     r"""
     Class for dealing with a discrete dynamic program.
@@ -895,7 +894,6 @@ class DPSolveResult(dict):
 
     def __dir__(self):
         return self.keys()
-
 
 def backward_induction(ddp, T, v_term=None):
     r"""
