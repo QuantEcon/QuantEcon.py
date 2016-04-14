@@ -9,10 +9,10 @@ from textwrap import dedent
 import numpy as np
 from numpy.random import multivariate_normal
 from scipy.linalg import solve
+from numba import jit
 
-#-Check if Numba is Available-#
-from .util import numba_installed, jit
-
+#TODO: Should this be specified with (nopython=True?)
+@jit
 def simulate_linear_model(A, x0, v, ts_length):
     """
     This is a separate function for simulating a vector linear system of 
@@ -55,8 +55,6 @@ def simulate_linear_model(A, x0, v, ts_length):
                 x[i, t+1] += A[i, j] * x[j, t]   #Dot Product
     return x
 
-if numba_installed:
-    simulate_linear_model = jit(simulate_linear_model)
 
 class LinearStateSpace(object):
     """

@@ -9,13 +9,12 @@ searchsorted
 """
 
 import numpy as np
-from .external import numba_installed, jit
 
 # ----------------- #
 # -ARRAY UTILITIES- #
 # ----------------- #
 
-
+@jit(nopython=True)
 def _searchsorted(a, v):
     """
     Custom version of np.searchsorted. Return the largest index `i` such
@@ -61,11 +60,3 @@ def _searchsorted(a, v):
         else:
             lo = m
     return hi
-
-if numba_installed:
-    searchsorted = jit(nopython=True)(_searchsorted)
-else:
-    def searchsorted(a, v):
-        return np.searchsorted(a, v, side='right')
-
-searchsorted.__doc__ = _searchsorted.__doc__
