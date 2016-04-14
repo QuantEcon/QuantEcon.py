@@ -612,6 +612,7 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
     -----
     This routine is jit-complied by Numba.
 
+
     """
     num_reps, ts_length = out.shape
 
