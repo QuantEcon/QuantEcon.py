@@ -10,13 +10,6 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 import numpy as np
 from numba import jit
 
-#TODO: Remove as we no longer officially support Python <3.5?
-try:
-    xrange
-except:  # python3
-    xrange = range
-
-
 def gth_solve(A, overwrite=False, use_jit=True):
     r"""
     This routine computes the stationary distribution of an irreducible
@@ -79,7 +72,7 @@ def gth_solve(A, overwrite=False, use_jit=True):
 
     # if not using jit
     # === Reduction === #
-    for k in xrange(n-1):
+    for k in range(n-1):
         scale = np.sum(A1[k, k+1:n])
         if scale <= 0:
             # There is one (and only one) recurrent class contained in
@@ -93,7 +86,7 @@ def gth_solve(A, overwrite=False, use_jit=True):
 
     # === Backward substitution === #
     x[n-1] = 1
-    for k in xrange(n-2, -1, -1):
+    for k in range(n-2, -1, -1):
         x[k] = np.dot(x[k+1:n], A1[k+1:n, k])
 
     # === Normalization === #
