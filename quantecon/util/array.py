@@ -9,14 +9,14 @@ searchsorted
 """
 
 import numpy as np
-from .external import numba_installed, jit
+from numba import jit
 
 # ----------------- #
 # -ARRAY UTILITIES- #
 # ----------------- #
 
-
-def _searchsorted(a, v):
+@jit(nopython=True)
+def searchsorted(a, v):
     """
     Custom version of np.searchsorted. Return the largest index `i` such
     that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `v[n-1] <=
@@ -61,11 +61,3 @@ def _searchsorted(a, v):
         else:
             lo = m
     return hi
-
-if numba_installed:
-    searchsorted = jit(nopython=True)(_searchsorted)
-else:
-    def searchsorted(a, v):
-        return np.searchsorted(a, v, side='right')
-
-searchsorted.__doc__ = _searchsorted.__doc__
