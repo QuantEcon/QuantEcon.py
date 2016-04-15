@@ -405,7 +405,7 @@ class MarkovChain(object):
                     gth_solve(self.P.toarray(),
                               overwrite=True).reshape(1, self.n)
         else:
-            rec_classes = self.recurrent_classes
+            rec_classes = self.recurrent_classes_indices
             stationary_dists = np.zeros((len(rec_classes), self.n))
             for i, rec_class in enumerate(rec_classes):
                 if not self.is_sparse:  # Dense
