@@ -76,8 +76,6 @@ def _diff(r, out):
             out[i, j] = r[i, j] - r[i, j-1]
         out[i, n] = 1 - r[i, n-1]
 
-
-#TODO: Should this use (nopython=True) flag?
 @jit
 def sample_without_replacement(n, k, num_trials=None, random_state=None):
     """

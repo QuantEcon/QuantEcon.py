@@ -11,7 +11,6 @@ from numpy.random import multivariate_normal
 from scipy.linalg import solve
 from numba import jit
 
-#TODO: Should this be specified with (nopython=True?)
 @jit
 def simulate_linear_model(A, x0, v, ts_length):
     """

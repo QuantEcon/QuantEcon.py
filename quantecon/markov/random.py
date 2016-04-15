@@ -219,7 +219,6 @@ def random_discrete_dp(num_states, num_actions, beta=None,
     ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
     return ddp
 
-#TODO: Should this use (nopython=True) flag?
 @jit
 def _sa_indices(num_states, num_actions):
     L = num_states * num_actions
