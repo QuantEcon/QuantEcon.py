@@ -479,6 +479,15 @@ class TestMCStateValues:
             assert_array_equal(X, X_expected)
 
 
+def test_mc_stationary_distributions_state_values():
+    P = [[0.4, 0.6, 0], [0.2, 0.8, 0], [0, 0, 1]]
+    state_values = ['a', 'b', 'c']
+    mc = MarkovChain(P, state_values=state_values)
+    stationary_dists_expected = [[0.25, 0.75, 0], [0, 0, 1]]
+    stationary_dists = mc.stationary_distributions
+    assert_allclose(stationary_dists, stationary_dists_expected)
+
+
 def test_get_index():
     P = [[0.4, 0.6], [0.2, 0.8]]
     mc = MarkovChain(P)
