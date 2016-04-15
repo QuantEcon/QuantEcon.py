@@ -21,8 +21,8 @@ See the [library website](http://quantecon.org/python_index.html) for instructio
 
 ## Additional Links
 
-1. [Project Coordinators](http://quantecon.org/about/)
-2. [Lead Developers](http://quantecon.org/about/)
+1. [Project Coordinators](http://quantecon.org/about)
+2. [Lead Developers](http://quantecon.org/about)
 3. [QuantEcon Lecture Website](http://quant-econ.net)
 
 ### License
