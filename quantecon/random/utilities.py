@@ -3,11 +3,12 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import numpy as np
-from numba import jit
+from numba import jit, guvectorize
 
 from ..util import check_random_state
 
-#-Generating Arrays and Vectors-#
+
+# Generating Arrays and Vectors #
 
 def probvec(m, k, random_state=None):
     """
@@ -46,35 +47,38 @@ def probvec(m, k, random_state=None):
     # if k >= 2
     random_state = check_random_state(random_state)
     r = random_state.random_sample(size=(m, k-1))
-
-    r.sort(axis=-1)
     x = np.empty((m, k))
-    _diff(r, out=x)
+    _probvec(r, x)
 
     return x
 
 
-@jit(nopython=True)
-def _diff(r, out):
+@guvectorize(['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel')
+def _probvec(r, out):
     """
-    Store in `out` the differences `r[i, 0]`, `r[i, 1] - r[i, 0]`, ...,
-    `r[i, n-1] - r[i, n-2]`, `1 - r[i, n-1]`.
+    Fill `out` with randomly sampled probability vectors as rows.
+
+    Complied as a ufunc by guvectorize of Numba. The inputs must have
+    the same shape except the last axis; the length of the last axis of
+    `r` must be that of `out` minus 1, i.e., if out.shape[-1] is k, then
+    r.shape[-1] must be k-1.
 
     Parameters
     ----------
-    r : ndarray(float, ndim=2)
-        Shape (m, n)
+    r : ndarray(float)
+        Array containing random values in [0, 1).
 
-    out : ndarray(float, ndim=2)
-        Shape (m, n+1)
+    out : ndarray(float)
+        Output array.
 
     """
-    m, n = r.shape
-    for i in range(m):
-        out[i, 0] = r[i, 0]
-        for j in range(1, n):
-            out[i, j] = r[i, j] - r[i, j-1]
-        out[i, n] = 1 - r[i, n-1]
+    n = r.shape[0]
+    r.sort()
+    out[0] = r[0]
+    for i in range(1, n):
+        out[i] = r[i] - r[i-1]
+    out[n] = 1 - r[n-1]
+
 
 @jit
 def sample_without_replacement(n, k, num_trials=None, random_state=None):
