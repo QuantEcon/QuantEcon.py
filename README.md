@@ -59,12 +59,24 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
-#### Ver. 0.3.1 (22-January-2016)
+### Ver. 0.3.2 (25-April-2016)
+
+1. Minor changes to ``NormalFormGame``. See [PR #226](https://github.com/QuantEcon/QuantEcon.py/pull/226)
+2. Update ``tauchen`` code to make use of Numba. See [PR #227](https://github.com/QuantEcon/QuantEcon.py/pull/227)
+3. Remove ``Python 2.7`` from test environment. Will support Python 3.5+
+4. Updated ``qe.util.nb_fetch`` to not overwrite files by default
+6. Remove ``num_actions`` from DiscreteDP. See [PR #236](https://github.com/QuantEcon/QuantEcon.py/pull/236)
+7. Add states/nodes to ``MarkovChain``/``DiGraph``. See [PR #237](https://github.com/QuantEcon/QuantEcon.py/pull/237)
+8. Updated ``DiscreteDP`` to include ``backward_induction`` (DiscreteDP now accepts beta=1). See [PR #244](https://github.com/QuantEcon/QuantEcon.py/pull/244)
+9. ``Numba`` is now a formal dependency. 
+10. Modified ``tauchen`` to return a ``MarkovChain`` instance. See [PR #250](https://github.com/QuantEcon/QuantEcon.py/pull/250)
+
+### Ver. 0.3.1 (22-January-2016)
 
 1. Adds the ``quantecon/game_theory/`` sub package
 2. Updates api for using ``distributions`` as a module ``qe.distributions``
 
-#### Ver. 0.3
+### Ver. 0.3
 
 1. Removes ``quantecon/models`` subpackage and the collection of code examples. Code has been migrated to the [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) repository.
 2. Adds a utility for fetching notebook dependencies from [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) to support community contributed notebooks.
