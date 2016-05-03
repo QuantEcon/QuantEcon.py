@@ -9,3 +9,4 @@ Markov
    markov/ddp
    markov/gth_solve
    markov/random
+   markov/utilities
