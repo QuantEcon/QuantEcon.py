@@ -10,7 +10,7 @@ from ..util import check_random_state
 
 # Generating Arrays and Vectors #
 
-def probvec(m, k, random_state=None):
+def probvec(m, k, random_state=None, parallel=True):
     """
     Return m randomly sampled probability vectors of dimension k.
 
@@ -48,12 +48,15 @@ def probvec(m, k, random_state=None):
     random_state = check_random_state(random_state)
     r = random_state.random_sample(size=(m, k-1))
     x = np.empty((m, k))
-    _probvec(r, x)
+    #-Parse Parallel Option-#
+    if parallel:
+        _probvec_parallel(r, x)
+    else:
+        _probvec_cpu(r, x)
 
     return x
 
 
-@guvectorize(['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel')
 def _probvec(r, out):
     """
     Fill `out` with randomly sampled probability vectors as rows.
@@ -78,6 +81,9 @@ def _probvec(r, out):
     for i in range(1, n):
         out[i] = r[i] - r[i-1]
     out[n] = 1 - r[n-1]
+
+_probvec_parallel = guvectorize(['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel')(_probvec)
+_probvec_cpu = guvectorize(['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu')(_probvec)
 
 
 @jit
