@@ -3,13 +3,33 @@ Tests for util/random.py
 
 Functions
 ---------
+probvec
 sample_without_replacement
 
 """
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises
 from nose.tools import eq_
-from quantecon.random import sample_without_replacement
+from quantecon.random import probvec, sample_without_replacement
+
+
+# probvec #
+
+class TestProbvec:
+    def setUp(self):
+        self.m, self.k = 2, 3  # m vectors of dimension k
+        seed = 1234
+
+        self.out_parallel = probvec(self.m, self.k, random_state=seed)
+        self.out_cpu = \
+            probvec(self.m, self.k, random_state=seed, parallel=False)
+
+    def test_shape(self):
+        for out in [self.out_parallel, self.out_cpu]:
+            eq_(out.shape, (self.m, self.k))
+
+    def test_parallel_cpu(self):
+        assert_array_equal(self.out_parallel, self.out_cpu)
 
 
 # sample_without_replacement #
