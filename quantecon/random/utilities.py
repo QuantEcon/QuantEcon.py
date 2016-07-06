@@ -29,6 +29,11 @@ def probvec(m, k, random_state=None, parallel=True):
         reproducibility. If None, a randomly initialized RandomState is
         used.
 
+    parallel : bool(default=True)
+        Whether to use multi-core CPU (parallel=True) or single-threaded
+        CPU (parallel=False). (Internally the code is executed through
+        Numba.guvectorize.)
+
     Returns
     -------
     x : ndarray(float, ndim=2)
@@ -48,7 +53,8 @@ def probvec(m, k, random_state=None, parallel=True):
     random_state = check_random_state(random_state)
     r = random_state.random_sample(size=(m, k-1))
     x = np.empty((m, k))
-    #-Parse Parallel Option-#
+
+    # Parse Parallel Option #
     if parallel:
         _probvec_parallel(r, x)
     else:
@@ -61,10 +67,10 @@ def _probvec(r, out):
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
-    Complied as a ufunc by guvectorize of Numba. The inputs must have
-    the same shape except the last axis; the length of the last axis of
-    `r` must be that of `out` minus 1, i.e., if out.shape[-1] is k, then
-    r.shape[-1] must be k-1.
+    To be complied as a ufunc by guvectorize of Numba. The inputs must
+    have the same shape except the last axis; the length of the last
+    axis of `r` must be that of `out` minus 1, i.e., if out.shape[-1] is
+    k, then r.shape[-1] must be k-1.
 
     Parameters
     ----------
@@ -82,8 +88,12 @@ def _probvec(r, out):
         out[i] = r[i] - r[i-1]
     out[n] = 1 - r[n-1]
 
-_probvec_parallel = guvectorize(['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel')(_probvec)
-_probvec_cpu = guvectorize(['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu')(_probvec)
+_probvec_parallel = guvectorize(
+    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel'
+    )(_probvec)
+_probvec_cpu = guvectorize(
+    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu'
+    )(_probvec)
 
 
 @jit
