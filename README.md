@@ -59,6 +59,11 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver. 0.3.3 (21-July-2016)
+1. Remove ``python2.7`` classifiers project only supports ``python3.5+``
+2. Migrate ``sa_indices`` to be a utility function for the markov submodule
+3. Updates ``probvec`` to include a multi-core parallel option using numba infrastructure in ``quantecon/random/utilities.py``
+
 ### Ver. 0.3.2 (25-April-2016)
 
 1. Minor changes to ``NormalFormGame``. See [PR #226](https://github.com/QuantEcon/QuantEcon.py/pull/226)
