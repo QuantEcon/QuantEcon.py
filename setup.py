@@ -4,7 +4,7 @@ import os
 #-Write Versions File-#
 #~~~~~~~~~~~~~~~~~~~~~#
 
-VERSION = '0.3.2'
+VERSION = '0.3.3'
 
 def write_version_py(filename=None):
     """
@@ -81,9 +81,7 @@ CLASSIFIERS = [
     'Operating System :: OS Independent',
     'Intended Audience :: Science/Research',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.5',
     'Topic :: Scientific/Engineering',
 ]
@@ -109,5 +107,6 @@ setup(name='quantecon',
       author='Thomas J. Sargent and John Stachurski (Project coordinators)',
       author_email='john.stachurski@gmail.com',
       url='https://github.com/QuantEcon/QuantEcon.py',  # URL to the repo
+      download_url='https://github.com/QuantEcon/QuantEcon.py/tarball/' + VERSION, 
       keywords=['quantitative', 'economics']
       )
