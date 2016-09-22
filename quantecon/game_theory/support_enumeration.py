@@ -11,10 +11,17 @@ Strategic and Extensive Form," Chapter 3, N. Nisan, T. Roughgarden, E.
 Tardos, and V. Vazirani eds., Algorithmic Game Theory, 2007.
 
 """
+from distutils.version import LooseVersion
 import numpy as np
 import numba
 from numba import jit
 
+
+least_numba_version = LooseVersion('0.28')
+is_numba_required_installed = True
+if LooseVersion(numba.__version__) < least_numba_version:
+    is_numba_required_installed = False
+nopython = is_numba_required_installed
 
 EPS = np.finfo(float).eps
 
@@ -38,6 +45,11 @@ def support_enumeration(g):
     -------
     list(tuple(ndarray(float, ndim=1)))
         List containing tuples of Nash equilibrium mixed actions.
+
+    Notes
+    -----
+    This routine is jit-complied if Numba version 0.28 or above is
+    installed.
 
     """
     return list(support_enumeration_gen(g))
@@ -68,7 +80,7 @@ def support_enumeration_gen(g):
                                     g.players[1].payoff_array)
 
 
-@jit(nopython=True)  # cache=True raises _pickle.PicklingError
+@jit(nopython=nopython)  # cache=True raises _pickle.PicklingError
 def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
     """
     Main body of `support_enumeration_gen`.
@@ -117,7 +129,7 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
             next_k_array(supps[0])
 
 
-@jit(nopython=True, cache=True)
+@jit(nopython=nopython, cache=True)
 def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
     """
     Given a player's payoff matrix `payoff_matrix`, an array `own_supp`
@@ -270,25 +282,37 @@ def next_k_array(a):
     return a
 
 
-@jit(nopython=True, cache=True)
-def is_singular(a):
-    """
-    Determine whether matrix `a` is numerically singular, by checking
-    its singular values.
+if is_numba_required_installed:
+    @jit(nopython=True, cache=True)
+    def is_singular(a):
+        s = numba.targets.linalg._compute_singular_values(a)
+        if s[-1] <= s[0] * EPS:
+            return True
+        else:
+            return False
+else:
+    def is_singular(a):
+        s = np.linalg.svd(a, compute_uv=False)
+        if s[-1] <= s[0] * EPS:
+            return True
+        else:
+            return False
 
-    Parameters
-    ----------
-    a : ndarray(float, ndim=2)
-        2-dimensional array of floats.
+_is_singular_docstr = \
+"""
+Determine whether matrix `a` is numerically singular, by checking
+its singular values.
 
-    Returns
-    -------
-    bool
-        Whether `a` is numerically singular.
+Parameters
+----------
+a : ndarray(float, ndim=2)
+    2-dimensional array of floats.
 
-    """
-    s = numba.targets.linalg._compute_singular_values(a)
-    if s[-1] <= s[0] * EPS:
-        return True
-    else:
-        return False
+Returns
+-------
+bool
+    Whether `a` is numerically singular.
+
+"""
+
+is_singular.__doc__ = _is_singular_docstr
