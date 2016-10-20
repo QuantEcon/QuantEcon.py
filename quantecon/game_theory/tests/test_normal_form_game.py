@@ -236,6 +236,16 @@ def test_normalformgame_payoff_profile_array():
             assert_array_equal(player_new.payoff_array, payoff_array)
 
 
+def test_normalformgame_payoff_profile_array_c_contiguous():
+    nums_actions = (2, 3, 4)
+    shape = nums_actions + (len(nums_actions),)
+    payoff_profile_array = \
+        np.arange(np.prod(shape)).reshape(shape)
+    g = NormalFormGame(payoff_profile_array)
+    for player in g.players:
+        ok_(player.payoff_array.flags['C_CONTIGUOUS'])
+
+
 # Trivial cases with one player #
 
 class TestPlayer_0opponents:
