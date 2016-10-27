@@ -163,7 +163,7 @@ class Player(object):
 
     """
     def __init__(self, payoff_array):
-        self.payoff_array = np.asarray(payoff_array)
+        self.payoff_array = np.asarray(payoff_array, order='C')
 
         if self.payoff_array.ndim == 0:
             raise ValueError('payoff_array must be an array_like')
