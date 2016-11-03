@@ -78,7 +78,7 @@ class TestLemkeHowsonDegenerate():
         for d in self.game_dicts:
             for k in d['NEs_dict'].keys():
                 NE_computed, res = lemke_howson(d['g'], init_pivot=k,
-                                                lex_min=True, full_output=True)
+                                                full_output=True)
                 for action_computed, action in zip(NE_computed,
                                                    d['NEs_dict'][k]):
                     assert_allclose(action_computed, action)

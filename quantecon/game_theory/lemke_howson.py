@@ -13,8 +13,7 @@ TOL_PIV = 1e-10
 TOL_RATIO_DIFF = 1e-15
 
 
-def lemke_howson(g, init_pivot=0, max_iter=10**6, lex_min=False,
-                 full_output=False):
+def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
     """
     Find one mixed-action Nash equilibrium of a 2-player normal form
     game by the Lemke-Howson algorithm [1]_, implemented by
@@ -32,10 +31,6 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, lex_min=False,
 
     max_iter : scalar(int), optional(default=10**6)
         Maximum number of pivoting steps.
-
-    lex_min : bool, optional(default=False)
-        Whether to perform the lexico-minimum ratio test, to resolve the
-        possible degeneracy of the input game.
 
     full_output : bool, optional(default=False)
         If False, only the computed Nash equilibrium is returned. If
@@ -119,7 +114,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, lex_min=False,
 
     initialize_tableaux(payoff_matrices, tableaux, bases)
     converged, num_iter = \
-        lemke_howson_tbl(tableaux, bases, init_pivot, max_iter, lex_min)
+        lemke_howson_tbl(tableaux, bases, init_pivot, max_iter)
     NE = get_mixed_actions(tableaux, bases)
 
     if not full_output:
@@ -129,8 +124,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, lex_min=False,
                      converged=converged,
                      num_iter=num_iter,
                      max_iter=max_iter,
-                     init_pivot=init_pivot,
-                     lex_min=lex_min)
+                     init_pivot=init_pivot)
 
     return NE, res
 
@@ -231,7 +225,7 @@ def initialize_tableaux(payoff_matrices, tableaux, bases):
 
 
 @jit(nopython=True)
-def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter, lex_min):
+def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     """
     Main body of the Lemke-Howson algorithm implementation.
 
@@ -254,9 +248,6 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter, lex_min):
     max_iter : scalar(int)
         Maximum number of pivoting steps.
 
-    lex_min : bool
-        Whether to perform the lexico-minimum ratio test.
-
     Returns
     -------
     converged : bool
@@ -274,7 +265,7 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter, lex_min):
     >>> tableaux = (np.empty((n, m+n+1)), np.empty((m, m+n+1)))
     >>> bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
     >>> tableaux, bases = initialize_tableaux((A, B), tableaux, bases)
-    >>> lemke_howson_tbl(tableaux, bases, 1, 10, False)
+    >>> lemke_howson_tbl(tableaux, bases, 1, 10)
     (True, 4)
     >>> tableaux[0]
     array([[ 0.875 ,  0.    ,  1.    ,  0.375 , -0.125 ,  0.25  ],
@@ -301,7 +292,11 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter, lex_min):
 
     pivot = init_pivot
 
-    slack_starts = (tableaux[1].shape[0], 0)
+    m, n = tableaux[1].shape[0], tableaux[0].shape[0]
+    slack_starts = (m, 0)
+
+    # Array to store row indices in lex_min_ratio_test
+    argmins = np.empty(max(m, n), dtype=np.int_)
 
     converged = False
     num_iter = 0
@@ -309,11 +304,8 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter, lex_min):
     while True:
         for pl in pls:
             # Determine the leaving variable
-            if lex_min:
-                row_min = \
-                    lex_min_ratio_test(tableaux[pl], pivot, slack_starts[pl])
-            else:
-                row_min = min_ratio_test(tableaux[pl], pivot)
+            row_min = lex_min_ratio_test(tableaux[pl], pivot,
+                                         slack_starts[pl], argmins)
 
             # Pivoting step: modify tableau in place
             pivoting(tableaux[pl], pivot, row_min)
@@ -376,46 +368,10 @@ def pivoting(tableau, pivot, pivot_row):
 
 
 @jit(nopython=True)
-def min_ratio_test(tableau, pivot):
-    """
-    Perform the minimum ratio test with tie breaking, where ties are
-    broken in favor of the row with the smallest index in the tableau.
-
-    Parameters
-    ----------
-    tableau : ndarray(float, ndim=2)
-        Array containing the tableau.
-
-    pivot : scalar(int)
-        Pivot.
-
-    Returns
-    -------
-    row_min : scalar(int)
-        Index of the row with the minimum ratio.
-
-    """
-    nrows = tableau.shape[0]
-
-    ratio_min = np.inf
-    row_min = -1  # dummy
-
-    for i in range(nrows):
-        if tableau[i, pivot] < TOL_PIV:  # Treated as nonpositive
-            continue
-        ratio = tableau[i, -1] / tableau[i, pivot]
-        if ratio < ratio_min - TOL_RATIO_DIFF:
-            row_min = i
-            ratio_min = ratio
-
-    return row_min
-
-
-@jit(nopython=True)
 def min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
                                    argmins, num_candidates):
     """
-    Perform the minimum ratio test without tie breaking among the
+    Perform the minimum ratio test, without tie breaking, for the
     candidate rows in `argmins[:num_candidates]`. Return the number
     `num_argmins` of the rows minimizing the ratio and store thier
     indices in `argmins[:num_argmins]`.
@@ -465,7 +421,7 @@ def min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
 
 
 @jit(nopython=True)
-def lex_min_ratio_test(tableau, pivot, slack_start):
+def lex_min_ratio_test(tableau, pivot, slack_start, argmins):
     """
     Perform the lexico-minimum ratio test.
 
@@ -480,6 +436,10 @@ def lex_min_ratio_test(tableau, pivot, slack_start):
     slack_start : scalar(int)
         First index for the slack variables.
 
+    argmins : ndarray(int, ndim=1)
+        Empty array used to store the row indices. Its length must be no
+        smaller than the number of the rows of `tableau`.
+
     Returns
     -------
     row_min : scalar(int)
@@ -487,8 +447,11 @@ def lex_min_ratio_test(tableau, pivot, slack_start):
 
     """
     nrows = tableau.shape[0]
-    argmins = np.arange(nrows)
     num_candidates = nrows
+
+    # Initialize `argmins`
+    for i in range(nrows):
+        argmins[i] = i
 
     num_argmins = min_ratio_test_no_tie_breaking(tableau, pivot, -1,
                                                  argmins, num_candidates)
