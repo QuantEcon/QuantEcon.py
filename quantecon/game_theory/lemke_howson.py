@@ -13,11 +13,12 @@ TOL_PIV = 1e-10
 TOL_RATIO_DIFF = 1e-15
 
 
-def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
+def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
+                 full_output=False):
     """
     Find one mixed-action Nash equilibrium of a 2-player normal form
-    game by the Lemke-Howson algorithm [1]_, implemented by
-    "comprementary pivoting" (see, e.g., von Stengel [2]_ for details).
+    game by the Lemke-Howson algorithm [2]_, implemented with
+    "complementary pivoting" (see, e.g., von Stengel [3]_ for details).
 
     Parameters
     ----------
@@ -31,6 +32,10 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
 
     max_iter : scalar(int), optional(default=10**6)
         Maximum number of pivoting steps.
+
+    capping : scalar(int), optional(default=None)
+        If supplied, the routine is executed with the heuristics
+        proposed by Codenotti et al. [1]_; see Notes below for details.
 
     full_output : bool, optional(default=False)
         If False, only the computed Nash equilibrium is returned. If
@@ -48,7 +53,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
 
     Examples
     --------
-    Consider the following game from von Stengel [2]_:
+    Consider the following game from von Stengel [3]_:
 
     >>> np.set_printoptions(precision=4)  # Reduce the digits printed
     >>> bimatrix = [[(3, 3), (3, 2)],
@@ -75,16 +80,37 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
 
     Notes
     -----
-    This routine is implemented with floating point arithmetic and thus
-    is subject to numerical instability.
+    * This routine is implemented with floating point arithmetic and
+      thus is subject to numerical instability.
+
+    * If `capping` is set to a positive integer, the routine is executed
+      with the heuristics proposed by [1]_:
+
+      * For k = `init_pivot`, `init_pivot` + 1, ..., `init_pivot` +
+        (m+n-2), (modulo m+n), the Lemke-Howson algorithm is executed
+        with k as the initial pivot and `capping` as the maximum number
+        of pivoting steps. If the algorithm converges during this loop,
+        then the Nash equilibrium found is returned.
+
+      * Otherwise, the Lemke-Howson algorithm is executed with
+        `init_pivot` + (m+n-1) (modulo m+n) as the initial pivot, with a
+        limit `max_iter` on the total number of pivoting steps.
+
+      Accoding to the simulation results for *uniformly random games*,
+      for medium- to large-size games this heuristics outperforms the
+      basic Lemke-Howson algorithm with a fixed initial pivot, where
+      [1]_ suggests that `capping` be set to 10.
 
     References
     ----------
-    .. [1] C. E. Lemke and J. T. Howson, "Equilibrium Points of Bimatrix
+    .. [1] B. Codenotti, S. De Rossi, and M. Pagan, "An Experimental
+       Analysis of Lemke-Howson Algorithm," arXiv:0811.3247, 2008.
+
+    .. [2] C. E. Lemke and J. T. Howson, "Equilibrium Points of Bimatrix
        Games," Journal of the Society for Industrial and Applied
        Mathematics (1964), 413-423.
 
-    .. [2] B. von Stengel, "Equilibrium Computation for Two-Player Games
+    .. [3] B. von Stengel, "Equilibrium Computation for Two-Player Games
        in Strategic and Extensive Form," Chapter 3, N. Nisan, T.
        Roughgarden, E. Tardos, and V. Vazirani eds., Algorithmic Game
        Theory, 2007.
@@ -107,14 +133,17 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
             .format(total_num)
         )
 
+    if capping is None:
+        capping = max_iter
+
     tableaux = tuple(
         np.empty((nums_actions[1-i], total_num+1)) for i in range(N)
     )
     bases = tuple(np.empty(nums_actions[1-i], dtype=int) for i in range(N))
 
-    initialize_tableaux(payoff_matrices, tableaux, bases)
-    converged, num_iter = \
-        lemke_howson_tbl(tableaux, bases, init_pivot, max_iter)
+    converged, num_iter, init_pivot_used = \
+        _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
+                              max_iter, capping)
     NE = get_mixed_actions(tableaux, bases)
 
     if not full_output:
@@ -124,9 +153,71 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, full_output=False):
                      converged=converged,
                      num_iter=num_iter,
                      max_iter=max_iter,
-                     init_pivot=init_pivot)
+                     init_pivot=init_pivot_used)
 
     return NE, res
+
+
+@jit(nopython=True, cache=True)
+def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
+                          max_iter, capping):
+    """
+    Execute the Lemke-Howson algorithm with the heuristics proposed by
+    Codenotti et al.
+
+    Parameters
+    ----------
+    payoff_matrices : tuple(ndarray(ndim=2))
+        Tuple of two arrays representing payoff matrices, of shape
+        (m, n) and (n, m), respectively.
+
+    tableaux : tuple(ndarray(float, ndim=2))
+        Tuple of two arrays to be used to store the tableaux, of shape
+        (n, m+n+1) and (m, m+n+1), respectively. Modified in place.
+
+    bases : tuple(ndarray(int, ndim=1))
+        Tuple of two arrays to be used to store the bases, of shape (n,)
+        and (m,), respectively. Modified in place.
+
+    init_pivot : scalar(int)
+        Integer k such that 0 <= k < m+n.
+
+    max_iter : scalar(int)
+        Maximum number of pivoting steps.
+
+    capping : scalar(int)
+        Value for capping. If set equal to `max_iter`, then the routine
+        is equivalent to the standard Lemke-Howson algorithm.
+
+    """
+    m, n = tableaux[1].shape[0], tableaux[0].shape[0]
+    init_pivot_curr = init_pivot
+    max_iter_curr = max_iter
+    total_num_iter = 0
+
+    for k in range(m+n-1):
+        capping_curr = min(max_iter_curr, capping)
+
+        initialize_tableaux(payoff_matrices, tableaux, bases)
+        converged, num_iter = \
+            lemke_howson_tbl(tableaux, bases, init_pivot_curr, capping_curr)
+
+        total_num_iter += num_iter
+
+        if converged or total_num_iter >= max_iter:
+            return converged, total_num_iter, init_pivot_curr
+
+        init_pivot_curr += 1
+        if init_pivot_curr >= m + n:
+            init_pivot_curr -= m + n
+        max_iter_curr -= num_iter
+
+    initialize_tableaux(payoff_matrices, tableaux, bases)
+    converged, num_iter = \
+        lemke_howson_tbl(tableaux, bases, init_pivot_curr, max_iter_curr)
+    total_num_iter += num_iter
+
+    return converged, total_num_iter, init_pivot_curr
 
 
 @jit(nopython=True, cache=True)

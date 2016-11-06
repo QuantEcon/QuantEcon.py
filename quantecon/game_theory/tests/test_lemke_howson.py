@@ -85,6 +85,31 @@ class TestLemkeHowsonDegenerate():
                 eq_(res.converged, d['converged'])
 
 
+def test_lemke_howson_capping():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    g = NormalFormGame(bimatrix)
+    m, n = g.nums_actions
+    max_iter = 10**6  # big number
+
+    for k in range(m+n):
+        NE0, res0 = lemke_howson(g, init_pivot=k, max_iter=max_iter,
+                                 capping=None, full_output=True)
+        NE1, res1 = lemke_howson(g, init_pivot=k, max_iter=max_iter,
+                                 capping=max_iter, full_output=True)
+        for action0, action1 in zip(NE0, NE1):
+            assert_allclose(action0, action1)
+        eq_(res0.init_pivot, res1.init_pivot)
+
+    init_pivot = 1
+    max_iter = m+n
+    NE, res = lemke_howson(g, init_pivot=init_pivot, max_iter=max_iter,
+                           capping=1, full_output=True)
+    eq_(res.num_iter, max_iter)
+    eq_(res.init_pivot, init_pivot-1)
+
+
 if __name__ == '__main__':
     import sys
     import nose
