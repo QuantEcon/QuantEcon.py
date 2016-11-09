@@ -7,6 +7,7 @@ specified initial condition v.
 
 """
 import time
+import warnings
 import numpy as np
 
 
@@ -33,7 +34,7 @@ def _print_after_skip(skip, it=None, dist=None, etime=None):
     return
 
 
-def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
+def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
                         print_skip=5, *args, **kwargs):
     """
     Computes and returns :math:`T^k v`, an approximate fixed point.
@@ -52,8 +53,12 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
         Error tolerance
     max_iter : scalar(int), optional(default=50)
         Maximum number of iterations
-    verbose : bool, optional(default=True)
-        If True then print current error at each iterate.
+    verbose : scalar(int), optional(default=2)
+        Level of feedback (0 for no output, 1 for warnings only, 2 for
+        warning and residual error reports during iteration)
+    print_skip : scalar(int), optional(default=5)
+        How many iterations to apply between print messages (effective
+        only when `verbose=2`)
     args, kwargs :
         Other arguments and keyword arguments that are passed directly
         to  the function T each time it is called
@@ -64,10 +69,13 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
         The approximate fixed point
 
     """
+    if verbose not in (0, 1, 2):
+        raise ValueError('verbose should be 0, 1 or 2')
+
     iterate = 0
     error = error_tol + 1
 
-    if verbose:
+    if verbose == 2:
         start_time = time.time()
         _print_after_skip(print_skip, it=None)
 
@@ -76,7 +84,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
         iterate += 1
         error = np.max(np.abs(new_v - v))
 
-        if verbose:
+        if verbose == 2:
             etime = time.time() - start_time
             _print_after_skip(print_skip, iterate, error, etime)
 
@@ -84,4 +92,12 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=1,
             v[:] = new_v
         except TypeError:
             v = new_v
+
+    if verbose >= 1:
+        if iterate == max_iter:
+            warnings.warn('max_iter attained in compute_fixed_point',
+                          RuntimeWarning)
+        elif verbose == 2:
+            print('Converged in {iterate} steps'.format(iterate=iterate))
+
     return v
