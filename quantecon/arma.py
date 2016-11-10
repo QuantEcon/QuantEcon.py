@@ -4,16 +4,13 @@ Authors: Doc-Jin Jang, Jerry Choi, Thomas Sargent, John Stachurski
 
 Provides functions for working with and visualizing scalar ARMA processes.
 
+TODO: 1. Fix warnings concerning casting complex variables back to floats
+
 """
 import numpy as np
 from numpy import conj, pi
 import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
-
-# == Ignore unnecessary warnings concerning casting complex variables back to
-# floats == #
-import warnings
-warnings.filterwarnings('ignore')
 
 
 class ARMA(object):
