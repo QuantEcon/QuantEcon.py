@@ -13,7 +13,6 @@ TODO: 1. See issue 47 on github repository, should add support for
 """
 from __future__ import division
 import numpy as np
-import warnings
 from numpy import dot
 from numpy.linalg import solve
 from scipy.linalg import solve_discrete_lyapunov as sp_solve_discrete_lyapunov
