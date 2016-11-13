@@ -14,6 +14,7 @@ TODO: add multivariate case
 """
 from __future__ import division
 import unittest
+import numpy as np
 from quantecon import compute_fixed_point
 
 
@@ -68,3 +69,24 @@ class TestFPLogisticEquation(unittest.TestCase):
             # This should not converge  (b/c unique fp is 0.0)
             self.assertFalse(abs(compute_fixed_point(f, i, **self.kwargs)-fp)
                              < 1e-4)
+
+    def test_imitation_game_method(self):
+        "compute_fp: Test imitation game method"
+        method = 'imitation_game'
+        error_tol = self.kwargs['error_tol']
+
+        for mu in [self.mu_1, self.mu_2]:
+            for i in self.unit_inverval:
+                fp_computed = \
+                    compute_fixed_point(self.T, i, mu=mu, **self.kwargs)
+                self.assertTrue(
+                    abs(self.T(fp_computed, mu=mu) - fp_computed) <= error_tol
+                )
+
+            # numpy array input
+            i = np.asarray(self.unit_inverval)
+            fp_computed = compute_fixed_point(self.T, i, mu=mu, **self.kwargs)
+            self.assertTrue(
+                abs(self.T(fp_computed, mu=mu) - fp_computed).max() <=
+                error_tol
+            )
