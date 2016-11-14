@@ -163,7 +163,7 @@ class Player(object):
 
     """
     def __init__(self, payoff_array):
-        self.payoff_array = np.asarray(payoff_array)
+        self.payoff_array = np.asarray(payoff_array, order='C')
 
         if self.payoff_array.ndim == 0:
             raise ValueError('payoff_array must be an array_like')
@@ -475,11 +475,16 @@ class NormalFormGame(object):
                         'size of innermost array must be equal to ' +
                         'the number of players'
                     )
-                self.players = tuple(
-                    Player(
+                payoff_arrays = tuple(
+                    np.empty(data.shape[i:-1]+data.shape[:i], dtype=data.dtype)
+                    for i in range(N)
+                )
+                for i, payoff_array in enumerate(payoff_arrays):
+                    payoff_array[:] = \
                         data.take(i, axis=-1).transpose(list(range(i, N)) +
                                                         list(range(i)))
-                    ) for i in range(N)
+                self.players = tuple(
+                    Player(payoff_array) for payoff_array in payoff_arrays
                 )
                 self.dtype = data.dtype
 
