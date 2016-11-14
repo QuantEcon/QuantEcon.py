@@ -261,7 +261,7 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
     return x_new
 
 
-@jit(nopython=True, cache=True)
+@jit(nopython=True)
 def _initialize_tableaux_ig(X, Y, tableaux, bases):
     """
     Given sequences `X` and `Y` of ndarrays, initialize the tableau and
