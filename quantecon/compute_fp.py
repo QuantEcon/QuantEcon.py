@@ -37,7 +37,8 @@ def _print_after_skip(skip, it=None, dist=None, etime=None):
 
 
 _convergence_msg = 'Converged in {iterate} steps'
-_non_convergence_msg = 'max_iter attained in compute_fixed_point'
+_non_convergence_msg = \
+    'max_iter attained before convergence in compute_fixed_point'
 
 
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
@@ -98,6 +99,9 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
        Kakutani," 2006.
 
     """
+    if max_iter < 1:
+        raise ValueError('max_iter must be a positive integer')
+
     if verbose not in (0, 1, 2):
         raise ValueError('verbose should be 0, 1 or 2')
 
@@ -116,22 +120,29 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
         start_time = time.time()
         _print_after_skip(print_skip, it=None)
 
-    while iterate < max_iter and error > error_tol:
+    while True:
         new_v = T(v, *args, **kwargs)
         iterate += 1
         error = np.max(np.abs(new_v - v))
-
-        if verbose == 2:
-            etime = time.time() - start_time
-            _print_after_skip(print_skip, iterate, error, etime)
 
         try:
             v[:] = new_v
         except TypeError:
             v = new_v
 
+        if error <= error_tol or iterate >= max_iter:
+            break
+
+        if verbose == 2:
+            etime = time.time() - start_time
+            _print_after_skip(print_skip, iterate, error, etime)
+
+    if verbose == 2:
+        etime = time.time() - start_time
+        print_skip = 1
+        _print_after_skip(print_skip, iterate, error, etime)
     if verbose >= 1:
-        if iterate == max_iter:
+        if error > error_tol:
             warnings.warn(_non_convergence_msg, RuntimeWarning)
         elif verbose == 2:
             print(_convergence_msg.format(iterate=iterate))
@@ -164,17 +175,21 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
     iterate = 1
     error = np.max(np.abs(y_new - x_new))
 
-    if verbose == 2:
-        etime = time.time() - start_time
-        _print_after_skip(print_skip, iterate, error, etime)
-
     if error <= error_tol or iterate >= max_iter:
+        if verbose == 2:
+            etime = time.time() - start_time
+            print_skip = 1
+            _print_after_skip(print_skip, iterate, error, etime)
         if verbose >= 1:
-            if iterate == max_iter:
+            if error > error_tol:
                 warnings.warn(_non_convergence_msg, RuntimeWarning)
             elif verbose == 2:
                 print(_convergence_msg.format(iterate=iterate))
         return x_new
+
+    if verbose == 2:
+        etime = time.time() - start_time
+        _print_after_skip(print_skip, iterate, error, etime)
 
     # Length of the arrays to store the computed sequences of x and y.
     # If exceeded, reset to min(max_iter, buff_size*2).
@@ -195,12 +210,12 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
         iterate += 1
         error = np.max(np.abs(y_new - x_new))
 
+        if error <= error_tol or iterate >= max_iter:
+            break
+
         if verbose == 2:
             etime = time.time() - start_time
             _print_after_skip(print_skip, iterate, error, etime)
-
-        if error <= error_tol or iterate >= max_iter:
-            break
 
         try:
             X[iterate-1] = x_new
@@ -233,8 +248,12 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
             Y_2d = Y.reshape(shape_Y[0], np.prod(shape_Y[1:]))
             x_new = rho.dot(Y_2d[:m]).reshape(shape_Y[1:])
 
+    if verbose == 2:
+        etime = time.time() - start_time
+        print_skip = 1
+        _print_after_skip(print_skip, iterate, error, etime)
     if verbose >= 1:
-        if iterate == max_iter:
+        if error > error_tol:
             warnings.warn(_non_convergence_msg, RuntimeWarning)
         elif verbose == 2:
             print(_convergence_msg.format(iterate=iterate))
