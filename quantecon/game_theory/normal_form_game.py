@@ -161,6 +161,9 @@ class Player(object):
     dtype : dtype
         Data type of the elements of `payoff_array`.
 
+    tol : scalar(float), default=1e-8
+        Default tolerance value used in determining best responses.
+
     """
     def __init__(self, payoff_array):
         self.payoff_array = np.asarray(payoff_array, order='C')
@@ -231,7 +234,7 @@ class Player(object):
 
         return payoff_vector
 
-    def is_best_response(self, own_action, opponents_actions):
+    def is_best_response(self, own_action, opponents_actions, tol=None):
         """
         Return True if `own_action` is a best response to
         `opponents_actions`.
@@ -244,6 +247,10 @@ class Player(object):
 
         opponents_actions : see `best_response`
 
+        tol : scalar(float), optional(default=None)
+            Tolerance level used in determining best responses. If None,
+            default to the value of the `tol` attribute.
+
         Returns
         -------
         bool
@@ -251,16 +258,19 @@ class Player(object):
             `opponents_actions`; False otherwise.
 
         """
+        if tol is None:
+            tol = self.tol
+
         payoff_vector = self.payoff_vector(opponents_actions)
         payoff_max = payoff_vector.max()
 
         if isinstance(own_action, numbers.Integral):
-            return payoff_vector[own_action] >= payoff_max - self.tol
+            return payoff_vector[own_action] >= payoff_max - tol
         else:
-            return np.dot(own_action, payoff_vector) >= payoff_max - self.tol
+            return np.dot(own_action, payoff_vector) >= payoff_max - tol
 
     def best_response(self, opponents_actions, tie_breaking='smallest',
-                      payoff_perturbation=None, random_state=None):
+                      payoff_perturbation=None, tol=None, random_state=None):
         """
         Return the best response action(s) to `opponents_actions`.
 
@@ -286,6 +296,10 @@ class Player(object):
             containing the values ("noises") to be added to the payoffs
             in determining the best response.
 
+        tol : scalar(float), optional(default=None)
+            Tolerance level used in determining best responses. If None,
+            default to the value of the `tol` attribute.
+
         random_state : scalar(int) or np.random.RandomState,
                        optional(default=None)
             Random seed (integer) or np.random.RandomState instance to
@@ -303,6 +317,9 @@ class Player(object):
             from the best response actions.
 
         """
+        if tol is None:
+            tol = self.tol
+
         payoff_vector = self.payoff_vector(opponents_actions)
         if payoff_perturbation is not None:
             try:
@@ -310,21 +327,19 @@ class Player(object):
             except TypeError:  # type mismatch
                 payoff_vector = payoff_vector + payoff_perturbation
 
+        best_responses = \
+            np.where(payoff_vector >= payoff_vector.max() - tol)[0]
+
         if tie_breaking == 'smallest':
-            best_response = np.argmax(payoff_vector)
-            return best_response
+            return best_responses[0]
+        elif tie_breaking == 'random':
+            return self.random_choice(best_responses,
+                                      random_state=random_state)
+        elif tie_breaking is False:
+            return best_responses
         else:
-            best_responses = \
-                np.where(payoff_vector >= payoff_vector.max() - self.tol)[0]
-            if tie_breaking == 'random':
-                return self.random_choice(best_responses,
-                                          random_state=random_state)
-            elif tie_breaking is False:
-                return best_responses
-            else:
-                msg = "tie_breaking must be one of 'smallest', 'random' " + \
-                      "or False"
-                raise ValueError(msg)
+            msg = "tie_breaking must be one of 'smallest', 'random', or False"
+            raise ValueError(msg)
 
     def random_choice(self, actions=None, random_state=None):
         """
@@ -565,7 +580,7 @@ class NormalFormGame(object):
                 tuple(action_profile[i:]) + tuple(action_profile[:i])
             ] = payoff_profile[i]
 
-    def is_nash(self, action_profile):
+    def is_nash(self, action_profile, tol=None):
         """
         Return True if `action_profile` is a Nash equilibrium.
 
@@ -574,6 +589,10 @@ class NormalFormGame(object):
         action_profile : array_like(int or array_like(float))
             An array of N objects, where each object must be an integer
             (pure action) or an array of floats (mixed action).
+
+        tol : scalar(float)
+            Tolerance level used in determining best responses. If None,
+            default to each player's `tol` attribute value.
 
         Returns
         -------
@@ -586,7 +605,8 @@ class NormalFormGame(object):
             for i, player in enumerate(self.players):
                 own_action, opponent_action = \
                     action_profile[i], action_profile[1-i]
-                if not player.is_best_response(own_action, opponent_action):
+                if not player.is_best_response(own_action, opponent_action,
+                                               tol):
                     return False
 
         elif self.N >= 3:
@@ -595,11 +615,13 @@ class NormalFormGame(object):
                 opponents_actions = \
                     tuple(action_profile[i+1:]) + tuple(action_profile[:i])
 
-                if not player.is_best_response(own_action, opponents_actions):
+                if not player.is_best_response(own_action, opponents_actions,
+                                               tol):
                     return False
 
         else:  # Trivial case with self.N == 1
-            if not self.players[0].is_best_response(action_profile[0], None):
+            if not self.players[0].is_best_response(action_profile[0], None,
+                                                    tol):
                 return False
 
         return True
@@ -659,8 +681,8 @@ def pure2mixed(num_actions, action):
 
 # Numba jitted functions #
 
-@jit(nopython=True)
-def best_response_2p(payoff_matrix, opponent_mixed_action):
+@jit(nopython=True, cache=True)
+def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
     """
     Numba-optimized version of `Player.best_response` compilied in
     nopython mode, specialized for 2-player games (where there is only
@@ -678,6 +700,9 @@ def best_response_2p(payoff_matrix, opponent_mixed_action):
         Opponent's mixed action. Its length must be equal to
         `payoff_matrix.shape[1]`.
 
+    tol : scalar(float), optional(default=None)
+        Tolerance level used in determining best responses.
+
     Return
     ------
     scalar(int)
@@ -686,18 +711,15 @@ def best_response_2p(payoff_matrix, opponent_mixed_action):
     """
     n, m = payoff_matrix.shape
 
-    best_response = 0
-    payoff_0 = 0
-    for b in range(m):
-        payoff_0 += payoff_matrix[0, b] * opponent_mixed_action[b]
-    payoff_max = payoff_0
+    payoff_max = -np.inf
+    payoff_vector = np.zeros(n)
 
-    for a in range(1, n):
-        payoff = 0
+    for a in range(n):
         for b in range(m):
-            payoff += payoff_matrix[a, b] * opponent_mixed_action[b]
-        if payoff > payoff_max:
-            payoff_max = payoff
-            best_response = a
+            payoff_vector[a] += payoff_matrix[a, b] * opponent_mixed_action[b]
+        if payoff_vector[a] > payoff_max:
+            payoff_max = payoff_vector[a]
 
-    return best_response
+    for a in range(n):
+        if payoff_vector[a] >= payoff_max - tol:
+            return a
