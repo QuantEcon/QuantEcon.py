@@ -41,6 +41,11 @@ _non_convergence_msg = \
     'max_iter attained before convergence in compute_fixed_point'
 
 
+def _is_approx_fp(T, v, error_tol, *args, **kwargs):
+    error = np.max(np.abs(T(v, *args, **kwargs) - v))
+    return error <= error_tol
+
+
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
                         print_skip=5, method='iteration', *args, **kwargs):
     """
@@ -109,8 +114,12 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
         raise ValueError('invalid method')
 
     if method == 'imitation_game':
-        return _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose,
-                                       print_skip, *args, **kwargs)
+        is_approx_fp = \
+            lambda v: _is_approx_fp(T, v, error_tol, *args, **kwargs)
+        v_star, converged, iterate = \
+             _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip,
+                                     is_approx_fp, *args, **kwargs)
+        return v_star
 
     # method == 'iteration'
     iterate = 0
@@ -150,7 +159,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
     return v
 
 
-def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
+def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
                             *args, **kwargs):
     """
     Implement the imitation game algorithm by McLennan and Tourky (2006)
@@ -158,12 +167,23 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
 
     Parameters
     ----------
-    See Parameters in compute_fixed_point.
+    is_approx_fp : callable
+        A callable with signature `is_approx_fp(v)` which determines
+        whether `v` is an approximate fixed point with a bool return
+        value (i.e., True or False)
+
+    For the other parameters, see Parameters in compute_fixed_point.
 
     Returns
     -------
     x_new : scalar(float) or ndarray(float)
         Approximate fixed point.
+
+    converged : bool
+        Whether the routine has converged.
+
+    iterate : scalar(int)
+        Number of iterations.
 
     """
     if verbose == 2:
@@ -173,21 +193,23 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
     x_new = v
     y_new = T(x_new, *args, **kwargs)
     iterate = 1
-    error = np.max(np.abs(y_new - x_new))
+    converged = is_approx_fp(x_new)
 
-    if error <= error_tol or iterate >= max_iter:
+    if converged or iterate >= max_iter:
         if verbose == 2:
+            error = np.max(np.abs(y_new - x_new))
             etime = time.time() - start_time
             print_skip = 1
             _print_after_skip(print_skip, iterate, error, etime)
         if verbose >= 1:
-            if error > error_tol:
+            if not converged:
                 warnings.warn(_non_convergence_msg, RuntimeWarning)
             elif verbose == 2:
                 print(_convergence_msg.format(iterate=iterate))
-        return x_new
+        return x_new, converged, iterate
 
     if verbose == 2:
+        error = np.max(np.abs(y_new - x_new))
         etime = time.time() - start_time
         _print_after_skip(print_skip, iterate, error, etime)
 
@@ -208,12 +230,13 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
     while True:
         y_new = T(x_new, *args, **kwargs)
         iterate += 1
-        error = np.max(np.abs(y_new - x_new))
+        converged = is_approx_fp(x_new)
 
-        if error <= error_tol or iterate >= max_iter:
+        if converged or iterate >= max_iter:
             break
 
         if verbose == 2:
+            error = np.max(np.abs(y_new - x_new))
             etime = time.time() - start_time
             _print_after_skip(print_skip, iterate, error, etime)
 
@@ -249,16 +272,17 @@ def _compute_fixed_point_ig(T, v, error_tol, max_iter, verbose, print_skip,
             x_new = rho.dot(Y_2d[:m]).reshape(shape_Y[1:])
 
     if verbose == 2:
+        error = np.max(np.abs(y_new - x_new))
         etime = time.time() - start_time
         print_skip = 1
         _print_after_skip(print_skip, iterate, error, etime)
     if verbose >= 1:
-        if error > error_tol:
+        if not converged:
             warnings.warn(_non_convergence_msg, RuntimeWarning)
         elif verbose == 2:
             print(_convergence_msg.format(iterate=iterate))
 
-    return x_new
+    return x_new, converged, iterate
 
 
 @jit(nopython=True)
