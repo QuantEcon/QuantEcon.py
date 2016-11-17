@@ -100,14 +100,14 @@ def test_lemke_howson_capping():
                                  capping=max_iter, full_output=True)
         for action0, action1 in zip(NE0, NE1):
             assert_allclose(action0, action1)
-        eq_(res0.init_pivot, res1.init_pivot)
+        eq_(res0.init, res1.init)
 
     init_pivot = 1
     max_iter = m+n
     NE, res = lemke_howson(g, init_pivot=init_pivot, max_iter=max_iter,
                            capping=1, full_output=True)
     eq_(res.num_iter, max_iter)
-    eq_(res.init_pivot, init_pivot-1)
+    eq_(res.init, init_pivot-1)
 
 
 if __name__ == '__main__':

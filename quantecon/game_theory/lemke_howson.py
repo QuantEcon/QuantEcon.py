@@ -7,6 +7,7 @@ Lemke-Howson algorithm.
 """
 import numpy as np
 from numba import jit
+from .utilities import NashResult
 
 
 TOL_PIV = 1e-10
@@ -119,7 +120,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     try:
         N = g.N
     except:
-        raise TypeError('input must be a 2-player NormalFormGame')
+        raise TypeError('g must be a 2-player NormalFormGame')
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')
 
@@ -153,7 +154,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
                      converged=converged,
                      num_iter=num_iter,
                      max_iter=max_iter,
-                     init_pivot=init_pivot_used)
+                     init=init_pivot_used)
 
     return NE, res
 
@@ -598,48 +599,3 @@ def get_mixed_actions(tableaux, bases):
             out[start:stop] /= sum_
 
     return out[:nums_actions[0]], out[nums_actions[0]:]
-
-
-class NashResult(dict):
-    """
-    Contain the information about the result of Nash equilibrium
-    computation.
-
-    Attributes
-    ----------
-    NE : tuple(ndarray(float, ndim=1))
-        Computed Nash equilibrium.
-
-    converged : bool
-        Whether the routine has converged.
-
-    num_iter : int
-        Total number of iterations.
-
-    max_iter : int
-        Maximum number of iterations.
-
-    init_pivot : int
-        Initial pivot used.
-
-    """
-    # This is sourced from sicpy.optimize.OptimizeResult.
-    def __getattr__(self, name):
-        try:
-            return self[name]
-        except KeyError:
-            raise AttributeError(name)
-
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-
-    def __repr__(self):
-        if self.keys():
-            m = max(map(len, list(self.keys()))) + 1
-            return '\n'.join([k.rjust(m) + ': ' + repr(v)
-                              for k, v in sorted(self.items())])
-        else:
-            return self.__class__.__name__ + "()"
-
-    def __dir__(self):
-        return self.keys()
