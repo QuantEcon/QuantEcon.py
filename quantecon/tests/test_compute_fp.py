@@ -77,15 +77,16 @@ class TestFPLogisticEquation(unittest.TestCase):
 
         for mu in [self.mu_1, self.mu_2]:
             for i in self.unit_inverval:
-                fp_computed = \
-                    compute_fixed_point(self.T, i, mu=mu, **self.kwargs)
+                fp_computed = compute_fixed_point(self.T, i, method=method,
+                                                  mu=mu, **self.kwargs)
                 self.assertTrue(
                     abs(self.T(fp_computed, mu=mu) - fp_computed) <= error_tol
                 )
 
             # numpy array input
             i = np.asarray(self.unit_inverval)
-            fp_computed = compute_fixed_point(self.T, i, mu=mu, **self.kwargs)
+            fp_computed = compute_fixed_point(self.T, i, method=method, mu=mu,
+                                              **self.kwargs)
             self.assertTrue(
                 abs(self.T(fp_computed, mu=mu) - fp_computed).max() <=
                 error_tol
