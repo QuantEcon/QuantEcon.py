@@ -55,7 +55,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     #-Obtain each requested file-#
     for directory in files.keys():
         if directory != "":
-            if verbose: print("Parsing directory: %s")
+            if verbose: print("Parsing directory: %s"%directory)
         for fl in files[directory]:
             if directory != "":
                 fl = directory+"/"+fl
