@@ -25,7 +25,7 @@ before_install:
   #- sudo ln -s /run/shm /dev/shm
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba=0.28.1
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba
     # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
   - pip install coveralls coverage
   - python setup.py install
