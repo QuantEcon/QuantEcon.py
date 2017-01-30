@@ -35,7 +35,7 @@ from .markov import mc_compute_stationary, mc_sample_path 												#Imports t
 #<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
-from .util import searchsorted, fetch_nb_dependencies
+from .util import searchsorted, fetch_nb_dependencies, tic, tac, toc
 
 #-Add Version Attribute-#
 from .version import version as __version__
