@@ -4,7 +4,7 @@ import os
 #-Write Versions File-#
 #~~~~~~~~~~~~~~~~~~~~~#
 
-VERSION = '0.3.3'
+VERSION = '0.3.4'
 
 def write_version_py(filename=None):
     """
