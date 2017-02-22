@@ -904,7 +904,7 @@ def _qnwsimp1(n, a, b):
 
     nodes = np.linspace(a, b, n)
     dx = nodes[1] - nodes[0]
-    weights = np.tile([2.0, 4.0], (n + 1.0) / 2.0)
+    weights = np.tile([2.0, 4.0], (n + 1) // 2)
     weights = weights[:n]
     weights[0] = weights[-1] = 1
     weights = (dx / 3.0) * weights
