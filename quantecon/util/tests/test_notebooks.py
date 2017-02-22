@@ -9,6 +9,7 @@ fetch_nb_dependencies
 
 from quantecon.util import fetch_nb_dependencies
 import unittest
+import os
 
 FILES = ['README.md']
 REPO = "https://github.com/QuantEcon/QuantEcon.py"
@@ -28,5 +29,9 @@ class TestNotebookUtils(unittest.TestCase):
         """
         Run Second and Ensure file is skipped by checking a False is found in status
         """
-        status = fetch_nb_dependencies(files=FILES, repo=REPO, raw=RAW, branch=BRANCH)
+        status = fetch_nb_dependencies(files=FILES, repo=REPO, raw=RAW, branch=BRANCH)  #First will succeed
+        status = fetch_nb_dependencies(files=FILES, repo=REPO, raw=RAW, branch=BRANCH)  #Second should skip
         self.assertTrue(False in status)
+
+    def tearDown(self):
+        os.remove("README.md")
