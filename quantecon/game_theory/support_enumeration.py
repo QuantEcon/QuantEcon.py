@@ -129,7 +129,7 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
             next_k_array(supps[0])
 
 
-@jit(nopython=nopython, cache=True)
+@jit(nopython=nopython)
 def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
     """
     Given a player's payoff matrix `payoff_matrix`, an array `own_supp`
