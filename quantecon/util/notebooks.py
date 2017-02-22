@@ -9,7 +9,7 @@ Note
 Files on the REMOTE Github Server can be organised into folders but they will end up at the root level of
 when downloaded as a support File
 
-"https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./somthing.py
+"https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./something.py
 
 TODO
 ----
@@ -21,6 +21,7 @@ TODO
 
 import os
 import requests
+import warnings
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
@@ -52,6 +53,8 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     if type(files) == list:
         files = {"" : files}
 
+    status = []
+
     #-Obtain each requested file-#
     for directory in files.keys():
         if directory != "":
@@ -62,7 +65,8 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
             #-Check for Local Copy of File (Default Behaviour is to Skip)-#
             if not overwrite:
                 if os.path.isfile(fl):
-                    if verbose: print("A file named %s already exists in the specified directory ... skipping download."%fl)
+                    if verbose: print("A file named %s already exists in the specified directory ... skipping download." % fl)
+                    status.append(False)
                     continue
             else:
                 if verbose: print("Overwriting file %s ..."%fl)
@@ -72,4 +76,6 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
             r = requests.get(url)
             with open(fl, "wb") as fl:
                 fl.write(r.content)
+            status.append(True)
 
+    return status
