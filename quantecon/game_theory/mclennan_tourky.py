@@ -70,7 +70,6 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     3-player NormalFormGame with payoff profile array:
     [[[[ 1.,  1.,  1.],   [ 1.,  1.,  2.]],
       [[ 1.,  2.,  1.],   [ 1.,  0.,  0.]]],
-
      [[[ 2.,  1.,  1.],   [ 0.,  1.,  0.]],
       [[ 0.,  0.,  1.],   [ 0.,  0.,  0.]]]]
 
