@@ -59,6 +59,16 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver. 0.3.4 (23-February-2017)
+1. Add support_enumeration, a simple algorithm that computes all mixed-action Nash equilibria of a non-degenerate 2-player game. See [PR #263](https://github.com/QuantEcon/QuantEcon.py/pull/263)
+2. Various fixes for issues with numba. See [PR #265](https://github.com/QuantEcon/QuantEcon.py/pull/265), [PR #283](https://github.com/QuantEcon/QuantEcon.py/pull/283)
+3.Add lemke_howson algorithm to game_theory module. See [PR #268](https://github.com/QuantEcon/QuantEcon.py/pull/268)
+4. Add random game generators to game_theory module. See [PR #270](https://github.com/QuantEcon/QuantEcon.py/pull/270)
+5. Implement the imitation game algorithm by McLennan and Tourky. See [PR #273](https://github.com/QuantEcon/QuantEcon.py/pull/273)
+6. Add brute force for finding pure nash equilibria. See [PR #276](https://github.com/QuantEcon/QuantEcon.py/pull/276)
+7. Improve parameter names to QuantEcon.notebooks dependency fetcher. See [PR #279](https://github.com/QuantEcon/QuantEcon.py/pull/279)
+8. Utilities ``tic``, ``tac`` and ``toc`` moved to top level namespace of package. See [PR #280](https://github.com/QuantEcon/QuantEcon.py/pull/280)
+
 ### Ver. 0.3.3 (21-July-2016)
 1. Remove ``python2.7`` classifiers project only supports ``python3.5+``
 2. Migrate ``sa_indices`` to be a utility function for the markov submodule
