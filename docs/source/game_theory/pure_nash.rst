@@ -1,7 +1,7 @@
-optgrowth
+pure_nash
 =========
 
-.. automodule:: quantecon.models.optgrowth
+.. automodule:: quantecon.game_theory.pure_nash
     :members:
     :undoc-members:
     :show-inheritance:

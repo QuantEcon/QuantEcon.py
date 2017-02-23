@@ -1,7 +1,7 @@
-lucastree
+utilities
 =========
 
-.. automodule:: quantecon.models.lucastree
+.. automodule:: quantecon.game_theory.utilities
     :members:
     :undoc-members:
     :show-inheritance:

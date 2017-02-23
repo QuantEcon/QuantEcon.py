@@ -1,7 +1,7 @@
-cobb_douglas
+lemke_howson
 ============
 
-.. automodule:: quantecon.models.solow.cobb_douglas
+.. automodule:: quantecon.game_theory.lemke_howson
     :members:
     :undoc-members:
     :show-inheritance:

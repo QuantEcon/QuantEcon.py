@@ -56,6 +56,14 @@ srcclean:
 	rm -f source/index.rst
 	rm -f source/models.rst
 	rm -f source/tools.rst
+	rm -rf source/game_theory
+	rm -f source/game_theory.rst
+	rm -rf source/markov
+	rm -f source/markov.rst
+	rm -rf source/random
+	rm -f source/random.rst
+	rm -rf source/util
+	rm -f source/util.rst
 
 myhtml:
 	make srcclean

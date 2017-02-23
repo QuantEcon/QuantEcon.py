@@ -1,7 +1,7 @@
-common_messages
+mclennan_tourky
 ===============
 
-.. automodule:: quantecon.common_messages
+.. automodule:: quantecon.game_theory.mclennan_tourky
     :members:
     :undoc-members:
     :show-inheritance:

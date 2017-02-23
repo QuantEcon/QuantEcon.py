@@ -125,8 +125,8 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
                                                                actions)):
                             out[p][supp] = action
                         yield out
-                next_k_array(supps[1])
-            next_k_array(supps[0])
+                _next_k_array(supps[1])
+            _next_k_array(supps[0])
 
 
 @jit(nopython=nopython)
@@ -176,7 +176,7 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
     k = len(own_supp)
 
     A[:-1, :-1] = payoff_matrix[own_supp, :][:, opp_supp]
-    if is_singular(A):
+    if _is_singular(A):
         return False
 
     sol = np.linalg.solve(A, b)
@@ -202,7 +202,7 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
 
 
 @jit(nopython=True, cache=True)
-def next_k_combination(x):
+def _next_k_combination(x):
     """
     Find the next k-combination, as described by an integer in binary
     representation with the k set bits, by "Gosper's hack".
@@ -226,7 +226,7 @@ def next_k_combination(x):
 
 
 @jit(nopython=True, cache=True)
-def next_k_array(a):
+def _next_k_array(a):
     """
     Given an array `a` of k distinct nonnegative integers, return the
     next k-array in lexicographic ordering of the descending sequences
@@ -250,7 +250,7 @@ def next_k_array(a):
     >>> a = np.arange(k)
     >>> while a[-1] < n:
     ...     print(a)
-    ...     a = next_k_array(a)
+    ...     a = _next_k_array(a)
     ...
     [0 1]
     [0 2]
@@ -268,7 +268,7 @@ def next_k_array(a):
     for i in range(k):
         x += (1 << a[i])
 
-    x = next_k_combination(x)
+    x = _next_k_combination(x)
 
     pos = 0
     for i in range(k):
@@ -284,14 +284,14 @@ def next_k_array(a):
 
 if is_numba_required_installed:
     @jit(nopython=True, cache=True)
-    def is_singular(a):
+    def _is_singular(a):
         s = numba.targets.linalg._compute_singular_values(a)
         if s[-1] <= s[0] * EPS:
             return True
         else:
             return False
 else:
-    def is_singular(a):
+    def _is_singular(a):
         s = np.linalg.svd(a, compute_uv=False)
         if s[-1] <= s[0] * EPS:
             return True
@@ -315,4 +315,4 @@ bool
 
 """
 
-is_singular.__doc__ = _is_singular_docstr
+_is_singular.__doc__ = _is_singular_docstr

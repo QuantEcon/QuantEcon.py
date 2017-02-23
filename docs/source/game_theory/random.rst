@@ -1,7 +1,7 @@
-timing
+random
 ======
 
-.. automodule:: quantecon.timing
+.. automodule:: quantecon.game_theory.random
     :members:
     :undoc-members:
     :show-inheritance:
