@@ -54,7 +54,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
     The default method `'iteration'` simply iterates the function given
     an initial condition `v` and returns :math:`T^k v` when the
     condition :math:`\lVert T^k v - T^{k-1} v\rVert \leq
-    \mathrm{error_tol}` is satisfied or the number of iterations
+    \mathrm{error\_tol}` is satisfied or the number of iterations
     :math:`k` reaches `max_iter`. Provided that `T` is a contraction
     mapping or similar, :math:`T^k v` will be an approximation to the
     fixed point.
