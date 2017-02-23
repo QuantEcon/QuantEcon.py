@@ -48,7 +48,7 @@ def _is_approx_fp(T, v, error_tol, *args, **kwargs):
 
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
                         print_skip=5, method='iteration', *args, **kwargs):
-    """
+    r"""
     Computes and returns an approximate fixed point of the function `T`.
 
     The default method `'iteration'` simply iterates the function given

@@ -15,7 +15,7 @@ from .utilities import NashResult
 
 def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
                     full_output=False):
-    """
+    r"""
     Find one mixed-action epsilon-Nash equilibrium of an N-player normal
     form game by the fixed point computation algorithm by McLennan and
     Tourky [1]_.
