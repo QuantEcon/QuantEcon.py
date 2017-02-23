@@ -145,7 +145,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     converged, num_iter, init_pivot_used = \
         _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
                               max_iter, capping)
-    NE = get_mixed_actions(tableaux, bases)
+    NE = _get_mixed_actions(tableaux, bases)
 
     if not full_output:
         return NE
@@ -199,9 +199,9 @@ def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
     for k in range(m+n-1):
         capping_curr = min(max_iter_curr, capping)
 
-        initialize_tableaux(payoff_matrices, tableaux, bases)
+        _initialize_tableaux(payoff_matrices, tableaux, bases)
         converged, num_iter = \
-            lemke_howson_tbl(tableaux, bases, init_pivot_curr, capping_curr)
+            _lemke_howson_tbl(tableaux, bases, init_pivot_curr, capping_curr)
 
         total_num_iter += num_iter
 
@@ -213,16 +213,16 @@ def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
             init_pivot_curr -= m + n
         max_iter_curr -= num_iter
 
-    initialize_tableaux(payoff_matrices, tableaux, bases)
+    _initialize_tableaux(payoff_matrices, tableaux, bases)
     converged, num_iter = \
-        lemke_howson_tbl(tableaux, bases, init_pivot_curr, max_iter_curr)
+        _lemke_howson_tbl(tableaux, bases, init_pivot_curr, max_iter_curr)
     total_num_iter += num_iter
 
     return converged, total_num_iter, init_pivot_curr
 
 
 @jit(nopython=True, cache=True)
-def initialize_tableaux(payoff_matrices, tableaux, bases):
+def _initialize_tableaux(payoff_matrices, tableaux, bases):
     """
     Given a tuple of payoff matrices, initialize the tableau and basis
     arrays in place.
@@ -277,7 +277,7 @@ def initialize_tableaux(payoff_matrices, tableaux, bases):
     >>> m, n = A.shape
     >>> tableaux = (np.empty((n, m+n+1)), np.empty((m, m+n+1)))
     >>> bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
-    >>> tableaux, bases = initialize_tableaux((A, B), tableaux, bases)
+    >>> tableaux, bases = _initialize_tableaux((A, B), tableaux, bases)
     >>> tableaux[0]
     array([[ 3.,  2.,  3.,  1.,  0.,  1.],
            [ 2.,  6.,  1.,  0.,  1.,  1.]])
@@ -317,7 +317,7 @@ def initialize_tableaux(payoff_matrices, tableaux, bases):
 
 
 @jit(nopython=True, cache=True)
-def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
+def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     """
     Main body of the Lemke-Howson algorithm implementation.
 
@@ -356,8 +356,8 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     >>> m, n = A.shape
     >>> tableaux = (np.empty((n, m+n+1)), np.empty((m, m+n+1)))
     >>> bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
-    >>> tableaux, bases = initialize_tableaux((A, B), tableaux, bases)
-    >>> lemke_howson_tbl(tableaux, bases, 1, 10)
+    >>> tableaux, bases = _initialize_tableaux((A, B), tableaux, bases)
+    >>> _lemke_howson_tbl(tableaux, bases, 1, 10)
     (True, 4)
     >>> tableaux[0]
     array([[ 0.875 ,  0.    ,  1.    ,  0.375 , -0.125 ,  0.25  ],
@@ -396,11 +396,11 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     while True:
         for pl in pls:
             # Determine the leaving variable
-            row_min = lex_min_ratio_test(tableaux[pl], pivot,
-                                         slack_starts[pl], argmins)
+            row_min = _lex_min_ratio_test(tableaux[pl], pivot,
+                                          slack_starts[pl], argmins)
 
             # Pivoting step: modify tableau in place
-            pivoting(tableaux[pl], pivot, row_min)
+            _pivoting(tableaux[pl], pivot, row_min)
 
             # Update the basic variables and the pivot
             bases[pl][row_min], pivot = pivot, bases[pl][row_min]
@@ -420,7 +420,7 @@ def lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
 
 
 @jit(nopython=True, cache=True)
-def pivoting(tableau, pivot, pivot_row):
+def _pivoting(tableau, pivot, pivot_row):
     """
     Perform a pivoting step. Modify `tableau` in place.
 
@@ -460,8 +460,8 @@ def pivoting(tableau, pivot, pivot_row):
 
 
 @jit(nopython=True, cache=True)
-def min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
-                                   argmins, num_candidates):
+def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
+                                    argmins, num_candidates):
     """
     Perform the minimum ratio test, without tie breaking, for the
     candidate rows in `argmins[:num_candidates]`. Return the number
@@ -513,7 +513,7 @@ def min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
 
 
 @jit(nopython=True, cache=True)
-def lex_min_ratio_test(tableau, pivot, slack_start, argmins):
+def _lex_min_ratio_test(tableau, pivot, slack_start, argmins):
     """
     Perform the lexico-minimum ratio test.
 
@@ -545,23 +545,23 @@ def lex_min_ratio_test(tableau, pivot, slack_start, argmins):
     for i in range(nrows):
         argmins[i] = i
 
-    num_argmins = min_ratio_test_no_tie_breaking(tableau, pivot, -1,
-                                                 argmins, num_candidates)
+    num_argmins = _min_ratio_test_no_tie_breaking(tableau, pivot, -1,
+                                                  argmins, num_candidates)
     if num_argmins == 1:
         return argmins[0]
 
     for j in range(slack_start, slack_start+nrows):
         if j == pivot:
             continue
-        num_argmins = min_ratio_test_no_tie_breaking(tableau, pivot, j,
-                                                     argmins, num_argmins)
+        num_argmins = _min_ratio_test_no_tie_breaking(tableau, pivot, j,
+                                                      argmins, num_argmins)
         if num_argmins == 1:
             break
     return argmins[0]
 
 
 @jit(nopython=True, cache=True)
-def get_mixed_actions(tableaux, bases):
+def _get_mixed_actions(tableaux, bases):
     """
     From `tableaux` and `bases`, extract non-slack basic variables and
     return a tuple of the corresponding, normalized mixed actions.

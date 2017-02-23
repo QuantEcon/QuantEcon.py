@@ -10,7 +10,7 @@ import time
 import warnings
 import numpy as np
 from numba import jit, generated_jit, types
-from .game_theory.lemke_howson import lemke_howson_tbl, get_mixed_actions
+from .game_theory.lemke_howson import _lemke_howson_tbl, _get_mixed_actions
 
 
 def _print_after_skip(skip, it=None, dist=None, etime=None):
@@ -225,7 +225,7 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
 
     tableaux = tuple(np.empty((buff_size, buff_size*2+1)) for i in range(2))
     bases = tuple(np.empty(buff_size, dtype=int) for i in range(2))
-    max_piv = 10**6  # Max number of pivoting steps in lemke_howson_tbl
+    max_piv = 10**6  # Max number of pivoting steps in _lemke_howson_tbl
 
     while True:
         y_new = T(x_new, *args, **kwargs)
@@ -259,10 +259,10 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         tableaux_curr = tuple(tableau[:m, :2*m+1] for tableau in tableaux)
         bases_curr = tuple(basis[:m] for basis in bases)
         _initialize_tableaux_ig(X[:m], Y[:m], tableaux_curr, bases_curr)
-        converged, num_iter = lemke_howson_tbl(
+        converged, num_iter = _lemke_howson_tbl(
             tableaux_curr, bases_curr, init_pivot=m-1, max_iter=max_piv
         )
-        _, rho = get_mixed_actions(tableaux_curr, bases_curr)
+        _, rho = _get_mixed_actions(tableaux_curr, bases_curr)
 
         if Y.ndim <= 2:
             x_new = rho.dot(Y[:m])
@@ -290,7 +290,7 @@ def _initialize_tableaux_ig(X, Y, tableaux, bases):
     """
     Given sequences `X` and `Y` of ndarrays, initialize the tableau and
     basis arrays in place for the "geometric" imitation game as defined
-    in McLennan and Tourky (2006), to be passed to `lemke_howson_tbl`.
+    in McLennan and Tourky (2006), to be passed to `_lemke_howson_tbl`.
 
     Parameters
     ----------
