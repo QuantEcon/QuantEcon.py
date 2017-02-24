@@ -12,13 +12,13 @@ from numba import njit
 def cartesian(nodes, order='C'):
     '''Cartesian product of a list of arrays
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     nodes: (list of 1d-arrays)
     order: ('C' or 'F') order in which the product is enumerated
 
-    Returns:
-    --------
+    Returns
+    -------
     out: (2d-array) each line corresponds to one point of the product space
     '''
 
@@ -49,15 +49,15 @@ def cartesian(nodes, order='C'):
 def mlinspace(a, b, nums, order='C'):
     '''Constructs a regular cartesian grid
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     a: (1d-array) lower bounds in each dimension
     b: (1d-array) upper bounds in each dimension
     nums: (1d-array) number of nodes along each dimension
     order: ('C' or 'F') order in which the product is enumerated
 
-    Returns:
-    --------
+    Returns
+    -------
     out: (2d-array) each line corresponds to one point of the product space
     '''
 

@@ -703,8 +703,8 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
     tol : scalar(float), optional(default=None)
         Tolerance level used in determining best responses.
 
-    Return
-    ------
+    Returns
+    -------
     scalar(int)
         Best response action.
 
