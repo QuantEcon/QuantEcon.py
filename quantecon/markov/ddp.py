@@ -639,10 +639,10 @@ class DiscreteDP(object):
 
         Parameters
         ----------
-        method : str in {'value_iteration', 'vi', 'policy_iteration',
-                         'pi', 'modified_policy_iteration', 'mpi'},
-                 optinal(default='policy_iteration')
-            Solution method.
+        method : str, optinal(default='policy_iteration')
+            Solution method, str in {'value_iteration', 'vi',
+            'policy_iteration', 'pi', 'modified_policy_iteration',
+            'mpi'}.
 
         v_init : array_like(float, ndim=1), optional(default=None)
             Initial value function, of length n. If None, `v_init` is

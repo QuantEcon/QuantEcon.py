@@ -22,8 +22,7 @@ def probvec(m, k, random_state=None, parallel=True):
     k : scalar(int)
         Dimension of each probability vectors.
 
-    random_state : scalar(int) or np.random.RandomState,
-                   optional(default=None)
+    random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
         reproducibility. If None, a randomly initialized RandomState is
@@ -112,8 +111,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     num_trials : scalar(int), optional(default=None)
         Number of trials.
 
-    random_state : scalar(int) or np.random.RandomState,
-                   optional(default=None)
+    random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
         reproducibility. If None, a randomly initialized RandomState is

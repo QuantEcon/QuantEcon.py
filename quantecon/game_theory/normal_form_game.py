@@ -276,8 +276,7 @@ class Player(object):
 
         Parameters
         ----------
-        opponents_actions : array_like(int or array_like(float)) or
-                            array_like(int, ndim=1) or scalar(int)
+        opponents_actions : scalar(int) or array_like
             A profile of N-1 opponents' actions. If N=2, then it must be
             a 1-dimensional array of floats (in which case it is treated
             as the opponent's mixed action) or a scalar of integer (in
@@ -286,10 +285,9 @@ class Player(object):
             object must be an integer (pure action) or an array of
             floats (mixed action).
 
-        tie_breaking : {'smallest', 'random', False},
-                       optional(default='smallest')
-            Control how, or whether, to break a tie (see Returns for
-            details).
+        tie_breaking : str, optional(default='smallest')
+            str in {'smallest', 'random', False}. Control how, or 
+            whether, to break a tie (see Returns for details).
 
         payoff_perturbation : array_like(float), optional(default=None)
             Array of length equal to the number of actions of the player
@@ -300,8 +298,7 @@ class Player(object):
             Tolerance level used in determining best responses. If None,
             default to the value of the `tol` attribute.
 
-        random_state : scalar(int) or np.random.RandomState,
-                       optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to
             set the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState
@@ -350,8 +347,7 @@ class Player(object):
         actions : array_like(int), optional(default=None)
             An array of integers representing pure actions.
 
-        random_state : scalar(int) or np.random.RandomState,
-                       optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to
             set the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState
@@ -389,8 +385,7 @@ class NormalFormGame(object):
 
     Parameters
     ----------
-    data : array_like(Player) or array_like(int, ndim=1) or
-           array_like(float, ndim=2 or N+1)
+    data : array_like of Player, int (ndim=1), or float (ndim=2 or N+1)
         Data to initialize a NormalFormGame. `data` may be an array of
         Players, in which case the shapes of the Players' payoff arrays
         must be consistent. If `data` is an array of N integers, then

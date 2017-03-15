@@ -22,8 +22,7 @@ def random_game(nums_actions, random_state=None):
     nums_actions : tuple(int)
         Tuple of the numbers of actions, one for each player.
 
-    random_state : scalar(int) or np.random.RandomState,
-                   optional(default=None)
+    random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
         reproducibility. If None, a randomly initialized RandomState is
@@ -63,8 +62,7 @@ def covariance_game(nums_actions, rho, random_state=None):
         Covariance of a pair of payoff values. Must be in [-1/(N-1), 1],
         where N is the number of players.
 
-    random_state : scalar(int) or np.random.RandomState,
-                   optional(default=None)
+    random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
         reproducibility. If None, a randomly initialized RandomState is
