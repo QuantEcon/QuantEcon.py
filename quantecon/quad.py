@@ -464,7 +464,7 @@ def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
         that accepts as its first argument a matrix representing points
         along each dimension (each dimension is a column). Other
         arguments that need to be passed to the function are caught by
-        *args and **kwargs
+        `*args` and `**kwargs`
 
     n : int or array_like(float)
         A length-d iterable of the number of nodes in each dimension
