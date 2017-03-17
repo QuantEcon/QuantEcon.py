@@ -277,13 +277,15 @@ class Player(object):
         Parameters
         ----------
         opponents_actions : scalar(int) or array_like
-            A profile of N-1 opponents' actions. If N=2, then it must be
-            a 1-dimensional array of floats (in which case it is treated
-            as the opponent's mixed action) or a scalar of integer (in
-            which case it is treated as the opponent's pure action). If
-            N>2, then it must be an array of N-1 objects, where each
-            object must be an integer (pure action) or an array of
-            floats (mixed action).
+            A profile of N-1 opponents' actions, represented by either
+            scalar(int), array_like(float), array_like(int), or
+            array_like(array_like(float)). If N=2, then it must be a
+            scalar of integer (in which case it is treated as the
+            opponent's pure action) or a 1-dimensional array of floats
+            (in which case it is treated as the opponent's mixed
+            action). If N>2, then it must be an array of N-1 objects,
+            where each object must be an integer (pure action) or an
+            array of floats (mixed action).
 
         tie_breaking : str, optional(default='smallest')
             str in {'smallest', 'random', False}. Control how, or 
