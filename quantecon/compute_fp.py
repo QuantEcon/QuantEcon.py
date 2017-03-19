@@ -86,9 +86,9 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
     print_skip : scalar(int), optional(default=5)
         How many iterations to apply between print messages (effective
         only when `verbose=2`)
-    method : str in {'iteration', 'imitation_game'},
-             optional(default='iteration')
-        Method of computing an approximate fixed point
+    method : str, optional(default='iteration')
+        str in {'iteration', 'imitation_game'}. Method of computing
+        an approximate fixed point
     args, kwargs :
         Other arguments and keyword arguments that are passed directly
         to  the function T each time it is called

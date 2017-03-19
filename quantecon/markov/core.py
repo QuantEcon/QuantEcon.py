@@ -458,16 +458,14 @@ class MarkovChain(object):
         ts_length : scalar(int)
             Length of each simulation.
 
-        init : scalar(int) or array_like(int, ndim=1),
-               optional(default=None)
+        init : int or array_like(int, ndim=1), optional
             Initial state(s). If None, the initial state is randomly
             drawn.
 
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        random_state : scalar(int) or np.random.RandomState,
-                       optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to
             set the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState
@@ -558,8 +556,7 @@ class MarkovChain(object):
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        random_state : scalar(int) or np.random.RandomState,
-                       optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to
             set the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState
@@ -700,8 +697,7 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     sample_size : scalar(int), optional(default=1000)
         The length of the sample path.
 
-    random_state : scalar(int) or np.random.RandomState,
-                   optional(default=None)
+    random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
         reproducibility. If None, a randomly initialized RandomState is

@@ -134,8 +134,8 @@ class DiscreteDP(object):
        * discount factor beta,
 
        where `R[s, a]` is the reward for action `a` when the state is
-       `s` and `Q[s, a, s']` is the probability that the state in the
-       next period is `s'` when the current state is `s` and the action
+       `s` and `Q[s, a, s_next]` is the probability that the state in the
+       next period is `s_next` when the current state is `s` and the action
        chosen is `a`.
 
     2. `DiscreteDP(R, Q, beta, s_indices, a_indices)`
@@ -151,8 +151,8 @@ class DiscreteDP(object):
        where the pairs (`s_indices[0]`, `a_indices[0]`), ...,
        (`s_indices[L-1]`, `a_indices[L-1]`) enumerate feasible
        state-action pairs, and `R[i]` is the reward for action
-       `a_indices[i]` when the state is `s_indices[i]` and `Q[i, s']` is
-       the probability that the state in the next period is `s'` when
+       `a_indices[i]` when the state is `s_indices[i]` and `Q[i, s_next]` is
+       the probability that the state in the next period is `s_next` when
        the current state is `s_indices[i]` and the action chosen is
        `a_indices[i]`. With this formulation, `Q` may be represented by
        a scipy.sparse matrix.
@@ -213,7 +213,7 @@ class DiscreteDP(object):
 
           r(0, 0) = 5, r(0, 1) =10, r(1, 0) = -1
 
-    * Transition probabilities q(s'|s, a):
+    * Transition probabilities q(s_next|s, a):
 
           q(0|0, 0) = 0.5, q(1|0, 0) = 0.5,
           q(0|0, 1) = 0,   q(1|0, 1) = 1,
@@ -639,16 +639,16 @@ class DiscreteDP(object):
 
         Parameters
         ----------
-        method : str in {'value_iteration', 'vi', 'policy_iteration',
-                         'pi', 'modified_policy_iteration', 'mpi'},
-                 optinal(default='policy_iteration')
-            Solution method.
+        method : str, optinal(default='policy_iteration')
+            Solution method, str in {'value_iteration', 'vi',
+            'policy_iteration', 'pi', 'modified_policy_iteration',
+            'mpi'}.
 
         v_init : array_like(float, ndim=1), optional(default=None)
             Initial value function, of length n. If None, `v_init` is
             set such that v_init(s) = max_a r(s, a) for value iteration
             and policy iteration; for modified policy iteration,
-            v_init(s) = min_(s', a) r(s', a)/(1 - beta) to guarantee
+            v_init(s) = min_(s_next, a) r(s_next, a)/(1 - beta) to guarantee
             convergence.
 
         epsilon : scalar(float), optional(default=None)

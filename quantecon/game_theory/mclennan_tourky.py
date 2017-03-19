@@ -25,8 +25,7 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     g : NormalFormGame
         NormalFormGame instance.
 
-    init : array_like(int or array_like(float, ndim=1)),
-           optional(default=None)
+    init : array_like(int or array_like(float, ndim=1)), optional
         Initial action profile, an array of N objects, where each object
         must be an iteger (pure action) or an array of floats (mixed
         action). If None, default to an array of zeros (the zero-th
