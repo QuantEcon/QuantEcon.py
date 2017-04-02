@@ -30,7 +30,7 @@ def support_enumeration(g):
     """
     Compute mixed-action Nash equilibria with equal support size for a
     2-player normal form game by support enumeration. For a
-    non-degenerate game input, these are all Nash equilibria.
+    non-degenerate game input, these are all the Nash equilibria.
 
     The algorithm checks all the equal-size support pairs; if the
     players have the same number n of actions, there are 2n choose n
