@@ -28,3 +28,4 @@ exclude_lines =
 
     # Don't count Numba nopython=True jit functions
     @jit\(.*nopython=True
+    @njit
