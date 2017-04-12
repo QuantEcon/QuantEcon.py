@@ -26,5 +26,5 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
 
-    # Don't count Numba Jit Functions
-    @jit
+    # Don't count Numba nopython=True jit functions
+    @jit\(.*nopython=True
