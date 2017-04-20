@@ -238,13 +238,13 @@ class LQ(object):
         Returns
         ========
         x_path : array_like(float)
-            An n x T matrix, where the t-th column represents x_t
+            An n x T+1 matrix, where the t-th column represents x_t
 
         u_path : array_like(float)
             A k x T matrix, where the t-th column represents u_t
 
         w_path : array_like(float)
-            A j x T matrix, where the t-th column represent w_t
+            A j x T+1 matrix, where the t-th column represent w_t
 
         """
 
@@ -266,7 +266,8 @@ class LQ(object):
         x0 = x0.reshape(self.n, 1)  # Make sure x0 is a column vector
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
-        w_path = dot(C, np.random.randn(self.j, T+1))
+        w_path = np.random.randn(self.j, T+1)
+        Cw_path = dot(C, w_path)
 
         # == Compute and record the sequence of policies == #
         policies = []
@@ -282,9 +283,9 @@ class LQ(object):
         for t in range(1, T):
             F = policies.pop()
             Ax, Bu = dot(A, x_path[:, t-1]), dot(B, u_path[:, t-1])
-            x_path[:, t] = Ax + Bu + w_path[:, t]
+            x_path[:, t] = Ax + Bu + Cw_path[:, t]
             u_path[:, t] = - dot(F, x_path[:, t])
         Ax, Bu = dot(A, x_path[:, T-1]), dot(B, u_path[:, T-1])
-        x_path[:, T] = Ax + Bu + w_path[:, T]
+        x_path[:, T] = Ax + Bu + Cw_path[:, T]
 
         return x_path, u_path, w_path
