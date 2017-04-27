@@ -1,33 +1,55 @@
 """
 Filename: ecdf.py
-Authors: Thomas Sargent, John Stachurski 
 
-Implements the empirical cumulative distribution function given an array of
-observations.
+Authors: Thomas Sargent, John Stachurski
+
+Implements the empirical cumulative distribution function given an array
+of observations.
+
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 
-class ECDF:
+
+class ECDF(object):
+    """
+    One-dimensional empirical distribution function given a vector of
+    observations.
+
+    Parameters
+    ----------
+    observations : array_like
+        An array of observations
+
+    Attributes
+    ----------
+    observations : see Parameters
+
+    """
 
     def __init__(self, observations):
         self.observations = np.asarray(observations)
 
-    def __call__(self, x): 
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        m = "Empirical CDF:\n  - number of observations: {n}"
+        return m.format(n=self.observations.size)
+
+    def __call__(self, x):
+        """
+        Evaluates the ecdf at x
+
+        Parameters
+        ----------
+        x : scalar(float)
+            The x at which the ecdf is evaluated
+
+        Returns
+        -------
+        scalar(float)
+            Fraction of the sample less than x
+
+        """
         return np.mean(self.observations <= x)
-
-    def plot(self, a=None, b=None): 
-
-        # === choose reasonable interval if [a, b] not specified === #
-        if not a:
-            a = self.observations.min() - self.observations.std()
-        if not b:
-            b = self.observations.max() + self.observations.std()
-
-        # === generate plot === #
-        x_vals = np.linspace(a, b, num=100)
-        f = np.vectorize(self.__call__)
-        plt.plot(x_vals, f(x_vals))
-        plt.show()
-

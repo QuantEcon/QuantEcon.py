@@ -1,0 +1,38 @@
+# Travis Configuration for QuantEcon.py
+#
+# Thank you for the writeup given by dan-blanchard at https://gist.github.com/dan-blanchard/7045057
+#
+
+sudo: false        #Use new Container Infrastructure
+language: python
+python:
+  - 3.5
+
+notifications:
+  email: false
+
+branches:
+  only:
+    - master
+
+before_install:
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p /home/travis/miniconda
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  #- sudo rm -rf /dev/shm
+  #- sudo ln -s /run/shm /dev/shm
+
+install:
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba
+    # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
+  - pip install coveralls coverage
+  - python setup.py install
+  - cp quantecon/tests/matplotlibrc .
+
+script:
+  - nosetests --with-coverage --cover-package=quantecon --exclude=models 	#quantecon.models excluded from tests to prevent triggering the ImportWarning
+
+after_success:
+  - coveralls

@@ -1,0 +1,2 @@
+# necessary in order to get tests working on Travis CI
+backend : Agg
