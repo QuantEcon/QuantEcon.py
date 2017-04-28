@@ -9,7 +9,6 @@ Libary Website: [http://quantecon.org/python_index.html](http://quantecon.org/py
 
 See the [library website](http://quantecon.org/python_index.html) for instructions
 
-
 #### Build and Coverage Status:
 
 [![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master)](https://travis-ci.org/QuantEcon/QuantEcon.py)
@@ -18,6 +17,11 @@ See the [library website](http://quantecon.org/python_index.html) for instructio
 #### ReadTheDocs Status:
 
 [![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](https://readthedocs.org/projects/quanteconpy/?badge=latest)
+
+#### Gitter
+
+[![Join the chat at https://gitter.im/QuantEcon/QuantEcon.py](https://badges.gitter.im/QuantEcon/QuantEcon.py.svg)](https://gitter.im/QuantEcon/QuantEcon.py?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ## Additional Links
 
