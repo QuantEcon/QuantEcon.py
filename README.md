@@ -16,7 +16,7 @@ See the [library website](http://quantecon.org/python_index.html) for instructio
 
 #### ReadTheDocs Status:
 
-[![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](https://readthedocs.org/projects/quanteconpy/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](http://quanteconpy.readthedocs.io/en/latest/?badge=latest)
 
 #### Gitter
 
