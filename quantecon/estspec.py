@@ -10,7 +10,6 @@ Functions for working with periodograms of scalar data.
 from __future__ import division, print_function
 import numpy as np
 from numpy.fft import fft
-from pandas import DataFrame
 import statsmodels.api as sm
 
 
