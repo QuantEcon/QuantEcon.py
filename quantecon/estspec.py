@@ -10,7 +10,7 @@ Functions for working with periodograms of scalar data.
 from __future__ import division, print_function
 import numpy as np
 from numpy.fft import fft
-import statsmodels.api as sm
+from statsmodels.api.tsa import AR
 
 
 def smooth(x, window_len=7, window='hanning'):
@@ -140,7 +140,7 @@ def ar_periodogram(x, window='hanning', window_len=7):
 
     """
     # === run regression === #
-    results = sm.tsa.AR(x).fit(maxlag=1, cov_type='HAC', cov_kwds={'maxlags':1})
+    results = AR(x).fit(maxlag=1, cov_type='HAC', cov_kwds={'maxlags':1})
     e_hat = results.resid
     phi = results.params[1]
 
