@@ -364,7 +364,7 @@ def _square_sum(a):
         return _square_sum_array
 
 
-def _square_sum_array(a):
+def _square_sum_array(a):  # pragma: no cover
     sum_ = 0
     for x in a.flat:
         sum_ += x**2
