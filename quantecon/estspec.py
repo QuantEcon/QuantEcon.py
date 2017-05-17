@@ -10,7 +10,6 @@ Functions for working with periodograms of scalar data.
 from __future__ import division, print_function
 import numpy as np
 from numpy.fft import fft
-from statsmodels.api import tsa
 
 
 def smooth(x, window_len=7, window='hanning'):
@@ -140,9 +139,18 @@ def ar_periodogram(x, window='hanning', window_len=7):
 
     """
     # === run regression === #
-    results = tsa.AR(x).fit(maxlag=1, cov_type='HAC', cov_kwds={'maxlags':1})
-    e_hat = results.resid
-    phi = results.params[1]
+    x_lag = x[:-1] # lagged x
+    X = np.array([np.ones(len(x_lag)), x_lag]).T # add constant
+    
+    y = np.array(x[1:]) # current x
+    
+    beta_hat = np.linalg.solve(X.T @ X, X.T @ y) # solve for beta hat
+    e_hat = y - X @ beta_hat # compute residuals
+    phi = beta_hat[1] # pull out phi parameter
+
+    # === compute periodogram on residuals === #
+    w, I_w = periodogram(e_hat, window=window, window_len=window_len)
+
 
     # === compute periodogram on residuals === #
     w, I_w = periodogram(e_hat, window=window, window_len=window_len)
