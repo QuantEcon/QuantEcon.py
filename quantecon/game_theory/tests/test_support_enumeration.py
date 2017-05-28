@@ -6,6 +6,7 @@ Tests for support_enumeration.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
+from nose.tools import eq_
 from quantecon.util import check_random_state
 from quantecon.game_theory import Player, NormalFormGame, support_enumeration
 
@@ -57,6 +58,7 @@ class TestSupportEnumeration():
     def test_support_enumeration(self):
         for d in self.game_dicts:
             NEs_computed = support_enumeration(d['g'])
+            eq_(len(NEs_computed), len(d['NEs']))
             for actions_computed, actions in zip(NEs_computed, d['NEs']):
                 for action_computed, action in zip(actions_computed, actions):
                     assert_allclose(action_computed, action)
