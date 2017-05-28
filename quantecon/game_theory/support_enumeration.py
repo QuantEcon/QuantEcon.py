@@ -110,7 +110,7 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
             _next_k_array(supps[0])
 
 
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
     """
     Given a player's payoff matrix `payoff_matrix`, an array `own_supp`
@@ -161,8 +161,9 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
     r = _numba_linalg_solve(A, out)
     if r != 0:  # A: singular
         return False
-    if (out[:-1] <= 0).any():
-        return False
+    for i in range(k):
+        if out[i] <= 0:
+            return False
     val = out[-1]
 
     if k == m:
