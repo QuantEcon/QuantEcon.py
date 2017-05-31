@@ -4,8 +4,31 @@ Author: Daisuke Oyama
 Tests for support_enumeration.py
 
 """
+import numpy as np
 from numpy.testing import assert_allclose
+from nose.tools import eq_
+from quantecon.util import check_random_state
 from quantecon.game_theory import Player, NormalFormGame, support_enumeration
+
+
+def random_skew_sym(n, m=None, random_state=None):
+    """
+    Generate a random skew symmetric zero-sum NormalFormGame of the form
+    O    B
+    -B.T O
+    where B is an n x m matrix.
+
+    """
+    if m is None:
+        m = n
+    random_state = check_random_state(random_state)
+    B = random_state.random_sample((n, m))
+    A = np.empty((n+m, n+m))
+    A[:n, :n] = 0
+    A[n:, n:] = 0
+    A[:n, n:] = B
+    A[n:, :n] = -B.T
+    return NormalFormGame([Player(A) for i in range(2)])
 
 
 class TestSupportEnumeration():
@@ -35,9 +58,17 @@ class TestSupportEnumeration():
     def test_support_enumeration(self):
         for d in self.game_dicts:
             NEs_computed = support_enumeration(d['g'])
+            eq_(len(NEs_computed), len(d['NEs']))
             for actions_computed, actions in zip(NEs_computed, d['NEs']):
                 for action_computed, action in zip(actions_computed, actions):
                     assert_allclose(action_computed, action)
+
+    def test_no_error_skew_sym(self):
+        # Test no LinAlgError is raised.
+        n, m = 3, 2
+        seed = 7028
+        g = random_skew_sym(n, m, random_state=seed)
+        NEs = support_enumeration(g)
 
 
 if __name__ == '__main__':

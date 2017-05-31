@@ -11,19 +11,9 @@ Strategic and Extensive Form," Chapter 3, N. Nisan, T. Roughgarden, E.
 Tardos, and V. Vazirani eds., Algorithmic Game Theory, 2007.
 
 """
-from distutils.version import LooseVersion
 import numpy as np
-import numba
 from numba import jit
-
-
-least_numba_version = LooseVersion('0.28')
-is_numba_required_installed = True
-if LooseVersion(numba.__version__) < least_numba_version:
-    is_numba_required_installed = False
-nopython = is_numba_required_installed
-
-EPS = np.finfo(float).eps
+from ..util.numba import _numba_linalg_solve
 
 
 def support_enumeration(g):
@@ -45,11 +35,6 @@ def support_enumeration(g):
     -------
     list(tuple(ndarray(float, ndim=1)))
         List containing tuples of Nash equilibrium mixed actions.
-
-    Notes
-    -----
-    This routine is jit-complied if Numba version 0.28 or above is
-    installed.
 
     """
     return list(support_enumeration_gen(g))
@@ -80,7 +65,7 @@ def support_enumeration_gen(g):
                                     g.players[1].payoff_array)
 
 
-@jit(nopython=nopython)  # cache=True raises _pickle.PicklingError
+@jit(nopython=True)  # cache=True raises _pickle.PicklingError
 def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
     """
     Main body of `support_enumeration_gen`.
@@ -105,32 +90,28 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
 
     for k in range(1, n_min+1):
         supps = (np.arange(k), np.empty(k, np.int_))
-        actions = (np.empty(k), np.empty(k))
+        actions = (np.empty(k+1), np.empty(k+1))
         A = np.empty((k+1, k+1))
-        A[:-1, -1] = -1
-        A[-1, :-1] = 1
-        A[-1, -1] = 0
-        b = np.zeros(k+1)
-        b[-1] = 1
+
         while supps[0][-1] < nums_actions[0]:
             supps[1][:] = np.arange(k)
             while supps[1][-1] < nums_actions[1]:
                 if _indiff_mixed_action(payoff_matrix0, supps[0], supps[1],
-                                        A, b, actions[1]):
+                                        A, actions[1]):
                     if _indiff_mixed_action(payoff_matrix1, supps[1], supps[0],
-                                            A, b, actions[0]):
+                                            A, actions[0]):
                         out = (np.zeros(nums_actions[0]),
                                np.zeros(nums_actions[1]))
                         for p, (supp, action) in enumerate(zip(supps,
                                                                actions)):
-                            out[p][supp] = action
+                            out[p][supp] = action[:-1]
                         yield out
                 _next_k_array(supps[1])
             _next_k_array(supps[0])
 
 
-@jit(nopython=nopython)
-def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
+@jit(nopython=True, cache=True)
+def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
     """
     Given a player's payoff matrix `payoff_matrix`, an array `own_supp`
     of this player's actions, and an array `opp_supp` of the opponent's
@@ -139,8 +120,7 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
     among the actions in `own_supp`, if any such exists. Return `True`
     if such a mixed action exists and actions in `own_supp` are indeed
     best responses to it, in which case the outcome is stored in `out`;
-    `False` otherwise. Arrays `A` and `b` are used in intermediate
-    steps.
+    `False` otherwise. Array `A` is used in intermediate steps.
 
     Parameters
     ----------
@@ -154,17 +134,11 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
         Array containing the opponent's action indices, of length k.
 
     A : ndarray(float, ndim=2)
-        Array used in intermediate steps, of shape (k+1, k+1). The
-        following values must be assigned in advance: `A[:-1, -1] = -1`,
-        `A[-1, :-1] = 1`, and `A[-1, -1] = 0`.
-
-    b : ndarray(float, ndim=1)
-        Array used in intermediate steps, of shape (k+1,). The following
-        values must be assigned in advance `b[:-1] = 0` and `b[-1] = 1`.
+        Array used in intermediate steps, of shape (k+1, k+1).
 
     out : ndarray(float, ndim=1)
-        Array of length k to store the k nonzero values of the desired
-        mixed action.
+        Array of length k+1 to store the k nonzero values of the desired
+        mixed action in `out[:-1]` (and the payoff value in `out[-1]`.)
 
     Returns
     -------
@@ -175,15 +149,22 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, b, out):
     m = payoff_matrix.shape[0]
     k = len(own_supp)
 
-    A[:-1, :-1] = payoff_matrix[own_supp, :][:, opp_supp]
-    if _is_singular(A):
-        return False
+    for i in range(k):
+        for j in range(k):
+            A[j, i] = payoff_matrix[own_supp[i], opp_supp[j]]  # transpose
+    A[:-1, -1] = 1
+    A[-1, :-1] = -1
+    A[-1, -1] = 0
+    out[:-1] = 0
+    out[-1] = 1
 
-    sol = np.linalg.solve(A, b)
-    if (sol[:-1] <= 0).any():
+    r = _numba_linalg_solve(A, out)
+    if r != 0:  # A: singular
         return False
-    out[:] = sol[:-1]
-    val = sol[-1]
+    for i in range(k):
+        if out[i] <= 0:
+            return False
+    val = out[-1]
 
     if k == m:
         return True
@@ -280,39 +261,3 @@ def _next_k_array(a):
         pos += 1
 
     return a
-
-
-if is_numba_required_installed:
-    @jit(nopython=True, cache=True)
-    def _is_singular(a):
-        s = numba.targets.linalg._compute_singular_values(a)
-        if s[-1] <= s[0] * EPS:
-            return True
-        else:
-            return False
-else:
-    def _is_singular(a):
-        s = np.linalg.svd(a, compute_uv=False)
-        if s[-1] <= s[0] * EPS:
-            return True
-        else:
-            return False
-
-_is_singular_docstr = \
-"""
-Determine whether matrix `a` is numerically singular, by checking
-its singular values.
-
-Parameters
-----------
-a : ndarray(float, ndim=2)
-    2-dimensional array of floats.
-
-Returns
--------
-bool
-    Whether `a` is numerically singular.
-
-"""
-
-_is_singular.__doc__ = _is_singular_docstr
