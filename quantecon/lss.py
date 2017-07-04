@@ -319,9 +319,9 @@ class LinearStateSpace(object):
 
         .. math::
 
-            S_x := E [\sum_{j=0}^{\infty} \beta^j x_{t+j} | x_t ]
+            S_x := E \Big[ \sum_{j=0}^{\infty} \beta^j x_{t+j} | x_t \Big]
 
-            S_y := E [\sum_{j=0}^{\infty} \beta^j y_{t+j} | x_t ]
+            S_y := E \Big[ \sum_{j=0}^{\infty} \beta^j y_{t+j} | x_t \Big]
 
         Parameters
         ----------
