@@ -24,8 +24,8 @@ class ARMA(object):
 
         X_t = \phi X_{t-1} + \epsilon_t + \theta \epsilon_{t-1}
 
-    where :math:`epsilon_t` is a white noise process with standard
-    deviation :math:`sigma`.  If phi and theta are arrays or sequences,
+    where :math:`\epsilon_t` is a white noise process with standard
+    deviation :math:`\sigma`.  If phi and theta are arrays or sequences,
     then the interpretation is the ARMA(p, q) model
 
     .. math::
@@ -182,7 +182,7 @@ class ARMA(object):
 
         .. math::
 
-            f(w) = \sum_k \gamma(k) exp(-ikw)
+            f(w) = \sum_k \gamma(k) \exp(-ikw)
 
         where gamma is the autocovariance function and the sum is over
         the set of all integers.
@@ -190,8 +190,8 @@ class ARMA(object):
         Parameters
         ----------
         two_pi : Boolean, optional
-            Compute the spectral density function over [0, pi] if
-            two_pi is False and [0, 2 pi] otherwise.  Default value is
+            Compute the spectral density function over :math:`[0, \pi]` if
+            two_pi is False and :math:`[0, 2 \pi]` otherwise.  Default value is
             True
         res : scalar or array_like(int), optional(default=1200)
             If res is a scalar then the spectral density is computed at
