@@ -21,10 +21,10 @@ def var_quadratic_sum(A, C, H, beta, x0):
 
     .. math::
 
-        q(x_0) = E \sum_{t=0}^{\infty} \beta^t x_t' H x_t
+        q(x_0) = \mathbb{E} \Big[ \sum_{t=0}^{\infty} \beta^t x_t' H x_t \Big]
 
-    Here {x_t} is the VAR process x_{t+1} = A x_t + C w_t with {w_t}
-    standard normal and x_0 the initial condition.
+    Here :math:`{x_t}` is the VAR process :math:`x_{t+1} = A x_t + C w_t`
+    with :math:`{x_t}` standard normal and :math:`x_0` the initial condition.
 
     Parameters
     ----------
@@ -43,13 +43,14 @@ def var_quadratic_sum(A, C, H, beta, x0):
     Returns
     -------
     q0: scalar(float)
-        Represents the value q(x_0)
+        Represents the value :math:`q(x_0)`
 
-    Remarks: The formula for computing q(x_0) is q(x_0) = x_0' Q x_0 + v
+    Remarks: The formula for computing :math:`q(x_0)` is
+    :math:`q(x_0) = x_0' Q x_0 + v`
     where
 
-        Q is the solution to Q = H + beta A' Q A and
-        v = \trace(C' Q C) \beta / (1 - \beta)
+        * :math:`Q` is the solution to :math:`Q = H + \beta A' Q A`, and
+        * :math:`v = \frac{trace(C' Q C) \beta}{(1 - \beta)}`
 
     """
     # == Make sure that A, C, H and x0 are array_like == #
@@ -81,11 +82,11 @@ def m_quadratic_sum(A, B, max_it=50):
     ----------
     A : array_like(float, ndim=2)
         An n x n matrix as described above.  We assume in order for
-        convergence that the eigenvalues of A have moduli bounded by
+        convergence that the eigenvalues of :math:`A` have moduli bounded by
         unity
     B : array_like(float, ndim=2)
         An n x n matrix as described above.  We assume in order for
-        convergence that the eigenvalues of A have moduli bounded by
+        convergence that the eigenvalues of :math:`A` have moduli bounded by
         unity
     max_it : scalar(int), optional(default=50)
         The maximum number of iterations
@@ -93,7 +94,7 @@ def m_quadratic_sum(A, B, max_it=50):
     Returns
     ========
     gamma1: array_like(float, ndim=2)
-        Represents the value V
+        Represents the value :math:`V`
 
     """
 
