@@ -1,6 +1,6 @@
 """
 Filename: kalman.py
-Reference: http://quant-econ.net/py/kalman.html
+Reference: https://lectures.quantecon.org/py/kalman.html
 
 Implements the Kalman filter for a linear Gaussian state space model.
 
@@ -57,7 +57,7 @@ class Kalman(object):
     References
     ----------
 
-    http://quant-econ.net/py/kalman.html
+    https://lectures.quantecon.org/py/kalman.html
 
     """
 

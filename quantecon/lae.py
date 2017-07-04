@@ -16,7 +16,7 @@ This is a density in :math:`y`.
 References
 ----------
 
-http://quant-econ.net/py/stationary_densities.html
+https://lectures.quantecon.org/py/stationary_densities.html
 
 """
 from textwrap import dedent

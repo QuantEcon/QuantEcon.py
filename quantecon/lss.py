@@ -1,6 +1,6 @@
 """
 Filename: lss.py
-Reference: http://quant-econ.net/py/linear_models.html
+Reference: https://lectures.quantecon.org/py/linear_models.html
 
 Computes quantities associated with the Gaussian linear state space model.
 """
