@@ -66,7 +66,7 @@ def rouwenhorst(n, ybar, sigma, rho):
 
     ybar : float
         The value :math:`\bar{y}` in the process.  Note that the mean of this
-        AR(1) process, y, is simply :math:`\bar{y}/(1 - \rho)`
+        AR(1) process, :math:`y`, is simply :math:`\bar{y}/(1 - \rho)`
 
     sigma : float
         The value of the standard deviation of the :math:`\varepsilon` process
@@ -148,7 +148,7 @@ def tauchen(rho, sigma_u, m=3, n=7):
 
         y_{t+1} = \rho y_t + u_{t+1}
 
-    using Tauchen's method. Here :math:`{u_t}`` is an iid Gaussian process
+    using Tauchen's method. Here :math:`{u_t}` is an i.i.d. Gaussian process
     with zero mean.
 
     Parameters
