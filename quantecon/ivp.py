@@ -24,28 +24,30 @@ from scipy import integrate, interpolate
 
 
 class IVP(integrate.ode):
+    
+    r"""
+    Creates an instance of the IVP class.
+
+    Parameters
+    ----------
+    f : callable ``f(t, y, *f_args)``
+        Right hand side of the system of equations defining the ODE.
+        The independent variable, ``t``, is a ``scalar``; ``y`` is
+        an ``ndarray`` of dependent variables with ``y.shape ==
+        (n,)``. The function `f` should return a ``scalar``,
+        ``ndarray`` or ``list`` (but not a ``tuple``).
+    jac : callable ``jac(t, y, *jac_args)``, optional(default=None)
+        Jacobian of the right hand side of the system of equations
+        defining the ODE.
+
+        .. :math:
+
+            \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]
+
+    """
 
     def __init__(self, f, jac=None):
-        r"""
-        Creates an instance of the IVP class.
 
-        Parameters
-        ----------
-        f : callable ``f(t, y, *f_args)``
-            Right hand side of the system of equations defining the ODE.
-            The independent variable, ``t``, is a ``scalar``; ``y`` is
-            an ``ndarray`` of dependent variables with ``y.shape ==
-            (n,)``. The function `f` should return a ``scalar``,
-            ``ndarray`` or ``list`` (but not a ``tuple``).
-        jac : callable ``jac(t, y, *jac_args)``, optional(default=None)
-            Jacobian of the right hand side of the system of equations
-            defining the ODE.
-
-            .. :math:
-
-                \mathcal{J}_{i,j} = \bigg[\frac{\partial f_i}{\partial y_j}\bigg]
-
-        """
         super(IVP, self).__init__(f, jac)
 
     def _integrate_fixed_trajectory(self, h, T, step, relax):
