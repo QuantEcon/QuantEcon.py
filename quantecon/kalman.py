@@ -1,6 +1,6 @@
 """
 Filename: kalman.py
-Reference: http://quant-econ.net/py/kalman.html
+Reference: https://lectures.quantecon.org/py/kalman.html
 
 Implements the Kalman filter for a linear Gaussian state space model.
 
@@ -17,11 +17,16 @@ class Kalman(object):
     r"""
     Implements the Kalman filter for the Gaussian state space model
 
-        x_{t+1} = A x_t + C w_{t+1}
-        y_t = G x_t + H v_t.
+    .. math::
 
-    Here x_t is the hidden state and y_t is the measurement. The shocks
-    w_t and v_t are iid standard normals.  Below we use the notation
+        x_{t+1} = A x_t + C w_{t+1}
+        y_t = G x_t + H v_t
+
+    Here :math:`x_t` is the hidden state and :math:`y_t` is the measurement.
+    The shocks :math:`w_t` and :math:`v_t` are iid standard normals. Below
+    we use the notation
+
+    .. math::
 
         Q := CC'
         R := HH'
@@ -52,7 +57,7 @@ class Kalman(object):
     References
     ----------
 
-    http://quant-econ.net/py/kalman.html
+    https://lectures.quantecon.org/py/kalman.html
 
     """
 
@@ -91,28 +96,46 @@ class Kalman(object):
         that system to the time-invariant whitener represenation
         given by
 
+        .. math::
+
             \tilde{x}_{t+1}^* = \tilde{A} \tilde{x} + \tilde{C} v
             a = \tilde{G} \tilde{x}
 
         where
 
+        .. math::
+
             \tilde{x}_t = [x+{t}, \hat{x}_{t}, v_{t}]
 
         and
 
-            \tilde{A} = [A  0    0
-                         KG A-KG KH
-                         0  0    0]
+        .. math::
 
-            \tilde{C} = [C 0
-                         0 0
-                         0 I]
+            \tilde{A} =
+            \begin{bmatrix}
+            A  & 0    & 0  \\
+            KG & A-KG & KH \\
+            0  & 0    & 0 \\
+            \end{bmatrix}
 
-            \tilde{G} = [G -G H]
+        .. math::
 
-        with A, C, G, H coming from the linear state space system 
+            \tilde{C} =
+            \begin{bmatrix}
+            C & 0 \\
+            0 & 0 \\
+            0 & I \\
+            \end{bmatrix}
+
+        .. math::
+
+            \tilde{G} =
+            \begin{bmatrix}
+            G & -G & H \\
+            \end{bmatrix}
+
+        with :math:`A, C, G, H` coming from the linear state space system
         that defines the Kalman instance
-
 
         Returns
         -------
@@ -147,18 +170,19 @@ class Kalman(object):
 
         return whitened_lss
 
-
     def prior_to_filtered(self, y):
         r"""
         Updates the moments (x_hat, Sigma) of the time t prior to the
-        time t filtering distribution, using current measurement y_t.
+        time t filtering distribution, using current measurement :math:`y_t`.
 
         The updates are according to
 
-            x_{hat}^F = x_{hat} + Sigma G' (G Sigma G' + R)^{-1}
-                (y - G x_{hat})
-            Sigma^F = Sigma - Sigma G' (G Sigma G' + R)^{-1} G
-                Sigma
+        .. math::
+
+            \hat{x}^F = \hat{x} + \Sigma G' (G \Sigma G' + R)^{-1}
+                (y - G \hat{x})
+            \Sigma^F = \Sigma - \Sigma G' (G \Sigma G' + R)^{-1} G
+                \Sigma
 
         Parameters
         ----------
@@ -210,15 +234,15 @@ class Kalman(object):
 
     def stationary_values(self):
         """
-        Computes the limit of Sigma_t as t  goes to infinity by
-        solving the associated Riccati equation.  Computation is via the
+        Computes the limit of :math:`\Sigma_t` as t goes to infinity by
+        solving the associated Riccati equation. Computation is via the
         doubling algorithm (see the documentation in
         `matrix_eqn.solve_discrete_riccati`).
 
         Returns
         -------
         Sigma_infinity : array_like or scalar(float)
-            The infinite limit of Sigma_t
+            The infinite limit of :math:`\Sigma_t`
         K_infinity : array_like or scalar(float)
             The stationary Kalman gain.
 

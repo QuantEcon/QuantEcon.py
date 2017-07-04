@@ -23,7 +23,7 @@ class RBLQ(object):
 
     .. math::
 
-        min_{u_t}  sum_t beta^t {x_t' R x_t + u_t' Q u_t }
+        \min_{u_t}  \sum_t \beta^t {x_t' R x_t + u_t' Q u_t }
 
     subject to
 
@@ -96,7 +96,7 @@ class RBLQ(object):
 
         .. math::
 
-            D(P) := P + PC(theta I - C'PC)^{-1} C'P.
+            D(P) := P + PC(\theta I - C'PC)^{-1} C'P.
 
         Parameters
         ----------
@@ -124,13 +124,13 @@ class RBLQ(object):
 
         .. math::
 
-            B(P) := R - beta^2 A'PB(Q + beta B'PB)^{-1}B'PA + beta A'PA
+            B(P) := R - \beta^2 A'PB(Q + \beta B'PB)^{-1}B'PA + \beta A'PA
 
         and also returning
 
         .. math::
 
-            F := (Q + beta B'PB)^{-1} beta B'PA
+            F := (Q + \beta B'PB)^{-1} \beta B'PA
 
         Parameters
         ----------
@@ -165,7 +165,7 @@ class RBLQ(object):
 
             u_t = - F x_t
 
-        And the value function is -x'Px
+        And the value function is :math:`-x'Px`
 
         Returns
         -------
@@ -299,10 +299,20 @@ class RBLQ(object):
         return F, P
 
     def compute_deterministic_entropy(self, F, K, x0):
-        """
+        r"""
 
         Given K and F, compute the value of deterministic entropy, which
-        is sum_t beta^t x_t' K'K x_t with x_{t+1} = (A - BF + CK) x_t.
+        is
+
+        .. math::
+
+            \sum_t \beta^t x_t' K'K x_t`
+
+        with
+
+        .. math::
+
+            x_{t+1} = (A - BF + CK) x_t
 
         Parameters
         ----------
@@ -328,9 +338,9 @@ class RBLQ(object):
 
     def evaluate_F(self, F):
         """
-        Given a fixed policy F, with the interpretation u = -F x, this
-        function computes the matrix P_F and constant d_F associated
-        with discounted cost J_F(x) = x' P_F x + d_F.
+        Given a fixed policy F, with the interpretation :math:`u = -F x`, this
+        function computes the matrix :math:`P_F` and constant :math:`d_F`
+        associated with discounted cost :math:`J_F(x) = x' P_F x + d_F`
 
         Parameters
         ----------

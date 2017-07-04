@@ -19,36 +19,50 @@ class LQ(object):
     This class is for analyzing linear quadratic optimal control
     problems of either the infinite horizon form
 
-    .     min E sum_{t=0}^{\infty} beta^t r(x_t, u_t)
+    .. math::
+
+        \min \mathbb{E}
+        \Big[ \sum_{t=0}^{\infty} \beta^t r(x_t, u_t) \Big]
 
     with
+
+    .. math::
 
          r(x_t, u_t) := x_t' R x_t + u_t' Q u_t + 2 u_t' N x_t
 
     or the finite horizon form
 
-         min E sum_{t=0}^{T-1} beta^t r(x_t, u_t) + beta^T x_T' R_f x_T
+    .. math::
+
+         \min \mathbb{E}
+         \Big[
+         \sum_{t=0}^{T-1} \beta^t r(x_t, u_t) + \beta^T x_T' R_f x_T
+         \Big]
 
     Both are minimized subject to the law of motion
 
+    .. math::
+
          x_{t+1} = A x_t + B u_t + C w_{t+1}
 
-    Here x is n x 1, u is k x 1, w is j x 1 and the matrices are
-    conformable for these dimensions.  The sequence {w_t} is assumed to
-    be white noise, with zero mean and E w_t w_t = I, the j x j
-    identity.
+    Here :math:`x` is n x 1, :math:`u` is k x 1, :math:`w` is j x 1 and the 
+    matrices are conformable for these dimensions.  The sequence :math:`{w_t}`
+    is assumed to be white noise, with zero mean and
+    :math:`\mathbb{E} [ w_t' w_t ] = I`, the j x j identity.
 
-    If C is not supplied as a parameter, the model is assumed to be
-    deterministic (and C is set to a zero matrix of appropriate
+    If :math:`C` is not supplied as a parameter, the model is assumed to be
+    deterministic (and :math:`C` is set to a zero matrix of appropriate
     dimension).
 
-    For this model, the time t value (i.e., cost-to-go) function V_t
+    For this model, the time t value (i.e., cost-to-go) function :math:`V_t`
     takes the form
+
+    .. math::
 
          x' P_T x + d_T
 
-    and the optimal policy is of the form u_T = -F_T x_T.  In
-    the infinite horizon case, V, P, d and F are all stationary.
+    and the optimal policy is of the form :math:`u_T = -F_T x_T`. In the
+    infinite horizon case, :math:`V, P, d` and :math:`F` are all stationary.
 
     Parameters
     ----------
@@ -87,9 +101,11 @@ class LQ(object):
     ----------
     Q, R, N, A, B, C, beta, T, Rf : see Parameters
     P : array_like(float)
-        P is part of the value function representation of V(x) = x'Px + d
+        P is part of the value function representation of
+        :math:`V(x) = x'Px + d`
     d : array_like(float)
-        d is part of the value function representation of V(x) = x'Px + d
+        d is part of the value function representation of
+        :math:`V(x) = x'Px + d`
     F : array_like(float)
         F is the policy rule that determines the choice of control in
         each period.
@@ -139,8 +155,8 @@ class LQ(object):
     def __str__(self):
         m = """\
         Linear Quadratic control system
-          - beta (discount parameter)   : {b}
-          - T (time horizon)            : {t}
+          - beta (discount parameter)       : {b}
+          - T (time horizon)                : {t}
           - n (number of state variables)   : {n}
           - k (number of control variables) : {k}
           - j (number of shocks)            : {j}
@@ -154,12 +170,14 @@ class LQ(object):
         This method is for updating in the finite horizon case.  It
         shifts the current value function
 
+        .. math::
+
              V_t(x) = x' P_t x + d_t
 
-        and the optimal policy F_t one step *back* in time,
-        replacing the pair P_t and d_t with
-        P_{t-1} and d_{t-1}, and F_t with
-        F_{t-1}
+        and the optimal policy :math:`F_t` one step *back* in time,
+        replacing the pair :math:`P_t` and :math:`d_t` with
+        :math:`P_{t-1}` and :math:`d_{t-1}`, and :math:`F_t` with
+        :math:`F_{t-1}`
 
         """
         # === Simplify notation === #
@@ -180,25 +198,27 @@ class LQ(object):
 
     def stationary_values(self):
         """
-        Computes the matrix P and scalar d that represent the value
-        function
+        Computes the matrix :math:`P` and scalar :math:`d` that represent 
+        the value function
+
+        .. math::
 
              V(x) = x' P x + d
 
         in the infinite horizon case.  Also computes the control matrix
-        F from u = - Fx
+        :math:`F` from :math:`u = - Fx`
 
         Returns
         -------
         P : array_like(float)
             P is part of the value function representation of
-            V(x) = xPx + d
+            :math:`V(x) = x'Px + d`
         F : array_like(float)
             F is the policy rule that determines the choice of control
             in each period.
         d : array_like(float)
             d is part of the value function representation of
-            V(x) = xPx + d
+            :math:`V(x) = x'Px + d`
 
         """
         # === simplify notation === #
@@ -224,8 +244,8 @@ class LQ(object):
     def compute_sequence(self, x0, ts_length=None):
         """
         Compute and return the optimal state and control sequences
-        x_0, ..., x_T and u_0,..., u_T  under the
-        assumption that {w_t} is iid and N(0, 1).
+        :math:`x_0, ..., x_T` and :math:`u_0,..., u_T`  under the
+        assumption that :math:`{w_t}` is iid and :math:`N(0, 1)`.
 
         Parameters
         ===========
@@ -238,13 +258,13 @@ class LQ(object):
         Returns
         ========
         x_path : array_like(float)
-            An n x T+1 matrix, where the t-th column represents x_t
+            An n x T+1 matrix, where the t-th column represents :math:`x_t`
 
         u_path : array_like(float)
-            A k x T matrix, where the t-th column represents u_t
+            A k x T matrix, where the t-th column represents :math:`u_t`
 
         w_path : array_like(float)
-            A j x T+1 matrix, where the t-th column represent w_t
+            A j x T+1 matrix, where the t-th column represent :math:`w_t`
 
         """
 

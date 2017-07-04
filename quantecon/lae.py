@@ -1,4 +1,4 @@
-"""
+r"""
 Filename: lae.py
 
 Authors: Thomas J. Sargent, John Stachurski,
@@ -11,12 +11,12 @@ as densities. The estimate of the marginal density of :math:`X_t` is
 
     \frac{1}{n} \sum_{i=0}^n p(X_{t-1}^i, y)
 
-This is a density in y.
+This is a density in :math:`y`.
 
 References
 ----------
 
-http://quant-econ.net/py/stationary_densities.html
+https://lectures.quantecon.org/py/stationary_densities.html
 
 """
 from textwrap import dedent

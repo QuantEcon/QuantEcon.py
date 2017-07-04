@@ -1,6 +1,6 @@
 """
 Filename: lss.py
-Reference: http://quant-econ.net/py/linear_models.html
+Reference: https://lectures.quantecon.org/py/linear_models.html
 
 Computes quantities associated with the Gaussian linear state space model.
 """
@@ -11,20 +11,25 @@ from numpy.random import multivariate_normal
 from scipy.linalg import solve
 from numba import jit
 
+
 @jit
 def simulate_linear_model(A, x0, v, ts_length):
-    """
-    This is a separate function for simulating a vector linear system of 
+    r"""
+    This is a separate function for simulating a vector linear system of
     the form
-    
-        x_{t+1} = A x_t + v_t given x_0 = x0
-        
-    Here x_t and v_t are both n x 1 and A is n x n.
-        
-    The purpose of separating this functionality out is to target it for 
+
+    .. math::
+
+        x_{t+1} = A x_t + v_t
+
+    given :math:`x_0` = x0
+
+    Here :math:`x_t` and :math:`v_t` are both n x 1 and :math:`A` is n x n.
+
+    The purpose of separating this functionality out is to target it for
     optimization by Numba.  For the same reason, matrix multiplication is
     broken down into for loops.
-    
+
     Parameters
     ----------
     A : array_like or scalar(float)
@@ -33,14 +38,14 @@ def simulate_linear_model(A, x0, v, ts_length):
         Should be n x 1.  Initial condition
     v : np.ndarray
         Should be n x ts_length-1.  Its t-th column is used as the time t
-        shock v_t
+        shock :math:`v_t`
     ts_length : int
         The length of the time series
 
     Returns
     --------
     x : np.ndarray
-        Time series with ts_length columns, the t-th column being x_t
+        Time series with ts_length columns, the t-th column being :math:`x_t`
     """
     A = np.asarray(A)
     n = A.shape[0]
@@ -49,24 +54,27 @@ def simulate_linear_model(A, x0, v, ts_length):
     for t in range(ts_length-1):
         # x[:, t+1] = A.dot(x[:, t]) + v[:, t]
         for i in range(n):
-            x[i, t+1] = v[i, t]                   #Shock
+            x[i, t+1] = v[i, t]                   # Shock
             for j in range(n):
-                x[i, t+1] += A[i, j] * x[j, t]   #Dot Product
+                x[i, t+1] += A[i, j] * x[j, t]   # Dot Product
     return x
 
 
 class LinearStateSpace(object):
-    """
+    r"""
     A class that describes a Gaussian linear state space model of the
     form:
+
+    .. math::
 
       x_{t+1} = A x_t + C w_{t+1}
 
       y_t = G x_t + H v_t
 
-    where {w_t} and {v_t} are independent and standard normal with dimensions
-    k and l respectively.  The initial conditions are mu_0 and Sigma_0 for x_0
-    ~ N(mu_0, Sigma_0).  When Sigma_0=0, the draw of x_0 is exactly mu_0.
+    where :math:`{w_t}` and :math:`{v_t}` are independent and standard normal
+    with dimensions k and l respectively.  The initial conditions are
+    :math:`\mu_0` and :math:`\Sigma_0` for :math:`x_0 \sim N(\mu_0, \Sigma_0)`.
+    When :math:`\Sigma_0=0`, the draw of :math:`x_0` is exactly :math:`\mu_0`.
 
     Parameters
     ----------
@@ -94,8 +102,8 @@ class LinearStateSpace(object):
 
     def __init__(self, A, C, G, H=None, mu_0=None, Sigma_0=None):
         self.A, self.G, self.C = list(map(self.convert, (A, G, C)))
-        #-Check Input Shapes-#
-        ni,nj = self.A.shape
+        # = Check Input Shapes = #
+        ni, nj = self.A.shape
         if ni != nj:
             raise ValueError("Matrix A (shape: %s) needs to be square" % (self.A.shape))
         if ni != self.C.shape[0]:
@@ -114,7 +122,7 @@ class LinearStateSpace(object):
             self.mu_0 = np.zeros((self.n, 1))
         else:
             self.mu_0 = self.convert(mu_0)
-            self.mu_0.shape = self.n, 1  
+            self.mu_0.shape = self.n, 1
         if Sigma_0 is None:
             self.Sigma_0 = np.zeros((self.n, self.n))
         else:
@@ -141,10 +149,12 @@ class LinearStateSpace(object):
         return np.atleast_2d(np.asarray(x, dtype='float'))
 
     def simulate(self, ts_length=100):
-        """
+        r"""
         Simulate a time series of length ts_length, first drawing
 
-            x_0 ~ N(mu_0, Sigma_0)
+        .. math::
+
+            x_0 \sim N(\mu_0, \Sigma_0)
 
         Parameters
         ----------
@@ -155,17 +165,17 @@ class LinearStateSpace(object):
         Returns
         -------
         x : array_like(float)
-            An n x ts_length array, where the t-th column is x_t
+            An n x ts_length array, where the t-th column is :math:`x_t`
         y : array_like(float)
-            A k x ts_length array, where the t-th column is y_t
+            A k x ts_length array, where the t-th column is :math:`y_t`
 
         """
         x0 = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
         w = np.random.randn(self.m, ts_length-1)
-        v = self.C.dot(w) # Multiply each w_t by C to get v_t = C w_t
+        v = self.C.dot(w)  # Multiply each w_t by C to get v_t = C w_t
         # == simulate time series == #
         x = simulate_linear_model(self.A, x0, v, ts_length)
-        
+
         if self.H is not None:
             v = np.random.randn(self.l, ts_length)
             y = self.G.dot(x) + self.H.dot(v)
@@ -175,9 +185,9 @@ class LinearStateSpace(object):
         return x, y
 
     def replicate(self, T=10, num_reps=100):
-        """
-        Simulate num_reps observations of x_T and y_T given
-        x_0 ~ N(mu_0, Sigma_0).
+        r"""
+        Simulate num_reps observations of :math:`x_T` and :math:`y_T` given
+        :math:`x_0 \sim N(\mu_0, \Sigma_0)`.
 
         Parameters
         ----------
@@ -190,11 +200,11 @@ class LinearStateSpace(object):
         -------
         x : array_like(float)
             An n x num_reps array, where the j-th column is the j_th
-            observation of x_T
+            observation of :math:`x_T`
 
         y : array_like(float)
             A k x num_reps array, where the j-th column is the j_th
-            observation of y_T
+            observation of :math:`y_T`
 
         """
         x = np.empty((self.n, num_reps))
@@ -210,12 +220,12 @@ class LinearStateSpace(object):
         return x, y
 
     def moment_sequence(self):
-        """
+        r"""
         Create a generator to calculate the population mean and
-        variance-convariance matrix for both x_t and y_t, starting at
-        the initial condition (self.mu_0, self.Sigma_0).  Each iteration
-        produces a 4-tuple of items (mu_x, mu_y, Sigma_x, Sigma_y) for
-        the next period.
+        variance-convariance matrix for both :math:`x_t` and :math:`y_t`
+        starting at the initial condition (self.mu_0, self.Sigma_0).
+        Each iteration produces a 4-tuple of items (mu_x, mu_y, Sigma_x,
+        Sigma_y) for the next period.
 
         Yields
         ------
@@ -250,10 +260,10 @@ class LinearStateSpace(object):
             Sigma_x = A.dot(Sigma_x).dot(A.T) + C.dot(C.T)
 
     def stationary_distributions(self, max_iter=200, tol=1e-5):
-        """
-        Compute the moments of the stationary distributions of x_t and
-        y_t if possible.  Computation is by iteration, starting from the
-        initial conditions self.mu_0 and self.Sigma_0
+        r"""
+        Compute the moments of the stationary distributions of :math:`x_t` and
+        :math:`y_t` if possible.  Computation is by iteration, starting from
+        the initial conditions self.mu_0 and self.Sigma_0
 
         Parameters
         ----------
@@ -265,15 +275,15 @@ class LinearStateSpace(object):
         Returns
         -------
         mu_x_star : array_like(float)
-            An n x 1 array representing the stationary mean of x_t
+            An n x 1 array representing the stationary mean of :math:`x_t`
         mu_y_star : array_like(float)
-            An k x 1 array representing the stationary mean of y_t
+            An k x 1 array representing the stationary mean of :math:`y_t`
         Sigma_x_star : array_like(float)
             An n x n array representing the stationary var-cov matrix
-            of x_t
+            of :math:`x_t`
         Sigma_y_star : array_like(float)
             An k x k array representing the stationary var-cov matrix
-            of y_t
+            of :math:`y_t`
 
         """
         # == Initialize iteration == #
@@ -304,12 +314,14 @@ class LinearStateSpace(object):
         return mu_x_star, mu_y_star, Sigma_x_star, Sigma_y_star
 
     def geometric_sums(self, beta, x_t):
-        """
+        r"""
         Forecast the geometric sums
 
-            S_x := E [sum_{j=0}^{\infty} beta^j x_{t+j} | x_t ]
+        .. math::
 
-            S_y := E [sum_{j=0}^{\infty} beta^j y_{t+j} | x_t ]
+            S_x := E \Big[ \sum_{j=0}^{\infty} \beta^j x_{t+j} | x_t \Big]
+
+            S_y := E \Big[ \sum_{j=0}^{\infty} \beta^j y_{t+j} | x_t \Big]
 
         Parameters
         ----------
@@ -328,6 +340,7 @@ class LinearStateSpace(object):
             Geometric sum as defined above
 
         """
+
         I = np.identity(self.n)
         S_x = solve(I - beta * self.A, x_t)
         S_y = self.G.dot(S_x)
@@ -335,15 +348,15 @@ class LinearStateSpace(object):
         return S_x, S_y
 
     def impulse_response(self, j=5):
-        """
+        r"""
         Pulls off the imuplse response coefficients to a shock
-        in w_{t} for x and y
+        in :math:`w_{t}` for :math:`x` and :math:`y`
 
         Important to note: We are uninterested in the shocks to
         v for this method
 
-        * x coefficients are C, AC, A^2 C...
-        * y coefficients are GC, GAC, GA^2C...
+        * :math:`x` coefficients are :math:`C, AC, A^2 C...`
+        * :math:`y` coefficients are :math:`GC, GAC, GA^2C...`
 
         Parameters
         ----------
@@ -371,4 +384,3 @@ class LinearStateSpace(object):
             Apower = np.dot(Apower, A)
 
         return xcoef, ycoef
-
