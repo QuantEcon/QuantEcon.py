@@ -157,9 +157,9 @@ def tauchen(rho, sigma_u, m=3, n=7):
         The autocorrelation coefficient
     sigma_u : scalar(float)
         The standard deviation of the random process
-    m : scalar(int), optional (default=3)
+    m : scalar(int), optional(default=3)
         The number of standard deviations to approximate out to
-    n : scalar(int), optional (default=7)
+    n : scalar(int), optional(default=7)
         The number of states to use in the approximation
 
     Returns
