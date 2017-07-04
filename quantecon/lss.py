@@ -24,7 +24,7 @@ def simulate_linear_model(A, x0, v, ts_length):
 
     given :math:`x_0` = x0
 
-    Here :math:`x_t` and :math:`v_t` are both n x 1 and A is n x n.
+    Here :math:`x_t` and :math:`v_t` are both n x 1 and :math:`A` is n x n.
 
     The purpose of separating this functionality out is to target it for
     optimization by Numba.  For the same reason, matrix multiplication is
@@ -275,15 +275,15 @@ class LinearStateSpace(object):
         Returns
         -------
         mu_x_star : array_like(float)
-            An n x 1 array representing the stationary mean of x_t
+            An n x 1 array representing the stationary mean of :math:`x_t`
         mu_y_star : array_like(float)
-            An k x 1 array representing the stationary mean of y_t
+            An k x 1 array representing the stationary mean of :math:`y_t`
         Sigma_x_star : array_like(float)
             An n x n array representing the stationary var-cov matrix
-            of x_t
+            of :math:`x_t`
         Sigma_y_star : array_like(float)
             An k x k array representing the stationary var-cov matrix
-            of y_t
+            of :math:`y_t`
 
         """
         # == Initialize iteration == #
