@@ -26,13 +26,15 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
 
         AXA' - X + B = 0
 
-    X is computed by using a doubling algorithm. In particular, we
-    iterate to convergence on X_j with the following recursions for j =
-    1, 2,... starting from X_0 = B, a_0 = A:
+    :math:`X` is computed by using a doubling algorithm. In particular, we
+    iterate to convergence on :math:`X_j` with the following recursions for
+    :math:`j = 1, 2, \dots` starting from :math:`X_0 = B`, :math:`a_0 = A`:
 
     .. math::
 
         a_j = a_{j-1} a_{j-1}
+
+    .. math::
 
         X_j = X_{j-1} + a_{j-1} X_{j-1} a_{j-1}'
 
@@ -96,6 +98,8 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
 def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     """
     Solves the discrete-time algebraic Riccati equation
+    
+    .. math::
 
         X = A'XA - (N + B'XA)'(B'XB + R)^{-1}(N + B'XA) + Q
 
@@ -103,8 +107,9 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     algorithm can be found in the reference below.
 
     Note that SciPy also has a discrete riccati equation solver.  However it
-    cannot handle the case where R is not invertible, or when N is nonzero.
-    Both of these cases can be handled in the algorithm implemented below.
+    cannot handle the case where :math:`R` is not invertible, or when N is
+    nonzero. Both of these cases can be handled in the algorithm implemented
+    below.
 
     Parameters
     ----------
