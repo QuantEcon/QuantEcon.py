@@ -17,22 +17,47 @@ from numba import njit
 
 
 def rouwenhorst(n, ybar, sigma, rho):
-    """
-    Takes as inputs n, p, q, psi.  It will then construct a markov chain
+    r"""
+    Takes as inputs n, p, q, psi. It will then construct a markov chain
     that estimates an AR(1) process of:
-    y_t = \bar{y} + \rho y_{t-1} + \varepsilon_t
-    where \varepsilon_t is i.i.d. normal of mean 0, std dev of sigma
+    :math:`y_t = \bar{y} + \rho y_{t-1} + \varepsilon_t`
+    where :math:`\varepsilon_t` is i.i.d. normal of mean 0, std dev of sigma
 
     The Rouwenhorst approximation uses the following recursive defintion
     for approximating a distribution:
 
-    theta_2 = [p    , 1 - p]
-              [1 - q, q    ]
+    .. math::
 
-    theta_{n+1} = p [theta_n, 0] + (1 - p) [0, theta_n]
-                    [0      , 0]           [0,       0]
-                + q [0       , 0] + (1 - q) [0,        ]
-                    [theta_n , 0]           [0, theta_n]
+        \theta_2 =
+        \begin{bmatrix}
+        p     &  1 - p \\
+        1 - q &  q     \\
+        \end{bmatrix}
+
+    .. math::
+
+        \theta_{n+1} =
+        p
+        \begin{bmatrix}
+        \theta_n & 0   \\
+        0        & 0   \\
+        \end{bmatrix}
+        + (1 - p)
+        \begin{bmatrix}
+        0  & \theta_n  \\
+        0  &  0        \\
+        \end{bmatrix}
+        + q
+        \begin{bmatrix}
+        0        & 0   \\
+        \theta_n & 0   \\
+        \end{bmatrix}
+        + (1 - q)
+        \begin{bmatrix}
+        0  &  0        \\
+        0  & \theta_n  \\
+        \end{bmatrix}
+
 
     Parameters
     ----------
@@ -40,11 +65,11 @@ def rouwenhorst(n, ybar, sigma, rho):
         The number of points to approximate the distribution
 
     ybar : float
-        The value \bar{y} in the process.  Note that the mean of this
-        AR(1) process, y, is simply ybar/(1 - rho)
+        The value :math:`\bar{y}` in the process.  Note that the mean of this
+        AR(1) process, y, is simply :math:`\bar{y}/(1 - \rho)`
 
     sigma : float
-        The value of the standard deviation of the \varepsilon process
+        The value of the standard deviation of the :math:`\varepsilon` process
 
     rho : float
         By default this will be 0, but if you are approximating an AR(1)
@@ -52,11 +77,11 @@ def rouwenhorst(n, ybar, sigma, rho):
 
     Returns
     -------
-    
+
     mc : MarkovChain
-        An instance of the MarkovChain class that stores the transition 
+        An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
-        
+
     """
 
     # Get the standard deviation of y
@@ -79,6 +104,7 @@ def rouwenhorst(n, ybar, sigma, rho):
         """
         This method uses the values of p and q to build the transition
         matrix for the rouwenhorst method
+
         """
 
         if n == 2:
@@ -114,14 +140,16 @@ def rouwenhorst(n, ybar, sigma, rho):
 
 
 def tauchen(rho, sigma_u, m=3, n=7):
-    """
+    r"""
     Computes a Markov chain associated with a discretized version of
     the linear Gaussian AR(1) process
 
-        y_{t+1} = rho * y_t + u_{t+1}
+    .. math::
 
-    using Tauchen's method.  Here {u_t} is an iid Gaussian process with zero
-    mean.
+        y_{t+1} = \rho y_t + u_{t+1}
+
+    using Tauchen's method. Here :math:`{u_t}`` is an iid Gaussian process
+    with zero mean.
 
     Parameters
     ----------
@@ -129,16 +157,16 @@ def tauchen(rho, sigma_u, m=3, n=7):
         The autocorrelation coefficient
     sigma_u : scalar(float)
         The standard deviation of the random process
-    m : scalar(int), optional(default=3)
+    m : scalar(int), optional (default=3)
         The number of standard deviations to approximate out to
-    n : scalar(int), optional(default=7)
+    n : scalar(int), optional (default=7)
         The number of states to use in the approximation
 
     Returns
     -------
 
     mc : MarkovChain
-        An instance of the MarkovChain class that stores the transition 
+        An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
     """
