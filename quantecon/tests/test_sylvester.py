@@ -7,7 +7,7 @@ email: thomas.hasenzagl@gmail.com
 import numpy as np
 from numpy.testing import assert_allclose
 from scipy import linalg
-from solve_sylvester import *
+from quantecon.matrix_eqn import solve_sylvester 
 
 def test_sylvester(A, B, C):
     """
