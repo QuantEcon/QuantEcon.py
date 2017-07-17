@@ -7,7 +7,7 @@ email: thomas.hasenzagl@gmail.com
 import numpy as np
 from numpy.testing import assert_allclose
 from scipy import linalg
-from matrix_eqn import solve_sylvester 
+from quantecon import matrix_eqn as qme
 
 
 def test_sylvester():
@@ -36,7 +36,7 @@ def check_sylvester(A, B, C):
     M2 = [B1, B2]
     
     desired = linalg.solve_sylvester(A1, B2, C)
-    computed =  solve_sylvester(M1, M2 , C)
+    computed =  qme.solve_sylvester(M1, M2 , C)
 
     assert_allclose(computed, desired)
     
@@ -54,7 +54,7 @@ def check_cont_lyapunov(A, C):
     M2 = [B1, B2]
     
     desired = linalg.solve_lyapunov(A1, C)
-    computed =  solve_sylvester(M1, M2, C)
+    computed =  qme.solve_sylvester(M1, M2, C)
 
     assert_allclose(computed, desired)
     
