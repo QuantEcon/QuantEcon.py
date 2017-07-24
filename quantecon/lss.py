@@ -262,7 +262,8 @@ class LinearStateSpace(object):
     def stationary_distributions(self, max_iter=200, tol=1e-5):
         r"""
         Compute the moments of the stationary distributions of :math:`x_t` and
-        :math:`y_t` if possible.  Computation is by iteration, starting from
+        :math:`y_t` if possible.  Tests for existence of stationary distribution.
+        If stationary distribution exists, computation is then by iteration, starting from
         the initial conditions self.mu_0 and self.Sigma_0
 
         Parameters
@@ -286,32 +287,60 @@ class LinearStateSpace(object):
             of :math:`y_t`
 
         """
-        # == Initialize iteration == #
-        m = self.moment_sequence()
-        mu_x, mu_y, Sigma_x, Sigma_y = next(m)
-        i = 0
-        error = tol + 1
+        # == Simplify names == #
+        A, C, = self.A, self.C
 
-        # == Loop until convergence or failure == #
-        while error > tol:
+        # == Stability test on A matrix == #
+        # == Prepare matrices == #
+        A = np.asarray(A)
+        C = np.asarray(C)
+        dim_x = A.shape[0]
+        dim_w = C.shape[1]
 
-            if i > max_iter:
-                fail_message = 'Convergence failed after {} iterations'
-                raise ValueError(fail_message.format(max_iter))
+        # == Detect location of constant in the state vector (if it exists) == #
+        cons_ind = []
+        for j in range(dim_x):
+            if np.array_equal(A[j,:] - np.eye(dim_x)[j,:],np.zeros(dim_x)) == True:
+                if np.array_equal(C[j,:] - np.zeros(dim_w),np.zeros(dim_w)) == True:
+                    cons_ind = j
 
-            else:
-                i += 1
-                mu_x1, mu_y1, Sigma_x1, Sigma_y1 = next(m)
-                error_mu = np.max(np.abs(mu_x1 - mu_x))
-                error_Sigma = np.max(np.abs(Sigma_x1 - Sigma_x))
-                error = max(error_mu, error_Sigma)
-                mu_x, Sigma_x = mu_x1, Sigma_x1
+        # == If constant exists, create submatrix without constant == #
+        if type(cons_ind) is int:
+            A = np.delete(A, cons_ind, axis=0)
+            A = np.delete(A, cons_ind, axis=1)
 
-        # == Prepare return values == #
-        mu_x_star, Sigma_x_star = mu_x, Sigma_x
-        mu_y_star, Sigma_y_star = mu_y1, Sigma_y1
+        # == Test eigenvalues of submatrix == #
+        d,v = np.linalg.eig(A)
+        if max(np.abs(d)) >= 1:
+            print('Stationary distribution does not exist')
+        else:
 
-        return mu_x_star, mu_y_star, Sigma_x_star, Sigma_y_star
+            # == Initialize iteration == #
+            m = self.moment_sequence()
+            mu_x, mu_y, Sigma_x, Sigma_y = next(m)
+            i = 0
+            error = tol + 1
+
+            # == Loop until convergence or failure == #
+            while error > tol:
+
+                if i > max_iter:
+                    fail_message = 'Convergence failed after {} iterations'
+                    raise ValueError(fail_message.format(max_iter))
+
+                else:
+                    i += 1
+                    mu_x1, mu_y1, Sigma_x1, Sigma_y1 = next(m)
+                    error_mu = np.max(np.abs(mu_x1 - mu_x))
+                    error_Sigma = np.max(np.abs(Sigma_x1 - Sigma_x))
+                    error = max(error_mu, error_Sigma)
+                    mu_x, Sigma_x = mu_x1, Sigma_x1
+
+            # == Prepare return values == #
+            mu_x_star, Sigma_x_star = mu_x, Sigma_x
+            mu_y_star, Sigma_y_star = mu_y1, Sigma_y1
+
+            return mu_x_star, mu_y_star, Sigma_x_star, Sigma_y_star
 
     def geometric_sums(self, beta, x_t):
         r"""
