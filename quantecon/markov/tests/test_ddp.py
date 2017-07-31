@@ -10,7 +10,7 @@ from __future__ import division
 import numpy as np
 import scipy.sparse as sparse
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises
-from nose.tools import eq_, ok_
+from nose.tools import ok_
 
 from quantecon.markov import DiscreteDP, backward_induction
 
@@ -126,10 +126,7 @@ def test_ddp_beta_0():
     v_init = [0, 0, 0]
 
     ddp0 = DiscreteDP(R, Q, beta)
-    s_indices, a_indices = np.where(R > -np.inf)
-    R_sa = R[s_indices, a_indices]
-    Q_sa = Q[s_indices, a_indices]
-    ddp1 = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
+    ddp1 = ddp0.to_sa_formulation()
     methods = ['vi', 'pi', 'mpi']
 
     for ddp in [ddp0, ddp1]:
@@ -140,7 +137,6 @@ def test_ddp_beta_0():
 
 
 def test_ddp_sorting():
-    n, m = 2, 2
     beta = 0.95
 
     # Sorted
@@ -238,8 +234,6 @@ def test_ddp_negative_inf_error():
 
 
 def test_ddp_no_feasibile_action_error():
-    n, m = 3, 2
-
     # No action is feasible at state 1
     s_indices = [0, 0, 2, 2]
     a_indices = [0, 1, 0, 1]
@@ -258,12 +252,8 @@ def test_ddp_beta_1_not_implemented_error():
     beta = 1
 
     ddp0 = DiscreteDP(R, Q, beta)
-    s_indices, a_indices = np.where(R > -np.inf)
-    R_sa = R[s_indices, a_indices]
-    Q_sa = Q[s_indices, a_indices]
-    ddp1 = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
-    Q_sa_sp = sparse.csr_matrix(Q_sa)
-    ddp2 = DiscreteDP(R_sa, Q_sa_sp, beta, s_indices, a_indices)
+    ddp1 = ddp0.to_sa_formulation()
+    ddp2 = ddp0.to_sa_formulation(sparse=False)
 
     solution_methods = \
         ['value_iteration', 'policy_iteration', 'modified_policy_iteration']
@@ -272,6 +262,45 @@ def test_ddp_beta_1_not_implemented_error():
         assert_raises(NotImplementedError, ddp.evaluate_policy, np.zeros(n))
         for method in solution_methods:
             assert_raises(NotImplementedError, getattr(ddp, method))
+
+
+def test_ddp_to_sa_and_to_full():
+    n, m = 3, 2
+    R = np.array([[0, 1], [1, 0], [0, 1]])
+    Q = np.empty((n, m, n))
+    Q[:] = 1/n
+    beta = 0.95
+
+    sparse_R = np.array([0, 1, 1, 0, 0, 1])
+    sparse_Q = sparse.coo_matrix(np.full((6, 3), 1/3))
+
+    ddp = DiscreteDP(R, Q, beta)
+    ddp_sa = ddp.to_sa_formulation()
+    ddp_sa2 = ddp_sa.to_sa_formulation()
+    ddp_sa3 = ddp.to_sa_formulation(sparse=False)
+    ddp2 = ddp_sa.to_full_formulation()
+    ddp3 = ddp_sa2.to_full_formulation()
+    ddp4 = ddp.to_full_formulation()
+
+    # make sure conversion worked
+    for ddp_s in [ddp_sa, ddp_sa2, ddp_sa3]:
+        assert_allclose(ddp_s.R, sparse_R)
+        # allcose doesn't work on sparse
+        np.max(np.abs((sparse_Q - ddp_sa.Q))) < 1e-15
+        assert_allclose(ddp_s.beta, beta)
+
+    for ddp_f in [ddp2, ddp3, ddp4]:
+        assert_allclose(ddp_f.R, ddp.R)
+        assert_allclose(ddp_f.Q, ddp.Q)
+        assert_allclose(ddp_f.beta, ddp.beta)
+
+    for method in ["pi", "vi", "mpi"]:
+        sol1 = ddp.solve(method=method)
+        for ddp_other in [ddp_sa, ddp_sa2, ddp_sa3, ddp2, ddp3, ddp4]:
+            sol2 = ddp_other.solve(method=method)
+
+            for k in ["v", "sigma", "num_iter"]:
+                assert_allclose(sol1[k], sol2[k])
 
 
 if __name__ == '__main__':
