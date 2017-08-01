@@ -126,7 +126,7 @@ def test_ddp_beta_0():
     v_init = [0, 0, 0]
 
     ddp0 = DiscreteDP(R, Q, beta)
-    ddp1 = ddp0.to_sa_formulation()
+    ddp1 = ddp0.to_sa_pair_form()
     methods = ['vi', 'pi', 'mpi']
 
     for ddp in [ddp0, ddp1]:
@@ -252,8 +252,8 @@ def test_ddp_beta_1_not_implemented_error():
     beta = 1
 
     ddp0 = DiscreteDP(R, Q, beta)
-    ddp1 = ddp0.to_sa_formulation()
-    ddp2 = ddp0.to_sa_formulation(sparse=False)
+    ddp1 = ddp0.to_sa_pair_form()
+    ddp2 = ddp0.to_sa_pair_form(sparse=False)
 
     solution_methods = \
         ['value_iteration', 'policy_iteration', 'modified_policy_iteration']
@@ -264,7 +264,7 @@ def test_ddp_beta_1_not_implemented_error():
             assert_raises(NotImplementedError, getattr(ddp, method))
 
 
-def test_ddp_to_sa_and_to_full():
+def test_ddp_to_sa_and_to_product():
     n, m = 3, 2
     R = np.array([[0, 1], [1, 0], [0, 1]])
     Q = np.empty((n, m, n))
@@ -275,12 +275,12 @@ def test_ddp_to_sa_and_to_full():
     sparse_Q = sparse.coo_matrix(np.full((6, 3), 1/3))
 
     ddp = DiscreteDP(R, Q, beta)
-    ddp_sa = ddp.to_sa_formulation()
-    ddp_sa2 = ddp_sa.to_sa_formulation()
-    ddp_sa3 = ddp.to_sa_formulation(sparse=False)
-    ddp2 = ddp_sa.to_full_formulation()
-    ddp3 = ddp_sa2.to_full_formulation()
-    ddp4 = ddp.to_full_formulation()
+    ddp_sa = ddp.to_sa_pair_form()
+    ddp_sa2 = ddp_sa.to_sa_pair_form()
+    ddp_sa3 = ddp.to_sa_pair_form(sparse=False)
+    ddp2 = ddp_sa.to_product_form()
+    ddp3 = ddp_sa2.to_product_form()
+    ddp4 = ddp.to_product_form()
 
     # make sure conversion worked
     for ddp_s in [ddp_sa, ddp_sa2, ddp_sa3]:

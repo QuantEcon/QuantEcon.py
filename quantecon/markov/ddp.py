@@ -456,31 +456,31 @@ class DiscreteDP(object):
                     'violated for state {s}'.format(s=s)
                 )
 
-    def to_sa_formulation(self, sparse=True):
+    def to_sa_pair_form(self, sparse=True):
         """
         Convert this instance of `DiscreteDP` to SA-pair form
 
         Parameters
         ----------
         sparse : bool, optional(default=True)
-            Should the `Q` matrix be stored as a sparse matrix.
+            Should the `Q` matrix be stored as a sparse matrix?
             If true the CSR format is used
 
         Returns
         -------
         ddp_sa : DiscreteDP
-            The correspnoding DiscreteDP instance in SA form
+            The correspnoding DiscreteDP instance in SA-pair form
 
         Notes
         -----
-        If this instance is already in SA form then it is returned
+        If this instance is already in SA-pair form then it is returned
         un-modified
         """
 
         if self._sa_pair:
             return self
         else:
-            s_ind, a_ind = np.where(np.isfinite(self.R))
+            s_ind, a_ind = np.where(self.R > - np.inf)
             RL = self.R[s_ind, a_ind]
             if sparse:
                 QL = sp.csr_matrix(self.Q[s_ind, a_ind])
@@ -488,11 +488,11 @@ class DiscreteDP(object):
                 QL = self.Q[s_ind, a_ind]
             return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
 
-    def to_full_formulation(self):
+    def to_product_form(self):
         """
-        Convert this instance of `DiscreteDP` to the "full" form.
+        Convert this instance of `DiscreteDP` to the "product" form.
 
-        The full form uses the version of the init method taking
+        The product form uses the version of the init method taking
         `R`, `Q` and `beta`.
 
         Parameters
@@ -501,18 +501,18 @@ class DiscreteDP(object):
         Returns
         -------
         ddp_sa : DiscreteDP
-            The correspnoding DiscreteDP instance in full form
+            The correspnoding DiscreteDP instance in product form
 
         Notes
         -----
-        If this instance is already in full form then it is returned
+        If this instance is already in product form then it is returned
         un-modified
 
         """
         if self._sa_pair:
             ns = self.num_states
             na = self.a_indices.max() + 1
-            R = np.zeros((ns, na))
+            R = np.full((ns, na), -np.inf)
             R[self.s_indices, self.a_indices] = self.R
             Q = np.zeros((ns, na, ns))
             if self._sparse:
