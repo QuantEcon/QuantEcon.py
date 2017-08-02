@@ -266,13 +266,18 @@ def test_ddp_beta_1_not_implemented_error():
 
 def test_ddp_to_sa_and_to_product():
     n, m = 3, 2
-    R = np.array([[0, 1], [1, 0], [0, 1]])
+    R = np.array([[0, 1], [1, 0], [-np.inf, 1]])
     Q = np.empty((n, m, n))
     Q[:] = 1/n
+    Q[0, 0, 0] = 0
+    Q[0, 0, 1] = 2/n
     beta = 0.95
 
-    sparse_R = np.array([0, 1, 1, 0, 0, 1])
-    sparse_Q = sparse.coo_matrix(np.full((6, 3), 1/3))
+    sparse_R = np.array([0, 1, 1, 0, 1])
+    _Q = np.full((5, 3), 1/3)
+    _Q[0, 0] = 0
+    _Q[0, 1] = 2/n
+    sparse_Q = sparse.coo_matrix(_Q)
 
     ddp = DiscreteDP(R, Q, beta)
     ddp_sa = ddp.to_sa_pair_form()
@@ -286,13 +291,25 @@ def test_ddp_to_sa_and_to_product():
     for ddp_s in [ddp_sa, ddp_sa2, ddp_sa3]:
         assert_allclose(ddp_s.R, sparse_R)
         # allcose doesn't work on sparse
-        np.max(np.abs((sparse_Q - ddp_sa.Q))) < 1e-15
+        np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15
         assert_allclose(ddp_s.beta, beta)
 
-    for ddp_f in [ddp2, ddp3, ddp4]:
+    # these two will have probability 0 in state 2, action 0 b/c
+    # of the infeasiability in R
+    funky_Q = np.empty((n, m, n))
+    funky_Q[:] = 1/n
+    funky_Q[0, 0, 0] = 0
+    funky_Q[0, 0, 1] = 2/n
+    funky_Q[2, 0, :] = 0
+    for ddp_f in [ddp2, ddp3]:
         assert_allclose(ddp_f.R, ddp.R)
-        assert_allclose(ddp_f.Q, ddp.Q)
+        assert_allclose(ddp_f.Q, funky_Q)
         assert_allclose(ddp_f.beta, ddp.beta)
+
+    # this one is just the original one.
+    assert_allclose(ddp4.R, ddp.R)
+    assert_allclose(ddp4.Q, ddp.Q)
+    assert_allclose(ddp4.beta, ddp.beta)
 
     for method in ["pi", "vi", "mpi"]:
         sol1 = ddp.solve(method=method)
