@@ -13,7 +13,7 @@ from quantecon.lss import LinearStateSpace
 from quantecon.matrix_eqn import solve_discrete_riccati
 
 
-class Kalman(object):
+class Kalman:
     r"""
     Implements the Kalman filter for the Gaussian state space model
 

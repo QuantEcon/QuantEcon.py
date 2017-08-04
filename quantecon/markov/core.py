@@ -96,7 +96,7 @@ from ..graph_tools import DiGraph
 from ..util import searchsorted, check_random_state
 
 
-class MarkovChain(object):
+class MarkovChain:
     """
     Class for a finite-state discrete-time Markov chain. It stores
     useful information such as the stationary distributions, and

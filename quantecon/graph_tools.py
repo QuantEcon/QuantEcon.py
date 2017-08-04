@@ -22,7 +22,7 @@ def annotate_nodes(func):
     return new_func
 
 
-class DiGraph(object):
+class DiGraph:
     r"""
     Class for a directed graph. It stores useful information about the
     graph structure such as strong connectivity [1]_ and periodicity

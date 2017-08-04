@@ -16,7 +16,7 @@ from scipy.linalg import solve, inv, det
 from .matrix_eqn import solve_discrete_lyapunov
 
 
-class RBLQ(object):
+class RBLQ:
     r"""
     Provides methods for analysing infinite horizon robust LQ control
     problems of the form

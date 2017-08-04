@@ -60,7 +60,7 @@ def simulate_linear_model(A, x0, v, ts_length):
     return x
 
 
-class LinearStateSpace(object):
+class LinearStateSpace:
     r"""
     A class that describes a Gaussian linear state space model of the
     form:
