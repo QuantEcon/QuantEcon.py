@@ -117,7 +117,7 @@ from numba import jit
 from .core import MarkovChain
 
 
-class DiscreteDP(object):
+class DiscreteDP:
     r"""
     Class for dealing with a discrete dynamic program.
 
