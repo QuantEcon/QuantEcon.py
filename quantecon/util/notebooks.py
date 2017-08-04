@@ -1,21 +1,13 @@
 """
 Support functions to Support QuantEcon.notebooks
 
-The purpose of these utilities is to implement simple support functions to allow for automatic downloading
-of any support files (python modules, or data) that may be required to run demonstration notebooks.
+Utilities to allow for automatic downloading of any support files (python modules, or data) 
+that may be required to run demonstration notebooks.
 
-Note
-----
-Files on the REMOTE Github Server can be organised into folders but they will end up at the root level of
-when downloaded as a support File
+.. note::
 
-"https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./something.py
-
-TODO
-----
-1. Write Style guide for QuantEcon.notebook contributions
-2. Write an interface for Dat Server
-3. Platform Agnostic (replace wget usage)
+    Files on the REMOTE Github Server can be organised into folders but they will end up at the root level of
+    when downloaded as a support File
 
 """
 
@@ -39,11 +31,11 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     file_list   list or dict
                 A list of files to specify a collection of filenames	
                 A dict of dir : list(files) to specify a directory
-    repo        str, optional(default=REPO)
-    raw 		str, optional(defualt=RAW)
+    repo        str, optional(default="https://github.com/QuantEcon/QuantEcon.notebooks")
+    raw 		str, optional(defualt="raw")
     			This is here in case github changes access to their raw files through web links
-    branch      str, optional(default=BRANCH)
-    folder      str, optional(default=FOLDER)
+    branch      str, optional(default="master")
+    folder      str, optional(default="dependencies")
     overwrite   bool, optional(default=False)
     verbose     bool, optional(default=True)
 
