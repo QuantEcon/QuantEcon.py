@@ -33,7 +33,8 @@ class __Timer__:
         self.last = t
 
     def tac(self):
-        """Returns and prints time elapsed since last tic()"""
+        """Returns and prints time elapsed since last
+             tic(), tac() or toc() whichever occured last."""
 
         import time
 
@@ -48,8 +49,7 @@ class __Timer__:
         return elapsed
 
     def toc(self):
-        """Returns and prints time elapsed since last
-        tic() or tac() whichever occured last"""
+        """Returns and prints time elapsed since last tic()."""
 
         import time
 
@@ -77,5 +77,5 @@ def tac():
 
 
 def toc():
-    """Prints and returns elapsed time since last tic, tac or toc."""
+    """Returns and prints time elapsed since last tic()."""
     return __timer__.toc()
