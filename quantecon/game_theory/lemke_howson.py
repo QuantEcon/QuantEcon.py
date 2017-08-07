@@ -5,6 +5,7 @@ Compute mixed Nash equilibria of a 2-player normal form game by the
 Lemke-Howson algorithm.
 
 """
+import numbers
 import numpy as np
 from numba import jit
 from .utilities import NashResult
@@ -128,11 +129,14 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     nums_actions = g.nums_actions
     total_num = sum(nums_actions)
 
+    msg = '`init_pivot` must be an integer k' + \
+          'such that 0 <= k < {0}'.format(total_num)
+
+    if not isinstance(init_pivot, numbers.Integral):
+        raise TypeError(msg)
+
     if not (0 <= init_pivot < total_num):
-        raise ValueError(
-            '`init_pivot` must be an integer k such that 0 <= k < {0}'
-            .format(total_num)
-        )
+        raise ValueError(msg)
 
     if capping is None:
         capping = max_iter
