@@ -14,7 +14,7 @@ from scipy.linalg import solve
 from .matrix_eqn import solve_discrete_riccati
 
 
-class LQ(object):
+class LQ:
     r"""
     This class is for analyzing linear quadratic optimal control
     problems of either the infinite horizon form

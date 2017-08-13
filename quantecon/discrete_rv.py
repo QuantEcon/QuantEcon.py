@@ -13,7 +13,7 @@ from numpy import cumsum
 from numpy.random import uniform
 
 
-class DiscreteRV(object):
+class DiscreteRV:
     """
     Generates an array of draws from a discrete random variable with
     vector of probabilities given by q.

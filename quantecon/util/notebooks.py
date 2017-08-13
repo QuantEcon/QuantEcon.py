@@ -32,7 +32,7 @@ FOLDER = "dependencies"          #Hard Coded Dependencies Folder on QuantEcon.no
 
 def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False, verbose=True):
     """
-    Retrieve raw files from QuantEcon.notebooks or any other Github repo
+    Retrieve raw files from QuantEcon.notebooks or other Github repo
     
     Parameters
     ----------
@@ -46,6 +46,30 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     folder      str, optional(default=FOLDER)
     overwrite   bool, optional(default=False)
     verbose     bool, optional(default=True)
+
+    Examples
+    --------
+    Consider a notebook that is dependant on a ``csv`` file to execute. If this file is 
+    located in a Github repository then it can be fetched using this utility
+
+    Assuming the file is at the root level in the ``master`` branch then:
+
+    >>> from quantecon.util import fetch_nb_dependencies
+    >>> status = fetch_nb_dependencies(["test.csv"], repo="https://<github_address>")
+
+    More than one file may be requested in the list provided
+
+    >>> status = fetch_nb_dependencies(["test.csv", "data.csv"], repo="https://<github_address>") 
+
+    A folder location can be added using ``folder=``
+
+    >>> status = fetch_nb_dependencies("test.csv", report="https://<github_address>", folder="data")
+
+    You can also specify a specific branch using ``branch=`` keyword argument. 
+
+    This will download the requested file(s) to your local working directory. The default
+    behaviour is **not** to overwrite a local file if it is present. This can be switched off
+    by setting ``overwrite=True``.
 
     """
 

@@ -23,7 +23,7 @@ from textwrap import dedent
 import numpy as np
 
 
-class LAE(object):
+class LAE:
     """
     An instance is a representation of a look ahead estimator associated
     with a given stochastic kernel p and a vector of observations X.

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 
 
-class ARMA(object):
+class ARMA:
     r"""
     This class represents scalar ARMA(p, q) processes.
 

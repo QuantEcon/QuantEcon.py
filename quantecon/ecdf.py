@@ -11,7 +11,7 @@ of observations.
 import numpy as np
 
 
-class ECDF(object):
+class ECDF:
     """
     One-dimensional empirical distribution function given a vector of
     observations.

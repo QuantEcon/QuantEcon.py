@@ -117,7 +117,7 @@ from numba import jit
 from .core import MarkovChain
 
 
-class DiscreteDP(object):
+class DiscreteDP:
     r"""
     Class for dealing with a discrete dynamic program.
 
@@ -455,6 +455,73 @@ class DiscreteDP(object):
                     'for every state at least one action must be available: '
                     'violated for state {s}'.format(s=s)
                 )
+
+    def to_sa_pair_form(self, sparse=True):
+        """
+        Convert this instance of `DiscreteDP` to SA-pair form
+
+        Parameters
+        ----------
+        sparse : bool, optional(default=True)
+            Should the `Q` matrix be stored as a sparse matrix?
+            If true the CSR format is used
+
+        Returns
+        -------
+        ddp_sa : DiscreteDP
+            The correspnoding DiscreteDP instance in SA-pair form
+
+        Notes
+        -----
+        If this instance is already in SA-pair form then it is returned
+        un-modified
+        """
+
+        if self._sa_pair:
+            return self
+        else:
+            s_ind, a_ind = np.where(self.R > - np.inf)
+            RL = self.R[s_ind, a_ind]
+            if sparse:
+                QL = sp.csr_matrix(self.Q[s_ind, a_ind])
+            else:
+                QL = self.Q[s_ind, a_ind]
+            return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
+
+    def to_product_form(self):
+        """
+        Convert this instance of `DiscreteDP` to the "product" form.
+
+        The product form uses the version of the init method taking
+        `R`, `Q` and `beta`.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        ddp_sa : DiscreteDP
+            The correspnoding DiscreteDP instance in product form
+
+        Notes
+        -----
+        If this instance is already in product form then it is returned
+        un-modified
+
+        """
+        if self._sa_pair:
+            ns = self.num_states
+            na = self.a_indices.max() + 1
+            R = np.full((ns, na), -np.inf)
+            R[self.s_indices, self.a_indices] = self.R
+            Q = np.zeros((ns, na, ns))
+            if self._sparse:
+                _fill_dense_Q(self.s_indices, self.a_indices, self.Q.toarray(), Q)
+            else:
+                _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
+            return DiscreteDP(R, Q, self.beta)
+        else:
+            return self
 
     def RQ_sigma(self, sigma):
         """
@@ -961,6 +1028,15 @@ def backward_induction(ddp, T, v_term=None):
         ddp.bellman_operator(vs[t, :], Tv=vs[t-1, :], sigma=sigmas[t-1, :])
 
     return vs, sigmas
+
+
+@jit(nopython=True)
+def _fill_dense_Q(s_indices, a_indices, Q_in, Q_out):
+    L = Q_in.shape[0]
+    for i in range(L):
+        Q_out[s_indices[i], a_indices[i], :] = Q_in[i, :]
+
+    return Q_out
 
 
 @jit(nopython=True)

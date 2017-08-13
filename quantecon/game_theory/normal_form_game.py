@@ -135,7 +135,7 @@ from numba import jit
 from ..util import check_random_state
 
 
-class Player(object):
+class Player:
     """
     Class representing a player in an N-player normal form game.
 
@@ -381,7 +381,7 @@ class Player(object):
             return idx
 
 
-class NormalFormGame(object):
+class NormalFormGame:
     """
     Class representing an N-player normal form game.
 
