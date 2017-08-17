@@ -6,7 +6,7 @@ Tests for lemke_howson.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from nose.tools import eq_
+from nose.tools import eq_, raises
 from quantecon.game_theory import Player, NormalFormGame, lemke_howson
 
 
@@ -108,6 +108,32 @@ def test_lemke_howson_capping():
                            capping=1, full_output=True)
     eq_(res.num_iter, max_iter)
     eq_(res.init, init_pivot-1)
+
+
+@raises(TypeError)
+def test_lemke_howson_invalid_g():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    lemke_howson(bimatrix)
+
+
+@raises(ValueError)
+def test_lemke_howson_invalid_init_pivot_integer():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    g = NormalFormGame(bimatrix)
+    lemke_howson(g, -1)
+
+
+@raises(TypeError)
+def test_lemke_howson_invalid_init_pivot_float():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    g = NormalFormGame(bimatrix)
+    lemke_howson(g, 1.0)
 
 
 if __name__ == '__main__':
