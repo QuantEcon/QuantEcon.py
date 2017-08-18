@@ -9,3 +9,4 @@ from .pure_nash import pure_nash_brute, pure_nash_brute_gen
 from .support_enumeration import support_enumeration, support_enumeration_gen
 from .lemke_howson import lemke_howson
 from .mclennan_tourky import mclennan_tourky
+from .vertex_enumeration import vertex_enumeration, vertex_enumeration_gen
