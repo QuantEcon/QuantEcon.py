@@ -288,7 +288,7 @@ class Player:
             array of floats (mixed action).
 
         tie_breaking : str, optional(default='smallest')
-            str in {'smallest', 'random', False}. Control how, or 
+            str in {'smallest', 'random', False}. Control how, or
             whether, to break a tie (see Returns for details).
 
         payoff_perturbation : array_like(float), optional(default=None)
@@ -379,6 +379,77 @@ class Player:
             return actions[idx]
         else:
             return idx
+
+    def is_dominated(self, action, tol=None, method=None):
+        """
+        Determine whether `action` is strictly dominated by some mixed
+        action.
+
+        Parameters
+        ----------
+        action : scalar(int)
+            Integer representing a pure action.
+
+        tol : scalar(float), optional(default=None)
+            Tolerance level used in determining domination. If None,
+            default to the value of the `tol` attribute.
+
+        method : str, optional(default=None)
+            If None, `lemke_howson` from `quantecon.game_theory` is used
+            to solve for a Nash equilibrium of an auxiliary zero-sum
+            game. If `method='simplex'`, `scipy.optimize.linprog` is
+            used with `method='simplex'`.
+
+        Returns
+        -------
+        bool
+            True if `action` is strictly dominated by some mixed action;
+            False otherwise.
+
+        """
+        if tol is None:
+            tol = self.tol
+
+        payoff_array = self.payoff_array
+
+        if self.num_opponents == 0:
+            return payoff_array.max() > payoff_array[action] + tol
+
+        ind = np.ones(self.num_actions, dtype=bool)
+        ind[action] = False
+        D = payoff_array[ind]
+        D -= payoff_array[action]
+        if self.num_opponents >= 2:
+            D.shape = (D.shape[0], np.prod(D.shape[1:]))
+
+        if method is None:
+            from .lemke_howson import lemke_howson
+            g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
+            NE = lemke_howson(g_zero_sum)
+            return NE[0] @ D @ NE[1] > tol
+        elif method in ['simplex']:
+            from scipy.optimize import linprog
+            m, n = D.shape
+            A = np.empty((n+2, m+1))
+            A[:n, :m] = -D.T
+            A[:n, -1] = 1  # Slack variable
+            A[n, :m], A[n+1, :m] = 1, -1  # Equality constraint
+            A[n:, -1] = 0
+            b = np.empty(n+2)
+            b[:n] = 0
+            b[n], b[n+1] = 1, -1
+            c = np.zeros(m+1)
+            c[-1] = -1
+            res = linprog(c, A_ub=A, b_ub=b, method=method)
+            if res.success:
+                return res.x[-1] > tol
+            elif res.status == 2:  # infeasible
+                return False
+            else:  # pragma: no cover
+                msg = 'scipy.optimize.linprog returned {0}'.format(res.status)
+                raise RuntimeError(msg)
+        else:
+            raise ValueError('Unknown method {0}'.format(method))
 
 
 class NormalFormGame:

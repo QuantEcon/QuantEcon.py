@@ -69,6 +69,11 @@ class TestPlayer_1opponent:
     def test_is_best_response_against_mixed(self):
         ok_(self.player.is_best_response([1/2, 1/2], [2/3, 1/3]))
 
+    def test_is_dominated(self):
+        for action in range(self.player.num_actions):
+            for method in [None, 'simplex']:
+                eq_(self.player.is_dominated(action, method=method), False)
+
 
 class TestPlayer_2opponents:
     """Test the methods of Player with two opponent players"""
@@ -101,6 +106,11 @@ class TestPlayer_2opponents:
             sorted([0, 1])
         )
 
+    def test_is_dominated(self):
+        for action in range(self.player.num_actions):
+            for method in [None, 'simplex']:
+                eq_(self.player.is_dominated(action, method=method), False)
+
 
 def test_random_choice():
     n, m = 5, 4
@@ -111,6 +121,24 @@ def test_random_choice():
 
     actions = list(range(player.num_actions))
     ok_(player.random_choice() in actions)
+
+
+def test_player_corner_cases():
+    n, m = 3, 4
+    player = Player(np.zeros((n, m)))
+    for action in range(n):
+        eq_(player.is_best_response(action, [1/m]*m), True)
+        for method in [None, 'simplex']:
+            eq_(player.is_dominated(action, method=method), False)
+
+    e = 1e-8
+    player = Player([[-e, -e], [1, -1], [-1, 1]])
+    action = 0
+    eq_(player.is_best_response(action, [1/2, 1/2], tol=e), True)
+    eq_(player.is_best_response(action, [1/2, 1/2], tol=e/2), False)
+    for method in [None, 'simplex']:
+        eq_(player.is_dominated(action, tol=e, method=method), False)
+        eq_(player.is_dominated(action, tol=e/2, method=method), True)
 
 
 # NormalFormGame #
@@ -267,6 +295,11 @@ class TestPlayer_0opponents:
     def test_best_response(self):
         """Trivial player: best_response"""
         eq_(self.player.best_response(None), 1)
+
+    def test_is_dominated(self):
+        """Trivial player: is_dominated"""
+        eq_(self.player.is_dominated(0), True)
+        eq_(self.player.is_dominated(1), False)
 
 
 class TestNormalFormGame_1p:
