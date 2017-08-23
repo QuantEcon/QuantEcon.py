@@ -6,7 +6,7 @@ Tests for support_enumeration.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from nose.tools import eq_
+from nose.tools import eq_, raises
 from quantecon.util import check_random_state
 from quantecon.game_theory import Player, NormalFormGame, support_enumeration
 
@@ -69,6 +69,14 @@ class TestSupportEnumeration():
         seed = 7028
         g = random_skew_sym(n, m, random_state=seed)
         NEs = support_enumeration(g)
+
+
+@raises(TypeError)
+def test_support_enumeration_invalid_g():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    support_enumeration(bimatrix)
 
 
 if __name__ == '__main__':
