@@ -6,7 +6,7 @@ Tests for vertex_enumeration.py
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
-from nose.tools import eq_
+from nose.tools import eq_, raises
 from quantecon.game_theory import NormalFormGame, vertex_enumeration
 from quantecon.game_theory.vertex_enumeration import _BestResponsePolytope
 
@@ -44,6 +44,14 @@ class TestVertexEnumeration:
             for actions_computed, actions in zip(NEs_computed, d['NEs']):
                 for action_computed, action in zip(actions_computed, actions):
                     assert_allclose(action_computed, action)
+
+
+@raises(TypeError)
+def test_vertex_enumeration_invalid_g():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    vertex_enumeration(bimatrix)
 
 
 class TestBestResponsePolytope:
@@ -96,6 +104,15 @@ class TestBestResponsePolytope:
 
         assert_array_equal(labelings_computed, self.labelings_P)
         assert_allclose(vertices_computed, self.vertices_P, atol=1e-15)
+
+
+@raises(TypeError)
+def test_best_response_polytope_invalid_player_instance():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    g = NormalFormGame(bimatrix)
+    _BestResponsePolytope(g)
 
 
 if __name__ == '__main__':
