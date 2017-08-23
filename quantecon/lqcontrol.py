@@ -12,6 +12,7 @@ import numpy as np
 from numpy import dot
 from scipy.linalg import solve
 from .matrix_eqn import solve_discrete_riccati
+from .util import check_random_state
 
 
 class LQ:
@@ -241,7 +242,7 @@ class LQ:
 
         return P, F, d
 
-    def compute_sequence(self, x0, ts_length=None):
+    def compute_sequence(self, x0, ts_length=None, random_state=None):
         """
         Compute and return the optimal state and control sequences
         :math:`x_0, ..., x_T` and :math:`u_0,..., u_T`  under the
@@ -254,6 +255,13 @@ class LQ:
 
         ts_length : scalar(int)
             Length of the simulation -- defaults to T in finite case
+
+        random_state : scalar(int) or np.random.RandomState,
+               optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
 
         Returns
         ========
@@ -282,11 +290,12 @@ class LQ:
             self.stationary_values()
 
         # == Set up initial condition and arrays to store paths == #
+        random_state = check_random_state(random_state)
         x0 = np.asarray(x0)
         x0 = x0.reshape(self.n, 1)  # Make sure x0 is a column vector
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
-        w_path = np.random.randn(self.j, T+1)
+        w_path = random_state.randn(self.j, T+1)
         Cw_path = dot(C, w_path)
 
         # == Compute and record the sequence of policies == #
