@@ -11,7 +11,7 @@ specified vector of probabilities.
 import numpy as np
 from numpy import cumsum
 from numpy.random import uniform
-
+from .util import check_random_state
 
 class DiscreteRV:
     """
@@ -58,7 +58,7 @@ class DiscreteRV:
         self._q = np.asarray(val)
         self.Q = cumsum(val)
 
-    def draw(self, k=1):
+    def draw(self, k=1, random_state=None):
         """
         Returns k draws from q.
 
@@ -70,10 +70,19 @@ class DiscreteRV:
         k : scalar(int), optional
             Number of draws to be returned
 
+        random_state : scalar(int) or np.random.RandomState,
+               optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
+
         Returns
         -------
         array_like(int)
             An array of k independent draws from q
 
         """
-        return self.Q.searchsorted(uniform(0, 1, size=k))
+        random_state = check_random_state(random_state)
+
+        return self.Q.searchsorted(random_state.uniform(0, 1, size=k))
