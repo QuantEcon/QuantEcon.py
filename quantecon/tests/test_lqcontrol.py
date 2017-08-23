@@ -61,6 +61,14 @@ class TestLQControl(unittest.TestCase):
         assert_allclose(u_0, u_seq, rtol=1e-4)
         assert_allclose(x_1, x_seq[0, -1], rtol=1e-4)
 
+    def test_scalar_sequences_with_seed(self):
+        lq_scalar = self.lq_scalar
+        x0 = 2
+        x_seq, u_seq, w_seq = lq_scalar.compute_sequence(x0, 10, 5)
+
+        expected_output = np.array([[ 0.44122749, -0.33087015]])
+
+        assert_allclose(w_seq, expected_output)
 
     def test_mat_sequences(self):
 
@@ -86,8 +94,6 @@ class TestLQControl(unittest.TestCase):
 
         assert_allclose(f_answer, F, atol=1e-3)
         assert_allclose(val_func_lq, val_func_answer, atol=1e-3)
-
-
 
 
 if __name__ == '__main__':
