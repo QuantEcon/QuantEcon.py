@@ -10,6 +10,7 @@ import numpy as np
 from numpy.random import multivariate_normal
 from scipy.linalg import solve
 from numba import jit
+from .util import check_random_state
 
 
 @jit
@@ -148,7 +149,7 @@ class LinearStateSpace:
         """
         return np.atleast_2d(np.asarray(x, dtype='float'))
 
-    def simulate(self, ts_length=100):
+    def simulate(self, ts_length=100, random_state=None):
         r"""
         Simulate a time series of length ts_length, first drawing
 
@@ -162,6 +163,13 @@ class LinearStateSpace:
         ts_length : scalar(int), optional(default=100)
             The length of the simulation
 
+        random_state : scalar(int) or np.random.RandomState,
+               optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
+
         Returns
         -------
         x : array_like(float)
@@ -170,21 +178,23 @@ class LinearStateSpace:
             A k x ts_length array, where the t-th column is :math:`y_t`
 
         """
+        random_state = check_random_state(random_state)
+
         x0 = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
-        w = np.random.randn(self.m, ts_length-1)
+        w = random_state.randn(self.m, ts_length-1)
         v = self.C.dot(w)  # Multiply each w_t by C to get v_t = C w_t
         # == simulate time series == #
         x = simulate_linear_model(self.A, x0, v, ts_length)
 
         if self.H is not None:
-            v = np.random.randn(self.l, ts_length)
+            v = random_state.randn(self.l, ts_length)
             y = self.G.dot(x) + self.H.dot(v)
         else:
             y = self.G.dot(x)
 
         return x, y
 
-    def replicate(self, T=10, num_reps=100):
+    def replicate(self, T=10, num_reps=100, random_state=None):
         r"""
         Simulate num_reps observations of :math:`x_T` and :math:`y_T` given
         :math:`x_0 \sim N(\mu_0, \Sigma_0)`.
@@ -195,6 +205,12 @@ class LinearStateSpace:
             The period that we want to replicate values for
         num_reps : scalar(int), optional(default=100)
             The number of replications that we want
+        random_state : scalar(int) or np.random.RandomState,
+               optional(default=None)
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
 
         Returns
         -------
@@ -207,12 +223,14 @@ class LinearStateSpace:
             observation of :math:`y_T`
 
         """
+        random_state = check_random_state(random_state)
+
         x = np.empty((self.n, num_reps))
         for j in range(num_reps):
-            x_T, _ = self.simulate(ts_length=T+1)
+            x_T, _ = self.simulate(ts_length=T+1, random_state=random_state)
             x[:, j] = x_T[:, -1]
         if self.H is not None:
-            v = np.random.randn(self.l, num_reps)
+            v = random_state.randn(self.l, num_reps)
             y = self.G.dot(x) + self.H.dot(v)
         else:
             y = self.G.dot(x)
