@@ -37,6 +37,23 @@ class TestLinearStateSpace(unittest.TestCase):
         self.assertTrue(abs(ssmux) < 2e-8)
         self.assertTrue(abs(sssigx - self.ss.C**2/(1 - self.ss.A**2)) < 2e-8)
 
+    def test_simulate(self):
+        ss = self.ss
+
+        sim = ss.simulate(ts_length=250)
+        for arr in sim:
+            self.assertTrue(len(arr[0])==250)
+
+    def test_simulate_with_seed(self):
+        ss = self.ss
+
+        xval, yval = ss.simulate(ts_length=5, random_state=5)
+        expected_output = np.array([0.75 , 0.73456137, 0.6812898, 0.76876387,
+                                    .71772107])
+ 
+        assert_allclose(xval[0], expected_output)
+        assert_allclose(yval[0], expected_output)
+
     def test_replicate(self):
         xval, yval = self.ss.replicate(T=100, num_reps=5000)
 
@@ -44,7 +61,13 @@ class TestLinearStateSpace(unittest.TestCase):
         self.assertEqual(xval.size, 5000)
         self.assertLessEqual(abs(np.mean(xval)), .05)
 
-    # def test_
+    def test_replicate_with_seed(self):
+        xval, yval = self.ss.replicate(T=100, num_reps=5, random_state=5)
+        expected_output = np.array([0.06871204, 0.06937119, -0.1478022, 
+                                    0.23841252, -0.06823762])
+        
+        assert_allclose(xval[0], expected_output)
+        assert_allclose(yval[0], expected_output)
 
 
 if __name__ == '__main__':
