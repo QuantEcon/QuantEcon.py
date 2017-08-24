@@ -22,6 +22,7 @@ import scipy.linalg as la
 from scipy.special import gammaln
 import sympy as sym
 from .ce_util import ckron, gridmake
+from .util import check_random_state
 
 __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
            'qnwsimp', 'qnwtrap', 'qnwunif', 'quadrect', 'qnwbeta',
@@ -73,7 +74,7 @@ def qnwcheb(n, a=1, b=1):
     return _make_multidim_func(_qnwcheb1, n, a, b)
 
 
-def qnwequi(n, a, b, kind="N", equidist_pp=None):
+def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     """
     Generates equidistributed sequences with property that averages
     value of integrable function evaluated over the sequence converges
@@ -105,6 +106,13 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
     equidist_pp : array_like, optional(default=None)
         TODO: I don't know what this does
 
+    random_state : scalar(int) or np.random.RandomState,
+           optional(default=None)
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
     Returns
     -------
     nodes : np.ndarray(dtype=float)
@@ -124,6 +132,8 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
     Economics and Finance, MIT Press, 2002.
 
     """
+    random_state = check_random_state(random_state)
+
     if equidist_pp is None:
         equidist_pp = np.sqrt(np.array(list(sym.primerange(0, 7920))))
 
@@ -153,7 +163,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None):
         nodes = np.outer(i * (i+1) / 2, j)
         nodes = (nodes - np.fix(nodes)).squeeze()
     elif kind.upper() == "R":  # pseudo-random
-        nodes = np.random.rand(n, d).squeeze()
+        nodes = random_state.rand(n, d).squeeze()
     else:
         raise ValueError("Unknown sequence requested")
 
