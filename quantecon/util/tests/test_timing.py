@@ -3,6 +3,8 @@ Filename: timing.py
 Authors: Pablo Winant
 Tests for timing.py
 """
+from numpy.testing import assert_allclose
+
 
 def test_tic_tac_toc():
 
@@ -22,9 +24,9 @@ def test_tic_tac_toc():
     time.sleep(h)
     el3 = toc()
 
-    assert(abs(el1-h)<0.01)
-    assert(abs(el2-h)<0.01)
-    assert(abs(el3-h*3)<0.01)
+    rtol = 0.1
+    for actual, desired in zip([el1, el2, el3], [h, h, h*3]):
+        assert_allclose(actual, desired, rtol=rtol)
 
 
 if __name__ == "__main__":
