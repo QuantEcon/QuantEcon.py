@@ -9,7 +9,6 @@ TODO: 1. Fix warnings concerning casting complex variables back to floats
 """
 import numpy as np
 from numpy import conj, pi
-import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 
 
