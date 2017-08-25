@@ -32,14 +32,12 @@ requirements:
       #    - numpy
       #    - scipy
       #    - pandas
-      #    - matplotlib
 
   run:
     - python
     - numpy
     - scipy
     - pandas
-    - matplotlib
 
 test:
   # Python imports

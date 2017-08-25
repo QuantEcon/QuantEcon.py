@@ -250,5 +250,3 @@ class ARMA:
         vals = dlsim(sys, u)[1]
 
         return vals.flatten()
-
-

@@ -6,7 +6,6 @@ dependencies:
 - numpy
 - numpydoc
 - scipy
-- matplotlib
 - pandas
 - statsmodels
 - sympy
