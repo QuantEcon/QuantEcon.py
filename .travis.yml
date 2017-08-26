@@ -25,11 +25,10 @@ before_install:
   #- sudo ln -s /run/shm /dev/shm
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy matplotlib nose pandas pip sympy pytables statsmodels numba
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy nose pandas pip sympy pytables statsmodels numba
     # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
   - pip install coveralls coverage
   - python setup.py install
-  - cp quantecon/tests/matplotlibrc .
 
 script:
   - nosetests --with-coverage --cover-package=quantecon --exclude=models 	#quantecon.models excluded from tests to prevent triggering the ImportWarning

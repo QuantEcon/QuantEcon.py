@@ -9,7 +9,6 @@ TODO: 1. Fix warnings concerning casting complex variables back to floats
 """
 import numpy as np
 from numpy import conj, pi
-import matplotlib.pyplot as plt
 from scipy.signal import dimpulse, freqz, dlsim
 from .util import check_random_state
 
@@ -260,69 +259,3 @@ class ARMA:
         vals = dlsim(sys, u)[1]
 
         return vals.flatten()
-
-    def plot_impulse_response(self, ax=None, show=True):
-        if show:
-            fig, ax = plt.subplots()
-        ax.set_title('Impulse response')
-        yi = self.impulse_response()
-        ax.stem(list(range(len(yi))), yi)
-        ax.set_xlim(xmin=(-0.5))
-        ax.set_ylim(min(yi)-0.1, max(yi)+0.1)
-        ax.set_xlabel('time')
-        ax.set_ylabel('response')
-        if show:
-            plt.show()
-
-    def plot_spectral_density(self, ax=None, show=True):
-        if show:
-            fig, ax = plt.subplots()
-        ax.set_title('Spectral density')
-        w, spect = self.spectral_density(two_pi=False)
-        ax.semilogy(w, spect)
-        ax.set_xlim(0, pi)
-        ax.set_ylim(0, np.max(spect))
-        ax.set_xlabel('frequency')
-        ax.set_ylabel('spectrum')
-        if show:
-            plt.show()
-
-    def plot_autocovariance(self, ax=None, show=True):
-        if show:
-            fig, ax = plt.subplots()
-        ax.set_title('Autocovariance')
-        acov = self.autocovariance()
-        ax.stem(list(range(len(acov))), acov)
-        ax.set_xlim(-0.5, len(acov) - 0.5)
-        ax.set_xlabel('time')
-        ax.set_ylabel('autocovariance')
-        if show:
-            plt.show()
-
-    def plot_simulation(self, ax=None, show=True):
-        if show:
-            fig, ax = plt.subplots()
-        ax.set_title('Sample path')
-        x_out = self.simulation()
-        ax.plot(x_out)
-        ax.set_xlabel('time')
-        ax.set_ylabel('state space')
-        if show:
-            plt.show()
-
-    def quad_plot(self):
-        """
-        Plots the impulse response, spectral_density, autocovariance,
-        and one realization of the process.
-
-        """
-        num_rows, num_cols = 2, 2
-        fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
-        plt.subplots_adjust(hspace=0.4)
-        plot_functions = [self.plot_impulse_response,
-                          self.plot_spectral_density,
-                          self.plot_autocovariance,
-                          self.plot_simulation]
-        for plot_func, ax in zip(plot_functions, axes.flatten()):
-            plot_func(ax, show=False)
-        plt.show()
