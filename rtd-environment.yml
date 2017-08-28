@@ -12,3 +12,4 @@ dependencies:
 - numba
 - requests
 - sphinx_rtd_theme
+- matplotlib
