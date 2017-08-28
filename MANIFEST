@@ -34,6 +34,7 @@ quantecon/game_theory/pure_nash.py
 quantecon/game_theory/random.py
 quantecon/game_theory/support_enumeration.py
 quantecon/game_theory/utilities.py
+quantecon/game_theory/vertex_enumeration.py
 quantecon/markov/__init__.py
 quantecon/markov/approximation.py
 quantecon/markov/core.py
@@ -48,6 +49,7 @@ quantecon/tests/__init__.py
 quantecon/tests/test_arma.py
 quantecon/tests/test_compute_fp.py
 quantecon/tests/test_discrete_rv.py
+quantecon/tests/test_distributions.py
 quantecon/tests/test_ecdf.py
 quantecon/tests/test_estspec.py
 quantecon/tests/test_graph_tools.py
@@ -70,5 +72,6 @@ quantecon/util/__init__.py
 quantecon/util/array.py
 quantecon/util/common_messages.py
 quantecon/util/notebooks.py
+quantecon/util/numba.py
 quantecon/util/random.py
 quantecon/util/timing.py
