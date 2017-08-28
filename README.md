@@ -71,7 +71,7 @@ modification, are permitted provided that the following conditions are met:
 5. Added tests for lemke howson exceptions. See [PR #323](https://github.com/QuantEcon/QuantEcon.py/pull/323)
 6. Added vertex_enumeration to game theory module. See [PR #326](https://github.com/QuantEcon/QuantEcon.py/pull/326)
 7. Added ``is_dominated`` method to game_theory.player. See [PR #327](https://github.com/QuantEcon/QuantEcon.py/pull/327)
-3. Minor Updates ([PR #320](https://github.com/QuantEcon/QuantEcon.py/pull/320), [PR #321](https://github.com/QuantEcon/QuantEcon.py/pull/321)
+8. Minor Updates ([PR #320](https://github.com/QuantEcon/QuantEcon.py/pull/320), [PR #321](https://github.com/QuantEcon/QuantEcon.py/pull/321)
 [PR #328](https://github.com/QuantEcon/QuantEcon.py/pull/328))
 
 ### Ver 0.3.5.1 (17-May-2017)
