@@ -11,12 +11,11 @@ import sys
 import os
 import unittest
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_array_equal
 from quantecon.arma import ARMA
 
 
 class TestARMA(unittest.TestCase):
-
     def setUp(self):
         # Initial Values
         phi = np.array([.95, -.4, -.4])
@@ -25,7 +24,6 @@ class TestARMA(unittest.TestCase):
 
 
         self.lp = ARMA(phi, theta, sigma)
-
 
     def tearDown(self):
         del self.lp
@@ -37,12 +35,21 @@ class TestARMA(unittest.TestCase):
 
         self.assertTrue(sim.size==250)
 
+    def test_simulate_with_seed(self):
+        lp = self.lp
+        seed = 5
+        sim0 = lp.simulation(ts_length=10, random_state=seed)
+        sim1 = lp.simulation(ts_length=10, random_state=seed)
+
+        assert_array_equal(sim0, sim1)
+
     def test_impulse_response(self):
         lp = self.lp
 
         imp_resp = lp.impulse_response(impulse_length=75)
 
         self.assertTrue(imp_resp.size==75)
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestARMA)

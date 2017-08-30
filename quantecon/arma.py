@@ -10,6 +10,7 @@ TODO: 1. Fix warnings concerning casting complex variables back to floats
 import numpy as np
 from numpy import conj, pi
 from scipy.signal import dimpulse, freqz, dlsim
+from .util import check_random_state
 
 
 class ARMA:
@@ -230,7 +231,7 @@ class ARMA:
         # num_autocov should be <= len(acov) / 2
         return acov[:num_autocov]
 
-    def simulation(self, ts_length=90):
+    def simulation(self, ts_length=90, random_state=None):
         """
         Compute a simulated sample path assuming Gaussian shocks.
 
@@ -239,14 +240,22 @@ class ARMA:
         ts_length : scalar(int), optional(default=90)
             Number of periods to simulate for
 
+        random_state : int or np.random.RandomState, optional
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
+
         Returns
         -------
         vals : array_like(float)
             A simulation of the model that corresponds to this class
 
         """
+        random_state = check_random_state(random_state)
+
         sys = self.ma_poly, self.ar_poly, 1
-        u = np.random.randn(ts_length, 1) * self.sigma
+        u = random_state.randn(ts_length, 1) * self.sigma
         vals = dlsim(sys, u)[1]
 
         return vals.flatten()
