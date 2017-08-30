@@ -5,7 +5,7 @@ Filename: test_cartesian.py
 Tests for gridtools.py file
 
 """
-
+from nose.plugins.attrib import attr
 from quantecon.gridtools import cartesian, _repeat_1d
 
 def test_cartesian_C_order():
@@ -48,6 +48,7 @@ def test_cartesian_F_order():
 
     assert(correct)
 
+@attr('slow')
 def test_performance_C():
 
     from numpy import linspace, column_stack, repeat, tile
@@ -82,6 +83,7 @@ def test_performance_C():
     print("Numpy:     {}".format(t4-t3))
     assert(abs(prod-prod_numpy).max()==0)
 
+@attr('slow')
 def test_performance_F():
 
     from numpy import linspace, column_stack, repeat, tile
