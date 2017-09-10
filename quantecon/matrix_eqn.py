@@ -16,6 +16,7 @@ from numpy import dot
 from numpy.linalg import solve
 from scipy.linalg import solve_discrete_lyapunov as sp_solve_discrete_lyapunov
 from numpy.linalg import norm
+from numpy.core.umath_tests import inner1d
 
 def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
     r"""
@@ -210,7 +211,7 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     return H1 + gamma * I  # Return X
 
 
-def solve_sylvester(A, B, C, X0=[], tol=1e-10, restart=[], maxiter=10000):
+def solve_sylvester(A, B, C, X0=None, tol=1e-10, maxiter=10000):
     """
     Computes the solution (X) to the generalized sylvester equation: 
     
@@ -233,9 +234,6 @@ def solve_sylvester(A, B, C, X0=[], tol=1e-10, restart=[], maxiter=10000):
     tol: float, optional 
          Error tolerance
 
-    restart: int, optional
-         Restart the algorithm every restart inner iterations
-
     maxiter: int, optional
          Maximum number of iterations
 
@@ -252,62 +250,60 @@ def solve_sylvester(A, B, C, X0=[], tol=1e-10, restart=[], maxiter=10000):
     """
     n = C.shape[0]
     p = C.shape[1]
-        
-    if X0 == []:
+    H = np.zeros([maxiter+1, maxiter+1])
+    V = np.zeros([n, p*(maxiter+1)]) 
+    c = np.zeros(maxiter)
+    s = np.zeros(maxiter)
+       
+    if X0 is None:
         X0 = np.zeros([n,p])
-
-    R0 = C - sum([np.dot(np.dot(Ai, X0), Bi) for Ai, Bi in zip(A, B)]) 
+    
+    R0 = C - np.sum(np.dot(np.dot(Ai, X0), Bi) for Ai, Bi in zip(A, B)) 
     beta = norm(R0) 
     epsilon = norm(R0) 
-    V = [R0 / beta] 
-    
-    j = 0
-    k = 0
-    while epsilon > tol:
-        
-        j += 1
-        k += 1
+    b = np.hstack([beta, np.zeros(maxiter)])
+    V[0:n, 0:p] = R0 / beta 
+
+    for j in range(1, maxiter+1):    
 
         # Arnoldi algorithm 
         hj = np.zeros(j+1)
-        Vj = sum([np.dot(np.dot(Ai, V[j-1]), Bi) for Ai, Bi in zip(A, B)])
+        Vj = np.sum(np.dot(np.dot(Ai, V[:,(j-1)*p:j*p]), Bi) for Ai, Bi in zip(A, B))
 
         for i in range(j):
-           hj[i] = np.trace(np.dot(V[i].T, Vj))
-           Vj = Vj - np.dot(hj[i], V[i]) 
-       
+            hj[i] = np.sum(inner1d(V[:,i*p:(i+1)*p], Vj))
+            Vj -= hj[i] * V[:, i*p:(i+1)*p]
+
         hj[-1] = norm(Vj) 
         Vj = Vj / hj[-1] 
-        V.append(Vj) 
+        V[:,j*p:(j+1)*p] = Vj 
     
-        if j == 1:
-            H = hj.reshape(hj.shape[0], -1) 
-        else:
-            H = np.vstack([H, np.zeros([1, H.shape[1]])])
-            H = np.hstack([H, hj.reshape(hj.shape[0], -1)])
-
-        # Minimize Euclidean norm of the residual
-        e1 = np.hstack([1, np.zeros(j)])
-        y = np.linalg.lstsq(H, beta*e1)[0]
-        X = np.dot(np.hstack(V[0:-1]), np.kron(y, np.eye(p)).T) + X0
-
-        # Compute new residual 
-        R = C - sum([np.dot(np.dot(Ai, X), Bi) for Ai, Bi in zip(A, B)]) 
-        epsilon = norm(R)
+        # Apply Givens rotation 
+        for i in range(j-1):
+            temp = c[i]*hj[i] + s[i]*hj[i+1]
+            hj[i+1] = -s[i]*hj[i] + c[i]*hj[i+1] 
+            hj[i] = temp
         
-        if k >= maxiter:
-            print("The algorithm did not converge after " + str(maxiter) 
+        # Update Givens rotation
+        r = np.sqrt(hj[j-1] ** 2 + hj[j] ** 2)
+        c[j-1] = hj[j-1] / r
+        s[j-1] = c[j-1] * hj[j] / hj[j-1] 
+        
+        # Rotate hj and b with the updated Givens rotation 
+        hj[j-1] = c[j-1]*hj[j-1] + s[j-1]*hj[j]
+        hj[j] = 0
+        H[0:j+1, j-1] = hj
+
+        b[j] = -s[j-1]*b[j-1]
+        b[j-1] *= c[j-1]
+
+        # Compute new residual and check stopping condition
+        epsilon = np.abs(b[j])
+        if epsilon < tol:
+            y = np.linalg.solve(H[0:j, 0:j], b[0:j])
+            X = np.dot(V[0:j*p, 0:j*p], np.kron(y, np.eye(p)).T) + X0
+            return X
+
+    print("The algorithm did not converge after " + str(maxiter) 
                 + " iterations. The residual is " + str(epsilon) + ".") 
-            break
-
-        # Restart
-        if restart != []:
-            if j == restart:
-                j = 0
-                X0 = X
-                R0 = R 
-                beta = norm(R0) 
-                V = [R0 / beta] 
-
-    return X 
 
