@@ -36,10 +36,10 @@ SCC that corresponds to a sink node in the *condensation* of the
 directed graph :math:`\Gamma(P)`, where the condensation of
 :math:`\Gamma(P)` is a directed graph in which each SCC is replaced with
 a single node and there is an edge from one SCC :math:`C` to another SCC
-:math:`C'` if :math:`C \neq C'` and some node in :math:`C` has access to
-some node in :math:`C'`. A recurrent class is also called a *closed
-communication class*. The condensation is acyclic, so that there exists
-at least one recurrent class.
+:math:`C'` if :math:`C \neq C'` and there is an edge from some node in
+:math:`C` to some node in :math:`C'`. A recurrent class is also called a
+*closed communication class*. The condensation is acyclic, so that there
+exists at least one recurrent class.
 
 For example, if the entries of :math:`P` are all strictly positive, then
 the whole state space is a communication class as well as a recurrent
