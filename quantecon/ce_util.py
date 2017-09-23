@@ -29,12 +29,12 @@ def ckron(*arrays):
     Returns
     -------
     out : np.ndarray
-        The result of repeated kronecker products
+          The result of repeated kronecker products.
 
     Notes
     -----
     Based of original function `ckron` in CompEcon toolbox by Miranda
-    and Fackler
+    and Fackler.
 
     References
     ----------
@@ -47,7 +47,19 @@ def ckron(*arrays):
 
 def gridmake(*arrays):
     """
-    TODO: finish this docstring
+    Expands one or more vectors (or matrices) into a matrix where rows span the
+    cartesian product of combinations of the input arrays. Each column of the
+    input arrays will correspond to one column of the output matrix.
+
+    Parameters
+    ----------
+    *arrays : tuple/list of np.ndarray
+              Tuple/list of vectors to be expanded.
+
+    Returns
+    -------
+    out : np.ndarray
+          The cartesian product of combinations of the input arrays.
 
     Notes
     -----
@@ -76,12 +88,27 @@ def gridmake(*arrays):
 
 def _gridmake2(x1, x2):
     """
-    TODO: finish this docstring
+    Expands two vectors (or matrices) into a matrix where rows span the
+    cartesian product of combinations of the input arrays. Each column of the
+    input arrays will correspond to one column of the output matrix.
+
+    Parameters
+    ----------
+    x1 : np.ndarray
+         First vector to be expanded.
+
+    x2 : np.ndarray
+         Second vector to be expanded.
+
+    Returns
+    -------
+    out : np.ndarray
+          The cartesian product of combinations of the input arrays.
 
     Notes
     -----
     Based of original function ``gridmake2`` in CompEcon toolbox by
-    Miranda and Fackler
+    Miranda and Fackler.
 
     References
     ----------
