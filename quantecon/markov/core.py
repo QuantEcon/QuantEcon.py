@@ -474,12 +474,8 @@ class MarkovChain:
         Returns
         -------
         X : ndarray(ndim=1 or 2)
-            Array containing the sample path(s), of shape (ts_length,)
-            if init is a scalar (integer) or None and num_reps is None;
-            of shape (k, ts_length) otherwise, where k = len(init) if
-            (init, num_reps) = (array, None), k = num_reps if (init,
-            num_reps) = (int or None, int), and k = len(init)*num_reps
-            if (init, num_reps) = (array, int).
+            Array containing the state values of the sample path(s). See
+            the `simulate` method for more information.
 
         """
         random_state = check_random_state(random_state)
@@ -565,8 +561,12 @@ class MarkovChain:
         Returns
         -------
         X : ndarray(ndim=1 or 2)
-            Array containing the state values of the sample path(s). See
-            the `simulate` method for more information.
+            Array containing the sample path(s), of shape (ts_length,)
+            if init is a scalar (integer) or None and num_reps is None;
+            of shape (k, ts_length) otherwise, where k = len(init) if
+            (init, num_reps) = (array, None), k = num_reps if (init,
+            num_reps) = (int or None, int), and k = len(init)*num_reps
+            if (init, num_reps) = (array, int).
 
         """
         if init is not None:
