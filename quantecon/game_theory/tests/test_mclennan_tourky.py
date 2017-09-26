@@ -136,14 +136,14 @@ class TestEpsilonNash():
         ok_(_is_epsilon_nash([1., 0., 0., 1., 0.], self.g, 1e-5))
 
 
-def test_flatten_action_profile(self):
+def test_flatten_action_profile():
     unflattened_actions = [[1/3, 1/3, 1/3], [1/2, 1/2]]
     flattened_actions = [1/3, 1/3, 1/3, 1/2, 1/2]
     test_obj = _flatten_action_profile(unflattened_actions, [0, 3, 5])
     assert_allclose(test_obj, flattened_actions)
 
 
-def test_best_response_selection_no_indptr(self):
+def test_best_response_selection_no_indptr():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
