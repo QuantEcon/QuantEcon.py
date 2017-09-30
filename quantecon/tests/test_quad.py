@@ -312,8 +312,8 @@ class TestQnwequiR(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.x_equiR_1, cls.w_equiR_1 = qnwequi(n, a, b, "R", 41)
-        temp, cls.w_equiR_3 = qnwequi(n_3, a_3, b_3, "R", 42)
+        cls.x_equiR_1, cls.w_equiR_1 = qnwequi(n, a, b, "R", random_state=41)
+        temp, cls.w_equiR_3 = qnwequi(n_3, a_3, b_3, "R", random_state=42)
 
         # NOTE: I need to do a little magic here. MATLAB and numpy
         #       are generating the same random numbers, but MATLAB is
