@@ -5,12 +5,12 @@ Tests for mclennan_tourky.py
 
 """
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_array_equal
 from nose.tools import ok_, raises
 from quantecon.game_theory import Player, NormalFormGame, mclennan_tourky
-from quantecon.game_theory.mclennan_tourky import _best_response_selection, \
-                                                  _flatten_action_profile, \
-                                                  _is_epsilon_nash
+from quantecon.game_theory.mclennan_tourky import (
+     _best_response_selection, _flatten_action_profile, _is_epsilon_nash
+)
 
 
 class TestMclennanTourky():
@@ -140,7 +140,7 @@ def test_flatten_action_profile():
     unflattened_actions = [[1/3, 1/3, 1/3], [1/2, 1/2]]
     flattened_actions = [1/3, 1/3, 1/3, 1/2, 1/2]
     test_obj = _flatten_action_profile(unflattened_actions, [0, 3, 5])
-    assert_allclose(test_obj, flattened_actions)
+    assert_array_equal(test_obj, flattened_actions)
 
 
 def test_best_response_selection_no_indptr():
@@ -152,7 +152,7 @@ def test_best_response_selection_no_indptr():
     test_obj = _best_response_selection([1/3, 1/3, 1/3, 1/2,1/2], g)
     expected_output = np.array([0., 1., 0., 0., 1.])
 
-    assert_allclose(test_obj, expected_output)
+    assert_array_equal(test_obj, expected_output)
 
 
 if __name__ == '__main__':
