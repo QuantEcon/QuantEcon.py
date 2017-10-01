@@ -1,6 +1,6 @@
 """
 Filename: repeated_game.py
-Author: Quentin Batista
+Author: Chase Coleman, Quentin Batista
 
 Tools for repeated games.
 
@@ -8,17 +8,15 @@ Tools for repeated games.
 
 import numpy as np
 from math import sqrt
-import copy
 from scipy.optimize import linprog
 from scipy.spatial import HalfspaceIntersection
-from .pure_nash import pure_nash_brute
-from .utilities import RGUtil
+from .pure_nash import pure_nash_brute_gen
 from ..ce_util import gridmake
 
 
 class RepeatedGame:
     """
-    Class representing an N-player repeated form game.
+    Class representing an N-player repeated game.
 
     Parameters
     ----------
@@ -37,6 +35,33 @@ class RepeatedGame:
 
 
 # Outer approximation algorithm
+def unitcircle(npts):
+    """
+    Places `npts` equally spaced points along the 2 dimensional circle and 
+    returns the points with x coordinates in first column and y coordinates
+     in second column
+
+    Parameters
+    ----------
+    npts : scalar(float)
+
+    Returns
+    -------
+    ndarray(float, dim=2)
+
+    """
+    import math
+    import numpy as np
+
+    degrees = np.linspace(0, 2*math.pi, npts+1)
+    
+    pts = np.empty((npts, 2))
+    for i in range(npts):
+        x = degrees[i]
+        pts[i, 0] = math.cos(x)
+        pts[i, 1] = math.sin(x)
+    return pts
+
 def initialize_hpl(nH, o, r):
     """
     Initializes subgradients, extreme points and hyperplane levels for the
@@ -62,7 +87,7 @@ def initialize_hpl(nH, o, r):
 
     """
     # Create unit circle
-    H = RGUtil.unitcircle(nH)
+    H = unitcircle(nH)
     HT = np.transpose(H)
 
     # Choose origin and radius for big approximation
@@ -270,9 +295,9 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
     p1_minpayoff, p1_maxpayoff = min(po_1.flatten()), max(po_1.flatten())
     p2_minpayoff, p2_maxpayoff = min(po_2.flatten()), max(po_2.flatten())
 
-    pure_nash_exists = pure_nash_brute(sg)
-
-    if not pure_nash_exists:
+    try:
+        next(pure_nash_brute_gen(sg))
+    except StopIteration:
         raise ValueError('No pure action Nash equilibrium exists in stage game')
 
     # Get number of actions for each player and create action space
@@ -282,7 +307,7 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
 
     # Create the unit circle, points, and hyperplane levels
     C, H, Z = initialize_sg_hpl(rpd, nH)
-    Cnew = copy.copy(C)
+    Cnew = C.copy()
 
     # Create matrices for linear programming
     c, A, b = initialize_LP_matrices(rpd, H)
@@ -291,15 +316,16 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
     lb = -np.inf
     ub = np.inf
 
+    # Allocate space to store all solutions
+    Cia = np.empty(nAS)
+    Wia = np.empty([2, nAS])
+
     # Set iterative parameters and iterate until converged
     itr, dist = 0, 10.0
     while (itr < maxiter) & (dist > tol):
         # Compute the current worst values for each agent
         _w1 = worst_value_1(rpd, H, C)
         _w2 = worst_value_2(rpd, H, C)
-
-        # Update all set constraints -- Copies elements 1:nH of C into b
-        b[:nH] = copy.copy(C)
 
         # Iterate over all subgradients
         for ih in range(nH):
@@ -308,13 +334,12 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
             #
             h1, h2 = H[ih, :]
 
+            # Update all set constraints -- Copies elements 1:nH of C into b
+            b[:nH] = C
+
             # Put the right objective into c (negative because want maximize)
             c[0] = -h1
             c[1] = -h2
-
-            # Allocate space to store all solutions
-            Cia = np.empty(nAS)
-            Wia = np.empty([2, nAS])
 
             for ia in range(nAS):
                 #
@@ -367,7 +392,7 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
             warn("Maximum Iteration Reached")
 
         # Update hyperplane levels
-        C = copy.copy(Cnew)
+        C[:] = Cnew
 
     # Given the H-representation `(H, C)` of the computed polytope of
     # equilibrium payoff profiles, we obtain its V-representation `vertices`
