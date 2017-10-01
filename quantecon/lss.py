@@ -159,12 +159,9 @@ class LinearStateSpace:
 
         Parameters
         ----------
-
         ts_length : scalar(int), optional(default=100)
             The length of the simulation
-
-        random_state : scalar(int) or np.random.RandomState,
-               optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to set
             the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState is
@@ -205,8 +202,7 @@ class LinearStateSpace:
             The period that we want to replicate values for
         num_reps : scalar(int), optional(default=100)
             The number of replications that we want
-        random_state : scalar(int) or np.random.RandomState,
-               optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to set
             the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState is

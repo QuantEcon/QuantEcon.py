@@ -256,8 +256,7 @@ class LQ:
         ts_length : scalar(int)
             Length of the simulation -- defaults to T in finite case
 
-        random_state : scalar(int) or np.random.RandomState,
-               optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to set
             the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState is

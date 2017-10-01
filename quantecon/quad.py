@@ -106,8 +106,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     equidist_pp : array_like, optional(default=None)
         TODO: I don't know what this does
 
-    random_state : scalar(int) or np.random.RandomState,
-           optional(default=None)
+    random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
         reproducibility. If None, a randomly initialized RandomState is

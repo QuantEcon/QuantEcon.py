@@ -70,8 +70,7 @@ class DiscreteRV:
         k : scalar(int), optional
             Number of draws to be returned
 
-        random_state : scalar(int) or np.random.RandomState,
-               optional(default=None)
+        random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to set
             the initial state of the random number generator for
             reproducibility. If None, a randomly initialized RandomState is
