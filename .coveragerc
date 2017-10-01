@@ -28,6 +28,7 @@ exclude_lines =
     if __name__ == .__main__.:
 
     # Don't count Numba nopython=True jit functions
+    @jit
     @jit\(.*nopython=True
     @njit
     @generated_jit\(.*nopython=True

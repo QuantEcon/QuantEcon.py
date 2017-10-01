@@ -20,7 +20,7 @@ from .ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
 # from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.
 from .graph_tools import DiGraph
-from .gridtools import cartesian, mlinspace
+from .gridtools import cartesian, mlinspace, simplex_grid, simplex_index
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
