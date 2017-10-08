@@ -11,4 +11,4 @@ from .lemke_howson import lemke_howson
 from .mclennan_tourky import mclennan_tourky
 from .vertex_enumeration import vertex_enumeration, vertex_enumeration_gen
 from .utilities import NashResult
-from .repeated_game import RepeatedGame, outerapproximation
+from .repeated_game import RepeatedGame
