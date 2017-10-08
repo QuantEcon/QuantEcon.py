@@ -242,7 +242,7 @@ def worst_value_i(rpd, H, C, i):
     lb = -np.inf
     ub = np.inf
 
-    lpout = linprog(c, A_ub=H, b_ub=C, bounds=(lb, ub))
+    lpout = linprog(c, A_ub=H, b_ub=C, bounds=(lb, ub), method='interior-point')
     if lpout.status == 0:
         out = lpout.x[i]
     else:
@@ -322,7 +322,7 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
 
     # Set iterative parameters and iterate until converged
     itr, dist = 0, 10.0
-    while (itr < maxiter) & (dist > tol):
+    while (itr < maxiter) and (dist > tol):
         # Compute the current worst values for each agent
         _w1 = worst_value_1(rpd, H, C)
         _w2 = worst_value_2(rpd, H, C)
@@ -353,7 +353,7 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
                 b[nH+1] = (1-delta)*flow_u_2(rpd, a1, a2) - \
                           (1-delta)*best_dev_payoff_2(rpd, a1) - delta*_w2
 
-                lpout = linprog(c, A_ub=A, b_ub=b, bounds=(lb, ub))
+                lpout = linprog(c, A_ub=A, b_ub=b, bounds=(lb, ub), method='interior-point')
                 if lpout.status == 0:
                     # Pull out optimal value and compute
                     w_sol = lpout.x
@@ -372,7 +372,7 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
             # Get hyperplane level and continuation value
             Cstar = Cia[astar]
             Wstar = Wia[:, astar]
-            if Cstar > -1e15:
+            if Cstar > -1e10:
                 Cnew[ih] = Cstar
             else:
                 raise Error("Failed to find feasible action/continuation pair")
@@ -382,10 +382,10 @@ def outerapproximation(rpd, nH=32, tol=1e-8, maxiter=500, check_pure_nash=True,
                        delta*np.array([Wstar[0], Wstar[1]])
 
         # Update distance and iteration counter
-        dist = max(C - Cnew)
+        dist = max(abs(C - Cnew))
         itr +=1 
 
-        if verbose & (nskipprint%itr==0):
+        if verbose and (nskipprint%itr==0):
             println("$iter\t$dist\t($_w1, $_w2)")
 
         if itr >= maxiter:
