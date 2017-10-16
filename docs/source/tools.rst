@@ -5,7 +5,6 @@ Tools
    :maxdepth: 2
 
    tools/arma
-   tools/cartesian
    tools/ce_util
    tools/compute_fp
    tools/discrete_rv
