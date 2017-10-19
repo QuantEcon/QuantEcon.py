@@ -19,7 +19,7 @@ class Kalman:
 
     .. math::
 
-        x_{t+1} = A x_t + C w_{t+1}
+        x_{t+1} = A x_t + C w_{t+1} \\
         y_t = G x_t + H v_t
 
     Here :math:`x_t` is the hidden state and :math:`y_t` is the measurement.
