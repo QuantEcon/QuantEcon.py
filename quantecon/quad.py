@@ -19,7 +19,7 @@ from __future__ import division
 import math
 import numpy as np
 import scipy.linalg as la
-from scipy.special import gammaln
+from numba import jit, vectorize
 import sympy as sym
 from .ce_util import ckron, gridmake
 from .util import check_random_state
@@ -27,6 +27,11 @@ from .util import check_random_state
 __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
            'qnwsimp', 'qnwtrap', 'qnwunif', 'quadrect', 'qnwbeta',
            'qnwgamma']
+
+@vectorize(nopython=True)
+def gammaln(x):
+    return math.lgamma(x)
+
 
 # ------------------ #
 # Exported Functions #
@@ -674,7 +679,7 @@ def _make_multidim_func(one_d_func, n, *args):
     nodes = gridmake(*nodes)
     return nodes, weights
 
-
+@jit(nopython=True)
 def _qnwcheb1(n, a, b):
     """
     Compute univariate Guass-Checbychev quadrature nodes and weights
@@ -722,7 +727,7 @@ def _qnwcheb1(n, a, b):
 
     return nodes, weights
 
-
+@jit(nopython=True)
 def _qnwlege1(n, a, b):
     """
     Compute univariate Guass-Legendre quadrature nodes and weights
@@ -794,7 +799,7 @@ def _qnwlege1(n, a, b):
 
     return nodes, weights
 
-
+@jit(nopython=True)
 def _qnwnorm1(n):
     """
     Compute nodes and weights for quadrature of univariate standard
@@ -872,7 +877,7 @@ def _qnwnorm1(n):
 
     return nodes, weights
 
-
+@jit(nopython=True)
 def _qnwsimp1(n, a, b):
     """
     Compute univariate Simpson quadrature nodes and weights
@@ -920,7 +925,7 @@ def _qnwsimp1(n, a, b):
 
     return nodes, weights
 
-
+@jit(nopython=True)
 def _qnwtrap1(n, a, b):
     """
     Compute univariate trapezoid rule quadrature nodes and weights
@@ -967,7 +972,7 @@ def _qnwtrap1(n, a, b):
 
     return nodes, weights
 
-
+@jit(nopython=True)
 def _qnwbeta1(n, a=1.0, b=1.0):
     """
     Computes nodes and weights for quadrature on the beta distribution.
@@ -1090,8 +1095,8 @@ def _qnwbeta1(n, a=1.0, b=1.0):
 
     return nodes, weights
 
-
-def _qnwgamma1(n, a=None):
+@jit(nopython=True)
+def _qnwgamma1(n, a=1.0, b=1.0):
     """
     Insert docs.  Default is a=0
 
@@ -1103,8 +1108,11 @@ def _qnwgamma1(n, a=None):
     n : scalar : int
         The number of quadrature points
 
-    a : scalar : float
-        Gamma distribution parameter
+    a : scalar : float, optional(default=1.0)
+        Shape parameter of the gamma distribution parameter. Must be positive
+
+    b : scalar : float, optional(default=1.0)
+        Scale parameter of the gamma distribution parameter. Must be positive
 
     Returns
     -------
@@ -1125,12 +1133,9 @@ def _qnwgamma1(n, a=None):
     Economics and Finance, MIT Press, 2002.
 
     """
-    if a is None:
-        a = 0
-    else:
-        a -= 1
+    a -= 1
 
-    maxit = 10
+    maxit = 25
 
     factor = -math.exp(gammaln(a+n) - gammaln(n) - gammaln(a+1))
     nodes = np.zeros(n)
@@ -1155,6 +1160,7 @@ def _qnwgamma1(n, a=None):
             p1 = 1.0
             p2 = 0.0
             for j in range(1, n+1):
+                # Recurrance relation for Laguerre polynomials
                 p3 = p2
                 p2 = p1
                 p1 = ((2*j - 1 + a - z)*p2 - (j - 1 + a)*p3) / j
@@ -1170,4 +1176,4 @@ def _qnwgamma1(n, a=None):
         nodes[i] = z
         weights[i] = factor / (pp*n*p2)
 
-    return nodes, weights
+    return nodes*b, weights
