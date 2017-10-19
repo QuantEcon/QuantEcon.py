@@ -32,31 +32,35 @@ class RepeatedGame:
         self.N = stage_game.N
         self.nums_actions = stage_game.nums_actions
 
-    def outerapproximation(self, nH=32, tol=1e-8, maxiter=500, 
-                           check_pure_nash=True, verbose=False, nskipprint=50):
+    def outerapproximation(self, nH=32, tol=1e-8, maxiter=500,
+                           check_pure_nash=True, verbose=False, nskipprint=50,
+                           linprog_method='simplex'):
         """
         Approximates the set of equilibrium value set for a repeated game with
-        the outer hyperplane approximation described by Judd, Yeltekin, 
+        the outer hyperplane approximation described by Judd, Yeltekin,
         Conklin 2002.
 
         Parameters
         ----------
         rpd : RepeatedGame
-              Two player repeated game.
+            Two player repeated game.
         nH : scalar(int), optional(default=32)
-             Number of subgradients used for the approximation.
-        tol: scalar(float), optional(default=1e-8)
-             Tolerance in differences of set.
-        maxiter: scalar(int), optional(default=500) 
-                 Maximum number of iterations.
-        check_pure_nash: bool, optional(default=True) 
-                         Whether to perform a check about whether a pure Nash 
-                         equilibrium exists.
-        verbose: bool, optional(default=False)
-                 Whether to display updates about iterations and distance.
-        nskipprint: scalar(int), optional(default=50)
-                    Number of iterations between printing information 
-                    (assuming verbose=true).
+            Number of subgradients used for the approximation.
+        tol : scalar(float), optional(default=1e-8)
+            Tolerance in differences of set.
+        maxiter : scalar(int), optional(default=500)
+            Maximum number of iterations.
+        check_pure_nash : bool, optional(default=True)
+            Whether to perform a check about whether a pure Nash equilibrium
+            exists.
+        verbose : bool, optional(default=False)
+            Whether to display updates about iterations and distance.
+        nskipprint : scalar(int), optional(default=50)
+            Number of iterations between printing information (assuming
+            verbose=true).
+        linprog_method : ,optional(default='simplex')
+            The name of the scipy linprog method used to solve linear
+            programming problems.
 
         Returns
         -------
@@ -73,7 +77,7 @@ class RepeatedGame:
         try:
             next(pure_nash_brute_gen(sg))
         except StopIteration:
-            raise ValueError("No pure action Nash equilibrium exists in" + 
+            raise ValueError("No pure action Nash equilibrium exists in" +
                              " stage game")
 
         # Get number of actions for each player and create action space
@@ -110,10 +114,10 @@ class RepeatedGame:
                 #
                 h1, h2 = H[ih, :]
 
-                # Update all set constraints -- Copies elements 1:nH of C into b
+                # Update all set constraints - Copies elements 1:nH of C into b
                 b[:nH] = C
 
-                # Put the right objective into c (negative because want 
+                # Put the right objective into c (negative because want
                 # maximize)
                 c[0] = -h1
                 c[1] = -h2
@@ -131,7 +135,7 @@ class RepeatedGame:
                               (1-delta)*best_dev_payoff_2(self, a1) - delta*_w2
 
                     lpout = linprog(c, A_ub=A, b_ub=b, bounds=(lb, ub),
-                                    method='interior-point')
+                                    method=linprog_method)
                     if lpout.status == 0:
                         # Pull out optimal value and compute
                         w_sol = lpout.x
@@ -157,14 +161,15 @@ class RepeatedGame:
                                 " pair")
 
                 # Update the points
-                Z[:, ih] = (1-delta)*flow_u(self, a1star, a2star) + \
-                           delta*np.array([Wstar[0], Wstar[1]])
+                Z[:, ih] = \
+                    (1-delta)*flow_u(self, a1star, a2star) + \
+                    delta*np.array([Wstar[0], Wstar[1]])
 
             # Update distance and iteration counter
             dist = np.max(abs(C - Cnew))
-            itr +=1 
+            itr += 1
 
-            if verbose and (nskipprint%itr==0):
+            if verbose and (nskipprint % itr == 0):
                 println("$iter\t$dist\t($_w1, $_w2)")
 
             if itr >= maxiter:
@@ -174,8 +179,8 @@ class RepeatedGame:
             C[:] = Cnew
 
         # Given the H-representation `(H, C)` of the computed polytope of
-        # equilibrium payoff profiles, we obtain its V-representation `vertices`
-        # using scipy
+        # equilibrium payoff profiles, we obtain its V-representation
+        # `vertices` using scipy
         p = HalfspaceIntersection(np.column_stack((H, -C)), np.mean(Z, axis=1))
         vertices = p.intersections
 
@@ -189,10 +194,9 @@ class RepeatedGame:
         return vertices
 
 
-# Outer approximation algorithm
 def unitcircle(npts):
     """
-    Places `npts` equally spaced points along the 2 dimensional circle and 
+    Places `npts` equally spaced points along the 2 dimensional circle and
     returns the points with x coordinates in first column and y coordinates
      in second column.
 
@@ -208,13 +212,14 @@ def unitcircle(npts):
 
     """
     degrees = np.linspace(0, 2*np.pi, npts+1)
-    
+
     pts = np.zeros((npts, 2))
     for i in range(npts):
         x = degrees[i]
         pts[i, 0] = np.cos(x)
         pts[i, 1] = np.sin(x)
     return pts
+
 
 def initialize_hpl(nH, o, r):
     """
@@ -261,15 +266,15 @@ def initialize_hpl(nH, o, r):
 def initialize_sg_hpl(rpd, nH):
     """
     Initializes subgradients, extreme points and hyperplane levels for the
-    approximation of the convex value set of a 2 player repeated game by 
+    approximation of the convex value set of a 2 player repeated game by
     choosing an appropriate origin and radius.
 
     Parameters
     ----------
     rpd : RepeatedGame
-          Two player repeated game.
+        Two player repeated game.
     nH : scalar(int)
-         Number of subgradients used for the approximation.
+        Number of subgradients used for the approximation.
 
     Returns
     -------
@@ -303,7 +308,7 @@ def initialize_LP_matrices(rpd, H):
     Parameters
     ----------
     rpd : RepeatedGame
-          Two player repeated game.
+        Two player repeated game.
     H : ndarray(float, ndim=2)
         Subgradients used to approximate value set.
 
@@ -312,7 +317,7 @@ def initialize_LP_matrices(rpd, H):
     c : ndarray(float, ndim=1)
         Vector used to determine which subgradient is being used.
     A : ndarray(float, ndim=2)
-        Matrix with nH set constraints and to be filled with 2 additional 
+        Matrix with nH set constraints and to be filled with 2 additional
         incentive compatibility constraints.
     b : ndarray(float, ndim=1)
         Vector to be filled with the values for the constraints.
@@ -335,19 +340,23 @@ def initialize_LP_matrices(rpd, H):
 
 # Flow utility in terms of the players actions
 def flow_u_1(rpd, a1, a2): return rpd.sg.players[0].payoff_array[a1, a2]
-    
+
+
 def flow_u_2(rpd, a1, a2): return rpd.sg.players[1].payoff_array[a2, a1]
-    
-def flow_u(rpd, a1, a2): 
+
+
+def flow_u(rpd, a1, a2):
     return np.array([flow_u_1(rpd, a1, a2), flow_u_2(rpd, a1, a2)])
-    
+
 
 # Computes each players best deviation given an opponent's action
 def best_dev_i(rpd, i, aj):
     return np.argmax(rpd.sg.players[i].payoff_array[:, aj])
 
+
 def best_dev_1(rpd, a2): return best_dev_i(rpd, 0, a2)
-    
+
+
 def best_dev_2(rpd, a1): return best_dev_i(rpd, 1, a1)
 
 
@@ -355,14 +364,16 @@ def best_dev_2(rpd, a1): return best_dev_i(rpd, 1, a1)
 def best_dev_payoff_i(rpd, i, aj):
     return max(rpd.sg.players[i].payoff_array[:, aj])
 
+
 def best_dev_payoff_1(rpd, a2):
     return max(rpd.sg.players[0].payoff_array[:, a2])
+
 
 def best_dev_payoff_2(rpd, a1):
     return max(rpd.sg.players[1].payoff_array[:, a1])
 
 
-def worst_value_i(rpd, H, C, i):
+def worst_value_i(rpd, H, C, i, linprog_method='simplex'):
     """
     Returns the worst possible payoff for player i.
 
@@ -391,7 +402,7 @@ def worst_value_i(rpd, H, C, i):
     lb = -np.inf
     ub = np.inf
 
-    lpout = linprog(c, A_ub=H, b_ub=C, bounds=(lb, ub), method='interior-point')
+    lpout = linprog(c, A_ub=H, b_ub=C, bounds=(lb, ub), method=linprog_method)
     if lpout.status == 0:
         out = lpout.x[i]
     else:
@@ -399,10 +410,15 @@ def worst_value_i(rpd, H, C, i):
 
     return out
 
-def worst_value_1(rpd, H, C): return worst_value_i(rpd, H, C, 0)
 
-def worst_value_2(rpd, H, C): return worst_value_i(rpd, H, C, 1)
+def worst_value_1(rpd, H, C, linprog_method='simplex'):
+    return worst_value_i(rpd, H, C, 0, linprog_method)
 
-def worst_values(rpd, H, C): 
-    return (worst_value_1(rpd, H, C), worst_value_2(rpd, H, C))
 
+def worst_value_2(rpd, H, C, linprog_method='simplex'):
+    return worst_value_i(rpd, H, C, 1, linprog_method)
+
+
+def worst_values(rpd, H, C, linprog_method='simplex'):
+    return (worst_value_1(rpd, H, C, linprog_method),
+            worst_value_2(rpd, H, C, linprog_method))
