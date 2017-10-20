@@ -33,6 +33,14 @@ def gammaln(x):
     return math.lgamma(x)
 
 
+@vectorize(nopython=True)
+def fix(x):
+    if x < 0:
+        return math.ceil(x)
+    else:
+        return math.floor(x)
+
+
 # ------------------ #
 # Exported Functions #
 # ------------------ #
@@ -157,15 +165,15 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     if kind.upper() == "N":  # Neiderreiter
         j = 2.0 ** (np.arange(1, d+1) / (d+1))
         nodes = np.outer(i, j)
-        nodes = (nodes - np.fix(nodes)).squeeze()
+        nodes = (nodes - fix(nodes)).squeeze()
     elif kind.upper() == "W":  # Weyl
         j = equidist_pp[:d]
         nodes = np.outer(i, j)
-        nodes = (nodes - np.fix(nodes)).squeeze()
+        nodes = (nodes - fix(nodes)).squeeze()
     elif kind.upper() == "H":  # Haber
         j = equidist_pp[:d]
         nodes = np.outer(i * (i+1) / 2, j)
-        nodes = (nodes - np.fix(nodes)).squeeze()
+        nodes = (nodes - fix(nodes)).squeeze()
     elif kind.upper() == "R":  # pseudo-random
         nodes = random_state.rand(n, d).squeeze()
     else:
@@ -257,21 +265,21 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
     Economics and Finance, MIT Press, 2002.
 
     """
-    n = np.asarray(n)
+    n = np.atleast_1d(n)
     d = n.size
 
     if mu is None:
         mu = np.zeros(d)
     else:
-        mu = np.asarray(mu)
+        mu = np.atleast_1d(mu)
 
     if sig2 is None:
         sig2 = np.eye(d)
     else:
-        sig2 = np.asarray(sig2).reshape(d, d)
+        sig2 = np.atleast_1d(sig2).reshape(d, d)
 
     if all([x.size == 1 for x in [n, mu, sig2]]):
-        nodes, weights = _qnwnorm1(n)
+        nodes, weights = _qnwnorm1(n[0])
     else:
         nodes = []
         weights = []
@@ -578,7 +586,7 @@ def qnwbeta(n, a=1.0, b=1.0):
     return _make_multidim_func(_qnwbeta1, n, a, b)
 
 
-def qnwgamma(n, a=None):
+def qnwgamma(n, a=1.0, b=1.0, tol=3e-14):
     """
     Computes nodes and weights for gamma distribution
 
@@ -615,7 +623,7 @@ def qnwgamma(n, a=None):
     Economics and Finance, MIT Press, 2002.
 
     """
-    return _make_multidim_func(_qnwgamma1, n, a)
+    return _make_multidim_func(_qnwgamma1, n, a, b, tol)
 
 # ------------------ #
 # Internal Functions #
@@ -652,12 +660,12 @@ def _make_multidim_func(one_d_func, n, *args):
 
 
     """
-    args = list(args)
-    n = np.asarray(n)
-    args = list(map(np.asarray, args))
+    _args = list(args)
+    n = np.atleast_1d(n)
+    args = list(map(np.atleast_1d, _args))
 
     if all([x.size == 1 for x in [n] + args]):
-        return one_d_func(n, *args)
+        return one_d_func(n[0], *_args)
 
     d = n.size
 
@@ -719,11 +727,11 @@ def _qnwcheb1(n, a, b):
     # Create temporary arrays to be used in computing weights
     t1 = np.arange(1, n+1) - 0.5
     t2 = np.arange(0.0, n, 2)
-    t3 = np.concatenate([np.array([1.0]),
-                        -2.0/(np.arange(1.0, n-1, 2)*np.arange(3.0, n+1, 2))])
+    t3 = np.concatenate((np.array([1.0]),
+                        -2.0/(np.arange(1.0, n-1, 2)*np.arange(3.0, n+1, 2))))
 
     # compute weights and return
-    weights = ((b-a)/n)*np.cos(np.pi/n*np.outer(t1, t2)).dot(t3)
+    weights = ((b-a)/n)*np.cos(np.pi/n*np.outer(t1, t2)) @ t3
 
     return nodes, weights
 
@@ -764,19 +772,19 @@ def _qnwlege1(n, a, b):
     """
     # import ipdb; ipdb.set_trace()
     maxit = 100
-    m = np.fix((n + 1) / 2.0).astype(int)
+    m = int(fix((n + 1) / 2.0))
     xm = 0.5 * (b + a)
     xl = 0.5 * (b - a)
     nodes = np.zeros(n)
 
     weights = nodes.copy()
-    i = np.arange(m, dtype='int')
+    i = np.arange(m)
 
     z = np.cos(np.pi * ((i + 1.0) - 0.25) / (n + 0.5))
 
     for its in range(maxit):
-        p1 = 1.0
-        p2 = 0.0
+        p1 = np.ones_like(z)
+        p2 = np.zeros_like(z)
         for j in range(1, n+1):
             p3 = p2
             p2 = p1
@@ -785,7 +793,7 @@ def _qnwlege1(n, a, b):
         pp = n * (z * p1 - p2)/(z * z - 1.0)
         z1 = z.copy()
         z = z1 - p1/pp
-        if all(np.abs(z - z1) < 1e-14):
+        if np.all(np.abs(z - z1) < 1e-14):
             break
 
     if its == maxit - 1:
@@ -831,7 +839,7 @@ def _qnwnorm1(n):
     """
     maxit = 100
     pim4 = 1 / np.pi**(0.25)
-    m = np.fix((n + 1) / 2).astype(int)
+    m = int(fix((n + 1) / 2))
     nodes = np.zeros(n)
     weights = np.zeros(n)
 
@@ -918,7 +926,7 @@ def _qnwsimp1(n, a, b):
 
     nodes = np.linspace(a, b, n)
     dx = nodes[1] - nodes[0]
-    weights = np.tile([2.0, 4.0], (n + 1) // 2)
+    weights = np.kron(np.ones((n+1) // 2), np.array([2.0, 4.0]))
     weights = weights[:n]
     weights[0] = weights[-1] = 1
     weights = (dx / 3.0) * weights
@@ -1096,7 +1104,7 @@ def _qnwbeta1(n, a=1.0, b=1.0):
     return nodes, weights
 
 @jit(nopython=True)
-def _qnwgamma1(n, a=1.0, b=1.0):
+def _qnwgamma1(n, a=1.0, b=1.0, tol=3e-14):
     """
     Insert docs.  Default is a=0
 
@@ -1113,6 +1121,9 @@ def _qnwgamma1(n, a=1.0, b=1.0):
 
     b : scalar : float, optional(default=1.0)
         Scale parameter of the gamma distribution parameter. Must be positive
+
+    tol : scalar : float, optional(default=3e-14)
+        Tolerance parameter for newton iterations for each node
 
     Returns
     -------
@@ -1156,7 +1167,7 @@ def _qnwgamma1(n, a=1.0, b=1.0):
         # root finding iterations
         its = 0
         z1 = -10000
-        while abs(z - z1) > 1e-10 and its < maxit:
+        while abs(z - z1) > tol and its < maxit:
             p1 = 1.0
             p2 = 0.0
             for j in range(1, n+1):
