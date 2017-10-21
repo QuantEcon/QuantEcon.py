@@ -151,7 +151,7 @@ class RBLQ:
         S1 = Q + beta * dot(B.T, dot(P, B))
         S2 = beta * dot(B.T, dot(P, A))
         S3 = beta * dot(A.T, dot(P, A))
-        F = solve(S1, S2) if not self.pure_forecasting else np.zeros((1, self.n))
+        F = solve(S1, S2) if not self.pure_forecasting else np.zeros((self.k, self.n))
         new_P = R - dot(S2.T, F) + S3
 
         return F, new_P
@@ -194,7 +194,7 @@ class RBLQ:
 
             # == Solve and convert back to robust problem == #
             P, f, d = lq.stationary_values()
-            F = np.zeros((1, self.n))
+            F = np.zeros((self.k, self.n))
             K = -f[:k, :]
 
         else:
