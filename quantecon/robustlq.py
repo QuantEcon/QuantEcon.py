@@ -75,10 +75,7 @@ class RBLQ:
         # == Remaining parameters == #
         self.beta, self.theta = beta, theta
         # == Check for case of no control (pure forecasting problem) == #
-        if not Q.any() and not B.any():
-            self.pure_forecasting = True
-        else:
-            self.pure_forecasting = False
+        self.pure_forecasting = True if not Q.any() and not B.any() else False
 
     def __repr__(self):
         return self.__str__()
@@ -191,6 +188,7 @@ class RBLQ:
         # == Set up LQ version == #
         I = identity(j)
         Z = np.zeros((k, j))
+
         if self.pure_forecasting:
             lq = LQ(-beta*I*theta, R, A, C, beta=beta)
 
