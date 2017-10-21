@@ -74,6 +74,11 @@ class RBLQ:
         self.j = self.C.shape[1]
         # == Remaining parameters == #
         self.beta, self.theta = beta, theta
+        # == Check for case of no control (pure forecasting problem) == #
+        if not Q.any() and not B.any():
+            self.pure_forecasting = True
+        else:
+            self.pure_forecasting = False
 
     def __repr__(self):
         return self.__str__()
@@ -149,8 +154,8 @@ class RBLQ:
         S1 = Q + beta * dot(B.T, dot(P, B))
         S2 = beta * dot(B.T, dot(P, A))
         S3 = beta * dot(A.T, dot(P, A))
-        F = solve(S1, S2)
-        new_P = R - dot(S2.T, solve(S1, S2)) + S3
+        F = solve(S1, S2) if not self.pure_forecasting else np.zeros((1, self.n))
+        new_P = R - dot(S2.T, F) + S3
 
         return F, new_P
 
@@ -186,14 +191,23 @@ class RBLQ:
         # == Set up LQ version == #
         I = identity(j)
         Z = np.zeros((k, j))
-        Ba = hstack([B, C])
-        Qa = vstack([hstack([Q, Z]), hstack([Z.T, -beta*I*theta])])
-        lq = LQ(Qa, R, A, Ba, beta=beta)
+        if self.pure_forecasting:
+            lq = LQ(-beta*I*theta, R, A, C, beta=beta)
 
-        # == Solve and convert back to robust problem == #
-        P, f, d = lq.stationary_values()
-        F = f[:k, :]
-        K = -f[k:f.shape[0], :]
+            # == Solve and convert back to robust problem == #
+            P, f, d = lq.stationary_values()
+            F = np.zeros((1, self.n))
+            K = -f[:k, :]
+
+        else:
+            Ba = hstack([B, C])
+            Qa = vstack([hstack([Q, Z]), hstack([Z.T, -beta*I*theta])])
+            lq = LQ(Qa, R, A, Ba, beta=beta)
+
+            # == Solve and convert back to robust problem == #
+            P, f, d = lq.stationary_values()
+            F = f[:k, :]
+            K = -f[k:f.shape[0], :]
 
         return F, K, P
 
