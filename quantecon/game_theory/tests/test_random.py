@@ -31,7 +31,7 @@ def test_covariance_game():
     for a in np.ndindex(*nums_actions):
         for i in range(N-1):
             payoff_profile = g.payoff_profile_array[a]
-            assert_allclose(payoff_profile[i], payoff_profile[-1])
+            assert_allclose(payoff_profile[i], payoff_profile[-1], atol=1e-8)
 
     rho = -1 / (N - 1)
     g = covariance_game(nums_actions, rho=rho)
