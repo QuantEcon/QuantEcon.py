@@ -1,5 +1,5 @@
 """
-Author: Chase Coleman
+Author: Chase Coleman and Balint Szoke
 Filename: test_robustlq
 
 Tests for robustlq.py file
