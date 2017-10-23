@@ -18,6 +18,9 @@ from numpy.linalg import solve
 from scipy.linalg import solve_discrete_lyapunov as sp_solve_discrete_lyapunov
 
 
+EPS = np.finfo(float).eps
+
+
 def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
     r"""
     Computes the solution to the discrete lyapunov equation
@@ -163,7 +166,7 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
     for gamma in candidates:
         Z = R + gamma * BB
         cn = np.linalg.cond(Z)
-        if np.isfinite(cn):
+        if cn * EPS < 1:
             Q_tilde = - Q + dot(N.T, solve(Z, N + gamma * BTA)) + gamma * I
             G0 = dot(B, solve(Z, B.T))
             A0 = dot(I - gamma * G0, A) - dot(B, solve(Z, N))
