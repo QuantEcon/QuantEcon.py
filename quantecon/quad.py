@@ -595,14 +595,14 @@ def qnwgamma(n, a=1.0, b=1.0, tol=3e-14):
     n : int or array_like(float)
         A length-d iterable of the number of nodes in each dimension
 
-    mu : scalar or array_like(float), optional(default=zeros(d))
-        The means of each dimension of the random variable. If a scalar
-        is given, that constant is repeated d times, where d is the
-        number of dimensions
+    a : scalar or array_like(float) : optional(default=ones(d))
+        Shape parameter of the gamma distribution parameter. Must be positive
 
-    sig2 : array_like(float), optional(default=eye(d))
-        A d x d array representing the variance-covariance matrix of the
-        multivariate normal distribution.
+    b : scalar or array_like(float) : optional(default=ones(d))
+        Scale parameter of the gamma distribution parameter. Must be positive
+
+    tol : scalar or array_like(float) : optional(default=ones(d) * 3e-14)
+        Tolerance parameter for newton iterations for each node
 
     Returns
     -------
@@ -1106,10 +1106,7 @@ def _qnwbeta1(n, a=1.0, b=1.0):
 @jit(nopython=True)
 def _qnwgamma1(n, a=1.0, b=1.0, tol=3e-14):
     """
-    Insert docs.  Default is a=0
-
-    NOTE: For now I am just following compecon; would be much better to
-    find a different way since I don't know what they are doing.
+    1d quadrature weights and nodes for Gamma distributed random variable
 
     Parameters
     ----------
