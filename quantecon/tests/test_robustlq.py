@@ -78,9 +78,10 @@ class TestRBLQControl(unittest.TestCase):
         assert_allclose(Kr, Ks, rtol=1e-4)
         assert_allclose(Pr, Ps, rtol=1e-4)
 
+        atol = 1e-10
         assert_allclose(Fr_pf, Fs_pf, rtol=1e-4)
-        assert_allclose(Kr_pf, Ks_pf, rtol=1e-4)
-        assert_allclose(Pr_pf, Ps_pf, rtol=1e-4)
+        assert_allclose(Kr_pf, Ks_pf, rtol=1e-4, atol=atol)
+        assert_allclose(Pr_pf, Ps_pf, rtol=1e-4, atol=atol)
 
 
     def test_f2k_and_k2f(self):
