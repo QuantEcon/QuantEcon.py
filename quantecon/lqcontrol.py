@@ -46,7 +46,7 @@ class LQ:
 
          x_{t+1} = A x_t + B u_t + C w_{t+1}
 
-    Here :math:`x` is n x 1, :math:`u` is k x 1, :math:`w` is j x 1 and the 
+    Here :math:`x` is n x 1, :math:`u` is k x 1, :math:`w` is j x 1 and the
     matrices are conformable for these dimensions.  The sequence :math:`{w_t}`
     is assumed to be white noise, with zero mean and
     :math:`\mathbb{E} [ w_t' w_t ] = I`, the j x j identity.
@@ -68,16 +68,13 @@ class LQ:
     Parameters
     ----------
     Q : array_like(float)
-        Q is the payoff(or cost) matrix that corresponds with the
+        Q is the payoff (or cost) matrix that corresponds with the
         control variable u and is k x k. Should be symmetric and
-        nonnegative definite
+        non-negative definite
     R : array_like(float)
-        R is the payoff(or cost) matrix that corresponds with the
+        R is the payoff (or cost) matrix that corresponds with the
         state variable x and is n x n. Should be symetric and
         non-negative definite
-    N : array_like(float)
-        N is the cross product term in the payoff, as above.  It should
-        be k x n.
     A : array_like(float)
         A is part of the state transition as described above. It should
         be n x n
@@ -88,6 +85,9 @@ class LQ:
         C is part of the state transition as described above and
         corresponds to the random variable today.  If the model is
         deterministic then C should take default value of None
+    N : array_like(float), optional(default=None)
+        N is the cross product term in the payoff, as above. It should
+        be k x n.
     beta : scalar(float), optional(default=1)
         beta is the discount parameter
     T : scalar(int), optional(default=None)
@@ -96,7 +96,6 @@ class LQ:
         Rf is the final (in a finite horizon model) payoff(or cost)
         matrix that corresponds with the control variable u and is n x
         n.  Should be symetric and non-negative definite
-
 
     Attributes
     ----------
@@ -197,9 +196,9 @@ class LQ:
         # == Set new state == #
         self.P, self.d = new_P, new_d
 
-    def stationary_values(self):
+    def stationary_values(self, method='doubling'):
         """
-        Computes the matrix :math:`P` and scalar :math:`d` that represent 
+        Computes the matrix :math:`P` and scalar :math:`d` that represent
         the value function
 
         .. math::
@@ -207,7 +206,16 @@ class LQ:
              V(x) = x' P x + d
 
         in the infinite horizon case.  Also computes the control matrix
-        :math:`F` from :math:`u = - Fx`
+        :math:`F` from :math:`u = - Fx`. Computation is via the solution
+        algorithm as specified by the `method` option (default to the
+        doubling algorithm) (see the documentation in
+        `matrix_eqn.solve_discrete_riccati`).
+
+        Parameters
+        ----------
+        method : str, optional(default='doubling')
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
 
         Returns
         -------
@@ -227,7 +235,7 @@ class LQ:
 
         # === solve Riccati equation, obtain P === #
         A0, B0 = np.sqrt(self.beta) * A, np.sqrt(self.beta) * B
-        P = solve_discrete_riccati(A0, B0, R, Q, N)
+        P = solve_discrete_riccati(A0, B0, R, Q, N, method=method)
 
         # == Compute F == #
         S1 = Q + self.beta * dot(B.T, dot(P, B))
@@ -242,19 +250,25 @@ class LQ:
 
         return P, F, d
 
-    def compute_sequence(self, x0, ts_length=None, random_state=None):
+    def compute_sequence(self, x0, ts_length=None, method='doubling',
+                         random_state=None):
         """
         Compute and return the optimal state and control sequences
         :math:`x_0, ..., x_T` and :math:`u_0,..., u_T`  under the
         assumption that :math:`{w_t}` is iid and :math:`N(0, 1)`.
 
         Parameters
-        ===========
+        ----------
         x0 : array_like(float)
             The initial state, a vector of length n
 
         ts_length : scalar(int)
             Length of the simulation -- defaults to T in finite case
+
+        method : str, optional(default='doubling')
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}. Only relevant when the
+            `T` attribute is `None` (i.e., the horizon is infinite).
 
         random_state : int or np.random.RandomState, optional
             Random seed (integer) or np.random.RandomState instance to set
@@ -263,7 +277,7 @@ class LQ:
             used.
 
         Returns
-        ========
+        -------
         x_path : array_like(float)
             An n x T+1 matrix, where the t-th column represents :math:`x_t`
 
@@ -286,7 +300,7 @@ class LQ:
         # == Preliminaries, infinite horizon case == #
         else:
             T = ts_length if ts_length else 100
-            self.stationary_values()
+            self.stationary_values(method=method)
 
         # == Set up initial condition and arrays to store paths == #
         random_state = check_random_state(random_state)
