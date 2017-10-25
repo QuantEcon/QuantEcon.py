@@ -160,7 +160,7 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500):
 
     # == Choose optimal value of gamma in R_hat = R + gamma B'B == #
     current_min = np.inf
-    candidates = (0.0, 0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5)
+    candidates = (0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5)
     BB = dot(B.T, B)
     BTA = dot(B.T, A)
     for gamma in candidates:
