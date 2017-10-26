@@ -61,11 +61,30 @@ class Kalman:
 
     """
 
-    def __init__(self, ss, x_hat=None, Sigma=None):
+    def __init__(self, *args, **kwargs):
+        args = list(args)
+        if type(args[0]) is LinearStateSpace:
+            self._init_lss(*args, **kwargs)
+        else:
+            self._init_matrix(*args, **kwargs)
+
+    def _init_lss(self, ss, x_hat=None, Sigma=None):
+        """ setup object using a LinearStateSpace as the first argument
+        """
         self.ss = ss
         self.set_state(x_hat, Sigma)
         self.K_infinity = None
         self.Sigma_infinity = None
+
+    def _init_matrix(self, *args, **kwargs):
+        """ setup object by passing A, C, and G matrices directly
+        """
+        kwargs = dict(**kwargs)
+        lss_kwarg_keys = ['H','mu_0','Sigma_0']
+        lss_kwargs = { key : kwargs[key] for key in lss_kwarg_keys if key in kwargs.keys() }
+        lss = LinearStateSpace(*args, **lss_kwargs)
+        kalman_kwargs = { key : value for key, value in kwargs.items() if key not in lss_kwargs}
+        self._init_lss(lss, **kalman_kwargs)
 
     def set_state(self, x_hat, Sigma):
         if Sigma is None:
