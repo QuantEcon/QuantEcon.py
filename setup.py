@@ -1,4 +1,8 @@
-from distutils.core import setup
+# Use setuptools in preference to distutils
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 import os
 
 #-Write Versions File-#
