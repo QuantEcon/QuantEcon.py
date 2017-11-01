@@ -67,12 +67,13 @@ modification, are permitted provided that the following conditions are met:
 1. FEAT: Add random_state option to arma.py with tests. See [PR #329](https://github.com/QuantEcon/QuantEcon.py/pull/329)
 2. FEAT: New features for timing functions. See [PR #340](https://github.com/QuantEcon/QuantEcon.py/pull/340)
 3. Improved test coverage ([PR #343](https://github.com/QuantEcon/QuantEcon.py/pull/343)) 
-4. FEAT: Add option to supply a random seed for discrete_rv, lqcontrol, lqnash, lss, and quad ([PR #153](https://github.com/QuantEcon/QuantEcon.py/pull/346))
+4. FEAT: Add option to supply a random seed for discrete_rv, lqcontrol, lqnash, lss, and quad ([PR #346](https://github.com/QuantEcon/QuantEcon.py/pull/346))
 5. FIX: RBLQ: add pure forecasting case ([PR #355](https://github.com/QuantEcon/QuantEcon.py/pull/355))
 6. FEAT: jit the 1d quadrature routines ([PR #352](https://github.com/QuantEcon/QuantEcon.py/pull/352))
 7. FIX: Replace `np.isfinite(cn)` with `cn * EPS < 1` ([PR #361](https://github.com/QuantEcon/QuantEcon.py/pull/361))
-8. FEAT: Add option to Ricatti use scipy.linalg ([PR #362](https://github.com/QuantEcon/QuantEcon.py/pull/362))
-9. Minor Fixes ([PR #342](https://github.com/QuantEcon/QuantEcon.py/pull/342))
+8. FEAT: Add option to `solve_discrete_riccati` to use `scipy.linalg.solve_discrete_are` ([PR #362](https://github.com/QuantEcon/QuantEcon.py/pull/362))
+9. FIX: Bugfix to `solve_discrete_riccati` ([PR #364](https://github.com/QuantEcon/QuantEcon.py/pull/364))
+10. Minor Fixes ([PR #342](https://github.com/QuantEcon/QuantEcon.py/pull/342))
 
 ### Ver 0.3.6.2 (27-August-2017)
 1. FIX: support_enumeration: Use ``_numba_linalg_solve``. See [PR #311](https://github.com/QuantEcon/QuantEcon.py/pull/311)
@@ -82,7 +83,7 @@ modification, are permitted provided that the following conditions are met:
 5. Added tests for lemke howson exceptions. See [PR #323](https://github.com/QuantEcon/QuantEcon.py/pull/323)
 6. Added vertex_enumeration to game theory module. See [PR #326](https://github.com/QuantEcon/QuantEcon.py/pull/326)
 7. Added ``is_dominated`` method to game_theory.player. See [PR #327](https://github.com/QuantEcon/QuantEcon.py/pull/327)
-8. Minor Updates ([PR #320](https://github.com/QuantEcon/QuantEcon.py/pull/320), [PR #321](https://github.com/QuantEcon/QuantEcon.py/pull/321)
+8. Minor Updates ([PR #320](https://github.com/QuantEcon/QuantEcon.py/pull/320), [PR #321](https://github.com/QuantEcon/QuantEcon.py/pull/321),
 [PR #328](https://github.com/QuantEcon/QuantEcon.py/pull/328))
 
 ### Ver 0.3.5.1 (17-May-2017)
