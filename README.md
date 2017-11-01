@@ -63,6 +63,17 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.3.7 (01-November-2017)
+1. FEAT: Add random_state option to arma.py with tests. See [PR #329](https://github.com/QuantEcon/QuantEcon.py/pull/329)
+2. FEAT: New features for timing functions. See [PR #340](https://github.com/QuantEcon/QuantEcon.py/pull/340)
+3. Improved test coverage ([PR #343](https://github.com/QuantEcon/QuantEcon.py/pull/343)) 
+4. FEAT: Add option to supply a random seed for discrete_rv, lqcontrol, lqnash, lss, and quad ([PR #153](https://github.com/QuantEcon/QuantEcon.py/pull/346))
+5. FIX: RBLQ: add pure forecasting case ([PR #355](https://github.com/QuantEcon/QuantEcon.py/pull/355))
+6. FEAT: jit the 1d quadrature routines ([PR #352](https://github.com/QuantEcon/QuantEcon.py/pull/352))
+7. FIX: Replace `np.isfinite(cn)` with `cn * EPS < 1` ([PR #361](https://github.com/QuantEcon/QuantEcon.py/pull/361))
+8. FEAT: Add option to Ricatti use scipy.linalg ([PR #362](https://github.com/QuantEcon/QuantEcon.py/pull/362))
+9. Minor Fixes ([PR #342](https://github.com/QuantEcon/QuantEcon.py/pull/342))
+
 ### Ver 0.3.6.2 (27-August-2017)
 1. FIX: support_enumeration: Use ``_numba_linalg_solve``. See [PR #311](https://github.com/QuantEcon/QuantEcon.py/pull/311)
 2. Updated Docstrings for better math rendering. See [PR #315](https://github.com/QuantEcon/QuantEcon.py/pull/315)
