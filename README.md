@@ -72,7 +72,8 @@ modification, are permitted provided that the following conditions are met:
 6. FEAT: jit the 1d quadrature routines ([PR #352](https://github.com/QuantEcon/QuantEcon.py/pull/352))
 7. FIX: Replace `np.isfinite(cn)` with `cn * EPS < 1` ([PR #361](https://github.com/QuantEcon/QuantEcon.py/pull/361))
 8. FEAT: Add option to Ricatti use scipy.linalg ([PR #362](https://github.com/QuantEcon/QuantEcon.py/pull/362))
-9. Minor Fixes ([PR #342](https://github.com/QuantEcon/QuantEcon.py/pull/342))
+9. FIX: Bugfix to `solve_discrete_riccati` ([PR #364](https://github.com/QuantEcon/QuantEcon.py/pull/364))
+10. Minor Fixes ([PR #342](https://github.com/QuantEcon/QuantEcon.py/pull/342))
 
 ### Ver 0.3.6.2 (27-August-2017)
 1. FIX: support_enumeration: Use ``_numba_linalg_solve``. See [PR #311](https://github.com/QuantEcon/QuantEcon.py/pull/311)
