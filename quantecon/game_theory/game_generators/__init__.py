@@ -2,4 +2,4 @@
 game_theory.game_generators
 
 """
-from .bimatrix_generators import sgc_game
+from .bimatrix_generators import blotto_game, sgc_game

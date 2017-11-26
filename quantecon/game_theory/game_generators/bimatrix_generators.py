@@ -2,7 +2,10 @@
 This module contains functions that generate NormalFormGame instances of
 the 2-player games studied by Fearnley, Igwe, and Savani (2015):
 
-* Colonel Blotto Games (`blotto_game`)
+* Colonel Blotto Games (`blotto_game`): A non-zero sum extension of the
+  Blotto game as studied by Hortala-Vallve and Llorente-Saguer (2012),
+  where opposing parties have asymmetric and heterogeneous battlefield
+  valuations.
 
 * Ranking Games (`ranking_game`)
 
@@ -24,6 +27,10 @@ References
 * J. Fearnley, T. P. Igwe, and R. Savani, "An Empirical Study of Finding
   Approximate Equilibria in Bimatrix Games," International Symposium on
   Experimental Algorithms (SEA), 2015.
+
+* R. Hortala-Vallve and A. Llorente-Saguer, "Pure Strategy Nash
+  Equilibria in Non-Zero Sum Colonel Blotto Games", International
+  Journal of Game Theory, 2012.
 
 * T. Sandholm, A. Gilpin, and V. Conitzer, "Mixed-Integer Programming
   Methods for Finding Nash Equilibria," AAAI, 2005.
@@ -63,6 +70,105 @@ References
 import numpy as np
 from numba import jit
 from ..normal_form_game import Player, NormalFormGame
+from ...util import check_random_state
+from ...gridtools import simplex_grid
+
+
+def blotto_game(h, t, rho, mu=0, random_state=None):
+    """
+    Return a NormalFormGame instance of a 2-player non-zero sum Colonel
+    Blotto game (Hortala-Vallve and Llorente-Saguer, 2012), where the
+    players have an equal number `t` of troops to assign to `h` hills
+    (so that the number of actions for each player is equal to
+    (t+h-1) choose (h-1) = (t+h-1)!/(t!*(h-1)!)). Each player has a
+    value for each hill that he receives if he assigns strictly more
+    troops to the hill than his opponent (ties are broken uniformly at
+    random), where the values are drawn from a multivariate normal
+    distribution with covariance `rho`. Each player’s payoff is the sum
+    of the values of the hills won by that player.
+
+    Parameters
+    ----------
+    h : scalar(int)
+        Number of hills.
+    t : scalar(int)
+        Number of troops.
+    rho : scalar(float)
+        Covariance of the players' values of each hill. Must be in
+        [-1, 1].
+    mu : scalar(float), optional(default=0)
+        Mean of the players' values of each hill.
+    random_state : int or np.random.RandomState, optional
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    g : NormalFormGame
+
+    Examples
+    --------
+    >>> g = blotto_game(2, 3, 0.5, random_state=1234)
+    >>> g.players[0]
+    Player([[-0.44861083, -1.08443468, -1.08443468, -1.08443468],
+            [ 0.18721302, -0.44861083, -1.08443468, -1.08443468],
+            [ 0.18721302,  0.18721302, -0.44861083, -1.08443468],
+            [ 0.18721302,  0.18721302,  0.18721302, -0.44861083]])
+    >>> g.players[1]
+    Player([[-1.20042463, -1.39708658, -1.39708658, -1.39708658],
+            [-1.00376268, -1.20042463, -1.39708658, -1.39708658],
+            [-1.00376268, -1.00376268, -1.20042463, -1.39708658],
+            [-1.00376268, -1.00376268, -1.00376268, -1.20042463]])
+
+    """
+    actions = simplex_grid(h, t)
+    n = actions.shape[0]
+    payoff_arrays = tuple(np.empty((n, n)) for i in range(2))
+    mean = np.array([mu, mu])
+    cov = np.array([[1, rho], [rho, 1]])
+    random_state = check_random_state(random_state)
+    values = random_state.multivariate_normal(mean, cov, h)
+    _populate_blotto_payoff_arrays(payoff_arrays, actions, values)
+    g = NormalFormGame(
+        [Player(payoff_array) for payoff_array in payoff_arrays]
+    )
+    return g
+
+
+@jit(nopython=True)
+def _populate_blotto_payoff_arrays(payoff_arrays, actions, values):
+    """
+    Populate the ndarrays in `payoff_arrays` with the payoff values of
+    the Blotto game with h hills and t troops.
+
+    Parameters
+    ----------
+    payoff_arrays : tuple(ndarray(float, ndim=2))
+        Tuple of 2 ndarrays of shape (n, n), where n = (t+h-1)!/
+        (t!*(h-1)!). Modified in place.
+    actions : ndarray(int, ndim=2)
+        ndarray of shape (n, h) containing all possible actions, i.e.,
+        h-part compositions of t.
+    values : ndarray(float, ndim=2)
+        ndarray of shape (h, 2), where `values[k, :]` contains the
+        players' values of hill `k`.
+
+    """
+    n, h = actions.shape
+    payoffs = np.empty(2)
+    for i in range(n):
+        for j in range(n):
+            payoffs[:] = 0
+            for k in range(h):
+                if actions[i, k] == actions[j, k]:
+                    for p in range(2):
+                        payoffs[p] += values[k, p] / 2
+                else:
+                    winner = np.int(actions[i, k] < actions[j, k])
+                    payoffs[winner] += values[k, winner]
+            payoff_arrays[0][i, j], payoff_arrays[1][j, i] = payoffs
 
 
 def sgc_game(k):
