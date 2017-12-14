@@ -7,9 +7,10 @@ from scipy.special import comb
 from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_
 from quantecon.gridtools import num_compositions
+from quantecon.game_theory import pure_nash_brute
 
 from quantecon.game_theory import (
-    blotto_game, ranking_game, sgc_game, tournament_game
+    blotto_game, ranking_game, sgc_game, tournament_game, unit_vector_game,
 )
 
 
@@ -107,6 +108,50 @@ class TestTournamentGame:
         g0 = tournament_game(self.n, self.k, random_state=seed)
         g1 = tournament_game(self.n, self.k, random_state=seed)
         assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
+
+
+class TestUnitVectorGame:
+    def setUp(self):
+        self.n = 100
+        self.g = unit_vector_game(self.n)
+
+    def test_size(self):
+        eq_(self.g.nums_actions, (self.n, self.n))
+
+    def test_payoff_values(self):
+        # Player 0
+        ok_((np.sum(self.g.players[0].payoff_array, axis=0) == 1).all())
+
+    def test_avoid_pure_nash(self):
+        NEs = pure_nash_brute(unit_vector_game(self.n, avoid_pure_nash=True),
+                              tol=0)
+        eq_(len(NEs), 0)
+
+    def test_seed(self):
+        seed = 0
+        n = 100
+        g0 = unit_vector_game(n, random_state=seed)
+        g1 = unit_vector_game(n, random_state=seed)
+        assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
+
+    def test_redraw(self):
+        seed = 1
+        n = 2
+        g = unit_vector_game(n, avoid_pure_nash=True, random_state=seed)
+        NEs = pure_nash_brute(g, tol=0)
+        eq_(len(NEs), 0)
+
+
+def test_payoff_range():
+    func_kwargs_tuples = \
+        [(sgc_game, {'k': 3}),
+         (tournament_game, {'n': 6, 'k': 3}),
+         (unit_vector_game, {'n': 5}),
+         (unit_vector_game, {'n': 5, 'avoid_pure_nash': True})]
+    for func, kwargs in func_kwargs_tuples:
+        g = func(**kwargs)
+        for payoff_array in g.payoff_arrays:
+            assert_array_equal(np.clip(payoff_array, 0, 1), payoff_array)
 
 
 if __name__ == '__main__':

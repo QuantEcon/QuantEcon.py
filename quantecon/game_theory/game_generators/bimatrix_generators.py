@@ -24,7 +24,11 @@ the 2-player games studied by Fearnley, Igwe, and Savani (2015):
   equilibria with constant cardinaliry supports for epsilon smaller than
   a certain threshold.
 
-* Unit vector Games (`unit_vector_game`)
+* Unit vector Games (`unit_vector_game`): These games are games where
+  the payoff matrix of one player consists of unit (column) vectors,
+  used by Savani and von Stengel (2016) to construct instances that are
+  hard, in temrs of computation complexity, both for the Lemke-Howson
+  and support enumeration algorithms.
 
 Large part of the code here is based on the C code available at
 https://github.com/bimatrix-games/bimatrix-generators distributed under
@@ -50,6 +54,9 @@ References
 
 * T. Sandholm, A. Gilpin, and V. Conitzer, "Mixed-Integer Programming
   Methods for Finding Nash Equilibria," AAAI, 2005.
+
+* R. Savani and B. von Stengel, "Unit Vector Games," International
+  Journal of Economic Theory, 2016.
 
 """
 
@@ -519,3 +526,90 @@ def _populate_tournament_payoff_array1(payoff_array, k):
         for i in range(k):
             payoff_array[j, X[i]] = 1
         X = next_k_array(X)
+
+
+def unit_vector_game(n, avoid_pure_nash=False, random_state=None):
+    """
+    Return a NormalFormGame instance of the 2-player game "unit vector
+    game" (Savani and von Stengel, 2016). Payoffs for player 1 are
+    chosen randomly from the [0, 1) range. For player 0, each column
+    contains exactly one 1 payoff and the rest is 0.
+
+    Parameters
+    ----------
+    n : scalar(int)
+        Number of actions.
+    avoid_pure_nash : bool, optional(default=False)
+        If True, player 0's payoffs will be placed in order to avoid
+        pure Nash equilibria. (If necessary, the payoffs for player 1
+        are redrawn so as not to have a dominant action.)
+    random_state : int or np.random.RandomState, optional
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    g : NormalFormGame
+
+    Examples
+    --------
+    >>> g = unit_vector_game(4, random_state=1234)
+    >>> g.players[0]
+    Player([[ 1.,  0.,  1.,  0.],
+            [ 0.,  0.,  0.,  1.],
+            [ 0.,  0.,  0.,  0.],
+            [ 0.,  1.,  0.,  0.]])
+    >>> g.players[1]
+    Player([[ 0.19151945,  0.62210877,  0.43772774,  0.78535858],
+            [ 0.77997581,  0.27259261,  0.27646426,  0.80187218],
+            [ 0.95813935,  0.87593263,  0.35781727,  0.50099513],
+            [ 0.68346294,  0.71270203,  0.37025075,  0.56119619]])
+
+    With `avoid_pure_nash=True`:
+
+    >>> g = unit_vector_game(4, avoid_pure_nash=True, random_state=1234)
+    >>> g.players[0]
+    Player([[ 1.,  1.,  0.,  0.],
+            [ 0.,  0.,  0.,  0.],
+            [ 0.,  0.,  1.,  1.],
+            [ 0.,  0.,  0.,  0.]])
+    >>> g.players[1]
+    Player([[ 0.19151945,  0.62210877,  0.43772774,  0.78535858],
+            [ 0.77997581,  0.27259261,  0.27646426,  0.80187218],
+            [ 0.95813935,  0.87593263,  0.35781727,  0.50099513],
+            [ 0.68346294,  0.71270203,  0.37025075,  0.56119619]])
+    >>> pure_nash_brute(g)
+    []
+
+    """
+    random_state = check_random_state(random_state)
+    payoff_arrays = (np.zeros((n, n)), random_state.random_sample((n, n)))
+
+    if not avoid_pure_nash:
+        ones_ind = random_state.randint(n, size=n)
+        payoff_arrays[0][ones_ind, np.arange(n)] = 1
+    else:
+        if n == 1:
+            raise ValueError('Cannot avoid pure Nash with n=1')
+        maxes = payoff_arrays[1].max(axis=0)
+        is_suboptimal = payoff_arrays[1] < maxes
+        nums_suboptimal = is_suboptimal.sum(axis=1)
+
+        while (nums_suboptimal==0).any():
+            payoff_arrays[1][:] = random_state.random_sample((n, n))
+            payoff_arrays[1].max(axis=0, out=maxes)
+            np.less(payoff_arrays[1], maxes, out=is_suboptimal)
+            is_suboptimal.sum(axis=1, out=nums_suboptimal)
+
+        for i in range(n):
+            one_ind = random_state.randint(n)
+            while not is_suboptimal[i, one_ind]:
+                one_ind = random_state.randint(n)
+            payoff_arrays[0][one_ind, i] = 1
+
+    g = NormalFormGame(
+        [Player(payoff_array) for payoff_array in payoff_arrays]
+    )
+    return g
