@@ -9,7 +9,7 @@ determines the index of a point in the simplex.
 
 """
 import numpy as np
-import scipy.misc
+import scipy.special
 from numba import jit, njit
 
 
@@ -281,4 +281,4 @@ def num_compositions(m, n):
 
     """
     # docs.scipy.org/doc/scipy/reference/generated/scipy.misc.comb.html
-    return scipy.misc.comb(n+m-1, m-1, exact=True)
+    return scipy.special.comb(n+m-1, m-1, exact=True)
