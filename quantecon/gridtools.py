@@ -280,5 +280,5 @@ def num_compositions(m, n):
         Total number of m-part compositions of n.
 
     """
-    # docs.scipy.org/doc/scipy/reference/generated/scipy.misc.comb.html
+    # docs.scipy.org/doc/scipy/reference/generated/scipy.special.comb.html
     return scipy.special.comb(n+m-1, m-1, exact=True)
