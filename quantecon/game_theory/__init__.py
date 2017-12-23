@@ -3,7 +3,7 @@ Game Theory SubPackage
 
 """
 from .normal_form_game import Player, NormalFormGame
-from .normal_form_game import pure2mixed, best_response_2p
+from .normal_form_game import pure2mixed, best_response_2p, expected_payoff_2p
 from .random import random_game, covariance_game
 from .pure_nash import pure_nash_brute, pure_nash_brute_gen
 from .support_enumeration import support_enumeration, support_enumeration_gen

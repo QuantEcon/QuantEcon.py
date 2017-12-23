@@ -132,6 +132,7 @@ import numbers
 import numpy as np
 from numba import jit
 
+from ..gridtools import cartesian
 from ..util import check_random_state
 
 
@@ -450,6 +451,41 @@ class Player:
                 raise RuntimeError(msg)
         else:
             raise ValueError('Unknown method {0}'.format(method))
+
+    def expected_payoff(self, player_action, opponents_actions):
+        """
+        Return the expected payoff given own mixed action `player_action`
+        and opponents' mixed actions `opponents_actions`.
+
+        Parameters
+        ----------
+        player_strategy : array_like(float)
+            Player's mixed action.
+
+        opponents_actions : array_like(array_like(float))
+            Array of N-1 arrays first in increasing order of the index of
+            opponents whose index is larger than that of the player, and second
+            by those smaller. Each array is the opponent's mixed action.
+
+        Returns
+        -------
+        scalar(float)
+            Expected payoff.
+
+        Examples
+        --------
+        >>> player1 = gt.Player([[[9, 10], [11, 12]], [[13, 14], [15, 16]]])
+        >>> s0 = np.array([1/2, 1/2])
+        >>> s1 = np.array([2/3, 1/3])
+        >>> s2 = np.array([1/4, 3/4])
+        >>> player1.expected_payoff(s1, [s2, s0])
+        12.333333333333332
+
+        """
+        cp = cartesian((player_action, *opponents_actions))
+        probs = np.prod(cp, axis=1)
+        expected_payoff = np.dot(self.payoff_array.flatten(), probs)
+        return expected_payoff
 
 
 class NormalFormGame:
@@ -791,3 +827,40 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
     for a in range(n):
         if payoff_vector[a] >= payoff_max - tol:
             return a
+
+
+@jit(nopython=True)
+def expected_payoff_2p(payoff_matrix, player_strategy, opponent_strategy):
+    """
+    Numba-optimized version of `Player.expected_payoff` compilied in
+    nopython mode, specialized for 2-player games (where there is only
+    one opponent).
+
+    Return the expected payoff given own mixed action `player_action`
+    and opponents' mixed actions `opponents_actions`.
+
+    Parameters
+    ----------
+    payoff_matrix : ndarray(float, ndim=2)
+        Payoff matrix.
+
+    player_mixed_action : ndarray(float, ndim=1)
+        Player's mixed action. Its length must be equal to
+        `payoff_matrix.shape[0]`.
+
+    opponent_mixed_action : ndarray(float, ndim=1)
+        Opponent's mixed action. Its length must be equal to
+        `payoff_matrix.shape[1]`.
+
+    Returns
+    -------
+    scalar(float)
+        Expected payoff.
+
+    """
+    expected_payoff = 0
+    for i in range(payoff_matrix.shape[0]):
+        for j in range(payoff_matrix.shape[1]):
+            expected_payoff += payoff_matrix[i, j]*player_strategy[i]*\
+            opponent_strategy[j]
+    return expected_payoff
