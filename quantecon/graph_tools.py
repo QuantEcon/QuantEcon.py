@@ -10,6 +10,9 @@ import numpy as np
 from scipy import sparse
 from scipy.sparse import csgraph
 from fractions import gcd
+from numba import jit
+
+from .util import check_random_state
 
 
 # Decorator for *_components properties
@@ -371,3 +374,70 @@ def _csr_matrix_indices(S):
         for j in range(S.indptr[i], S.indptr[i+1]):
             row_index, col_index = i, S.indices[j]
             yield row_index, col_index
+
+
+def random_tournament_graph(n, random_state=None):
+    """
+    Return a random tournament graph [1]_ with n nodes.
+
+    Parameters
+    ----------
+    n : scalar(int)
+        Number of nodes.
+
+    random_state : int or np.random.RandomState, optional
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    DiGraph
+        A DiGraph representing the tournament graph.
+
+    References
+    ----------
+    .. [1] `Tournament (graph theory)
+       <https://en.wikipedia.org/wiki/Tournament_(graph_theory)>`_,
+       Wikipedia.
+
+    """
+    random_state = check_random_state(random_state)
+    num_edges = n * (n-1) // 2
+    r = random_state.random_sample(num_edges)
+    row = np.empty(num_edges, dtype=int)
+    col = np.empty(num_edges, dtype=int)
+    _populate_random_tournament_row_col(n, r, row, col)
+    data = np.ones(num_edges, dtype=bool)
+    adj_matrix = sparse.coo_matrix((data, (row, col)), shape=(n, n))
+    return DiGraph(adj_matrix)
+
+
+@jit(nopython=True, cache=True)
+def _populate_random_tournament_row_col(n, r, row, col):
+    """
+    Populate ndarrays `row` and `col` with directed edge indices
+    determined by random numbers in `r` for a tournament graph with n
+    nodes, which has num_edges = n * (n-1) // 2 edges.
+
+    Parameters
+    ----------
+    n : scalar(int)
+        Number of nodes.
+
+    r : ndarray(float, ndim=1)
+        ndarray of length num_edges containing random numbers in [0, 1).
+
+    row, col : ndarray(int, ndim=1)
+        ndarrays of length num_edges to be modified in place.
+
+    """
+    k = 0
+    for i in range(n):
+        for j in range(i+1, n):
+            if r[k] < 0.5:
+                row[k], col[k] = i, j
+            else:
+                row[k], col[k] = j, i
+            k += 1

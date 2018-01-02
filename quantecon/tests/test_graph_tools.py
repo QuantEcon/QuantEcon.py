@@ -11,7 +11,7 @@ from numpy.testing import assert_array_equal, assert_raises
 import nose
 from nose.tools import eq_, ok_, raises
 
-from quantecon.graph_tools import DiGraph
+from quantecon.graph_tools import DiGraph, random_tournament_graph
 
 
 def list_of_array_equal(s, t):
@@ -298,6 +298,29 @@ def test_raises_non_homogeneous_node_labels():
     adj_matrix = [[1, 0], [0, 1]]
     node_labels = [(0, 1), 2]
     assert_raises(ValueError, DiGraph, adj_matrix, node_labels=node_labels)
+
+
+class TestRandomTournamentGraph:
+    def setUp(self):
+        n = 5
+        g = random_tournament_graph(n)
+        self.adj_matrix = g.csgraph.toarray()
+        self.eye_bool = np.eye(n, dtype=bool)
+
+    def test_diagonal(self):
+        # Test no self loop
+        ok_(not self.adj_matrix[self.eye_bool].any())
+
+    def test_off_diagonal(self):
+        # Test for each pair of distinct nodes to have exactly one edge
+        ok_((self.adj_matrix ^ self.adj_matrix.T)[~self.eye_bool].all())
+
+
+def test_random_tournament_graph_seed():
+    n = 7
+    seed = 1234
+    graphs = [random_tournament_graph(n, random_state=seed) for i in range(2)]
+    assert_array_equal(*[g.csgraph.toarray() for g in graphs])
 
 
 if __name__ == '__main__':
