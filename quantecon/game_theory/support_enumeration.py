@@ -14,6 +14,7 @@ Tardos, and V. Vazirani eds., Algorithmic Game Theory, 2007.
 import numpy as np
 from numba import jit
 from ..util.numba import _numba_linalg_solve
+from ..util.combinatorics import next_k_array
 
 
 def support_enumeration(g):
@@ -106,8 +107,8 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
                                                                actions)):
                             out[p][supp] = action[:-1]
                         yield out
-                _next_k_array(supps[1])
-            _next_k_array(supps[0])
+                next_k_array(supps[1])
+            next_k_array(supps[0])
 
 
 @jit(nopython=True, cache=True)
@@ -180,84 +181,3 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
             if payoff > val:
                 return False
     return True
-
-
-@jit(nopython=True, cache=True)
-def _next_k_combination(x):
-    """
-    Find the next k-combination, as described by an integer in binary
-    representation with the k set bits, by "Gosper's hack".
-
-    Copy-paste from en.wikipedia.org/wiki/Combinatorial_number_system
-
-    Parameters
-    ----------
-    x : int
-        Integer with k set bits.
-
-    Returns
-    -------
-    int
-        Smallest integer > x with k set bits.
-
-    """
-    u = x & -x
-    v = u + x
-    return v + (((v ^ x) // u) >> 2)
-
-
-@jit(nopython=True, cache=True)
-def _next_k_array(a):
-    """
-    Given an array `a` of k distinct nonnegative integers, return the
-    next k-array in lexicographic ordering of the descending sequences
-    of the elements. `a` is modified in place.
-
-    Parameters
-    ----------
-    a : ndarray(int, ndim=1)
-        Array of length k.
-
-    Returns
-    -------
-    a : ndarray(int, ndim=1)
-        View of `a`.
-
-    Examples
-    --------
-    Enumerate all the subsets with k elements of the set {0, ..., n-1}.
-
-    >>> n, k = 4, 2
-    >>> a = np.arange(k)
-    >>> while a[-1] < n:
-    ...     print(a)
-    ...     a = _next_k_array(a)
-    ...
-    [0 1]
-    [0 2]
-    [1 2]
-    [0 3]
-    [1 3]
-    [2 3]
-
-    """
-    k = len(a)
-    if k == 0:
-        return a
-
-    x = 0
-    for i in range(k):
-        x += (1 << a[i])
-
-    x = _next_k_combination(x)
-
-    pos = 0
-    for i in range(k):
-        while x & 1 == 0:
-            x = x >> 1
-            pos += 1
-        a[i] = pos
-        x = x >> 1
-        pos += 1
-
-    return a
