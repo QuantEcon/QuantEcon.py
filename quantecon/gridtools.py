@@ -11,6 +11,7 @@ determines the index of a point in the simplex.
 import numpy as np
 import scipy.special
 from numba import jit, njit
+from .util.numba import comb_jit
 
 
 def cartesian(nodes, order='C'):
@@ -124,7 +125,10 @@ def _repeat_1d(x, K, out):
                 out[ind] = val
 
 
-@jit
+_msg_max_size_exceeded = 'Maximum allowed size exceeded'
+
+
+@jit(nopython=True, cache=True)
 def simplex_grid(m, n):
     r"""
     Construct an array consisting of the integer points in the
@@ -196,10 +200,12 @@ def simplex_grid(m, n):
     Academic Press, 1978.
 
     """
-    L = num_compositions(m, n)
-    out = np.empty((L, m), dtype=int)
+    L = num_compositions_jit(m, n)
+    if L == 0:  # Overflow occured
+    	raise ValueError(_msg_max_size_exceeded)
+    out = np.empty((L, m), dtype=np.int_)
 
-    x = np.zeros(m, dtype=int)
+    x = np.zeros(m, dtype=np.int_)
     x[m-1] = n
 
     for j in range(m):
@@ -282,3 +288,13 @@ def num_compositions(m, n):
     """
     # docs.scipy.org/doc/scipy/reference/generated/scipy.special.comb.html
     return scipy.special.comb(n+m-1, m-1, exact=True)
+
+
+@jit(nopython=True, cache=True)
+def num_compositions_jit(m, n):
+    """
+    Numba jit version of `num_compositions`. Return `0` if the outcome
+    exceeds the maximum value of `np.intp`.
+
+    """
+    return comb_jit(n+m-1, m-1)

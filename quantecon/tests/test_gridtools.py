@@ -7,12 +7,12 @@ Tests for gridtools.py file
 """
 import numpy as np
 from numpy.testing import assert_array_equal
-from nose.tools import eq_
+from nose.tools import eq_, raises
 from nose.plugins.attrib import attr
 
 from quantecon.gridtools import (
     cartesian, mlinspace, _repeat_1d, simplex_grid, simplex_index,
-    num_compositions
+    num_compositions, num_compositions_jit
 )
 
 
@@ -211,6 +211,17 @@ class TestSimplexGrid:
     def test_num_compositions(self):
         num = num_compositions(3, 4)
         eq_(num, len(self.simplex_grid_3_4))
+
+    def test_num_compositions_jit(self):
+        num = num_compositions_jit(3, 4)
+        eq_(num, len(self.simplex_grid_3_4))
+
+        eq_(num_compositions_jit(100, 50), 0)  # Exceed max value of np.intp
+
+
+@raises(ValueError)
+def test_simplex_grid_raises_value_error_overflow():
+    simplex_grid(100, 50)  # Exceed max value of np.intp
 
 
 if __name__ == '__main__':
