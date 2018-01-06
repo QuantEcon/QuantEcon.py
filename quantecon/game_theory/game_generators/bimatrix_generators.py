@@ -19,7 +19,10 @@ the 2-player games studied by Fearnley, Igwe, and Savani (2015):
   enumeration as it has a unique equilibrium where each player uses half
   of his actions in his support.
 
-* Tournament Games (`tournament_game`)
+* Tournament Games (`tournament_game`): These games are constructed by
+  Anbalagan et al. (2013) as games that do not have interim epsilon-Nash
+  equilibria with constant cardinaliry supports for epsilon smaller than
+  a certain threshold.
 
 * Unit vector Games (`unit_vector_game`)
 
@@ -29,6 +32,10 @@ BSD 3-Clause License.
 
 References
 ----------
+* Y. Anbalagan, S. Norin, R. Savani, and A. Vetta, "Polylogarithmic
+  Supports Are Required for Approximate Well-Supported Nash Equilibria
+  below 2/3," WINE, 2013.
+
 * J. Fearnley, T. P. Igwe, and R. Savani, "An Empirical Study of Finding
   Approximate Equilibria in Bimatrix Games," International Symposium on
   Experimental Algorithms (SEA), 2015.
@@ -77,10 +84,13 @@ References
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
+import scipy.special
 from numba import jit
 from ..normal_form_game import Player, NormalFormGame
 from ...util import check_random_state
 from ...gridtools import simplex_grid
+from ...graph_tools import random_tournament_graph
+from ...util.combinatorics import next_k_array, k_array_rank_jit
 
 
 def blotto_game(h, t, rho, mu=0, random_state=None):
@@ -372,3 +382,140 @@ def _populate_sgc_payoff_arrays(payoff_arrays):
         payoff_arrays[0][i+1, j+1] = 0.75
         payoff_arrays[1][j, i+1] = 0.75
         payoff_arrays[1][j+1, i] = 0.75
+
+
+def tournament_game(n, k, random_state=None):
+    """
+    Return a NormalFormGame instance of the 2-player win-lose game,
+    whose payoffs are either 0 or 1, introduced by Anbalagan et al.
+    (2013). Player 0 has n actions, which constitute the set of nodes
+    {0, ..., n-1}, while player 1 has n choose k actions, each
+    corresponding to a subset of k elements of the set of n nodes. Given
+    a randomly generated tournament graph on the n nodes, the payoff for
+    player 0 is 1 if, in the tournament, the node chosen by player 0
+    dominates all the nodes in the k-subset chosen by player 1. The
+    payoff for player 1 is 1 if player 1's k-subset contains player 0's
+    node.
+
+    Parameters
+    ----------
+    n : scalar(int)
+        Number of nodes in the tournament graph.
+    k : scalar(int)
+        Size of subsets of nodes in the tournament graph.
+    random_state : int or np.random.RandomState, optional
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    g : NormalFormGame
+
+    Notes
+    -----
+    The actions of player 1 are ordered according to the combinatorial
+    number system [1]_, different from the order used in the original
+    library in C.
+
+    Examples
+    --------
+    >>> g = tournament_game(5, 2, random_state=1234)
+    >>> g.players[0]
+    Player([[ 0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.],
+            [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.],
+            [ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+            [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+            [ 0.,  1.,  0.,  1.,  0.,  1.,  0.,  0.,  0.,  0.]])
+    >>> g.players[1]
+    Player([[ 1.,  1.,  0.,  0.,  0.],
+            [ 1.,  0.,  1.,  0.,  0.],
+            [ 0.,  1.,  1.,  0.,  0.],
+            [ 1.,  0.,  0.,  1.,  0.],
+            [ 0.,  1.,  0.,  1.,  0.],
+            [ 0.,  0.,  1.,  1.,  0.],
+            [ 1.,  0.,  0.,  0.,  1.],
+            [ 0.,  1.,  0.,  0.,  1.],
+            [ 0.,  0.,  1.,  0.,  1.],
+            [ 0.,  0.,  0.,  1.,  1.]])
+
+    References
+    ----------
+    .. [1] `Combinatorial number system
+       <https://en.wikipedia.org/wiki/Combinatorial_number_system>`_,
+       Wikipedia.
+
+    """
+    m = scipy.special.comb(n, k, exact=True)
+    if m > np.iinfo(np.intp).max:
+        raise ValueError('Maximum allowed size exceeded')
+
+    payoff_arrays = tuple(np.zeros(shape) for shape in [(n, m), (m, n)])
+    tourn = random_tournament_graph(n, random_state=random_state)
+    indices, indptr = tourn.csgraph.indices, tourn.csgraph.indptr
+    _populate_tournament_payoff_array0(payoff_arrays[0], k, indices, indptr)
+    _populate_tournament_payoff_array1(payoff_arrays[1], k)
+    g = NormalFormGame(
+        [Player(payoff_array) for payoff_array in payoff_arrays]
+    )
+    return g
+
+
+@jit(nopython=True)
+def _populate_tournament_payoff_array0(payoff_array, k, indices, indptr):
+    """
+    Populate `payoff_array` with the payoff values for player 0 in the
+    tournament game given a random tournament graph in CSR format.
+
+    Parameters
+    ----------
+    payoff_array : ndarray(float, ndim=2)
+        ndarray of shape (n, m), where m = n choose k, prefilled with
+        zeros. Modified in place.
+    k : scalar(int)
+        Size of the subsets of nodes.
+    indices : ndarray(int, ndim=1)
+        CSR format index array of the adjacency matrix of the tournament
+        graph.
+    indptr : ndarray(int, ndim=1)
+        CSR format index pointer array of the adjacency matrix of the
+        tournament graph.
+
+    """
+    n = payoff_array.shape[0]
+    X = np.empty(k, dtype=np.int_)
+    a = np.empty(k, dtype=np.int_)
+    for i in range(n):
+        d = indptr[i+1] - indptr[i]
+        if d >= k:
+            for j in range(k):
+                a[j] = j
+            while a[-1] < d:
+                for j in range(k):
+                    X[j] = indices[indptr[i]+a[j]]
+                payoff_array[i, k_array_rank_jit(X)] = 1
+                a = next_k_array(a)
+
+
+@jit(nopython=True)
+def _populate_tournament_payoff_array1(payoff_array, k):
+    """
+    Populate `payoff_array` with the payoff values for player 1 in the
+    tournament game.
+
+    Parameters
+    ----------
+    payoff_array : ndarray(float, ndim=2)
+        ndarray of shape (m, n), where m = n choose k, prefilled with
+        zeros. Modified in place.
+    k : scalar(int)
+        Size of the subsets of nodes.
+
+    """
+    m = payoff_array.shape[0]
+    X = np.arange(k)
+    for j in range(m):
+        for i in range(k):
+            payoff_array[j, X[i]] = 1
+        X = next_k_array(X)

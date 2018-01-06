@@ -3,11 +3,14 @@ Tests for bimatrix_generators.py
 
 """
 import numpy as np
+from scipy.special import comb
 from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_
 from quantecon.gridtools import num_compositions
 
-from quantecon.game_theory import blotto_game, ranking_game, sgc_game
+from quantecon.game_theory import (
+    blotto_game, ranking_game, sgc_game, tournament_game
+)
 
 
 class TestBlottoGame:
@@ -77,6 +80,33 @@ def test_sgc_game():
 
     g = sgc_game(k)
     assert_array_equal(g.payoff_profile_array, bimatrix)
+
+
+class TestTournamentGame:
+    def setUp(self):
+        self.n = 5
+        self.k = 3
+        self.m = comb(self.n, self.k, exact=True)
+        self.g = tournament_game(self.n, self.k)
+
+    def test_size(self):
+        eq_(self.g.nums_actions, (self.n, self.m))
+
+    def test_payoff_values(self):
+        possible_values = [0, 1]
+        for payoff_array in self.g.payoff_arrays:
+            ok_(np.isin(payoff_array, possible_values).all())
+
+        max_num_dominated_subsets = \
+            sum([comb(i, self.k, exact=True) for i in range(self.n)])
+        ok_(self.g.payoff_arrays[0].sum() <= max_num_dominated_subsets)
+        ok_((self.g.payoff_arrays[1].sum(axis=1) == self.k).all())
+
+    def test_seed(self):
+        seed = 0
+        g0 = tournament_game(self.n, self.k, random_state=seed)
+        g1 = tournament_game(self.n, self.k, random_state=seed)
+        assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
 
 
 if __name__ == '__main__':
