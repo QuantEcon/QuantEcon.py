@@ -166,18 +166,28 @@ class TestNormalFormGame_Asym2p:
 
     def setUp(self):
         """Setup a NormalFormGame instance"""
-        matching_pennies_bimatrix = [[(1, -1), (-1, 1)],
-                                     [(-1, 1), (1, -1)]]
-        self.g = NormalFormGame(matching_pennies_bimatrix)
+        self.BoS_bimatrix = np.array([[(3, 2), (1, 1)],
+                                      [(0, 0), (2, 3)]])
+        self.g = NormalFormGame(self.BoS_bimatrix)
 
     def test_getitem(self):
-        assert_array_equal(self.g[1, 0], [-1, 1])
+        action_profile = (1, 0)
+        assert_array_equal(self.g[action_profile],
+                           self.BoS_bimatrix[action_profile])
 
-    def test_is_nash_against_pure(self):
-        ok_(not self.g.is_nash((0, 0)))
+    def test_is_nash_pure(self):
+        ok_(not self.g.is_nash((1, 0)))
 
-    def test_is_nash_against_mixed(self):
-        ok_(self.g.is_nash(([1/2, 1/2], [1/2, 1/2])))
+    def test_is_nash_mixed(self):
+        ok_(self.g.is_nash(([3/4, 1/4], [1/4, 3/4])))
+
+    def test_payoff_arrays(self):
+        assert_array_equal(
+            self.g.payoff_arrays[0], self.BoS_bimatrix[:, :, 0]
+        )
+        assert_array_equal(
+            self.g.payoff_arrays[1], self.BoS_bimatrix[:, :, 1].T
+        )
 
 
 class TestNormalFormGame_3p:
@@ -349,7 +359,7 @@ def test_normalformgame_setitem_1p():
     eq_(g.players[0].payoff_array[0], 10)
 
 
-# Test __repre__ #
+# Test __repr__ #
 
 def test_player_repr():
     nums_actions = (2, 3, 4)

@@ -125,7 +125,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')
 
-    payoff_matrices = tuple(g.players[i].payoff_array for i in range(N))
+    payoff_matrices = g.payoff_arrays
     nums_actions = g.nums_actions
     total_num = sum(nums_actions)
 

@@ -486,6 +486,9 @@ class NormalFormGame:
     nums_actions : tuple(int)
         Tuple of the numbers of actions, one for each player.
 
+    payoff_arrays : tuple(ndarray(float, ndim=N))
+        Tuple of the payoff arrays, one for each player.
+
     """
     def __init__(self, data, dtype=None):
         # data represents an array_like of Players
@@ -574,6 +577,9 @@ class NormalFormGame:
         self.N = N  # Number of players
         self.nums_actions = tuple(
             player.num_actions for player in self.players
+        )
+        self.payoff_arrays = tuple(
+            player.payoff_array for player in self.players
         )
 
     @property
