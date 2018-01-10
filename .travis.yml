@@ -31,7 +31,7 @@ install:
   - python setup.py install
 
 script:
-  - nosetests --with-coverage --cover-package=quantecon --exclude=models 	#quantecon.models excluded from tests to prevent triggering the ImportWarning
+  - nosetests --with-coverage --cover-package=quantecon
 
 after_success:
   - coveralls

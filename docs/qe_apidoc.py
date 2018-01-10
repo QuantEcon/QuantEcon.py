@@ -26,9 +26,13 @@ $ python qe_apidoc.py single  # generates the single directory
 
 Notes
 -----
-This file can also be run from within ipython using the %%run magic.
+1. This file can also be run from within ipython using the %%run magic.
 To do this, use one of the commands above and replace `python` with
 `%%run`
+
+2. Models has been removed. But leaving infrastructure here for qe_apidoc
+in the event we need it in the future
+
 
 """
 import os

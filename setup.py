@@ -100,8 +100,6 @@ setup(name='quantecon',
                 'quantecon.random',
                 'quantecon.tests',
                 'quantecon.util',
-                #-Deprecated-#
-                'quantecon.models',
                 ],
       version=VERSION,
       description=DESCRIPTION,
