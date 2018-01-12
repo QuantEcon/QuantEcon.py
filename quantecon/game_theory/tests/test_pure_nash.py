@@ -57,6 +57,20 @@ class TestPureNashBruteForce():
         for d in self.game_dicts:
             eq_(sorted(pure_nash_brute(d['g'])), sorted(d['NEs']))
 
+    def test_tol(self):
+        # Prisoners' Dilemma game with one NE and one epsilon NE
+        epsilon = 1e-08
+
+        PD_bimatrix = [[(1, 1), (-2, 1 + epsilon)],
+                       [(1 + epsilon, -2), (0, 0)]]
+
+        NEs = [(1, 1)]
+        epsilon_NEs = [(1, 1), (0, 0)]
+
+        g = NormalFormGame(PD_bimatrix)
+        for tol, answer in zip([0, epsilon], [NEs, epsilon_NEs]):
+            eq_(sorted(pure_nash_brute(g, tol=tol)), sorted(answer))
+
 
 if __name__ == '__main__':
     import sys
