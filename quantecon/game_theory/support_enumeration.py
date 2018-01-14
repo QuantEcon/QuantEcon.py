@@ -62,22 +62,19 @@ def support_enumeration_gen(g):
         raise TypeError('input must be a 2-player NormalFormGame')
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')
-    return _support_enumeration_gen(g.players[0].payoff_array,
-                                    g.players[1].payoff_array)
+    return _support_enumeration_gen(g.payoff_arrays)
 
 
 @jit(nopython=True)  # cache=True raises _pickle.PicklingError
-def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
+def _support_enumeration_gen(payoff_matrices):
     """
     Main body of `support_enumeration_gen`.
 
     Parameters
     ----------
-    payoff_matrix0 : ndarray(float, ndim=2)
-        Payoff matrix for player 0, of shape (m, n)
-
-    payoff_matrix1 : ndarray(float, ndim=2)
-        Payoff matrix for player 1, of shape (n, m)
+    payoff_matrices : tuple(ndarray(float, ndim=2))
+        Tuple of payoff matrices, of shapes (m, n) and (n, m),
+        respectively.
 
     Yields
     ------
@@ -86,7 +83,7 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
         respectively.
 
     """
-    nums_actions = payoff_matrix0.shape[0], payoff_matrix1.shape[0]
+    nums_actions = payoff_matrices[0].shape
     n_min = min(nums_actions)
 
     for k in range(1, n_min+1):
@@ -97,10 +94,12 @@ def _support_enumeration_gen(payoff_matrix0, payoff_matrix1):
         while supps[0][-1] < nums_actions[0]:
             supps[1][:] = np.arange(k)
             while supps[1][-1] < nums_actions[1]:
-                if _indiff_mixed_action(payoff_matrix0, supps[0], supps[1],
-                                        A, actions[1]):
-                    if _indiff_mixed_action(payoff_matrix1, supps[1], supps[0],
-                                            A, actions[0]):
+                if _indiff_mixed_action(
+                    payoff_matrices[0], supps[0], supps[1], A, actions[1]
+                ):
+                    if _indiff_mixed_action(
+                        payoff_matrices[1], supps[1], supps[0], A, actions[0]
+                    ):
                         out = (np.zeros(nums_actions[0]),
                                np.zeros(nums_actions[1]))
                         for p, (supp, action) in enumerate(zip(supps,
@@ -139,7 +138,7 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
 
     out : ndarray(float, ndim=1)
         Array of length k+1 to store the k nonzero values of the desired
-        mixed action in `out[:-1]` (and the payoff value in `out[-1]`.)
+        mixed action in `out[:-1]` (and the payoff value in `out[-1]`).
 
     Returns
     -------
