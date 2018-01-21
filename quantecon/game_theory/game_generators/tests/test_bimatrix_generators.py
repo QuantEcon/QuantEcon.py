@@ -5,7 +5,7 @@ Tests for bimatrix_generators.py
 import numpy as np
 from scipy.special import comb
 from numpy.testing import assert_array_equal
-from nose.tools import eq_, ok_
+from nose.tools import eq_, ok_, raises
 from quantecon.gridtools import num_compositions
 from quantecon.game_theory import pure_nash_brute
 
@@ -109,6 +109,11 @@ class TestTournamentGame:
         g1 = tournament_game(self.n, self.k, random_state=seed)
         assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
 
+    @raises(ValueError)
+    def test_raises_value_error_too_large_inputs(self):
+        n, k = 100, 50
+        g = tournament_game(n, k)
+
 
 class TestUnitVectorGame:
     def setUp(self):
@@ -140,6 +145,11 @@ class TestUnitVectorGame:
         g = unit_vector_game(n, avoid_pure_nash=True, random_state=seed)
         NEs = pure_nash_brute(g, tol=0)
         eq_(len(NEs), 0)
+
+    @raises(ValueError)
+    def test_raises_value_error_avoid_pure_nash_n_1(self):
+        n = 1
+        g = unit_vector_game(n, avoid_pure_nash=True)
 
 
 def test_payoff_range():
