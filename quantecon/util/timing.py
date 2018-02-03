@@ -9,6 +9,7 @@ Provides Matlab-like tic, tac and toc functions.
 
 """
 import time
+import numpy as np
 
 
 class __Timer__:
@@ -143,7 +144,7 @@ class __Timer__:
 
         """
         tic()
-        all_times = []
+        all_times = np.empty(n)
         for run in range(n):
             if hasattr(args, '__iter__'):
                 function(*args)
@@ -151,7 +152,7 @@ class __Timer__:
                 function()
             else:
                 function(args)
-            all_times.append(tac(verbose=False, digits=digits))
+            all_times[run] = tac(verbose=False, digits=digits)
 
         elapsed = toc(verbose=False, digits=digits)
 
@@ -161,10 +162,8 @@ class __Timer__:
         print("Total run time: %d:%02d:%0d.%0*d" %
               (h, m, s, digits, (s % 1)*(10**digits)))
 
-        average_time = sum(all_times) / len(all_times)
-
-        best_times = all_times[:best_of]
-        average_of_best = sum(best_times) / len(best_times)
+        average_time = all_times.mean()
+        average_of_best = np.sort(all_times)[:best_of].mean()
 
         if verbose:
             m, s = divmod(average_time, 60)

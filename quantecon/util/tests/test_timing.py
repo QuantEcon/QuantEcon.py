@@ -6,7 +6,7 @@ Tests for timing.py
 
 import time
 from numpy.testing import assert_allclose
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 from quantecon.util import tic, tac, toc, loop_timer
 
 
@@ -47,6 +47,9 @@ class TestTicTacToc():
             assert(abs(tm - self.h) < 0.01)
         for tm in test_two_arg:
             assert(abs(tm - self.h) < 0.01)
+
+        for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
+            ok_(average_time >= average_of_best)
 
 
 if __name__ == '__main__':
