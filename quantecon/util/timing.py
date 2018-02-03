@@ -1,9 +1,14 @@
 """
 Filename: timing.py
+
 Authors: Pablo Winant
+
 Date: 10/16/14
+
 Provides Matlab-like tic, tac and toc functions.
+
 """
+import time
 
 
 class __Timer__:
@@ -19,95 +24,74 @@ class __Timer__:
         Returns and prints time elapsed since last
              tic(), tac() or toc() whichever occured last.
     loop_timer :
-        Returns and prints the total and average time elapsed for n runs 
+        Returns and prints the total and average time elapsed for n runs
         of a given function.
-    """
 
+    """
     start = None
     last = None
 
     def tic(self):
-        """Resets timer."""
+        """
+        Save time for future use with `tac()` or `toc()`.
 
-        import time
-
+        """
         t = time.time()
         self.start = t
         self.last = t
 
-    def tac(self, digits=2, print_output=True, output=True):
+    def tac(self, verbose=True, digits=2):
         """
-        Returns and prints time elapsed since last tic(), tac() or toc()
-        whichever occured last.
-        
+        Return and print elapsed time since last `tic()`, `tac()`, or
+        `toc()`.
+
         Parameters
         ----------
-        digits : scalar(int), optional(default=2)
-            Number of digits for time elapsed.
-        
-        print_output : bool, optional(default=True)
+        verbose : bool, optional(default=True)
             If True, then prints time.
-        
-        output : bool, optional(default=True)
-            If True, then returns time.
+
+        digits : scalar(int), optional(default=2)
+            Number of digits printed for time elapsed.
 
         Returns
         -------
-        tac : str
-            Time elapsed since last tic(), tac() or toc().
-        
-        """
-        
-        import time
+        elapsed : scalar(float)
+            Time elapsed since last `tic()`, `tac()`, or `toc()`.
 
+        """
         if self.start is None:
             raise Exception("tac() without tic()")
 
         t = time.time()
         elapsed = t-self.last
         self.last = t
-        
-        if print_output:
+
+        if verbose:
             m, s = divmod(elapsed, 60)
             h, m = divmod(m, 60)
-            print("TAC: Elapsed: %d:%02d:%0d.%0*d" % 
-                  (h, m, s, digits, (s%1)*(10**digits)))
-        
-        if output:
-            rounded_time = str(round(elapsed, digits))
-            time_digits = rounded_time.split('.')[1]
+            print("TAC: Elapsed: %d:%02d:%0d.%0*d" %
+                  (h, m, s, digits, (s % 1)*(10**digits)))
 
-            while len(time_digits) < digits:
-                time_digits += "0"
-            
-            tac = rounded_time.split('.')[0] + "." + time_digits
-            
-            return tac
+        return elapsed
 
-    def toc(self, digits=2, print_output=True, output=True):
+    def toc(self, verbose=True, digits=2):
         """
-        Returns and prints time elapsed since last tic().
-        
+        Return and print time elapsed since last `tic()`.
+
         Parameters
         ----------
-        digits : scalar(int), optional(default=2)
-            Number of digits for time elapsed.
-        
-        print_output : bool, optional(default=True)
+        verbose : bool, optional(default=True)
             If True, then prints time.
-        
-        output : bool, optional(default=True)
-            If True, then returns time.
-        
+
+        digits : scalar(int), optional(default=2)
+            Number of digits printed for time elapsed.
+
         Returns
         -------
-        toc : str
-            Time elapsed since last tic().
-        
+        elapsed : scalar(float)
+            Time elapsed since last `tic()`.
+
         """
-
-        import time
-
         if self.start is None:
             raise Exception("toc() without tic()")
 
@@ -115,136 +99,108 @@ class __Timer__:
         self.last = t
         elapsed = t-self.start
 
-        if print_output:
+        if verbose:
             m, s = divmod(elapsed, 60)
             h, m = divmod(m, 60)
             print("TOC: Elapsed: %d:%02d:%0d.%0*d" %
-                  (h, m, s, digits, (s%1)*(10**digits)))
-        
-        if output:
-            rounded_time = str(round(elapsed, digits))
-            time_digits = rounded_time.split('.')[1]
+                  (h, m, s, digits, (s % 1)*(10**digits)))
 
-            while len(time_digits) < digits:
-                time_digits += "0"
+        return elapsed
 
-            toc = rounded_time.split('.')[0] + "." + time_digits
-                
-            return toc
-        
-
-    def loop_timer(self, n, function, args=None, digits=2, print_output=True,
-                   output=True, best_of=3):
+    def loop_timer(self, n, function, args=None, verbose=True, digits=2,
+                   best_of=3):
         """
-        Returns and prints the total and average time elapsed for n runs 
+        Return and print the total and average time elapsed for n runs
         of function.
-                
+
         Parameters
         ----------
         n : scalar(int)
             Number of runs.
-        
+
         function : function
             Function to be timed.
-        
+
         args : list, optional(default=None)
             Arguments of the function.
-        
-        digits : scalar(int), optional(default=2)
-            Number of digits for time elapsed.
-            
-        print_output : bool, optional(default=True)
+
+        verbose : bool, optional(default=True)
             If True, then prints average time.
-        
-        output : bool, optional(default=True)
-            If True, then returns average time.
-        
+
+        digits : scalar(int), optional(default=2)
+            Number of digits printed for time elapsed.
+
         best_of : scalar(int), optional(default=3)
             Average time over best_of runs.
 
         Returns
         -------
-        average_time : str
+        average_time : scalar(float)
             Average time elapsed for n runs of function.
-        
-        average_of_best : str
+
+        average_of_best : scalar(float)
             Average of best_of times for n runs of function.
-            
+
         """
         tic()
         all_times = []
         for run in range(n):
             if hasattr(args, '__iter__'):
                 function(*args)
-            elif args == None:
+            elif args is None:
                 function()
             else:
                 function(args)
-            all_times.append(float(tac(digits, False, True)))
+            all_times.append(tac(verbose=False, digits=digits))
 
-        elapsed = toc(digits, False, True)
+        elapsed = toc(verbose=False, digits=digits)
 
-        m, s = divmod(float(elapsed), 60)
+        m, s = divmod(elapsed, 60)
         h, m = divmod(m, 60)
 
-        print("Total run time: %d:%02d:%0d.%0*d" % 
-              (h, m, s, digits, (s%1)*(10**digits)))
+        print("Total run time: %d:%02d:%0d.%0*d" %
+              (h, m, s, digits, (s % 1)*(10**digits)))
 
         average_time = sum(all_times) / len(all_times)
-        
+
         best_times = all_times[:best_of]
         average_of_best = sum(best_times) / len(best_times)
-        
-        if print_output:
+
+        if verbose:
             m, s = divmod(average_time, 60)
             h, m = divmod(m, 60)
             print("Average time for %d runs: %d:%02d:%0d.%0*d" %
-                               (n, h, m, s, digits, (s%1)*(10**digits)))
+                  (n, h, m, s, digits, (s % 1)*(10**digits)))
             m, s = divmod(average_of_best, 60)
             h, m = divmod(m, 60)
             print("Average of %d best times: %d:%02d:%0d.%0*d" %
-                               (best_of, h, m, s, digits, (s%1)*(10**digits)))
-        
-        if output:
-            rounded_time = str(round(average_time, digits))
-            time_digits = rounded_time.split('.')[1]
+                  (best_of, h, m, s, digits, (s % 1)*(10**digits)))
 
-            while len(time_digits) < digits:
-                time_digits += "0"
+        return average_time, average_of_best
 
-            average_time = rounded_time.split('.')[0] + "." + time_digits
-            
-            rounded_time = str(round(average_of_best, digits))
-            time_digits = rounded_time.split('.')[1]
 
-            while len(time_digits) < digits:
-                time_digits += "0"
-
-            average_of_best = rounded_time.split('.')[0] + "." + time_digits
-            
-            return average_time, average_of_best
-
-        
 __timer__ = __Timer__()
 
 
 def tic():
-    """Saves time for future use with tac or toc."""
     return __timer__.tic()
 
 
-def tac(digits=2, print_output=True, output=True):
-    """Prints and returns elapsed time since last tic, tac or toc."""
-    return __timer__.tac(digits, print_output, output)
+def tac(verbose=True, digits=2):
+    return __timer__.tac(verbose, digits)
 
 
-def toc(digits=2, print_output=True, output=True):
-    """Returns and prints time elapsed since last tic()."""
-    return __timer__.toc(digits, print_output, output)
+def toc(verbose=True, digits=2):
+    return __timer__.toc(verbose, digits)
 
 
-def loop_timer(n, function, args=None, digits=2, print_output=True,
-               output=True, best_of=3):
-    """Prints the total and average time elapsed for n runs of function."""
-    return __timer__.loop_timer(n, function, args, digits, print_output, output,
-                                best_of)
+def loop_timer(n, function, args=None, verbose=True, digits=2, best_of=3):
+    return __timer__.loop_timer(n, function, args, verbose, digits, best_of)
+
+
+# Set docstring
+_names = ['tic', 'tac', 'toc', 'loop_timer']
+_funcs = [eval(name) for name in _names]
+_methods = [getattr(__Timer__, name) for name in _names]
+for _func, _method in zip(_funcs, _methods):
+    _func.__doc__ = _method.__doc__
