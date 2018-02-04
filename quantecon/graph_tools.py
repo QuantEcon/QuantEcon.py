@@ -351,7 +351,7 @@ class DiGraph:
             A DiGraph representing the subgraph.
 
         """
-        adj_matrix = self.csgraph[nodes, :][:, nodes]
+        adj_matrix = self.csgraph[np.ix_(nodes, nodes)]
 
         weighted = True  # To copy the dtype
 
