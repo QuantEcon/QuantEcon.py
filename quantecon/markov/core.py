@@ -408,13 +408,11 @@ class MarkovChain:
             rec_classes = self.recurrent_classes_indices
             stationary_dists = np.zeros((len(rec_classes), self.n))
             for i, rec_class in enumerate(rec_classes):
-                if not self.is_sparse:  # Dense
-                    stationary_dists[i, rec_class] = \
-                        gth_solve(self.P[rec_class, :][:, rec_class])
-                else:  # Sparse
-                    stationary_dists[i, rec_class] = \
-                        gth_solve(self.P[rec_class, :][:, rec_class].toarray(),
-                                  overwrite=True)
+                P_rec_class = self.P[np.ix_(rec_class, rec_class)]
+                if self.is_sparse:
+                    P_rec_class = P_rec_class.toarray()
+                stationary_dists[i, rec_class] = \
+                    gth_solve(P_rec_class, overwrite=True)
 
         self._stationary_dists = stationary_dists
 
