@@ -60,7 +60,7 @@ class TestDiscreteRV(unittest.TestCase):
         x = np.array([0.03326189, 0.60713005, 0.84514831, 0.28493183,
                       0.12393182, 0.35308009, 0.70371579, 0.81728178,
                       0.21294538, 0.05358209])
-        draws = DiscreteRV(x).draw(k=10, random_state=5)
+        draws = DiscreteRV(x).draw(k=10, seed=5)
 
         expected_output = np.array([1, 2, 1, 2, 1, 1, 2, 1, 1, 1])
 
