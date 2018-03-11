@@ -11,8 +11,7 @@ specified vector of probabilities.
 import numpy as np
 from numpy import cumsum
 from numpy.random import uniform
-from numba import jit
-
+from .util import check_random_state
 
 class DiscreteRV:
     """
@@ -22,13 +21,13 @@ class DiscreteRV:
     Parameters
     ----------
     q : array_like(float)
-        Nonnegative numbers that sum to 1.
+        Nonnegative numbers that sum to 1
 
     Attributes
     ----------
     q : see Parameters
     Q : array_like(float)
-        The cumulative sum of q.
+        The cumulative sum of q
 
     """
 
@@ -59,7 +58,7 @@ class DiscreteRV:
         self._q = np.asarray(val)
         self.Q = cumsum(val)
 
-    def draw(self, k=None, seed=None):
+    def draw(self, k=1, random_state=None):
         """
         Returns k draws from q.
 
@@ -69,87 +68,20 @@ class DiscreteRV:
         Parameters
         -----------
         k : scalar(int), optional
-            Number of draws to be returned.
-        seed : scalar(int), optional
-            Random seed (integer) to set the initial state of the random number
-            generator for reproducibility. If None, a seed is randomly
-            generated.
+            Number of draws to be returned
+
+        random_state : int or np.random.RandomState, optional
+            Random seed (integer) or np.random.RandomState instance to set
+            the initial state of the random number generator for
+            reproducibility. If None, a randomly initialized RandomState is
+            used.
 
         Returns
         -------
         array_like(int)
-            An array of k independent draws from q.
+            An array of k independent draws from q
 
         """
-        if seed is None:
-            seed = np.random.randint(10**18)
+        random_state = check_random_state(random_state)
 
-        if k is None:
-            return random_choice_scalar(self._q, seed=seed, cum_sum=self.Q)
-        else:
-            return random_choice(self._q, seed=seed, cum_sum=self.Q, size=k)
-
-
-@jit(nopython=True)
-def random_choice_scalar(p_vals, seed, cum_sum=None):
-    """
-    Returns one draw from `p_vals`. Optimized using Numba and compilied in
-    nopython mode.
-
-    Parameters
-    -----------
-    p_vals : array_like(float)
-        Nonnegative numbers that sum to 1.
-    seed : scalar(int)
-        Random seed (integer) to set the initial state of the random number
-        generator for reproducibility.
-    cum_sum : array_like(float), optional
-        The cumulative sum of p_vals.
-
-    Returns
-    -------
-    scalar(int)
-       One draw from p_vals.
-
-    """
-    np.random.seed(seed)
-
-    if cum_sum is None:
-        cum_sum = cumsum(p_vals)
-
-    return np.searchsorted(a=cum_sum, v=uniform(0, 1))
-
-
-@jit(nopython=True)
-def random_choice(p_vals, seed, cum_sum=None, size=1):
-    """
-    Returns `size` draws from `p_vals`. Optimized using Numba and compilied in
-    nopython mode.
-
-    For each such draw, the value i is returned with probability
-    p_vals[i].
-
-    Parameters
-    -----------
-    p_vals : array_like(float)
-        Nonnegative numbers that sum to 1.
-    seed : scalar(int)
-        Random seed (integer) to set the initial state of the random number
-        generator for reproducibility.
-    cum_sum : array_like(float), optional
-        The cumulative sum of p_vals.
-    size : scalar(int), optional
-        Number of draws to be returned.
-
-    Returns
-    -------
-    array_like(int)
-        An array of k independent draws from p_vals.
-
-    """
-    np.random.seed(seed)
-
-    if cum_sum is None:
-        cum_sum = cumsum(p_vals)
-
-    return np.searchsorted(a=cum_sum, v=uniform(0, 1, size=size))
+        return self.Q.searchsorted(random_state.uniform(0, 1, size=k))
