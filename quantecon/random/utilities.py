@@ -167,7 +167,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 def draw(cdf, size=None):
     """
     Generate a random sample according to the cumulative distribution
-    given by `cdf`. Jit-complied by Numba in nonptython mode.
+    given by `cdf`. Jit-complied by Numba in nopython mode.
 
     Parameters
     ----------
