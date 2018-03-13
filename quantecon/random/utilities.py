@@ -3,9 +3,9 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import numpy as np
-from numba import jit, guvectorize
+from numba import jit, guvectorize, generated_jit, types
 
-from ..util import check_random_state
+from ..util import check_random_state, searchsorted
 
 
 # Generating Arrays and Vectors #
@@ -161,3 +161,46 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
         return result[0]
     else:
         return result
+
+
+@generated_jit(nopython=True)
+def draw(cdf, size=None):
+    """
+    Generate a random sample according to the cumulative distribution
+    given by `cdf`. Jit-complied by Numba in nopython mode.
+
+    Parameters
+    ----------
+    cdf : array_like(float, ndim=1)
+        Array containing the cumulative distribution.
+
+    size : scalar(int), optional(default=None)
+        Size of the sample. If an integer is supplied, an ndarray of
+        `size` independent draws is returned; otherwise, a single draw
+        is returned as a scalar.
+
+    Returns
+    -------
+    scalar(int) or ndarray(int, ndim=1)
+
+    Examples
+    --------
+    >>> cdf = np.cumsum([0.4, 0.6])
+    >>> qe.random.draw(cdf)
+    1
+    >>> qe.random.draw(cdf, 10)
+    array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
+
+    """
+    if isinstance(size, types.Integer):
+        def draw_impl(cdf, size):
+            rs = np.random.random_sample(size)
+            out = np.empty(size, dtype=np.int_)
+            for i in range(size):
+                out[i] = searchsorted(cdf, rs[i])
+            return out
+    else:
+        def draw_impl(cdf, size):
+            r = np.random.random_sample()
+            return searchsorted(cdf, r)
+    return draw_impl

@@ -13,6 +13,7 @@ from numpy import cumsum
 from numpy.random import uniform
 from .util import check_random_state
 
+
 class DiscreteRV:
     """
     Generates an array of draws from a discrete random variable with
@@ -21,13 +22,13 @@ class DiscreteRV:
     Parameters
     ----------
     q : array_like(float)
-        Nonnegative numbers that sum to 1
+        Nonnegative numbers that sum to 1.
 
     Attributes
     ----------
-    q : see Parameters
+    q : see Parameters.
     Q : array_like(float)
-        The cumulative sum of q
+        The cumulative sum of q.
 
     """
 
@@ -84,4 +85,5 @@ class DiscreteRV:
         """
         random_state = check_random_state(random_state)
 
-        return self.Q.searchsorted(random_state.uniform(0, 1, size=k))
+        return self.Q.searchsorted(random_state.uniform(0, 1, size=k),
+                                   side='right')
