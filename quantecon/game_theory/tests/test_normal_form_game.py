@@ -11,7 +11,7 @@ from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_, raises
 
 from quantecon.game_theory import (
-    Player, NormalFormGame, pure2mixed, best_response_2p
+    Player, NormalFormGame, pure2mixed, best_response_2p, expected_payoff_2p
 )
 
 
@@ -74,6 +74,12 @@ class TestPlayer_1opponent:
             for method in [None, 'simplex']:
                 eq_(self.player.is_dominated(action, method=method), False)
 
+    def test_expected_payoff(self):
+        s0 = np.array([1/2, 1/2])
+        s1 = np.array([2/3, 1/3])
+        ep = 8/3
+        eq_(self.player.expected_payoff(s0, [s1]), ep)
+
 
 class TestPlayer_2opponents:
     """Test the methods of Player with two opponent players"""
@@ -110,6 +116,18 @@ class TestPlayer_2opponents:
         for action in range(self.player.num_actions):
             for method in [None, 'simplex']:
                 eq_(self.player.is_dominated(action, method=method), False)
+
+    def test_expected_payoff(self):
+        s0 = np.array([1/2, 1/2])
+        s1 = np.array([2/3, 1/3])
+        s2 = np.array([1/4, 3/4])
+        ep = 9/2
+        player0 = Player([[[1, 2],
+                           [3, 4]],
+                          [[6, 6],
+                           [7, 8]]])
+
+        eq_(player0.expected_payoff(s0, [s1, s2]), ep)
 
 
 def test_random_choice():
@@ -438,6 +456,15 @@ def test_best_response_2p():
             br_computed = \
                 best_response_2p(test_case['payoff_array'], mixed_action)
             eq_(br_computed, br_expected)
+
+
+def test_expected_payoff_2p():
+    coordination_game_matrix = np.array([[4, 0], [3, 2]])
+    s0 = np.array([1/2, 1/2])
+    s1 = np.array([2/3, 1/3])
+    ep = 8/3
+    eq_(expected_payoff_2p(coordination_game_matrix, s0, s1),
+        ep)
 
 
 if __name__ == '__main__':
