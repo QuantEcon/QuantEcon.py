@@ -63,6 +63,23 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.3.8 (14-March-2017)
+1. FEAT: Add random.draw. See [PR #397](https://github.com/QuantEcon/QuantEcon.py/pull/397)
+1. FEAT: Add Numba jit version of scipy.special.comb. See [PR #377](https://github.com/QuantEcon/QuantEcon.py/pull/377)
+1. FEAT: Add random_tournament_graph for game theory module. See [PR #378](https://github.com/QuantEcon/QuantEcon.py/pull/378)
+2. MAINT: Implement Sigma_infinity and K_infinity as properties. See [PR #396](https://github.com/QuantEcon/QuantEcon.py/pull/396)
+2. MAINT: Use `np.ix_` to extract submatrix. See [PR #389](https://github.com/QuantEcon/QuantEcon.py/pull/389)
+2. MAINT: support_enumeration: Refactoring. See [PR #384](https://github.com/QuantEcon/QuantEcon.py/pull/384)
+2. MAINT: pure_nash_brute: Add tol option. See [PR #385](https://github.com/QuantEcon/QuantEcon.py/pull/385)
+2. MAINT: NormalFormGame: Add `payoff_arrays` attribute. See [PR #382](https://github.com/QuantEcon/QuantEcon.py/pull/382)
+2. MAINT: Re-implement `next_k_array`; add `k_array_rank`. See [PR #379](https://github.com/QuantEcon/QuantEcon.py/pull/379)
+3. FIX: Fix tac, toc, loop_timer to return float. See [PR #387](https://github.com/QuantEcon/QuantEcon.py/pull/387)
+3. FIX: Update to ``scipy.special.com``. See [PR #375](https://github.com/QuantEcon/QuantEcon.py/pull/375)
+4. DEPRECATE: remove models subpackage. See [PR #383](https://github.com/QuantEcon/QuantEcon.py/pull/383)
+5. DOCS: Improvements to documentation. See [PR #388](https://github.com/QuantEcon/QuantEcon.py/pull/388)
+
+Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com/QBatista), and [mcsalgado](https://github.com/mcsalgado)
+
 ### Ver 0.3.7 (01-November-2017)
 1. FEAT: Add random_state option to arma.py with tests. See [PR #329](https://github.com/QuantEcon/QuantEcon.py/pull/329)
 2. FEAT: New features for timing functions. See [PR #340](https://github.com/QuantEcon/QuantEcon.py/pull/340)
