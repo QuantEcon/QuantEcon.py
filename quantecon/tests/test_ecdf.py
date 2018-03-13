@@ -1,7 +1,6 @@
 """
 tests for quantecon.ecdf
 
-@author : Spencer Lyon
 @date : 2014-07-31
 
 """

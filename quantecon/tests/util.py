@@ -1,7 +1,6 @@
 """
 Utilities for testing within quantecon
 
-@author : Spencer Lyon
 @date : 2014-08-01 10:56:32
 
 """

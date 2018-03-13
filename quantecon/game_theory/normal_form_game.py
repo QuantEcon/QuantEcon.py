@@ -1,6 +1,4 @@
 r"""
-Authors: Tomohiro Kusano, Daisuke Oyama
-
 Tools for normal form games.
 
 Definitions and Basic Concepts

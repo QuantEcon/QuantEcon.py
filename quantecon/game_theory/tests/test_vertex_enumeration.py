@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Tests for vertex_enumeration.py
 
 """

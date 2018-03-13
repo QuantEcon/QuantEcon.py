@@ -1,6 +1,4 @@
 """
-Author: Zejin Shi
-
 Methods for computing pure Nash equilibria of a normal form game.
 (For now, only brute force method is supported)
 

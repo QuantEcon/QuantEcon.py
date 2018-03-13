@@ -1,6 +1,5 @@
 """
 Filename: test_lqnash.py
-Authors: Chase Coleman
 Date: 07/24/2014
 
 Tests for lqnash.py file.
@@ -91,7 +90,7 @@ class TestLQNash(unittest.TestCase):
         m2 = np.copy(m1)
 
         # build model and solve it
-        f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1, 
+        f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1,
                                m2)
 
         aaa = a - b1.dot(f1) - b2.dot(f2)

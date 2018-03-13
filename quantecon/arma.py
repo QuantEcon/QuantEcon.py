@@ -1,6 +1,5 @@
 """
 Filename: arma.py
-Authors: Doc-Jin Jang, Jerry Choi, Thomas Sargent, John Stachurski
 
 Provides functions for working with and visualizing scalar ARMA processes.
 

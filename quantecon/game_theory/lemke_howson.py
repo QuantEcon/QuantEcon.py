@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Compute mixed Nash equilibria of a 2-player normal form game by the
 Lemke-Howson algorithm.
 

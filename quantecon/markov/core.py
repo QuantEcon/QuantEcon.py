@@ -1,7 +1,4 @@
 r"""
-Authors: Chase Coleman, Spencer Lyon, Daisuke Oyama, Tom Sargent,
-         John Stachurski
-
 Filename: core.py
 
 This file contains some useful objects for handling a finite-state

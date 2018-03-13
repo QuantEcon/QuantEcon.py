@@ -1,6 +1,5 @@
 """
 Filename: timing.py
-Authors: Pablo Winant
 Tests for timing.py
 """
 

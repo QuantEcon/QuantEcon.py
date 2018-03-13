@@ -1,6 +1,5 @@
 """
 Filename: test_tauchen.py
-Authors: Chase Coleman
 Date: 07/21/2014
 
 Tests for rank_nullspace.py file

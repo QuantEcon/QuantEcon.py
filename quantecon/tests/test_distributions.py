@@ -1,6 +1,5 @@
 """
 Filename: test_distributions.py
-Author: Quentin Batista
 
 Tests for distributions.py
 
@@ -18,7 +17,7 @@ class TestBetaBinomial:
         self.a = 5
         self.b = 5
         self.test_obj = BetaBinomial(self.n, self.a, self.b)
-    
+
     def test_init(self):
         eq_(self.test_obj.n, self.n)
         eq_(self.test_obj.a, self.a)
@@ -42,7 +41,7 @@ class TestBetaBinomial:
         b = 1
         test_obj = BetaBinomial(n, a, b)
         assert_allclose(test_obj.pdf(), np.full(n+1, 1/(n+1)))
-            
+
 
 if __name__ == '__main__':
     import sys

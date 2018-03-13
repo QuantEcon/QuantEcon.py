@@ -1,7 +1,6 @@
 """
 Tests for lae.py
 
-@author : Spencer Lyon
 @date : 2014-08-02
 
 TODO: write (economically) meaningful tests for this module

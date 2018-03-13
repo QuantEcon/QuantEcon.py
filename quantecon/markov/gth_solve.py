@@ -1,8 +1,6 @@
 """
 Filename: gth_solve.py
 
-Author: Daisuke Oyama
-
 Routine to compute the stationary distribution of an irreducible Markov
 chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 

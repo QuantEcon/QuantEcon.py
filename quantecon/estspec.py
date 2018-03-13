@@ -1,8 +1,6 @@
 """
 Filename: estspec.py
 
-Authors: Thomas Sargent, John Stachurski
-
 Functions for working with periodograms of scalar data.
 
 """

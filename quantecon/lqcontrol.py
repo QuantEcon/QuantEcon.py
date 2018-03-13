@@ -1,8 +1,6 @@
 """
 Filename: lqcontrol.py
 
-Authors: Thomas J. Sargent, John Stachurski
-
 Provides a class called LQ for solving linear quadratic control
 problems.
 

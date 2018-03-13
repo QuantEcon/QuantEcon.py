@@ -1,6 +1,5 @@
 """
 Filename: gth_solve.py
-Author: Daisuke Oyama
 
 Tests for gth_solve.py
 

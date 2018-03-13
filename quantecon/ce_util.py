@@ -1,6 +1,5 @@
 """
 Filename: ce_util.py
-Authors: Chase Coleman, Spencer Lyon, John Stachurski, and Thomas Sargent
 Date: 2014-07-01
 
 Utility functions used in CompEcon

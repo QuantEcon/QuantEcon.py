@@ -1,8 +1,6 @@
 """
 Filename: discrete_rv.py
 
-Authors: Thomas Sargent, John Stachurski
-
 Generates an array of draws from a discrete random variable with a
 specified vector of probabilities.
 

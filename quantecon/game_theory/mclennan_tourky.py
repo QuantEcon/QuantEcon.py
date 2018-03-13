@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Compute mixed Nash equilibria of an N-player normal form game by
 applying the imitation game algorithm by McLennan and Tourky to the best
 response correspondence.

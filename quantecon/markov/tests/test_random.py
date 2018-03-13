@@ -1,6 +1,5 @@
 """
 Filename: test_random.py
-Author: Daisuke Oyama
 
 Tests for markov/random.py
 

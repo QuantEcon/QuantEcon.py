@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Tests for lemke_howson.py
 
 """

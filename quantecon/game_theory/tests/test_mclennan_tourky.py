@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Tests for mclennan_tourky.py
 
 """

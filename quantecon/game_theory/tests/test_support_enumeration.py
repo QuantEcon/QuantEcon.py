@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Tests for support_enumeration.py
 
 """

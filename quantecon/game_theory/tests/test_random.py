@@ -1,6 +1,5 @@
 """
 Filename: test_random.py
-Author: Daisuke Oyama
 
 Tests for game_theory/random.py
 

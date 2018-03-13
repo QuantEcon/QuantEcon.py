@@ -1,5 +1,4 @@
 """
-Author: Chase Coleman
 Filename: test_lqcontrol
 
 Tests for lqcontrol.py file

@@ -1,6 +1,5 @@
 """
 Filename: test_arma.py
-Authors: Chase Coleman
 Date: 07/24/2014
 
 Tests for arma.py file.  Most of this testing can be considered

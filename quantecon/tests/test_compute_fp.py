@@ -1,7 +1,6 @@
 """
 tests for quantecon.compute_fp module
 
-@author : Spencer Lyon
 @date : 2014-07-31
 
 References
