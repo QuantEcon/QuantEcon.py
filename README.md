@@ -78,7 +78,7 @@ modification, are permitted provided that the following conditions are met:
 4. DEPRECATE: remove models subpackage. See [PR #383](https://github.com/QuantEcon/QuantEcon.py/pull/383)
 5. DOCS: Improvements to documentation. See [PR #388](https://github.com/QuantEcon/QuantEcon.py/pull/388)
 
-Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com/QBatista), and [mcsalgado](https://github.com/mcsalgado)
+Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com/QBatista), [mcsalgado](https://github.com/mcsalgado), and [okuchap](https://github.com/okuchap)
 
 ### Ver 0.3.7 (01-November-2017)
 1. FEAT: Add random_state option to arma.py with tests. See [PR #329](https://github.com/QuantEcon/QuantEcon.py/pull/329)
