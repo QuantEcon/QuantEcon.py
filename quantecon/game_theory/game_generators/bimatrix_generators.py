@@ -21,13 +21,13 @@ the 2-player games studied by Fearnley, Igwe, and Savani (2015):
 
 * Tournament Games (`tournament_game`): These games are constructed by
   Anbalagan et al. (2013) as games that do not have interim epsilon-Nash
-  equilibria with constant cardinaliry supports for epsilon smaller than
+  equilibria with constant cardinality supports for epsilon smaller than
   a certain threshold.
 
-* Unit vector Games (`unit_vector_game`): These games are games where
+* Unit Vector Games (`unit_vector_game`): These games are games where
   the payoff matrix of one player consists of unit (column) vectors,
   used by Savani and von Stengel (2016) to construct instances that are
-  hard, in temrs of computation complexity, both for the Lemke-Howson
+  hard, in terms of computational complexity, both for the Lemke-Howson
   and support enumeration algorithms.
 
 Large part of the code here is based on the C code available at
@@ -206,20 +206,20 @@ def ranking_game(n, steps=10, random_state=None):
     player with the higher score wins the first prize, whose value is 1,
     and the other player obtains the "second prize" of value 0; in the
     case of a tie, the first prize is split and each player receives a
-    value 0.5. The payoff of a player is given by the value of the prize
-    minus the cost of the effort.
+    value of 0.5. The payoff of a player is given by the value of the
+    prize minus the cost of the effort.
 
     Parameters
     ----------
     n : scalar(int)
         Number of actions, i.e, number of possible effort levels.
     steps : scalar(int), optional(default=10)
-        Parameter determining the random step sizes for the scores and
-        costs for each player: The step sizes for the scores are drawn
-        from `1`, ..., `steps`, while those for the costs are multiples
-        of `1/(n*steps)`, where the cost of effort level `0` is 0, and
-        the maximum possible cost of effort level `n-1` is less than or
-        equal to 1.
+        Parameter determining the upper bound for the size of the random
+        steps for the scores and costs for each player: The step sizes
+        for the scores are drawn from `1`, ..., `steps`, while those for
+        the costs are multiples of `1/(n*steps)`, where the cost of
+        effort level `0` is 0, and the maximum possible cost of effort
+        level `n-1` is less than or equal to 1.
     random_state : int or np.random.RandomState, optional
         Random seed (integer) or np.random.RandomState instance to set
         the initial state of the random number generator for
@@ -402,7 +402,7 @@ def tournament_game(n, k, random_state=None):
     player 0 is 1 if, in the tournament, the node chosen by player 0
     dominates all the nodes in the k-subset chosen by player 1. The
     payoff for player 1 is 1 if player 1's k-subset contains player 0's
-    node.
+    chosen node.
 
     Parameters
     ----------
@@ -423,8 +423,8 @@ def tournament_game(n, k, random_state=None):
     Notes
     -----
     The actions of player 1 are ordered according to the combinatorial
-    number system [1]_, different from the order used in the original
-    library in C.
+    number system [1]_, which is different from the order used in the
+    original library in C.
 
     Examples
     --------
