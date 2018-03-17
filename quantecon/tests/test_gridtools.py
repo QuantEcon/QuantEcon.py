@@ -1,6 +1,4 @@
 """
-Filename: test_cartesian.py
-
 Tests for gridtools.py file
 
 """

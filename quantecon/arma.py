@@ -1,6 +1,4 @@
 """
-Filename: arma.py
-
 Provides functions for working with and visualizing scalar ARMA processes.
 
 TODO: 1. Fix warnings concerning casting complex variables back to floats

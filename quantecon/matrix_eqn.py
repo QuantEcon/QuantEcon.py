@@ -1,6 +1,4 @@
 """
-Filename: matrix_eqn.py
-
 This file holds several functions that are used to solve matrix
 equations.  Currently has functionality to solve:
 

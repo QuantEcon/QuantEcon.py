@@ -1,8 +1,6 @@
 """
 Tests for ivp.py
 
-@date : 2014-09-09
-
 """
 import nose
 

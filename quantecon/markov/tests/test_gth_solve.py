@@ -1,6 +1,4 @@
 """
-Filename: gth_solve.py
-
 Tests for gth_solve.py
 
 """

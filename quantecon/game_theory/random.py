@@ -1,6 +1,4 @@
 """
-Filename: random.py
-
 Generate random NormalFormGame instances.
 
 """

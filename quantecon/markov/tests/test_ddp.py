@@ -1,6 +1,4 @@
 """
-Filename: test_ddp.py
-
 Tests for markov/ddp.py
 
 """

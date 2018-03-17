@@ -1,6 +1,4 @@
 """
-Filename: approximation.py
-
 tauchen
 -------
 Discretizes Gaussian linear AR(1) processes via Tauchen's method

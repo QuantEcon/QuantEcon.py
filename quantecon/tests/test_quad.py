@@ -1,8 +1,5 @@
 """
-Filename: test_quad.py
-Date: 2014-07-02
-
-Tests for quantecon.quad module
+Tests for quad.py
 
 Notes
 -----

@@ -1,6 +1,4 @@
 """
-Filename: test_random.py
-
 Tests for markov/random.py
 
 """

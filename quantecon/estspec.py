@@ -1,6 +1,4 @@
 """
-Filename: estspec.py
-
 Functions for working with periodograms of scalar data.
 
 """

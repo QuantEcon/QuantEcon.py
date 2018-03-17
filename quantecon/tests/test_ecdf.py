@@ -1,7 +1,5 @@
 """
-tests for quantecon.ecdf
-
-@date : 2014-07-31
+Tests for ecdf.py
 
 """
 from __future__ import division

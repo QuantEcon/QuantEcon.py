@@ -1,6 +1,4 @@
 """
-Filename: quadsums.py
-
 This module provides functions to compute quadratic sums of the form described
 in the docstrings.
 

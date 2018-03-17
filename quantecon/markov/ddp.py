@@ -1,6 +1,4 @@
 r"""
-Filename: ddp.py
-
 Module for solving dynamic programs (also known as Markov decision
 processes) with finite states and actions.
 

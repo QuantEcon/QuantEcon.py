@@ -1,6 +1,4 @@
 r"""
-Filename: core.py
-
 This file contains some useful objects for handling a finite-state
 discrete-time Markov chain.
 

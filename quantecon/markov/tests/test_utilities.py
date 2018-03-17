@@ -1,6 +1,4 @@
 """
-Filename: test_utilities.py
-
 Tests for markov/utilities.py
 
 """

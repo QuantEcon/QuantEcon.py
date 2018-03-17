@@ -13,8 +13,6 @@ between grid points. The `quantecon.ivp` module also provides a method
 for computing the residual of the solution which can be used for
 assessing the overall accuracy of the approximated solution.
 
-@date : 2014-09-09
-
 """
 from __future__ import division
 

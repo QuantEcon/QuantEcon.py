@@ -1,8 +1,5 @@
 """
-Filename: test_tauchen.py
-Date: 07/22/2014
-
-Tests for ricatti.py file
+Tests for ricatti.py
 
 """
 import numpy as np

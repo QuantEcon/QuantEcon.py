@@ -1,6 +1,4 @@
 """
-Filename: ecdf.py
-
 Implements the empirical cumulative distribution function given an array
 of observations.
 

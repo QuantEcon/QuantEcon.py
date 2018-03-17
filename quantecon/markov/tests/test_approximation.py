@@ -1,7 +1,4 @@
 """
-Filename: test_approximation.py
-Date: 07/18/2014
-
 Tests for approximation.py file (i.e. tauchen)
 
 """

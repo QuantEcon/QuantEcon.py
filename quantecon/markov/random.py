@@ -1,6 +1,4 @@
 """
-Filename: random.py
-
 Generate MarkovChain and DiscreteDP instances randomly.
 
 """

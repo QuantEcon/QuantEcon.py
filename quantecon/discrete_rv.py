@@ -1,6 +1,4 @@
 """
-Filename: discrete_rv.py
-
 Generates an array of draws from a discrete random variable with a
 specified vector of probabilities.
 

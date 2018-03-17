@@ -1,8 +1,5 @@
 """
-Filename: test_lss.py
-Date: 07/24/2014
-
-Tests for lss.py file
+Tests for lss.py
 
 """
 import sys

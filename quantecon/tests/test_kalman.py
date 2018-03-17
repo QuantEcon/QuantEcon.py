@@ -1,7 +1,5 @@
 """
-Date: 08/04/2014
-
-Contains test for the kalman.py file.
+Tests for the kalman.py
 
 """
 import sys

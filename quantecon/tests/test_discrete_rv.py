@@ -1,7 +1,5 @@
 """
-tests for quantecon.discrete_rv
-
-@date : 2014-07-31
+Tests for discrete_rv.py
 
 """
 from __future__ import division

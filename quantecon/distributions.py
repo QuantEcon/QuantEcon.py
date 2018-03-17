@@ -1,6 +1,4 @@
 """
-Filename: distributions.py
-
 Probability distributions useful in economics.
 
 References

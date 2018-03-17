@@ -1,6 +1,6 @@
 """
-Filename: timing.py
 Tests for timing.py
+
 """
 
 import time

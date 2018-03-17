@@ -1,8 +1,6 @@
 """
 Utilities for testing within quantecon
 
-@date : 2014-08-01 10:56:32
-
 """
 import sys
 import os

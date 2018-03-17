@@ -1,7 +1,5 @@
 """
-tests for quantecon.estspec
-
-@date : 2014-08-01
+Tests for estspec.py
 
 TODO: write tests that check accuracy of returns
 

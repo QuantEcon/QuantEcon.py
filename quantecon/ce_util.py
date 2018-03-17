@@ -1,7 +1,4 @@
 """
-Filename: ce_util.py
-Date: 2014-07-01
-
 Utility functions used in CompEcon
 
 Based routines found in the CompEcon toolbox by Miranda and Fackler.

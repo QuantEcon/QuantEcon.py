@@ -1,8 +1,6 @@
 """
 Tests for lae.py
 
-@date : 2014-08-02
-
 TODO: write (economically) meaningful tests for this module
 
 """

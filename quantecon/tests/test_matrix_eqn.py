@@ -1,5 +1,5 @@
 """
-tests for quantecon.util
+Tests for quantecon.util
 
 """
 from __future__ import division

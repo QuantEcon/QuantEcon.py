@@ -1,6 +1,4 @@
 """
-Filename: compute_fp.py
-
 Compute an approximate fixed point of a given operator T, starting from
 specified initial condition v.
 

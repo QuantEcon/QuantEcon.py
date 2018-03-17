@@ -1,8 +1,11 @@
 """
-Filename: lss.py
-Reference: https://lectures.quantecon.org/py/linear_models.html
-
 Computes quantities associated with the Gaussian linear state space model.
+
+References
+----------
+
+https://lectures.quantecon.org/py/linear_models.html
+
 """
 
 from textwrap import dedent

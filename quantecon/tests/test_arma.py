@@ -1,7 +1,4 @@
 """
-Filename: test_arma.py
-Date: 07/24/2014
-
 Tests for arma.py file.  Most of this testing can be considered
 covered by the numpy tests since we rely on much of their code.
 

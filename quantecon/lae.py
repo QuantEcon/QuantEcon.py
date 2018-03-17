@@ -1,6 +1,4 @@
 r"""
-Filename: lae.py
-
 Computes a sequence of marginal densities for a continuous state space
 Markov chain :math:`X_t` where the transition probabilities can be represented
 as densities. The estimate of the marginal density of :math:`X_t` is

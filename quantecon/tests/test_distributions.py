@@ -1,6 +1,4 @@
 """
-Filename: test_distributions.py
-
 Tests for distributions.py
 
 """

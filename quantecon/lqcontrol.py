@@ -1,6 +1,4 @@
 """
-Filename: lqcontrol.py
-
 Provides a class called LQ for solving linear quadratic control
 problems.
 

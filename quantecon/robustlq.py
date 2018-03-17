@@ -1,6 +1,4 @@
 """
-Filename: robustlq.py
-
 Solves robust LQ control problems.
 
 """

@@ -1,6 +1,4 @@
 """
-Filename: test_graph_tools.py
-
 Tests for graph_tools.py
 
 """

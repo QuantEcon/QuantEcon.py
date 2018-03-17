@@ -1,7 +1,4 @@
 """
-Filename: quad.py
-Date: 2014-07-01
-
 Defining various quadrature routines.
 
 Based on the quadrature routines found in the CompEcon toolbox by

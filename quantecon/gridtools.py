@@ -1,6 +1,4 @@
 """
-Filename: gridtools.py
-
 Implements cartesian products and regular cartesian grids, and provides
 a function that constructs a grid for a simplex as well as one that
 determines the index of a point in the simplex.

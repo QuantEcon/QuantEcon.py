@@ -1,8 +1,5 @@
 """
-Filename: test_lqnash.py
-Date: 07/24/2014
-
-Tests for lqnash.py file.
+Tests for lqnash.py
 
 """
 from __future__ import division

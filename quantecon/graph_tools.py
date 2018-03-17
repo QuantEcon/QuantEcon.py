@@ -1,6 +1,4 @@
 """
-Filename: graph_tools.py
-
 Tools for dealing with a directed graph.
 
 """
