@@ -25,6 +25,7 @@ from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
 from .lqcontrol import LQ
+from .filter import hamilton_filter
 from .lqnash import nnash
 from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
