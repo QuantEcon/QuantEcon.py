@@ -5,10 +5,9 @@ Authors: Shunsuke Hori
 function for filtering
 
 """
-import pandas as pd
 import numpy as np
 
-def hamilton_filter(data, h, p, prefix = ''):
+def hamilton_filter(data, h, p):
     r"""
     This function applies "Hamilton filter" to the data
     
@@ -31,8 +30,9 @@ def hamilton_filter(data, h, p, prefix = ''):
 
     Returns
     -------
-    filtered_data : Dataframe containing cyclical component and trend component
-                    with specified prefix.
+    cycle : array of cyclical component
+    trend : trend component
+
     """
     # transform data to array
     y = np.asarray(data, float)
@@ -47,9 +47,8 @@ def hamilton_filter(data, h, p, prefix = ''):
     b = np.linalg.solve(X.transpose()@X, X.transpose()@y[p+h-1:T])
     # trend component (`nan` for the first p+h-1 period)
     trend = np.append(np.zeros(p+h-1)+np.nan, X@b)
-    # cycle component
+    # cyclical component
     cycle = data - trend
 
-    filtered_data = pd.DataFrame(data = {prefix+'cycle': cycle, prefix+'trend': trend})
-    return filtered_data
+    return cycle, trend
 
