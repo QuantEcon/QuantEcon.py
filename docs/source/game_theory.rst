@@ -12,3 +12,4 @@ Game theory
    game_theory/support_enumeration
    game_theory/utilities
    game_theory/vertex_enumeration
+   game_theory/game_generators/bimatrix_generators

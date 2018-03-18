@@ -62,6 +62,15 @@ game_theory_module_template = """{mod_name}
     :show-inheritance:
 """
 
+game_generators_module_template = """{mod_name}
+{equals}
+
+.. automodule:: quantecon.game_theory.game_generators.{mod_name}
+    :members:
+    :undoc-members:
+    :show-inheritance:
+"""
+
 markov_module_template = """{mod_name}
 {equals}
 
@@ -189,6 +198,13 @@ def model_tool():
     # Alphabetize
     game_theory.sort()
 
+    # list file names with game_theory/game_generators
+    game_generators_files = glob("../quantecon/game_theory/game_generators/[a-z0-9]*.py")
+    game_generators = list(
+        map(lambda x: x.split('/')[-1][:-3], game_generators_files))
+    # Alphabetize
+    game_generators.sort()
+
     # list file names with markov
     markov_files = glob("../quantecon/markov/[a-z0-9]*.py")
     markov = list(map(lambda x: x.split('/')[-1][:-3], markov_files))
@@ -224,6 +240,15 @@ def model_tool():
         with open(new_path, "w") as f:
             equals = "=" * len(mod)
             f.write(game_theory_module_template.format(mod_name=mod, equals=equals))
+
+    for mod in game_generators:
+        new_path = os.path.join("source", "game_theory", "game_generators", mod + ".rst")
+        with open(new_path, "w") as f:
+            equals = "=" * len(mod)
+            f.write(game_generators_module_template.format(
+                mod_name=mod, equals=equals))
+        #Add sudirectory to flat game_theory list for index file
+        game_theory.append("game_generators/{}".format(mod))
 
     # Write file for each markov file
     for mod in markov:
