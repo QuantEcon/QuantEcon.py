@@ -1,8 +1,4 @@
 """
-Filename: quadsums.py
-
-Authors: Thomas Sargent,  John Stachurski
-
 This module provides functions to compute quadratic sums of the form described
 in the docstrings.
 

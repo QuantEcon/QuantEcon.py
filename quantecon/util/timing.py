@@ -1,10 +1,4 @@
 """
-Filename: timing.py
-
-Authors: Pablo Winant
-
-Date: 10/16/14
-
 Provides Matlab-like tic, tac and toc functions.
 
 """

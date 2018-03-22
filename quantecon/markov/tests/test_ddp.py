@@ -1,7 +1,4 @@
 """
-Filename: test_ddp.py
-Author: Daisuke Oyama
-
 Tests for markov/ddp.py
 
 """

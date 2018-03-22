@@ -1,8 +1,5 @@
 """
-tests for quantecon.discrete_rv
-
-@author : Spencer Lyon
-@date : 2014-07-31
+Tests for discrete_rv.py
 
 """
 from __future__ import division

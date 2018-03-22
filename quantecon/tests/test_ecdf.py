@@ -1,8 +1,5 @@
 """
-tests for quantecon.ecdf
-
-@author : Spencer Lyon
-@date : 2014-07-31
+Tests for ecdf.py
 
 """
 from __future__ import division

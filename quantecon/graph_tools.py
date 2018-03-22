@@ -1,8 +1,4 @@
 """
-Filename: graph_tools.py
-
-Author: Daisuke Oyama
-
 Tools for dealing with a directed graph.
 
 """

@@ -1,7 +1,4 @@
 """
-Filename: compute_fp.py
-Authors: Thomas Sargent, John Stachurski, Daisuke Oyama
-
 Compute an approximate fixed point of a given operator T, starting from
 specified initial condition v.
 

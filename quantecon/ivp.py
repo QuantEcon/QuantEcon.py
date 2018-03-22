@@ -13,9 +13,6 @@ between grid points. The `quantecon.ivp` module also provides a method
 for computing the residual of the solution which can be used for
 assessing the overall accuracy of the approximated solution.
 
-@author : David R. Pugh
-@date : 2014-09-09
-
 """
 from __future__ import division
 
@@ -24,7 +21,7 @@ from scipy import integrate, interpolate
 
 
 class IVP(integrate.ode):
-    
+
     r"""
     Creates an instance of the IVP class.
 

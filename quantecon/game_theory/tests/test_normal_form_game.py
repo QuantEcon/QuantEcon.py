@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Tests for normal_form_game.py
 
 """

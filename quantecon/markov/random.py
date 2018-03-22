@@ -1,8 +1,4 @@
 """
-Filename: random.py
-
-Author: Daisuke Oyama
-
 Generate MarkovChain and DiscreteDP instances randomly.
 
 """

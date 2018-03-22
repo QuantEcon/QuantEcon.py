@@ -1,8 +1,4 @@
 """
-Filename: robustlq.py
-
-Authors: Chase Coleman, Spencer Lyon, Thomas Sargent, John Stachurski
-
 Solves robust LQ control problems.
 
 """

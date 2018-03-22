@@ -1,9 +1,6 @@
 """
 Tests for ivp.py
 
-@author : David R. Pugh
-@date : 2014-09-09
-
 """
 import nose
 

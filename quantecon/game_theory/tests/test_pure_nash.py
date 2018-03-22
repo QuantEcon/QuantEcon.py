@@ -1,6 +1,4 @@
 """
-Author: Zejin Shi
-
 Tests for pure_nash.py
 
 """

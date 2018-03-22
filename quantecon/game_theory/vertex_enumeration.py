@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Compute all mixed Nash equilibria of a 2-player normal form game by
 vertex enumeration.
 

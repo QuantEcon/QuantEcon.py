@@ -1,8 +1,4 @@
 """
-Filename: test_ricatti.py
-Authors: Chase Coleman, John Stachurski
-Date: 07/22/2014
-
 Tests for solve_discrete_riccati in matrix_eqn.py file
 
 """

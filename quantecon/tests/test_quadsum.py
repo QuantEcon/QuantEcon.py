@@ -1,9 +1,5 @@
 """
-Filename: test_tauchen.py
-Authors: Chase Coleman
-Date: 07/24/2014
-
-Tests for quadsums.py file
+Tests for quadsums.py
 
 """
 import sys

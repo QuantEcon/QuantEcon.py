@@ -1,6 +1,4 @@
 """
-Author: Daisuke Oyama
-
 Compute all mixed Nash equilibria of a 2-player (non-degenerate) normal
 form game by support enumeration.
 

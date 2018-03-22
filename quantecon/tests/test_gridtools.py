@@ -1,7 +1,4 @@
 """
-Authors: Pablo Winant, Daisuke Oyama
-Filename: test_cartesian.py
-
 Tests for gridtools.py file
 
 """

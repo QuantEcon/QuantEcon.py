@@ -1,9 +1,5 @@
 """
-Filename: test_lss.py
-Authors: Chase Coleman
-Date: 07/24/2014
-
-Tests for lss.py file
+Tests for lss.py
 
 """
 import sys
@@ -50,7 +46,7 @@ class TestLinearStateSpace(unittest.TestCase):
         xval, yval = ss.simulate(ts_length=5, random_state=5)
         expected_output = np.array([0.75 , 0.73456137, 0.6812898, 0.76876387,
                                     .71772107])
- 
+
         assert_allclose(xval[0], expected_output)
         assert_allclose(yval[0], expected_output)
 
@@ -63,9 +59,9 @@ class TestLinearStateSpace(unittest.TestCase):
 
     def test_replicate_with_seed(self):
         xval, yval = self.ss.replicate(T=100, num_reps=5, random_state=5)
-        expected_output = np.array([0.06871204, 0.06937119, -0.1478022, 
+        expected_output = np.array([0.06871204, 0.06937119, -0.1478022,
                                     0.23841252, -0.06823762])
-        
+
         assert_allclose(xval[0], expected_output)
         assert_allclose(yval[0], expected_output)
 

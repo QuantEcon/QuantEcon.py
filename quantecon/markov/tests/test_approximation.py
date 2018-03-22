@@ -1,8 +1,4 @@
 """
-Filename: test_approximation.py
-Authors: Chase Coleman
-Date: 07/18/2014
-
 Tests for approximation.py file (i.e. tauchen)
 
 """
@@ -89,7 +85,7 @@ class TestRouwenhorst(unittest.TestCase):
     def test_control_case(self):
         n = 3; ybar = 1; sigma = 0.5; rho = 0.8;
         mc_rouwenhorst = rouwenhorst(n, ybar, sigma, rho)
-        mc_rouwenhorst.x, mc_rouwenhorst.P = mc_rouwenhorst.state_values, mc_rouwenhorst.P 
+        mc_rouwenhorst.x, mc_rouwenhorst.P = mc_rouwenhorst.state_values, mc_rouwenhorst.P
         sigma_y = np.sqrt(sigma**2 / (1-rho**2))
         psi = sigma_y * np.sqrt(n-1)
         known_x = np.array([-psi+5.0, 5., psi+5.0])

@@ -1,8 +1,4 @@
 """
-Filename: approximation.py
-
-Authors: Thomas Sargent, John Stachurski
-
 tauchen
 -------
 Discretizes Gaussian linear AR(1) processes via Tauchen's method

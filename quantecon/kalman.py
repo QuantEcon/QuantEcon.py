@@ -1,8 +1,10 @@
 """
-Filename: kalman.py
-Reference: https://lectures.quantecon.org/py/kalman.html
-
 Implements the Kalman filter for a linear Gaussian state space model.
+
+References
+----------
+
+https://lectures.quantecon.org/py/kalman.html
 
 """
 from textwrap import dedent

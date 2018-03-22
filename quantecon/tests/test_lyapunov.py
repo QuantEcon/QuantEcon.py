@@ -1,9 +1,5 @@
 """
-Filename: test_tauchen.py
-Authors: Chase Coleman, John Stachurski
-Date: 07/22/2014
-
-Tests for ricatti.py file
+Tests for ricatti.py
 
 """
 import numpy as np

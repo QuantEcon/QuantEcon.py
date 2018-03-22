@@ -1,7 +1,4 @@
 """
-Filename: test_utilities.py
-Author: Daisuke Oyama
-
 Tests for markov/utilities.py
 
 """
