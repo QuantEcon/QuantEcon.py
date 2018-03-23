@@ -1,7 +1,4 @@
 """
-Filename: test_filter.py
-Authors: Shunsuke Hori
-
 Tests for filter.py.
 Using the data of original paper.
 
@@ -20,11 +17,13 @@ def test_hamilton_filter():
     # read data
     data_dir = get_data_dir()
     data = pd.read_csv(os.path.join(data_dir, "employment.csv"),
-                       names = ['year', 'employment', 'matlab_cycle'])
+                       names = ['year', 'employment', 'matlab_cycle', 'matlab_cycle_rw'])
 
-    filtered_data = hamilton_filter(100*np.log(data['employment']), 8, 4, 'empl_')
-    assert_allclose(data['matlab_cycle'], filtered_data['empl_cycle'],
+    data['hamilton_cyc'], data['hamilton_trend'] =  hamilton_filter(100*np.log(data['employment']), 8, 4)
+    data['hamilton_cyc_rw'], data['hamilton_trend_rw'] = hamilton_filter(100*np.log(data['employment']), 8)
+    assert_allclose(data['matlab_cycle'], filtered_data['hamilton_cycle'],
                     rtol = 1e-07, atol = 1e-07)
+    assert_allclose(data['matlab_cycle_rw'], filtered_data['hamilton_cycle_rw'])
 
 
 if __name__ == '__main__':
