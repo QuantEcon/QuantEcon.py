@@ -23,7 +23,7 @@ def test_hamilton_filter():
     data['hamilton_cyc'], data['hamilton_trend'] =  hamilton_filter(100*np.log(data['employment']), 8, 4)
     data['hamilton_cyc_rw'], data['hamilton_trend_rw'] = hamilton_filter(100*np.log(data['employment']), 8)
     assert_allclose(data['matlab_cyc'], data['hamilton_cyc'],
-                    rtol = 1e-06, atol = 1e-06)
+                    rtol = 1e-07, atol = 1e-07)
     assert_allclose(data['matlab_cyc_rw'], data['hamilton_cyc_rw'])
 
 
