@@ -26,6 +26,7 @@ from .gridtools import cartesian, mlinspace, simplex_grid, simplex_index
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
+from .linprog_simplex import simplex_algorithm
 from .lqcontrol import LQ
 from .filter import hamilton_filter
 from .lqnash import nnash
