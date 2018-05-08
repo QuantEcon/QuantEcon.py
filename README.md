@@ -63,7 +63,7 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
-### Ver 0.3.8 (14-March-2017)
+### Ver 0.3.8 (14-March-2018)
 1. FEAT: Add random.draw. See [PR #397](https://github.com/QuantEcon/QuantEcon.py/pull/397)
 1. FEAT: Add Numba jit version of scipy.special.comb. See [PR #377](https://github.com/QuantEcon/QuantEcon.py/pull/377)
 1. FEAT: Add random_tournament_graph for game theory module. See [PR #378](https://github.com/QuantEcon/QuantEcon.py/pull/378)
