@@ -2,13 +2,10 @@
 Tests for discrete_rv.py
 
 """
-from __future__ import division
-from collections import Counter
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 from nose.plugins.attrib import attr
-import pandas as pd
 from quantecon import DiscreteRV
 
 
@@ -49,9 +46,9 @@ class TestDiscreteRV(unittest.TestCase):
     def test_draw_lln(self):
         "discrete_rv: lln satisfied?"
         draws = self.drv.draw(1000000)
-        counts = pd.Series(Counter(draws))
-        counts = (counts / counts.sum()).values
-        assert max(np.abs(counts - self.drv.q)) < 1e-2
+        bins = np.arange(self.drv.q.size+1)
+        freqs, _ = np.histogram(draws, bins=bins, density=True)
+        assert_allclose(freqs, self.drv.q, atol=1e-2)
 
     def test_draw_with_seed(self):
         x = np.array([0.03326189, 0.60713005, 0.84514831, 0.28493183,
