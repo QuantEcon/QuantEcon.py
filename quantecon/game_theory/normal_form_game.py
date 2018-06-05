@@ -395,8 +395,9 @@ class Player:
         method : str, optional(default=None)
             If None, `lemke_howson` from `quantecon.game_theory` is used
             to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method='simplex'`, `scipy.optimize.linprog` is
-            used with `method='simplex'`.
+            game. If `method` is set to `'simplex'` or
+            `'interior-point'`, `scipy.optimize.linprog` is used with
+            the method as specified by `method`.
 
         Returns
         -------
@@ -425,7 +426,7 @@ class Player:
             g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
             NE = lemke_howson(g_zero_sum)
             return NE[0] @ D @ NE[1] > tol
-        elif method in ['simplex']:
+        elif method in ['simplex', 'interior-point']:
             from scipy.optimize import linprog
             m, n = D.shape
             A = np.empty((n+2, m+1))
@@ -448,6 +449,37 @@ class Player:
                 raise RuntimeError(msg)
         else:
             raise ValueError('Unknown method {0}'.format(method))
+
+    def dominated_actions(self, tol=None, method=None):
+        """
+        Return a list of actions that are strictly dominated by some
+        mixed actions.
+
+        Parameters
+        ----------
+        tol : scalar(float), optional(default=None)
+            Tolerance level used in determining domination. If None,
+            default to the value of the `tol` attribute.
+
+        method : str, optional(default=None)
+            If None, `lemke_howson` from `quantecon.game_theory` is used
+            to solve for a Nash equilibrium of an auxiliary zero-sum
+            game. If `method` is set to `'simplex'` or
+            `'interior-point'`, `scipy.optimize.linprog` is used with
+            the method as specified by `method`.
+
+        Returns
+        -------
+        list(int)
+            List of integers representing pure actions, each of which is
+            strictly dominated by some mixed action.
+
+        """
+        out = []
+        for action in range(self.num_actions):
+            if self.is_dominated(action, tol=tol, method=method):
+                out.append(action)
+        return out
 
 
 class NormalFormGame:
