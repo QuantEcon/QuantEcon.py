@@ -144,8 +144,8 @@ def test_player_corner_cases():
     eq_(player.is_best_response(action, [1/2, 1/2], tol=e), True)
     eq_(player.is_best_response(action, [1/2, 1/2], tol=e/2), False)
     for method in LP_METHODS:
-        eq_(player.is_dominated(action, tol=e, method=method), False)
-        eq_(player.dominated_actions(tol=e, method=method), [])
+        eq_(player.is_dominated(action, tol=2*e, method=method), False)
+        eq_(player.dominated_actions(tol=2*e, method=method), [])
 
         eq_(player.is_dominated(action, tol=e/2, method=method), True)
         eq_(player.dominated_actions(tol=e/2, method=method), [action])
