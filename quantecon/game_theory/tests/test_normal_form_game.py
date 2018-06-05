@@ -2,8 +2,6 @@
 Tests for normal_form_game.py
 
 """
-from __future__ import division
-
 import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_, raises
@@ -75,6 +73,10 @@ class TestPlayer_1opponent:
             for method in LP_METHODS:
                 eq_(self.player.is_dominated(action, method=method), False)
 
+    def test_dominated_actions(self):
+        for method in LP_METHODS:
+            eq_(self.player.dominated_actions(method=method), [])
+
 
 class TestPlayer_2opponents:
     """Test the methods of Player with two opponent players"""
@@ -112,6 +114,10 @@ class TestPlayer_2opponents:
             for method in LP_METHODS:
                 eq_(self.player.is_dominated(action, method=method), False)
 
+    def test_dominated_actions(self):
+        for method in LP_METHODS:
+            eq_(self.player.dominated_actions(method=method), [])
+
 
 def test_random_choice():
     n, m = 5, 4
@@ -139,7 +145,10 @@ def test_player_corner_cases():
     eq_(player.is_best_response(action, [1/2, 1/2], tol=e/2), False)
     for method in LP_METHODS:
         eq_(player.is_dominated(action, tol=e, method=method), False)
+        eq_(player.dominated_actions(tol=e, method=method), [])
+
         eq_(player.is_dominated(action, tol=e/2, method=method), True)
+        eq_(player.dominated_actions(tol=e/2, method=method), [action])
 
 
 # NormalFormGame #
@@ -292,25 +301,32 @@ class TestPlayer_0opponents:
 
     def setUp(self):
         """Setup a Player instance"""
-        payoffs = [0, 1]
-        self.player = Player(payoffs)
+        self.payoffs = [0, 1, -1]
+        self.player = Player(self.payoffs)
+        self.best_response_action = 1
+        self.dominated_actions = [0, 2]
 
     def test_payoff_vector(self):
         """Trivial player: payoff_vector"""
-        assert_array_equal(self.player.payoff_vector(None), [0, 1])
+        assert_array_equal(self.player.payoff_vector(None), self.payoffs)
 
     def test_is_best_response(self):
         """Trivial player: is_best_response"""
-        ok_(self.player.is_best_response(1, None))
+        ok_(self.player.is_best_response(self.best_response_action, None))
 
     def test_best_response(self):
         """Trivial player: best_response"""
-        eq_(self.player.best_response(None), 1)
+        eq_(self.player.best_response(None), self.best_response_action)
 
     def test_is_dominated(self):
         """Trivial player: is_dominated"""
-        eq_(self.player.is_dominated(0), True)
-        eq_(self.player.is_dominated(1), False)
+        for action in range(self.player.num_actions):
+            eq_(self.player.is_dominated(action),
+                (action in self.dominated_actions))
+
+    def test_dominated_actions(self):
+        """Trivial player: dominated_actions"""
+        eq_(self.player.dominated_actions(), self.dominated_actions)
 
 
 class TestNormalFormGame_1p:
