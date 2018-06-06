@@ -12,6 +12,7 @@ from . import distributions
 from . import game_theory
 from . import quad
 from . import random
+from . import optimize
 
 #-Objects-#
 from .compute_fp import compute_fixed_point
