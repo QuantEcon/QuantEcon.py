@@ -2,7 +2,7 @@ import numpy as np
 from numba import jit, njit
 
 @njit
-def maximize_scalar(func, a, b, xtol=1e-5, maxiter=500):
+def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
     """
     Uses a jitted version of the maximization routine from SciPy's fminbound.
     The algorithm is identical except that it's been switched to maximization
@@ -13,15 +13,17 @@ def maximize_scalar(func, a, b, xtol=1e-5, maxiter=500):
 
     Parameters
     ----------
-    maxiter : int, optional
-        Maximum number of iterations to perform.
-    xtol : float, optional
-        Absolute error in solution `xopt` acceptable for convergence.
     func : jitted function
     a : scalar
         Lower bound for search
     b : scalar
         Upper bound for search
+    args : tuple, optional
+        Extra arguments passed to the objective function.
+    maxiter : int, optional
+        Maximum number of iterations to perform.
+    xtol : float, optional
+        Absolute error in solution `xopt` acceptable for convergence.
 
     Returns
     -------
@@ -42,6 +44,7 @@ def maximize_scalar(func, a, b, xtol=1e-5, maxiter=500):
     ```
 
     """
+    
     maxfun = maxiter
 
     sqrt_eps = np.sqrt(2.2e-16)
@@ -51,7 +54,7 @@ def maximize_scalar(func, a, b, xtol=1e-5, maxiter=500):
     nfc, xf = fulc, fulc
     rat = e = 0.0
     x = xf
-    fx = -func(x)
+    fx = -func(x, *args)
     num = 1
     fmin_data = (1, xf, fx)
 
@@ -100,7 +103,7 @@ def maximize_scalar(func, a, b, xtol=1e-5, maxiter=500):
             si = np.sign(rat)
 
         x = xf + si * np.maximum(np.abs(rat), tol1)
-        fu = -func(x)
+        fu = -func(x, *args)
         num += 1
         fmin_data = (num, x, fu)
 
