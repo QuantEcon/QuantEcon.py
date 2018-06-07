@@ -30,7 +30,7 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
     fval : float
         The maximum value attained
     xf : float
-        The maxizer
+        The maximizer
 
     Example
     -------
