@@ -22,7 +22,7 @@ def test_maximize_scalar():
     """
     true_fval = 1.0
     true_xf = -2.0
-    fval, xf, status_flag = maximize_scalar(f, -2, 2)
+    fval, xf, info = maximize_scalar(f, -2, 2)
     assert_almost_equal(true_fval, fval, decimal=4)
     assert_almost_equal(true_xf, xf, decimal=4)
     
@@ -41,7 +41,7 @@ def test_maximize_scalar_multivariate():
     y = 5
     true_fval = 5.0
     true_xf = -0.0
-    fval, xf, status_flag = maximize_scalar(g, -10, 10, args=(y,))
+    fval, xf, info = maximize_scalar(g, -10, 10, args=(y,))
     assert_almost_equal(true_fval, fval, decimal=4)
     assert_almost_equal(true_xf, xf, decimal=4)
 

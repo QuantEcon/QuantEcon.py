@@ -31,9 +31,11 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         The maximum value attained
     xf : float
         The maximizer
-    status_flag : int
-        Indicates whether or not the maximum number of function calls was
+    info : tuple
+        A tuple of the form (status_flag, num_iter).  Here status_flag
+        indicates whether or not the maximum number of function calls was
         attained.  A value of 0 implies that the maximum was not hit.  
+        The value `num_iter` is the number of function calls.
 
     Example
     -------
@@ -43,7 +45,7 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         def f(x):
             return -(x + 2.0)**2 + 1.0
 
-        fval, xf, status_flag = maximize_scalar(f, -2, 2)
+        fval, xf, info = maximize_scalar(f, -2, 2)
     ```
 
     """
@@ -137,5 +139,6 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
             break
 
     fval = -fx
+    info = status_flag, num
 
-    return fval, xf, status_flag
+    return fval, xf, info
