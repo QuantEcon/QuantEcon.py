@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 from numba import njit
 
-from quantecon.optimize import maximize_scalar
+from quantecon.optimize import brent_max
 
 @njit
 def f(x):
@@ -15,14 +15,14 @@ def f(x):
     """
     return -(x + 2.0)**2 + 1.0
 
-def test_maximize_scalar():
+def test_brent_max():
     """
     Uses the function f defined above to test the scalar maximization 
     routine.
     """
     true_fval = 1.0
     true_xf = -2.0
-    fval, xf, info = maximize_scalar(f, -2, 2)
+    xf, fval, info = brent_max(f, -2, 2)
     assert_almost_equal(true_fval, fval, decimal=4)
     assert_almost_equal(true_xf, xf, decimal=4)
     
@@ -33,7 +33,7 @@ def g(x, y):
     """
     return -x**2 + y
     
-def test_maximize_scalar_multivariate():
+def test_brent_max():
     """
     Uses the function f defined above to test the scalar maximization 
     routine.
@@ -41,7 +41,7 @@ def test_maximize_scalar_multivariate():
     y = 5
     true_fval = 5.0
     true_xf = -0.0
-    fval, xf, info = maximize_scalar(g, -10, 10, args=(y,))
+    xf, fval, info = brent_max(g, -10, 10, args=(y,))
     assert_almost_equal(true_fval, fval, decimal=4)
     assert_almost_equal(true_xf, xf, decimal=4)
 

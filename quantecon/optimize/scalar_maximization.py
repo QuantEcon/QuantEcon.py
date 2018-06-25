@@ -2,7 +2,7 @@ import numpy as np
 from numba import jit, njit
 
 @njit
-def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
+def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
     """
     Uses a jitted version of the maximization routine from SciPy's fminbound.
     The algorithm is identical except that it's been switched to maximization
@@ -27,10 +27,10 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
 
     Returns
     -------
-    fval : float
-        The maximum value attained
     xf : float
         The maximizer
+    fval : float
+        The maximum value attained
     info : tuple
         A tuple of the form (status_flag, num_iter).  Here status_flag
         indicates whether or not the maximum number of function calls was
@@ -45,7 +45,7 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         def f(x):
             return -(x + 2.0)**2 + 1.0
 
-        fval, xf, info = maximize_scalar(f, -2, 2)
+        xf, fval, info = maximize_scalar(f, -2, 2)
     ```
 
     """
@@ -141,4 +141,4 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
     fval = -fx
     info = status_flag, num
 
-    return fval, xf, info
+    return xf, fval, info
