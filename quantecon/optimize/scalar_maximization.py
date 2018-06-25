@@ -31,6 +31,9 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         The maximum value attained
     xf : float
         The maximizer
+    status_flag : int
+        Indicates whether or not the maximum number of function calls was
+        attained.  A value of 0 implies that the maximum was not hit.  
 
     Example
     -------
@@ -40,12 +43,13 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         def f(x):
             return -(x + 2.0)**2 + 1.0
 
-        fval, xf = maximize_scalar(f, -2, 2)
+        fval, xf, status_flag = maximize_scalar(f, -2, 2)
     ```
 
     """
     
     maxfun = maxiter
+    status_flag = 0
 
     sqrt_eps = np.sqrt(2.2e-16)
     golden_mean = 0.5 * (3.0 - np.sqrt(5.0))
@@ -56,7 +60,6 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
     x = xf
     fx = -func(x, *args)
     num = 1
-    fmin_data = (1, xf, fx)
 
     ffulc = fnfc = fx
     xm = 0.5 * (a + b)
@@ -105,7 +108,6 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         x = xf + si * np.maximum(np.abs(rat), tol1)
         fu = -func(x, *args)
         num += 1
-        fmin_data = (num, x, fu)
 
         if fu <= fx:
             if x >= xf:
@@ -131,8 +133,9 @@ def maximize_scalar(func, a, b, args=(), xtol=1e-5, maxiter=500):
         tol2 = 2.0 * tol1
 
         if num >= maxfun:
+            status_flag = 1
             break
 
     fval = -fx
 
-    return fval, xf
+    return fval, xf, status_flag
