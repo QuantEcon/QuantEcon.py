@@ -11,6 +11,7 @@ Tools
    tools/distributions
    tools/ecdf
    tools/estspec
+   tools/filter
    tools/graph_tools
    tools/gridtools
    tools/ivp

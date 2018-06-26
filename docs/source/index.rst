@@ -13,6 +13,7 @@ mainly used by developers internal to the package.
 
    game_theory
    markov
+   optimize
    random
    tools
    util
