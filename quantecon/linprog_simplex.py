@@ -8,7 +8,112 @@ from numba import jit
 from .util import pivot_operation, min_ratio_test,
 
 
+infeasible_err_msg = "The problem appears to be infeasible"
 unbounded_obj = "The problem appears to be unbounded."
+max_iter_p1 = "The maximum number of iterations has been reached in Phase I"
+max_iter_p2 = "The maximum number of iterations has been reached in Phase 2"
+
+
+@jit(nopython=True, cache=True)
+def linprog_simplex(tableau, N, M_ub=0, M_eq=0, maxiter=10000, tol_npos=1e-10,
+                    tol_ratio_diff=1e-15):
+    """
+    Solve the following LP problem using the Simplex method:
+
+    Minimize:    c.T @ x
+    Subject to:  A_ub @ x ≤ b_ub
+                 A_eq @ x = b_eq
+                 x ≥ 0
+
+    Jit-compiled in `nopython` mode.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        2-D array containing the standardized LP problem in detached
+        coefficients form augmented with the artificial variables, the
+        infeasibility form and with nonnegative constant terms. The
+        infeasibility form is assumed to be placed in the last row, and the
+        objective function in the second last row.
+
+    N : scalar(int)
+        Number of control variables.
+
+    M_ub : scalar(int)
+        Number of inequality constraints.
+
+    M_eq : scalar(int)
+        Number of equality constraints.
+
+    maxiter : scalar(int), optional(default=10000)
+        Maximum number of pivot operation for each phase.
+
+    tol_npos : scalar(float), optional(default=1e-10)
+        Tolerance for treating an element as nonpositive.
+
+    tol_ratio_diff : scalar(float), optional(default=1e-15)
+        Tolerance for comparing candidate minimum ratios.
+
+    Return
+    ----------
+    A tuple containing the following elements:
+
+    sol : ndarray(float, ndim=1)
+        If `status` is 0, a basic solution to the linear programming problem.
+
+    status : scalar(int)
+        An integer representing the exit status of the optimization:
+        0 : Optimization terminated successfully
+        1 : Iteration limit reached
+
+    References
+    ----------
+
+    [1] Dantzig, George B., "Linear programming and extensions". Rand
+        Corporation Research Study Princeton Univ. Press, Princeton, NJ, 1963
+
+    [2] Bland, Robert G. (May 1977). "New finite pivoting tie_breaking_rules
+        for the simplex method". Mathematics of Operations Research.
+        2 (2): 103–107.
+
+    [3] Pan, Ping-Qi., "Linear Programming Computation". Springer,
+        Berlin (2014).
+
+    [4] https://www.whitman.edu/Documents/Academics/Mathematics/lewis.pdf
+
+    [5] http://mat.gsia.cmu.edu/classes/QUANT/NOTES/chap7.pdf
+
+    """
+    M = M_ub + M_eq
+
+    basis = np.empty(M, dtype=np.int64)
+    for i in range(M):  # Warning: the artificial variables are used as a basis
+        basis[i] = N + M_ub + i
+
+    # Phase I
+    status = simplex_algorithm(tableau, basis, M, maxiter, tol_npos,
+                               tol_ratio_diff)
+
+    if status == 1:
+        print(max_iter_p1)
+        return (np.empty(1), status)
+
+    if abs(tableau[-1, -1]) > tol_npos:
+        raise ValueError(infeasible_err_msg)
+
+    # Update `tableau`
+    tableau = tableau[:-1, tableau[-1, :] <= tol_npos]
+
+    # Phase II
+    status = simplex_algorithm(tableau, basis, M, maxiter, tol_npos,
+                               tol_ratio_diff)
+
+    sol = _find_basic_solution(tableau, basis, N)
+
+    if status == 1:
+        print(max_iter_p2)
+
+    return (sol, status)
 
 
 @jit(nopython=True, cache=True)
@@ -150,3 +255,34 @@ def _choose_pivot_row(tableau, pivot_col, argmins, M, tol_npos=1e-10,
         argmins[i] = i
 
     return pivot_row, num_argmins
+
+
+@jit(nopython=True, cache=True)
+def _find_basic_solution(tableau, basis, N):
+    """
+    Find a basic solution to the LP problem in `tableau`. Jit-compiled in
+    `nopython` mode.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        2-D array which contains the LP problem in detached coefficients form.
+
+    basis : ndarray(int, ndim=1)
+        1-D array containing the indices of the basic variables in `tableau`.
+
+    N : scalar(int)
+        Number of control variables.
+
+    Return
+    ----------
+    sol : ndarray(float, ndim=1)
+        A basic solution to the LP problem.
+
+    """
+    sol = np.zeros(N)
+    for last_col_row_idx, sol_idx in enumerate(basis):
+        if sol_idx < N:
+            sol[sol_idx] = tableau[last_col_row_idx, -1]
+
+    return sol
