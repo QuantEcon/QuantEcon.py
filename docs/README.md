@@ -9,11 +9,12 @@ The documentation requires a few dependencies beyond those necessary for the qua
 * sphinx
 * numpydoc
 * sphinx_rtd_theme
+* mock
 
 You can install these by executing
 
 ```
-pip install sphinx numpydoc sphinx_rtd_theme
+conda install sphinx numpydoc sphinx_rtd_theme mock
 ```
 
 ## Building the docs
