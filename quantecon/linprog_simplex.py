@@ -8,12 +8,6 @@ from numba import jit
 from .util import pivot_operation, min_ratio_test, lex_min_ratio_test
 
 
-infeasible_err_msg = "The problem appears to be infeasible"
-unbounded_obj = "The problem appears to be unbounded."
-max_iter_p1 = "The maximum number of iterations has been reached in Phase I"
-max_iter_p2 = "The maximum number of iterations has been reached in Phase 2"
-
-
 jit(nopython=True, cache=True)
 def linprog_simplex(tableau, N, M_ub=0, M_eq=0, tie_breaking_rule=0,
                     maxiter=10000, tol_npos=1e-10, tol_ratio_diff=1e-15):
@@ -100,11 +94,11 @@ def linprog_simplex(tableau, N, M_ub=0, M_eq=0, tie_breaking_rule=0,
                                maxiter, tol_npos, tol_ratio_diff)
 
     if status == 1:
-        print(max_iter_p1)
+        print("The maximum number of iterations has been reached in Phase I")
         return (np.empty(1), status)
 
     if abs(tableau[-1, -1]) > tol_npos:
-        raise ValueError(infeasible_err_msg)
+        raise ValueError("The problem appears to be infeasible")
 
     # Update `tableau`
     tableau = tableau[:-1, tableau[-1, :] <= tol_npos]
@@ -116,7 +110,7 @@ def linprog_simplex(tableau, N, M_ub=0, M_eq=0, tie_breaking_rule=0,
     sol = _find_basic_solution(tableau, basis, N)
 
     if status == 1:
-        print(max_iter_p2)
+        print("The maximum number of iterations has been reached in Phase II")
 
     return (sol, status)
 
@@ -178,7 +172,7 @@ def simplex_algorithm(tableau, basis, M, tie_breaking_rule, maxiter=10000,
 
         # Check if there is no lower bound
         if num_argmins == 0:
-            raise ValueError(unbounded_obj)
+            raise ValueError("The problem appears to be unbounded.")
 
         pivot_operation(tableau, (pivot_row, pivot_col))
 

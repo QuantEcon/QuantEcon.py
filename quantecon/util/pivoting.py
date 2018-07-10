@@ -1,19 +1,15 @@
 """
-Useful routines for manipulating linear equation systems.
+Useful routines for manipulating linear equation systems through pivoting.
 
 """
+
 import numpy as np
-from numba import jit, generated_jit, types
-
-
-cons_err_msg = "At least one tpye of constraints must be specified."
-ub_err_msg = "Inequality constraints are not properly specified."
-eq_err_msg = "Equality constraints are not properly specified."
+from numba import jit
 
 
 @jit(nopython=True, cache=True)
 def make_tableau(c, A_ub=np.array([[]]).T, b_ub=np.array([[]]),
-                  A_eq=np.array([[]]).T, b_eq=np.array([[]])):
+                 A_eq=np.array([[]]).T, b_eq=np.array([[]])):
     """
     Create a tableau for an LP problem given an objective function and
     constraints by transforming the problem to its standard form, making,
@@ -134,10 +130,10 @@ def standardize_lp_problem(c, A_ub=np.array([[]]).T, b_ub=np.array([[]]),
     N = max(N_ub, N_eq)
 
     if M_ub != b_ub.size:
-        raise ValueError(ub_err_msg)
+        raise ValueError("Inequality constraints are not properly specified.")
 
     if M_eq != b_eq.size:
-        raise ValueError(eq_err_msg)
+        raise ValueError("Equality constraints are not properly specified.")
 
     if M_ub > 0 and N > 0:  # At least inequality constraints
         if tableau is None:
@@ -176,7 +172,7 @@ def standardize_lp_problem(c, A_ub=np.array([[]]).T, b_ub=np.array([[]]),
         return tableau
 
     else:
-        raise ValueError(cons_err_msg)
+        raise ValueError("At least one type of constraints must be specified.")
 
 
 @jit(nopython=True, cache=True)
