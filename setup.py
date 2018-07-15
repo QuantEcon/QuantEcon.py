@@ -116,6 +116,7 @@ setup(name='quantecon',
       install_requires=[
           'numba>=0.38',
           'numpy',
+          'requests',
           'scipy>=1.0.0',
           'sympy',
           ]
