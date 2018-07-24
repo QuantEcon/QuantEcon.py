@@ -44,6 +44,25 @@ class TestVertexEnumeration:
                     assert_allclose(action_computed, action)
 
 
+def test_vertex_enumeration_qhull_options():
+    # Degenerate game, player 0's actions reordered
+    bimatrix = [[(0, 3), (6, 1)],
+                [(2, 2), (5, 6)],
+                [(3, 3), (3, 3)]]
+    g = NormalFormGame(bimatrix)
+    NEs_expected = [([0, 0, 1], [1, 0]),
+                    ([0, 0, 1], [2/3, 1/3]),
+                    ([2/3, 1/3, 0], [1/3, 2/3])]
+    qhull_options = 'QJ'
+    NEs_computed = vertex_enumeration(g, qhull_options=qhull_options)
+    eq_(len(NEs_computed), len(NEs_expected))
+    for NEs in (NEs_computed, NEs_expected):
+        NEs.sort(key=lambda x: (list(x[1]), list(x[0])))
+    for actions_computed, actions in zip(NEs_computed, NEs_expected):
+        for action_computed, action in zip(actions_computed, actions):
+            assert_allclose(action_computed, action, atol=1e-10)
+
+
 @raises(TypeError)
 def test_vertex_enumeration_invalid_g():
     bimatrix = [[(3, 3), (3, 2)],
