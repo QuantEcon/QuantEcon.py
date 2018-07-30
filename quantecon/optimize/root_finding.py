@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit, njit
+from numba import njit
 from collections import namedtuple
 
 __all__ = ['newton', 'newton_halley', 'newton_secant', 'bisect', 'brentq']
@@ -43,13 +43,13 @@ def newton(func, x0, fprime, args=(), tol=1.48e-8, maxiter=50,
         actual zero.
     fprime : callable and jitted
         The derivative of the function (when available and convenient).
-    args : tuple, optional
+    args : tuple, optional(default=())
         Extra arguments to be used in the function call.
-    tol : float, optional
+    tol : float, optional(default=1.48e-8)
         The allowable error of the zero value.
-    maxiter : int, optional
+    maxiter : int, optional(default=50)
         Maximum number of iterations.
-    disp : bool, optional
+    disp : bool, optional(default=True)
         If True, raise a RuntimeError if the algorithm didn't converge
 
     Returns
@@ -90,7 +90,7 @@ def newton(func, x0, fprime, args=(), tol=1.48e-8, maxiter=50,
             break
         newton_step = fval / fder
         # Newton step
-        p = p0 - newton_step 
+        p = p0 - newton_step
         if abs(p - p0) < tol:
             status = _ECONVERGED
             break
@@ -125,13 +125,13 @@ def newton_halley(func, x0, fprime, fprime2, args=(), tol=1.48e-8,
         The derivative of the function (when available and convenient).
     fprime2 : callable and jitted
         The second order derivative of the function
-    args : tuple, optional
+    args : tuple, optional(default=())
         Extra arguments to be used in the function call.
-    tol : float, optional
+    tol : float, optional(default=1.48e-8)
         The allowable error of the zero value.
-    maxiter : int, optional
+    maxiter : int, optional(default=50)
         Maximum number of iterations.
-    disp : bool, optional
+    disp : bool, optional(default=True)
         If True, raise a RuntimeError if the algorithm didn't converge
 
     Returns
@@ -190,11 +190,11 @@ def newton_halley(func, x0, fprime, fprime2, args=(), tol=1.48e-8,
 def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
                   disp=True):
     """
-    Find a zero from the secant method using the jitted version of 
+    Find a zero from the secant method using the jitted version of
     Scipy's secant method.
-    
+
     Note that `func` must be jitted via Numba.
-    
+
     Parameters
     ----------
     func : callable and jitted
@@ -204,13 +204,13 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
     x0 : float
         An initial estimate of the zero that should be somewhere near the
         actual zero.
-    args : tuple, optional
+    args : tuple, optional(default=())
         Extra arguments to be used in the function call.
-    tol : float, optional
+    tol : float, optional(default=1.48e-8)
         The allowable error of the zero value.
-    maxiter : int, optional
+    maxiter : int, optional(default=50)
         Maximum number of iterations.
-    disp : bool, optional
+    disp : bool, optional(default=True)
         If True, raise a RuntimeError if the algorithm didn't converge.
 
     Returns
@@ -221,17 +221,17 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
         iterations - Number of iterations needed to find the root.
         converged - True if the routine converged
     """
-    
+
     if tol <= 0:
         raise ValueError("tol is too small <= 0")
     if maxiter < 1:
         raise ValueError("maxiter must be greater than 0")
-    
+
     # Convert to float (don't use float(x0); this works also for complex x0)
     p0 = 1.0 * x0
     funcalls = 0
     status = _ECONVERR
-    
+
     # Secant method
     if x0 >= 0:
         p1 = x0 * (1 + 1e-4) + 1e-4
@@ -256,7 +256,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
         p1 = p
         q1 = func(p1, *args)
         funcalls += 1
-        
+
     if disp and status == _ECONVERR:
         msg = "Failed to converge"
         raise RuntimeError(msg)
@@ -302,18 +302,18 @@ def bisect(f, a, b, args=(), xtol=_xtol,
         One end of the bracketing interval [a,b].
     b : number
         The other end of the bracketing interval [a,b].
-    args : tuple, optional
+    args : tuple, optional(default=())
         Extra arguments to be used in the function call.
-    xtol : number, optional
+    xtol : number, optional(default=2e-12)
         The computed root ``x0`` will satisfy ``np.allclose(x, x0,
         atol=xtol, rtol=rtol)``, where ``x`` is the exact root. The
         parameter must be nonnegative.
-    rtol : number, optional
+    rtol : number, optional(default=4*np.finfo(float).eps)
         The computed root ``x0`` will satisfy ``np.allclose(x, x0,
         atol=xtol, rtol=rtol)``, where ``x`` is the exact root.
-    maxiter : number, optional
+    maxiter : number, optional(default=100)
         Maximum number of iterations.
-    disp : bool, optional
+    disp : bool, optional(default=True)
         If True, raise a RuntimeError if the algorithm didn't converge.
 
     Returns
@@ -384,18 +384,18 @@ def brentq(f, a, b, args=(), xtol=_xtol,
         One end of the bracketing interval [a,b].
     b : number
         The other end of the bracketing interval [a,b].
-    args : tuple, optional
+    args : tuple, optional(default=())
         Extra arguments to be used in the function call.
-    xtol : number, optional
+    xtol : number, optional(default=2e-12)
         The computed root ``x0`` will satisfy ``np.allclose(x, x0,
         atol=xtol, rtol=rtol)``, where ``x`` is the exact root. The
         parameter must be nonnegative.
-    rtol : number, optional
+    rtol : number, optional(default=4*np.finfo(float).eps)
         The computed root ``x0`` will satisfy ``np.allclose(x, x0,
         atol=xtol, rtol=rtol)``, where ``x`` is the exact root.
-    maxiter : number, optional
+    maxiter : number, optional(default=100)
         Maximum number of iterations.
-    disp : bool, optional
+    disp : bool, optional(default=True)
         If True, raise a RuntimeError if the algorithm didn't converge.
 
     Returns
