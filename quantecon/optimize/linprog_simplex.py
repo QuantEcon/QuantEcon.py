@@ -5,16 +5,16 @@ Implements a linear programming solver using the "Simplex" method.
 
 import numpy as np
 from numba import jit
-from .util import pivot_operation, min_ratio_test, lex_min_ratio_test
+from ..util import pivot_operation, min_ratio_test, lex_min_ratio_test
 
 
-jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True)
 def linprog_simplex(tableau, N, M_ub=0, M_eq=0, tie_breaking_rule=0,
                     maxiter=10000, tol_npos=1e-10, tol_ratio_diff=1e-15):
     """
     Solve the following LP problem using the Simplex method:
 
-    Minimize:    c.T @ x
+    Maximize:    c.T @ x
     Subject to:  A_ub @ x ≤ b_ub
                  A_eq @ x = b_eq
                  x ≥ 0
@@ -84,6 +84,8 @@ def linprog_simplex(tableau, N, M_ub=0, M_eq=0, tie_breaking_rule=0,
 
     """
     M = M_ub + M_eq
+
+    tableau[M, 0:N] = -tableau[M, 0:N] # Maximize
 
     basis = np.empty(M, dtype=np.int64)
     for i in range(M):  # Warning: the artificial variables are used as a basis
@@ -187,7 +189,7 @@ def simplex_algorithm(tableau, basis, M, tie_breaking_rule, maxiter=10000,
 
 
 @jit(nopython=True, cache=True)
-def _choose_pivot_col(tableau, basis, tie_breaking_rule, tol_npos=1e-10):
+def _choose_pivot_col(tableau, basis, tie_breaking_rule, tol_npos):
     """
     Choose the column index of the pivot element in `tableau` using
     `tie_breaking_rule`. Jit-compiled in `nopython` mode.
@@ -231,7 +233,7 @@ def _choose_pivot_col(tableau, basis, tie_breaking_rule, tol_npos=1e-10):
 
 @jit(nopython=True, cache=True)
 def _choose_pivot_row(tableau, pivot_col, argmins, M, tie_breaking_rule,
-                      tol_npos=1e-10, tol_ratio_diff=1e-15):
+                      tol_npos, tol_ratio_diff):
     """
     Choose the row index of the pivot element in `tableau` using
     `tie_breaking_rule`. Jit-compiled in `nopython` mode.
