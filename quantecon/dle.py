@@ -1,21 +1,18 @@
 """
-Filename: DynLinEcon.py
-
-Author: Sebastian Graves
-
-Provides a class called DLE to convert and solve dynamic linear economics (as set out in Hansen & Sargent (2013)) as LQ problems.
+Provides a class called DLE to convert and solve dynamic linear economics 
+(as set out in Hansen & Sargent (2013)) as LQ problems.
 """
 
 import numpy as np
-from quantecon import LQ
-from quantecon import solve_discrete_lyapunov
 from sympy import Matrix
 from pylab import array
-
+from .lqcontrol import LQ
+from .matrix_eqn import solve_discrete_lyapunov
 
 class DLE(object):
     """
-    This class is for analysing economies that are characterised by matrices defining information and shocks {a22, c2, ub, ud}, 
+    This class is for analysing economies that are characterised by matrices 
+    defining information and shocks {a22, c2, ub, ud}, 
     production technology {phic, phig, phii, gamma, deltak, thetak},
     household technology {deltah, thetah, lambda, pih},
     and the scalar {beta}.
