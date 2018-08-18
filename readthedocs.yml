@@ -7,5 +7,4 @@ python:
   version: 3.6
   setup_py_install: true
 
-conda:
-  file: rtd-environment.yml
+requirements_file: pip-requirements.txt
