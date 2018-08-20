@@ -63,6 +63,21 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.4.0 (20-August-2018)
+
+1. FEAT: Add bisection and brent's method for root finding. See PR [\#424](https://github.com/QuantEcon/QuantEcon.py/pull/424) ([spvdchachan](https://github.com/spvdchachan))
+1. FEAT: Add `qhull\_options` to `game\_theory.vertex\_enumeration`. See PR [\#421](https://github.com/QuantEcon/QuantEcon.py/pull/421) ([oyamad](https://github.com/oyamad))
+1. FEAT: Root finding. See PR [\#417](https://github.com/QuantEcon/QuantEcon.py/pull/417) ([chrishyland](https://github.com/chrishyland))
+1. FEAT: Add `'interior-point'` option to `is\_dominated`; add `dominated\_actions`. See PR [\#415](https://github.com/QuantEcon/QuantEcon.py/pull/415) ([oyamad](https://github.com/oyamad))
+1. FEAT: Add hamilton filter. See PR [\#405](https://github.com/QuantEcon/QuantEcon.py/pull/405) ([Shunsuke-Hori](https://github.com/Shunsuke-Hori))
+1. FEAT: Add sample game generators from bimatrix-generators. See PR [\#392](https://github.com/QuantEcon/QuantEcon.py/pull/392) ([oyamad](https://github.com/oyamad))
+1. MAINT: update to new rtd requirements spec. See PR [\#427](https://github.com/QuantEcon/QuantEcon.py/pull/427) ([mmcky](https://github.com/mmcky))
+1. MAINT: Add `requests` to setup.py. See PR [\#420](https://github.com/QuantEcon/QuantEcon.py/pull/420) ([oyamad](https://github.com/oyamad))
+1. MAINT: Add `mock` to the dependencies list. See PR [\#418](https://github.com/QuantEcon/QuantEcon.py/pull/418) ([oyamad](https://github.com/oyamad))
+1. TEST: Fix test\_discrete\_rv. See PR [\#412](https://github.com/QuantEcon/QuantEcon.py/pull/412) ([oyamad](https://github.com/oyamad))
+1. MAINT: add minimum version number for numba support. See PR [\#409](https://github.com/QuantEcon/QuantEcon.py/pull/409) ([mmcky](https://github.com/mmcky))
+1. MAINT: Setup an auto-generate changelog for releases. See PR [\#403](https://github.com/QuantEcon/QuantEcon.py/pull/403) ([mmcky](https://github.com/mmcky))
+
 ### Ver 0.3.8 (14-March-2018)
 1. FEAT: Add random.draw. See [PR #397](https://github.com/QuantEcon/QuantEcon.py/pull/397)
 1. FEAT: Add Numba jit version of scipy.special.comb. See [PR #377](https://github.com/QuantEcon/QuantEcon.py/pull/377)
