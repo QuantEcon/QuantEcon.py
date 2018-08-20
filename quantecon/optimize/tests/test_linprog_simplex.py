@@ -22,7 +22,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([0.])
 
@@ -37,7 +37,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([3.0])
 
@@ -47,16 +47,16 @@ class TestSimplexSolver:
         # Maximize a linear function subject to only linear upper bound
         # constraints.
         # http://www.dam.brown.edu/people/huiwang/classes/am121/Archive/simplex_121_c.pdf
-        c = -np.array([3, 2])
+        c = np.array([3, 2])
         A_ub = np.array([[2, 1],
                          [1, 1],
                          [1, 0]])
         b_ub = np.array([10, 8, 4])
 
         M_ub, N = A_ub.shape
-        tableau = make_tableau(-c, A_ub, b_ub)  # Maximize
+        tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([2., 6.])
 
@@ -74,7 +74,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([2/3, 1/3])
 
@@ -91,7 +91,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(-c, A_ub, b_ub)  # Maximize
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([1., 3.])
 
@@ -108,7 +108,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([0., 0., 10000.])
 
@@ -127,7 +127,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([0, 0, 19, 16/3, 29/3])
 
@@ -175,7 +175,7 @@ class TestSimplexSolver:
         M_eq = A_eq.shape[0]
         tableau = make_tableau(c, A_ub, b_ub, A_eq, b_eq)
 
-        x = linprog_simplex(tableau, N, M_ub, M_eq)[0]
+        x = linprog_simplex(tableau, N, M_ub, M_eq)[1]
 
         solution = np.array([101 / 1391, 1462 / 1391, 0, 752 / 1391])
 
@@ -200,7 +200,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([19., 0., 16., 0., 0., 0.,
                              0., 0., 0., 3., 33., 0.])
@@ -223,7 +223,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([0., 4., 0., 0., 4.])
 
@@ -239,7 +239,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([0., 0., 5.])
 
@@ -256,7 +256,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([66.25, 0, 17.5, 0, 183.75, 0])
 
@@ -275,7 +275,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([0.3, 0.2, 0.0, 0.0, 0.1, 0.3])
 
@@ -292,7 +292,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.zeros(m)
 
@@ -345,7 +345,7 @@ class TestSimplexSolver:
         M_eq = A_eq.shape[0]
         tableau = make_tableau(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_ub=M_ub, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_ub=M_ub, M_eq=M_eq)[1]
 
         solution = np.zeros_like(c)
 
@@ -362,7 +362,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([3., 0., 0.])
 
@@ -377,7 +377,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([0., 6./7])
 
@@ -387,7 +387,7 @@ class TestSimplexSolver:
         # Has a solution by the inequality version of Farkas' Lemma
         random_state = check_random_state(0)
 
-        for i in range(100):
+        for i in range(10):
             c = -np.ones(100)
             A_ub = 0.5 + random_state.rand(100, 100)
             b_ub = random_state.rand(100)
@@ -395,7 +395,7 @@ class TestSimplexSolver:
             M_ub, N = A_ub.shape
             tableau = make_tableau(-c, A_ub, b_ub)
 
-            sol = linprog_simplex(tableau, N, M_ub)[0]
+            sol = linprog_simplex(tableau, N, M_ub)[1]
             sci = linprog(c, A_ub, b_ub, method='interior-point')
 
             assert_allclose(sol, sci.x, atol=1e-07)
@@ -416,7 +416,7 @@ class TestSimplexSolver:
         M_eq = A_eq.shape[0]
         tableau = make_tableau(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_ub=M_ub, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_ub=M_ub, M_eq=M_eq)[1]
 
         solution = np.array([43.33333333, 2., 4.33333333, 46.33333333,
                              2., 2., 19.5])
@@ -443,7 +443,7 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[0]
+        x = linprog_simplex(tableau, N, M_ub)[1]
 
         solution = np.array([0., 1., 0., 0., 1.])
 
@@ -460,7 +460,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
 
         solution = np.array([5., 1., 0., 2., 0.])
 
@@ -477,7 +477,7 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq, tie_breaking_rule=1)[0]
+        x = linprog_simplex(tableau, N, M_eq=M_eq, tie_breaking_rule=1)[1]
 
         solution = np.array([0.75, 0.  , 0.  , 1.  , 0.  , 1.  , 0.  ])
 
