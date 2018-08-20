@@ -4,9 +4,36 @@
 
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.8.1...HEAD)
 
+**Implemented enhancements:**
+
+- Add bisection and brent's method for root finding [\#424](https://github.com/QuantEcon/QuantEcon.py/pull/424) ([spvdchachan](https://github.com/spvdchachan))
+- EHN: Add `qhull\_options` to `game\_theory.vertex\_enumeration` [\#421](https://github.com/QuantEcon/QuantEcon.py/pull/421) ([oyamad](https://github.com/oyamad))
+- ENH: Root finding [\#417](https://github.com/QuantEcon/QuantEcon.py/pull/417) ([chrishyland](https://github.com/chrishyland))
+- Add `'interior-point'` option to `is\_dominated`; add `dominated\_actions` [\#415](https://github.com/QuantEcon/QuantEcon.py/pull/415) ([oyamad](https://github.com/oyamad))
+
+**Closed issues:**
+
+- update RTD [\#423](https://github.com/QuantEcon/QuantEcon.py/issues/423)
+- Add robust jitted root finding routine [\#422](https://github.com/QuantEcon/QuantEcon.py/issues/422)
+- Import fails [\#408](https://github.com/QuantEcon/QuantEcon.py/issues/408)
+- Setup automated GitHub release notes [\#402](https://github.com/QuantEcon/QuantEcon.py/issues/402)
+- Notification: Direct commits! [\#400](https://github.com/QuantEcon/QuantEcon.py/issues/400)
+- remove authors' names [\#394](https://github.com/QuantEcon/QuantEcon.py/issues/394)
+
 **Merged pull requests:**
 
+- DOC: Add doc entry for root\_finding [\#428](https://github.com/QuantEcon/QuantEcon.py/pull/428) ([oyamad](https://github.com/oyamad))
+- update to new rtd requirements spec [\#427](https://github.com/QuantEcon/QuantEcon.py/pull/427) ([mmcky](https://github.com/mmcky))
+- Add `requests` to setup.py [\#420](https://github.com/QuantEcon/QuantEcon.py/pull/420) ([oyamad](https://github.com/oyamad))
+- DOC: Add `mock` to the dependencies list [\#418](https://github.com/QuantEcon/QuantEcon.py/pull/418) ([oyamad](https://github.com/oyamad))
+- adding jitted scalar maximization routine, first build [\#416](https://github.com/QuantEcon/QuantEcon.py/pull/416) ([jstac](https://github.com/jstac))
+- TEST: Fix test\_discrete\_rv [\#412](https://github.com/QuantEcon/QuantEcon.py/pull/412) ([oyamad](https://github.com/oyamad))
+- add minimum version number for numba support [\#409](https://github.com/QuantEcon/QuantEcon.py/pull/409) ([mmcky](https://github.com/mmcky))
+- FIX: fix release year [\#407](https://github.com/QuantEcon/QuantEcon.py/pull/407) ([mirca](https://github.com/mirca))
+- Add hamilton filter [\#405](https://github.com/QuantEcon/QuantEcon.py/pull/405) ([Shunsuke-Hori](https://github.com/Shunsuke-Hori))
+- Setup an auto-generate changelog for releases [\#403](https://github.com/QuantEcon/QuantEcon.py/pull/403) ([mmcky](https://github.com/mmcky))
 - README: Add a contributor [\#401](https://github.com/QuantEcon/QuantEcon.py/pull/401) ([oyamad](https://github.com/oyamad))
+- RFC: Remove authors' name [\#399](https://github.com/QuantEcon/QuantEcon.py/pull/399) ([QBatista](https://github.com/QBatista))
 - Add sample game generators from bimatrix-generators [\#392](https://github.com/QuantEcon/QuantEcon.py/pull/392) ([oyamad](https://github.com/oyamad))
 
 ## [0.3.8.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.8.1) (2018-03-13)
