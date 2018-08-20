@@ -274,7 +274,8 @@ def min_ratio_test(tableau, pivot_col, test_col, argmins, num_candidates,
 
 
 @jit(nopython=True, cache=True)
-def lex_min_ratio_test(tableau, pivot_col, start, end, argmins, nrows):
+def lex_min_ratio_test(tableau, pivot_col, start, end, argmins, nrows,
+                       tol_piv=1e-10, tol_ratio_diff=1e-15):
     """
     Perform the lexico-minimum ratio test.
 
@@ -299,6 +300,12 @@ def lex_min_ratio_test(tableau, pivot_col, start, end, argmins, nrows):
     nrows : scalar(int)
         Number of candidate rows for the lexico-minimum ratio test.
 
+    tol_piv : scalar(float), optional(default=1e-10)
+        Tolerance for treating an element of the pivot column as nonpositive.
+
+    tol_ratio_diff : scalar(float), optional(default=1e-15)
+        Tolerance for comparing candidate minimum ratios.
+
     Returns
     -------
     row_min : scalar(int)
@@ -312,7 +319,7 @@ def lex_min_ratio_test(tableau, pivot_col, start, end, argmins, nrows):
         argmins[i] = i
 
     num_argmins = min_ratio_test(tableau, pivot_col, -1, argmins,
-                                 num_candidates)
+                                 num_candidates, tol_piv, tol_ratio_diff)
     if num_argmins == 1:
         return argmins[0], num_argmins
 
@@ -320,7 +327,7 @@ def lex_min_ratio_test(tableau, pivot_col, start, end, argmins, nrows):
         if j == pivot_col:
             continue
         num_argmins = min_ratio_test(tableau, pivot_col, j, argmins,
-                                     num_argmins)
+                                     num_argmins, tol_piv, tol_ratio_diff)
         if num_argmins == 1:
             break
     return argmins[0], num_argmins
