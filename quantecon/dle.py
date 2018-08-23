@@ -4,8 +4,6 @@ Provides a class called DLE to convert and solve dynamic linear economics
 """
 
 import numpy as np
-from sympy import Matrix
-from pylab import array
 from .lqcontrol import LQ
 from .matrix_eqn import solve_discrete_lyapunov
 
@@ -164,7 +162,7 @@ class DLE(object):
         """
         zx = Matrix(np.eye(self.A0.shape[0]) - self.A0)
         self.zz = zx.nullspace()
-        self.zz = array(self.zz)
+        self.zz = np.array(self.zz)
         self.zz = self.zz.T
         self.zz = zz = self.zz / self.zz[nnc]
         self.css = self.Sc.dot(self.zz).astype(float)
