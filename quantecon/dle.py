@@ -6,6 +6,7 @@ Provides a class called DLE to convert and solve dynamic linear economics
 import numpy as np
 from .lqcontrol import LQ
 from .matrix_eqn import solve_discrete_lyapunov
+from .rank_nullspace import nullspace
 
 
 class DLE(object):
@@ -160,8 +161,9 @@ class DLE(object):
             nnc is the location of the constant in the state vector x_t
 
         """
-        zx =np.matrix(np.eye(self.A0.shape[0]) - self.A0)
-        self.zz = zx.nullspace()
+        # zx =Matrix(np.eye(self.A0.shape[0]) - self.A0)  #remove once confirmed can use nullspace from QE
+        # self.zz = zx.nullspace()
+        self.zz = nullspace(A0)
         self.zz = np.array(self.zz)
         self.zz = self.zz.T
         self.zz = zz = self.zz / self.zz[nnc]
