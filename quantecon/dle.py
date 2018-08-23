@@ -160,7 +160,7 @@ class DLE(object):
             nnc is the location of the constant in the state vector x_t
 
         """
-        zx = Matrix(np.eye(self.A0.shape[0]) - self.A0)
+        zx =np.matrix(np.eye(self.A0.shape[0]) - self.A0)
         self.zz = zx.nullspace()
         self.zz = np.array(self.zz)
         self.zz = self.zz.T
