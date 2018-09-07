@@ -31,25 +31,31 @@ class DLE(object):
 
     where h_{-1}, k_{-1}, and z_0 are given as initial conditions.
 
-    Section 5.5 of HS2013 describes how to map these matrices into those of a LQ problem. 
+    Section 5.5 of HS2013 describes how to map these matrices into those of 
+    a LQ problem. 
 
     HS2013 sort the matrices defining the problem into three groups:
 
-    Information: A_{22}, C_2, U_b , and U_d characterize the motion of information sets and of taste and technology shocks
+    Information: A_{22}, C_2, U_b , and U_d characterize the motion of information 
+    sets and of taste and technology shocks
 
-    Technology: \Phi_c, \Phi_g, \Phi_i, \Gamma, \Delta_k, and \Theta_k determine the technology for producing consumption goods
+    Technology: \Phi_c, \Phi_g, \Phi_i, \Gamma, \Delta_k, and \Theta_k determine the 
+    technology for producing consumption goods
 
-    Preferences: \Delta_h, \Theta_h, \Lambda, and \Pi determine the technology for producing consumption services from consumer goods.
-    A scalar discount factor \beta determines the preference ordering over consumption services.
+    Preferences: \Delta_h, \Theta_h, \Lambda, and \Pi determine the technology for 
+    producing consumption services from consumer goods. A scalar discount factor \beta 
+    determines the preference ordering over consumption services.
 
     Parameters
     ----------
     Information : tuple
         Information is a tuple containing the matrices A_{22}, C_2, U_b, and U_d
     Technology : tuple
-        Technology is a tuple containing the matrices \Phi_c, \Phi_g, \Phi_i, \Gamma, \Delta_k, and \Theta_k
+        Technology is a tuple containing the matrices \Phi_c, \Phi_g, \Phi_i, \Gamma, 
+        \Delta_k, and \Theta_k
     Preferences : tuple
-        Preferences is a tuple containing the matrices \Delta_h, \Theta_h, \Lambda, \Pi, and the scalar \beta
+        Preferences is a tuple containing the matrices \Delta_h, \Theta_h, \Lambda, 
+        \Pi, and the scalar \beta
 
     """
 
