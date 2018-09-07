@@ -7,7 +7,7 @@ import numpy as np
 from .lqcontrol import LQ
 from .matrix_eqn import solve_discrete_lyapunov
 from .rank_nullspace import nullspace
-
+from sympy import Matrix
 
 class DLE(object):
     r"""
@@ -167,8 +167,8 @@ class DLE(object):
             nnc is the location of the constant in the state vector x_t
 
         """
-        zx = np.eye(self.A0.shape[0]) - self.A0
-        self.zz = nullspace(zx)
+        zx = Matrix(np.eye(self.A0.shape[0])-self.A0)
+        self.zz = zx.nullspace()
         self.zz = np.array(self.zz)
         self.zz = self.zz.T
         self.zz = zz = self.zz / self.zz[nnc]
