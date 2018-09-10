@@ -83,9 +83,14 @@ def standardize_lp_problem(c, A_ub=np.array([[]]).T, b_ub=np.array([[]]),
     """
     Standardize an LP problem of the following form:
 
-    Objective:   c.T @ x
-    Subject to:  A_ub @ x ≤ b_ub
-                 A_eq @ x = b_eq
+    Objective: :math:`cx`
+    Subject to:
+
+    .. math::
+
+        A_{ub}x ≤ b_{ub}
+
+        A_{eq}x = b_{eq}
 
     Jit-compiled in `nopython` mode.
 
