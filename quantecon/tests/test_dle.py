@@ -88,6 +88,19 @@ class TestDLE(unittest.TestCase):
         W_solution = np.array([[0., 0., 0., 0., 0.]])
         assert_allclose(W_solution, self.dle.W)
 
+    def test_compute_steadystate(self):
+        solutions = {
+            'css' : np.array([[5.]]),
+            'sss' : np.array([[5.]]),
+            'iss' : np.array([[0.]]),
+            'dss' : np.array([[5.], [0.]]),
+            'bss' : np.array([[30.]]),
+            'kss' : np.array([[0.]]),
+            'hss' : np.array([[5.]]),
+        }
+        for item in solutions.keys():
+            assert_allclose(self.dle.__dict__[item], solutions[item])
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDLE)
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)

@@ -7,7 +7,6 @@ import numpy as np
 from .lqcontrol import LQ
 from .matrix_eqn import solve_discrete_lyapunov
 from .rank_nullspace import nullspace
-from sympy import Matrix
 
 class DLE(object):
     r"""
@@ -167,18 +166,16 @@ class DLE(object):
             nnc is the location of the constant in the state vector x_t
 
         """
-        zx = Matrix(np.eye(self.A0.shape[0])-self.A0)
-        self.zz = zx.nullspace()
-        self.zz = np.array(self.zz)
-        self.zz = self.zz.T
-        self.zz = zz = self.zz / self.zz[nnc]
-        self.css = self.Sc.dot(self.zz).astype(float)
-        self.sss = self.Ss.dot(self.zz).astype(float)
-        self.iss = self.Si.dot(self.zz).astype(float)
-        self.dss = self.Sd.dot(self.zz).astype(float)
-        self.bss = self.Sb.dot(self.zz).astype(float)
-        self.kss = self.Sk.dot(self.zz).astype(float)
-        self.hss = self.Sh.dot(self.zz).astype(float)
+        zx = np.eye(self.A0.shape[0])-self.A0
+        self.zz = nullspace(zx)
+        self.zz /= self.zz[nnc]
+        self.css = self.Sc.dot(self.zz)
+        self.sss = self.Ss.dot(self.zz)
+        self.iss = self.Si.dot(self.zz)
+        self.dss = self.Sd.dot(self.zz)
+        self.bss = self.Sb.dot(self.zz)
+        self.kss = self.Sk.dot(self.zz)
+        self.hss = self.Sh.dot(self.zz)
 
     def compute_sequence(self, x0, ts_length=None, Pay=None):
         """
