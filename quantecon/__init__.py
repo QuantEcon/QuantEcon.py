@@ -17,6 +17,7 @@ from . import optimize
 #-Objects-#
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
+from .dle import DLE
 from .ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
 # from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.

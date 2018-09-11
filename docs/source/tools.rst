@@ -9,6 +9,7 @@ Tools
    tools/compute_fp
    tools/discrete_rv
    tools/distributions
+   tools/dle
    tools/ecdf
    tools/estspec
    tools/filter
