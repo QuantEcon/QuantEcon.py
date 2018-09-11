@@ -98,6 +98,7 @@ class TestDLE(unittest.TestCase):
             'kss' : np.array([[0.]]),
             'hss' : np.array([[5.]]),
         }
+        self.dle.compute_steadystate()
         for item in solutions.keys():
             assert_allclose(self.dle.__dict__[item], solutions[item])
 
