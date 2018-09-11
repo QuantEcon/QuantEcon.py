@@ -11,6 +11,7 @@ from numpy.testing import assert_allclose
 from numpy import dot
 from quantecon.dle import DLE
 
+ATOL = 1e-10
 
 class TestDLE(unittest.TestCase):
 
@@ -100,7 +101,7 @@ class TestDLE(unittest.TestCase):
         }
         self.dle.compute_steadystate()
         for item in solutions.keys():
-            assert_allclose(self.dle.__dict__[item], solutions[item])
+            assert_allclose(self.dle.__dict__[item], solutions[item], atol=ATOL)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDLE)
