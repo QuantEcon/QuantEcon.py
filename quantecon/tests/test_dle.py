@@ -103,6 +103,17 @@ class TestDLE(unittest.TestCase):
         for item in solutions.keys():
             assert_allclose(self.dle.__dict__[item], solutions[item], atol=ATOL)
 
+    def test_canonical(self):
+        solutions = {
+            'pihat': np.array([[1.]]),
+            'llambdahat': np.array([[-1.48690584e-19]]),
+            'ubhat': np.array([[30., -0., -0.]])
+        }
+        self.dle.canonical()
+        for item in solutions.keys():
+            assert_allclose(self.dle.__dict__[item], solutions[item], atol=ATOL)
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestDLE)
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
