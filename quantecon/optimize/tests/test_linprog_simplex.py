@@ -22,11 +22,12 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub)[1:3]
 
-        solution = np.array([0.])
+        sol_true, sol_dual_true = np.array([0.]), np.array([0.])
 
-        assert_allclose(x, solution)
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     def test_aliasing_b_eq(self):
         # Obtained from Scipy
@@ -37,11 +38,13 @@ class TestSimplexSolver:
         M_eq, N = A_eq.shape
         tableau = make_tableau(c, A_eq=A_eq, b_eq=b_eq)
 
-        x = linprog_simplex(tableau, N, M_eq=M_eq)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N,
+                                                        M_eq=M_eq)[1:3]
 
-        solution = np.array([3.0])
+        sol_true, sol_dual_true = np.array([3.0]), np.array([-1.])
 
-        assert_allclose(x, solution)
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     def test_linear_upper_bound(self):
         # Maximize a linear function subject to only linear upper bound
@@ -56,11 +59,12 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub)[1:3]
 
-        solution = np.array([2., 6.])
+        sol_true, sol_dual_true = np.array([2., 6.]), np.array([1., 1., 0.])
 
-        assert_allclose(x, solution)
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     def test_mixed_constraints(self):
         # Minimize linear function subject to non-negative variables.
@@ -74,28 +78,30 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub)[1:3]
 
-        solution = np.array([2/3, 1/3])
+        sol_true, sol_dual_true = np.array([2/3, 1/3]), np.array([0., 4., 1.])
 
-        assert_allclose(x, solution)
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     def test_degeneracy(self):
         # http://mat.gsia.cmu.edu/classes/QUANT/NOTES/chap7.pdf
-        c = -np.array([2, 1])
+        c = np.array([2, 1])
         A_ub = np.array([[3, 1],
                          [1, -1],
                          [0, 1]])
         b_ub = np.array([6, 2, 3])
 
         M_ub, N = A_ub.shape
-        tableau = make_tableau(-c, A_ub, b_ub)  # Maximize
+        tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub)[1:3]
 
-        solution = np.array([1., 3.])
+        sol_true, sol_dual_true = np.array([1., 3.]), np.array([2/3, 0., 1/3])
 
-        assert_allclose(x, solution)
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     def test_cyclic_recovery(self):
         # http://www.math.ubc.ca/~israel/m340/kleemin3.pdf
@@ -108,11 +114,13 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub)[1:3]
 
-        solution = np.array([0., 0., 10000.])
+        sol_true = np.array([0., 0., 10000.])
+        sol_dual_true = np.array([0., 0., 1.])
 
-        assert_allclose(x, solution)
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     def test_cyclic_bland(self):
         # Obtained from Scipy
@@ -127,11 +135,15 @@ class TestSimplexSolver:
         M_ub, N = A_ub.shape
         tableau = make_tableau(c, A_ub, b_ub)
 
-        x = linprog_simplex(tableau, N, M_ub)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub)[1:3]
 
-        solution = np.array([0, 0, 19, 16/3, 29/3])
+        sol_true = np.array([0, 0, 19, 16/3, 29/3])
 
-        assert_allclose(x, solution)
+        # Obtained using Scipy
+        sol_dual_true = np.array([132.5, 0. , 0., 23., 53.5])
+
+        assert_allclose(sol_linprog, sol_true)
+        assert_allclose(sol_dual_linprog, sol_dual_true)
 
     @raises(ValueError)
     def test_linprog_unbounded(self):
@@ -175,11 +187,16 @@ class TestSimplexSolver:
         M_eq = A_eq.shape[0]
         tableau = make_tableau(c, A_ub, b_ub, A_eq, b_eq)
 
-        x = linprog_simplex(tableau, N, M_ub, M_eq)[1]
+        sol_linprog, sol_dual_linprog = linprog_simplex(tableau, N, M_ub,
+                                                        M_eq)[1:3]
 
-        solution = np.array([101 / 1391, 1462 / 1391, 0, 752 / 1391])
+        sol_true = np.array([101 / 1391, 1462 / 1391, 0, 752 / 1391])
 
-        assert_allclose(x, solution)
+        # Obtained using Scipy
+        sol_dual_true = np.array([0.39324227, 0., 0.54133717, 0., 0.16606758])
+
+        assert_allclose(sol_linprog, sol_true)
+        #assert_allclose(sol_dual_linprog, sol_dual_true) # Not working yet
 
     def test_network_flow(self):
         # A network flow problem with supply and demand at nodes
