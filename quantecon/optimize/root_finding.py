@@ -55,10 +55,14 @@ def newton(func, x0, fprime, args=(), tol=1.48e-8, maxiter=50,
     Returns
     -------
     results : namedtuple
-        root - Estimated location where function is zero.
-        function_calls - Number of times the function was called.
-        iterations - Number of iterations needed to find the root.
-        converged - True if the routine converged
+        A namedtuple containing the following items:
+        ::
+
+            root - Estimated location where function is zero.
+            function_calls - Number of times the function was called.
+            iterations - Number of iterations needed to find the root.
+            converged - True if the routine converged
+
     """
 
     if tol <= 0:
@@ -137,10 +141,13 @@ def newton_halley(func, x0, fprime, fprime2, args=(), tol=1.48e-8,
     Returns
     -------
     results : namedtuple
-        root - Estimated location where function is zero.
-        function_calls - Number of times the function was called.
-        iterations - Number of iterations needed to find the root.
-        converged - True if the routine converged
+        A namedtuple containing the following items:
+        ::
+
+            root - Estimated location where function is zero.
+            function_calls - Number of times the function was called.
+            iterations - Number of iterations needed to find the root.
+            converged - True if the routine converged
     """
 
     if tol <= 0:
@@ -216,10 +223,13 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
     Returns
     -------
     results : namedtuple
-        root - Estimated location where function is zero.
-        function_calls - Number of times the function was called.
-        iterations - Number of iterations needed to find the root.
-        converged - True if the routine converged
+        A namedtuple containing the following items:
+        ::
+
+            root - Estimated location where function is zero.
+            function_calls - Number of times the function was called.
+            iterations - Number of iterations needed to find the root.
+            converged - True if the routine converged
     """
 
     if tol <= 0:
