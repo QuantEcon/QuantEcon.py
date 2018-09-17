@@ -63,6 +63,11 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.4.1 (17-September-2018)
+
+1. FEAT: add solver for dynamic linear economies as LQ problem [\#426](https://github.com/QuantEcon/QuantEcon.py/pull/426) ([mmcky](https://github.com/mmcky))
+1. DOC: Fix the doc of `root\_finding.py` to display nicely [\#431](https://github.com/QuantEcon/QuantEcon.py/pull/431) ([QBatista](https://github.com/QBatista))
+
 ### Ver 0.4.0 (20-August-2018)
 
 1. FEAT: Add bisection and brent's method for root finding. See PR [\#424](https://github.com/QuantEcon/QuantEcon.py/pull/424) ([spvdchachan](https://github.com/spvdchachan))
