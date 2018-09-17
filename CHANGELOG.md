@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/QuantEcon/QuantEcon.py/tree/HEAD)
 
-[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.8.1...HEAD)
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.0...HEAD)
+
+**Closed issues:**
+
+- Issue new release of QuantEcon.py [\#425](https://github.com/QuantEcon/QuantEcon.py/issues/425)
+
+**Merged pull requests:**
+
+- DOC: Fix the doc of `root\_finding.py` to display nicely [\#431](https://github.com/QuantEcon/QuantEcon.py/pull/431) ([QBatista](https://github.com/QBatista))
+- add solver for dynamic linear economies as LQ problem [\#426](https://github.com/QuantEcon/QuantEcon.py/pull/426) ([mmcky](https://github.com/mmcky))
+
+## [0.4.0](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.0) (2018-08-20)
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.8.1...0.4.0)
 
 **Implemented enhancements:**
 
@@ -22,6 +34,7 @@
 
 **Merged pull requests:**
 
+- Release of 0.4.0 [\#429](https://github.com/QuantEcon/QuantEcon.py/pull/429) ([mmcky](https://github.com/mmcky))
 - DOC: Add doc entry for root\_finding [\#428](https://github.com/QuantEcon/QuantEcon.py/pull/428) ([oyamad](https://github.com/oyamad))
 - update to new rtd requirements spec [\#427](https://github.com/QuantEcon/QuantEcon.py/pull/427) ([mmcky](https://github.com/mmcky))
 - Add `requests` to setup.py [\#420](https://github.com/QuantEcon/QuantEcon.py/pull/420) ([oyamad](https://github.com/oyamad))
