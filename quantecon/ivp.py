@@ -14,8 +14,6 @@ for computing the residual of the solution which can be used for
 assessing the overall accuracy of the approximated solution.
 
 """
-from __future__ import division
-
 import numpy as np
 from scipy import integrate, interpolate
 

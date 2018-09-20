@@ -2,8 +2,6 @@
 Tests for markov/ddp.py
 
 """
-from __future__ import division
-
 import numpy as np
 import scipy.sparse as sparse
 from numpy.testing import assert_array_equal, assert_allclose, assert_raises

@@ -4,7 +4,6 @@ Tests for lae.py
 TODO: write (economically) meaningful tests for this module
 
 """
-from __future__ import division
 from nose.tools import assert_equal
 import numpy as np
 from scipy.stats import lognorm

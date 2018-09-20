@@ -10,8 +10,6 @@ Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
 and Finance, MIT Press, 2002.
 
 """
-from __future__ import division
-
 import math
 import numpy as np
 import scipy.linalg as la

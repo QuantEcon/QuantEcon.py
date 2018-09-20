@@ -10,7 +10,6 @@ For all other tests, the MATLAB code is provided here in
 a section of comments.
 
 """
-from __future__ import division
 import os
 import unittest
 from scipy.io import loadmat

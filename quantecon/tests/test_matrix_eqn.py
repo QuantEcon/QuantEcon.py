@@ -2,7 +2,6 @@
 Tests for quantecon.util
 
 """
-from __future__ import division
 from collections import Counter
 import unittest
 import numpy as np
