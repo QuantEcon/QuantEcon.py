@@ -39,53 +39,58 @@ def AS(g, delta, tol=1e-12, max_iter=500, u=np.zeros(2)):
     best_dev_gains = _best_dev_gains(g, delta)
     C = np.empty((4, 2))
     IC = np.empty(2)
-    payoff = np.empty(2)
+    action_profile_payoff = np.empty(2)
     # array for checking if payoff is inside the polytope or not
-    payoff_pts = np.ones(3)
+    # the last entry is set to be 1
+    extended_payoff = np.ones(3)
+    # array to store new points of C in each intersection
+    # at most 4 new points will be generated
     new_pts = np.empty((4, 2))
+    # array to store the points of W
     # the length of v is limited by |A1|*|A2|*4
-    v_new = np.empty((np.prod(g.nums_actions)*4, 2))
-    v_old = np.empty((np.prod(g.nums_actions)*4, 2))
+    W_new = np.empty((np.prod(g.nums_actions)*4, 2))
+    W_old = np.empty((np.prod(g.nums_actions)*4, 2))
+    # count the new points generated in each iteration
     n_new_pt = 0
 
     # initialization
-    payoff_profile_pts = \
+    payoff_pts = \
         g.payoff_profile_array.reshape(np.prod(g.nums_actions), 2)
-    v_new[:np.prod(g.nums_actions)] = payoff_profile_pts
+    W_new[:np.prod(g.nums_actions)] = payoff_pts
     n_new_pt = np.prod(g.nums_actions)
 
     n_iter = 0
     while True:
-        v_old[:n_new_pt] = v_new[:n_new_pt]
+        W_old[:n_new_pt] = W_new[:n_new_pt]
         n_old_pt = n_new_pt
-        hull = ConvexHull(v_old[:n_old_pt])
+        hull = ConvexHull(W_old[:n_old_pt])
 
-        v_new, n_new_pt = \
-            update_v(delta, g.nums_actions, g.payoff_arrays,
-                     best_dev_gains, hull.points, hull.vertices,
-                     hull.equations, u, IC, payoff, payoff_pts,
-                     new_pts, v_new)
+        W_new, n_new_pt = \
+            R(delta, g.nums_actions, g.payoff_arrays,
+              best_dev_gains, hull.points, hull.vertices,
+              hull.equations, u, IC, action_profile_payoff,
+              extended_payoff, new_pts, W_new)
         n_iter += 1
         if n_iter >= max_iter:
             break
 
         # check convergence
         if n_new_pt == n_old_pt:
-            if np.linalg.norm(v_new[:n_new_pt] - v_old[:n_new_pt]) < tol:
+            if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
                 break
 
         # update threat points
-        update_u(u, v_new[:n_new_pt])
+        update_u(u, W_new[:n_new_pt])
 
-    hull = ConvexHull(v_new[:n_new_pt])
+    hull = ConvexHull(W_new[:n_new_pt])
 
     return hull
 
 @jit()
 def _best_dev_gains(g, delta):
     """
-    Calculate the payoff gains from deviating from the current action to
-    the best response for each player.
+    Calculate the normalized payoff gains from deviating from the current
+    action to the best response for each player.
     """
     best_dev_gains0 = (1-delta)/delta * \
         (np.max(g.payoff_arrays[0], 0) - g.payoff_arrays[0])
@@ -95,43 +100,47 @@ def _best_dev_gains(g, delta):
     return best_dev_gains0, best_dev_gains1
 
 @jit(nopython=True)
-def update_v(delta, nums_actions, payoff_arrays, best_dev_gains, points,
-             vertices, equations, u, IC, payoff, payoff_pts, new_pts,
-             v_new, tol=1e-10):
+def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
+      vertices, equations, u, IC, action_profile_payoff,
+      extended_payoff, new_pts, W_new, tol=1e-10):
     """
     Updating the payoff convex hull by iterating all action pairs.
+    Using the R operator proposed by Abreu and Sannikov 2014.
     """
     n_new_pt = 0
     for a0 in range(nums_actions[0]):
         for a1 in range(nums_actions[1]):
-            payoff[0] = payoff_arrays[0][a0, a1]
-            payoff[1] = payoff_arrays[1][a1, a0]
+            action_profile_payoff[0] = payoff_arrays[0][a0, a1]
+            action_profile_payoff[1] = payoff_arrays[1][a1, a0]
             IC[0] = u[0] + best_dev_gains[0][a0, a1]
             IC[1] = u[1] + best_dev_gains[1][a1, a0]
 
             # check if payoff is larger than IC
-            if (payoff >= IC).all():
+            if (action_profile_payoff >= IC).all():
                 # check if payoff is inside the convex hull
-                payoff_pts[:2] = payoff
-                if (np.dot(equations, payoff_pts) <= tol).all():
-                    v_new[n_new_pt] = payoff
+                extended_payoff[:2] = action_profile_payoff
+                if (np.dot(equations, extended_payoff) <= tol).all():
+                    W_new[n_new_pt] = action_profile_payoff
                     n_new_pt += 1
                     continue
 
             new_pts, n = find_C(new_pts, points, vertices, IC, tol)
 
             for i in range(n):
-                v_new[n_new_pt] = delta * new_pts[i] + (1-delta) * payoff
+                W_new[n_new_pt] = \
+                    delta * new_pts[i] + (1-delta) * action_profile_payoff
                 n_new_pt += 1
 
-    return v_new, n_new_pt
+    return W_new, n_new_pt
 
 @jit(nopython=True)
 def find_C(C, points, vertices, IC, tol):
     """
     Find all the intersection points between the current polytope
-    and the two IC constraints.
+    and the two IC constraints. It is done by iterating simplex
+    counterclockwise.
     """
+    # record the number of intersections for each IC.
     n_IC = [0, 0]
     weights = np.empty(2)
     # vertices is ordered counterclockwise
@@ -154,7 +163,7 @@ def find_C(C, points, vertices, IC, tol):
 @jit(nopython=True)
 def intersect(C, n_IC, weights, IC, pt0, pt1, tol):
     """
-    Find the intersection points of a simplex and ICs.
+    Find the intersection points of a simplex and IC constraints.
     """
     for i in range(2):
         if (abs(pt0[i] - pt1[i]) < tol):
