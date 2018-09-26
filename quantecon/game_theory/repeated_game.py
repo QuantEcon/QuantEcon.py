@@ -1,5 +1,5 @@
 """
-Algorithms for repeated game.
+Tools for repeated game.
 
 """
 
@@ -7,96 +7,116 @@ import numpy as np
 from scipy.spatial import ConvexHull
 from numba import jit, njit
 
-def AS(g, delta, tol=1e-12, max_iter=500, u=np.zeros(2)):
+class RepeatedGame:
     """
-    Using AS algorithm to compute the set of payoff pairs of all 
-    pure-strategy subgame-perfect equilibria with public randomization
-    for any repeated two-player games with perfect monitoring and
-    discounting, following Abreu and Sannikov (2014).
+    Class representing an N-player repeated game.
 
     Parameters
     ----------
-    g : NormalFormGame
-        NormalFormGame instance with 2 players.
+    stage_game : NormalFormGame
+                 The stage game used to create the repeated game.
 
     delta : scalar(float)
-        The discounting factor.
+            The common discount rate at which all players discount the future.
 
-    tol : scalar(float), optional(default=1e-12)
-        Tolerance for convergence checking.
-
-    max_iter : scalar(int), optional(default=500)
-        Maximum number of iterations.
-
-    u : ndarray(float, ndim=1)
-        The initial threat points.
-
-    Returns
-    -------
-    hull : scipy.spatial.ConvexHull
-        The convex hull of feasible payoff pairs.
     """
-    best_dev_gains = _best_dev_gains(g, delta)
-    C = np.empty((4, 2))
-    IC = np.empty(2)
-    action_profile_payoff = np.empty(2)
-    # array for checking if payoff is inside the polytope or not
-    # the last entry is set to be 1
-    extended_payoff = np.ones(3)
-    # array to store new points of C in each intersection
-    # at most 4 new points will be generated
-    new_pts = np.empty((4, 2))
-    # array to store the points of W
-    # the length of v is limited by |A1|*|A2|*4
-    W_new = np.empty((np.prod(g.nums_actions)*4, 2))
-    W_old = np.empty((np.prod(g.nums_actions)*4, 2))
-    # count the new points generated in each iteration
-    n_new_pt = 0
+    def __init__(self, stage_game, delta):
+        self.sg = stage_game
+        self.delta = delta
+        self.N = stage_game.N
+        self.nums_actions = stage_game.nums_actions
 
-    # initialization
-    payoff_pts = \
-        g.payoff_profile_array.reshape(np.prod(g.nums_actions), 2)
-    W_new[:np.prod(g.nums_actions)] = payoff_pts
-    n_new_pt = np.prod(g.nums_actions)
+    def AS(self, tol=1e-12, max_iter=500, u=np.zeros(2)):
+        """
+        Using AS algorithm to compute the set of payoff pairs of all
+        pure-strategy subgame-perfect equilibria with public randomization
+        for any repeated two-player games with perfect monitoring and
+        discounting, following Abreu and Sannikov (2014).
 
-    n_iter = 0
-    while True:
-        W_old[:n_new_pt] = W_new[:n_new_pt]
-        n_old_pt = n_new_pt
-        hull = ConvexHull(W_old[:n_old_pt])
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance with 2 players.
 
-        W_new, n_new_pt = \
-            R(delta, g.nums_actions, g.payoff_arrays,
-              best_dev_gains, hull.points, hull.vertices,
-              hull.equations, u, IC, action_profile_payoff,
-              extended_payoff, new_pts, W_new)
+        delta : scalar(float)
+            The discounting factor.
 
-        n_iter += 1
-        if n_iter >= max_iter:
-            break
+        tol : scalar(float), optional(default=1e-12)
+            Tolerance for convergence checkinsg.
 
-        # check convergence
-        if n_new_pt == n_old_pt:
-            if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
+        max_iter : scalar(int), optional(default=500)
+            Maximum number of iterations.
+
+        u : ndarray(float, ndim=1)
+            The initial threat points.
+
+        Returns
+        -------
+        hull : scipy.spatial.ConvexHull
+            The convex hull of feasible payoff pairs.
+        """
+        sg, delta = self.sg, self.delta
+        best_dev_gains = _best_dev_gains(sg, delta)
+        C = np.empty((4, 2))
+        IC = np.empty(2)
+        action_profile_payoff = np.empty(2)
+        # array for checking if payoff is inside the polytope or not
+        # the last entry is set to be 1
+        extended_payoff = np.ones(3)
+        # array to store new points of C in each intersection
+        # at most 4 new points will be generated
+        new_pts = np.empty((4, 2))
+        # array to store the points of W
+        # the length of v is limited by |A1|*|A2|*4
+        W_new = np.empty((np.prod(sg.nums_actions)*4, 2))
+        W_old = np.empty((np.prod(sg.nums_actions)*4, 2))
+        # count the new points generated in each iteration
+        n_new_pt = 0
+
+        # initialization
+        payoff_pts = \
+            sg.payoff_profile_array.reshape(np.prod(sg.nums_actions), 2)
+        W_new[:np.prod(sg.nums_actions)] = payoff_pts
+        n_new_pt = np.prod(sg.nums_actions)
+
+        n_iter = 0
+        while True:
+            W_old[:n_new_pt] = W_new[:n_new_pt]
+            n_old_pt = n_new_pt
+            hull = ConvexHull(W_old[:n_old_pt])
+
+            W_new, n_new_pt = \
+                R(delta, sg.nums_actions, sg.payoff_arrays,
+                  best_dev_gains, hull.points, hull.vertices,
+                  hull.equations, u, IC, action_profile_payoff,
+                  extended_payoff, new_pts, W_new)
+
+            n_iter += 1
+            if n_iter >= max_iter:
                 break
 
-        # update threat points
-        update_u(u, W_new[:n_new_pt])
+            # check convergence
+            if n_new_pt == n_old_pt:
+                if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
+                    break
 
-    hull = ConvexHull(W_new[:n_new_pt])
+            # update threat points
+            update_u(u, W_new[:n_new_pt])
 
-    return hull
+        hull = ConvexHull(W_new[:n_new_pt])
+
+        return hull
 
 @jit()
-def _best_dev_gains(g, delta):
+def _best_dev_gains(sg, delta):
     """
     Calculate the normalized payoff gains from deviating from the current
     action to the best response for each player.
     """
     best_dev_gains0 = (1-delta)/delta * \
-        (np.max(g.payoff_arrays[0], 0) - g.payoff_arrays[0])
+        (np.max(sg.payoff_arrays[0], 0) - sg.payoff_arrays[0])
     best_dev_gains1 = (1-delta)/delta * \
-        (np.max(g.payoff_arrays[1], 0) - g.payoff_arrays[1])
+        (np.max(sg.payoff_arrays[1], 0) - sg.payoff_arrays[1])
 
     return best_dev_gains0, best_dev_gains1
 
