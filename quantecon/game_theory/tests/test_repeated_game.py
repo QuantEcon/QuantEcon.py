@@ -24,7 +24,7 @@ class TestAS():
         # Prisoner's dilemma
         bimatrix = [[(9, 9), (1, 10)],
                     [(10, 1), (3, 3)]]
-        vertice_inds = np.array([6, 3, 0, 2])
+        vertice_inds = np.array([6, 3, 0, 1])
         d = {'g': NormalFormGame(bimatrix),
              'delta': 0.9,
              'vertices': vertice_inds,

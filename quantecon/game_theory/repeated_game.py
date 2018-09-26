@@ -5,14 +5,14 @@ Algorithms for repeated game.
 
 import numpy as np
 from scipy.spatial import ConvexHull
-from numba import jit
+from numba import jit, njit
 
 def AS(g, delta, tol=1e-12, max_iter=500, u=np.zeros(2)):
     """
-    Using AS algorithm to compute the set of payoff pairs of all pure-strategy
-    subgame-perfect equilibria with public randomization for any repeated
-    two-player games with perfect monitoring and discounting, following
-    Abreu and Sannikov (2014).
+    Using AS algorithm to compute the set of payoff pairs of all 
+    pure-strategy subgame-perfect equilibria with public randomization
+    for any repeated two-player games with perfect monitoring and
+    discounting, following Abreu and Sannikov (2014).
 
     Parameters
     ----------
@@ -70,6 +70,7 @@ def AS(g, delta, tol=1e-12, max_iter=500, u=np.zeros(2)):
               best_dev_gains, hull.points, hull.vertices,
               hull.equations, u, IC, action_profile_payoff,
               extended_payoff, new_pts, W_new)
+
         n_iter += 1
         if n_iter >= max_iter:
             break
@@ -99,7 +100,7 @@ def _best_dev_gains(g, delta):
 
     return best_dev_gains0, best_dev_gains1
 
-@jit(nopython=True)
+@njit
 def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
       vertices, equations, u, IC, action_profile_payoff,
       extended_payoff, new_pts, W_new, tol=1e-10):
@@ -124,7 +125,8 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
                     n_new_pt += 1
                     continue
 
-            new_pts, n = find_C(new_pts, points, vertices, IC, tol)
+            new_pts, n = find_C(new_pts, points, vertices, equations,
+                                extended_payoff, IC, tol)
 
             for i in range(n):
                 W_new[n_new_pt] = \
@@ -133,63 +135,68 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
 
     return W_new, n_new_pt
 
-@jit(nopython=True)
-def find_C(C, points, vertices, IC, tol):
+@njit
+def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
     """
     Find all the intersection points between the current polytope
     and the two IC constraints. It is done by iterating simplex
     counterclockwise.
     """
     # record the number of intersections for each IC.
-    n_IC = [0, 0]
+    n = 0
     weights = np.empty(2)
     # vertices is ordered counterclockwise
     for i in range(len(vertices)-1):
-        intersect(C, n_IC, weights, IC,
-                  points[vertices[i]], points[vertices[i+1]], tol)
+        n = intersect(C, n, weights, IC,
+                      points[vertices[i]],
+                      points[vertices[i+1]], tol)
 
-    intersect(C, n_IC, weights, IC,
-              points[vertices[-1]], points[vertices[0]], tol)
+    n = intersect(C, n, weights, IC,
+                  points[vertices[-1]],
+                  points[vertices[0]], tol)
 
     # check the case that IC is a interior point of the polytope
-    n = n_IC[0] + n_IC[1]
-    if (n_IC[0] == 1 & n_IC[1] == 1):
-        C[2, 0] = IC[0]
-        C[2, 1] = IC[1]
+    extended_payoff[:2] = IC
+    if (np.dot(equations, extended_payoff) <= tol).all():
+        C[n, :] = IC
         n += 1
 
     return C, n
 
-@jit(nopython=True)
-def intersect(C, n_IC, weights, IC, pt0, pt1, tol):
+@njit
+def intersect(C, n, weights, IC, pt0, pt1, tol):
     """
-    Find the intersection points of a simplex and IC constraints.
+    Find the intersection points of a half-closed simplex
+    (pt0, pt1] and IC constraints.
     """
     for i in range(2):
         if (abs(pt0[i] - pt1[i]) < tol):
-            None
+            if (abs(pt1[i] - IC[i]) < tol):
+                x = pt1[1-i]
+            else:
+                continue
         else:
             weights[i] = (pt0[i] - IC[i]) / (pt0[i] - pt1[i])
-
-            # intersection of IC[j]
+            # pt0 is not included to avoid duplication
+            # weights in (0, 1]
             if (0 < weights[i] <= 1):
                 x = (1 - weights[i]) * pt0[1-i] + weights[i] * pt1[1-i]
-                # x has to be strictly higher than IC[1-j]
-                # if it is equal, then it means IC is one of the vertex
-                # it will be added to C in below
-                if x - IC[1-i] > tol:
-                    C[n_IC[0]+n_IC[1], i] = IC[i]
-                    C[n_IC[0]+n_IC[1], 1-i] = x
-                    n_IC[i] += 1
-                elif x - IC[1-i] > -tol:
-                    C[n_IC[0]+n_IC[1], i] = IC[i]
-                    C[n_IC[0]+n_IC[1], 1-i] = x
-                    n_IC[i] += 1
-                    # to avoid duplication when IC is a vertex
-                    break
-    return C, n_IC
+            else:
+                continue
+        # x has to be strictly higher than IC[1-j]
+        # if it is equal, then it means IC is one of the vertex
+        # it will be added to C in below
+        if x - IC[1-i] > tol:
+            C[n, i] = IC[i]
+            C[n, 1-i] = x
+            n += 1
+        elif x - IC[1-i] > -tol:
+            # to avoid duplication when IC is a vertex
+            break
 
-@jit(nopython=True)
+    return n
+
+@njit
 def update_u(u, v):
     """
     Update the threat points.
