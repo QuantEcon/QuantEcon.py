@@ -4,7 +4,7 @@ Implements inequality and segregation measures such as Gini, Lorenz Curve
 """
 
 import numpy as np
-from numba import njit, prange, jitclass, float64, int64
+from numba import njit, prange
 
 
 @njit
@@ -56,16 +56,8 @@ def lorenz_curve(y):
     return cum_people, cum_income
 
 
-
-# Gini
-
-spec = [
-    ('n', int64),
-    ('y', float64[:])
-]
-
-@jitclass(spec)
-class Gini(object):
+@njit(parallel=True)
+def gini_coefficient(y):
     r"""
     Implements the Gini inequality index
 
@@ -74,11 +66,9 @@ class Gini(object):
     y : array_like(float)
         Array of income/wealth for each individual. Ordered or unordered is fine
 
-    Attributes
-    ----------
-    y : as above
-    n : scalar(int)
-        length of array y
+    Returns
+    -------
+
 
 
     References
@@ -86,19 +76,11 @@ class Gini(object):
 
     https://en.wikipedia.org/wiki/Gini_coefficient
     """
+    n = len(y)
+    i_sum = np.zeros(n)
+    for i in prange(n):
+        for j in range(n):
+            i_sum[i] += abs(y[i] - y[j])
+    return np.sum(i_sum) / (2 * n * np.sum(y))
 
-    def __init__(self, y):
-        self.y = y
-        self.n = len(y)
-
-    def gini_coeff(self):
-        i_sum = np.zeros(self.n)
-        for i in prange(self.n):  # prange
-            for j in range(self.n):
-                i_sum[i] += abs(self.y[i] - self.y[j])
-        return np.sum(i_sum) / (2 * self.n * np.sum(self.y))
-
-    def gini_decomposition(self):
-        # TODO
-        pass
 
