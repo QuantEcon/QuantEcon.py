@@ -39,9 +39,8 @@ class Kalman:
     ss : instance of LinearStateSpace
         An instance of the quantecon.lss.LinearStateSpace class
     x_hat : scalar(float) or array_like(float), optional(default=None)
-        An n x 1 array representing the mean x_hat and covariance
-        matrix Sigma of the prior/predictive density.  Set to zero if
-        not supplied.
+        An n x 1 array representing the mean x_hat of the
+        prior/predictive density.  Set to zero if not supplied.
     Sigma : scalar(float) or array_like(float), optional(default=None)
         An n x n array representing the covariance matrix Sigma of
         the prior/predictive density.  Must be positive definite.
