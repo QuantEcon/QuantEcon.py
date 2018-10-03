@@ -104,7 +104,6 @@ M. L. Puterman, Markov Decision Processes: Discrete Stochastic Dynamic
 Programming, Wiley-Interscience, 2005.
 
 """
-from __future__ import division
 import warnings
 import numpy as np
 import scipy.sparse as sp

@@ -7,8 +7,6 @@ Functions
     mc_sample_path          [Status: Tested in test_mc_sample_path]
 
 """
-from __future__ import division
-
 import numpy as np
 from scipy import sparse
 import itertools

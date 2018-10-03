@@ -9,7 +9,6 @@ https://www.math.ucdavis.edu/~hunter/book/ch3.pdf
 TODO: add multivariate case
 
 """
-from __future__ import division
 import unittest
 import numpy as np
 from nose.tools import ok_, raises

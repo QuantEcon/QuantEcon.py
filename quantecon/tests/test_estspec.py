@@ -4,7 +4,6 @@ Tests for estspec.py
 TODO: write tests that check accuracy of returns
 
 """
-from __future__ import division
 import unittest
 import numpy as np
 from quantecon import smooth, periodogram, ar_periodogram

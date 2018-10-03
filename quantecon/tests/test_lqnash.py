@@ -2,7 +2,6 @@
 Tests for lqnash.py
 
 """
-from __future__ import division
 import sys
 import os
 import unittest

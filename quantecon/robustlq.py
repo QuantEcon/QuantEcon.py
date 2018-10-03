@@ -2,7 +2,6 @@
 Solves robust LQ control problems.
 
 """
-from __future__ import division  # Remove for Python 3.sx
 from textwrap import dedent
 import numpy as np
 from .lqcontrol import LQ

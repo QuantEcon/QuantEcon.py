@@ -2,8 +2,6 @@
 Tests for gth_solve.py
 
 """
-from __future__ import division
-
 import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import eq_, ok_, raises

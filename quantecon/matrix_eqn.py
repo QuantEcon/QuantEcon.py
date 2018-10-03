@@ -9,7 +9,6 @@ TODO: 1. See issue 47 on github repository, should add support for
       Sylvester equations
       2. Fix warnings from checking conditioning of matrices
 """
-from __future__ import division
 import numpy as np
 from numpy import dot
 from numpy.linalg import solve
