@@ -35,11 +35,8 @@ class RepeatedGame:
 
         Parameters
         ----------
-        g : NormalFormGame
-            NormalFormGame instance with 2 players.
-
-        delta : scalar(float)
-            The discounting factor.
+        rpd : RepeatedGame
+            Two player repeated game.
 
         tol : scalar(float), optional(default=1e-12)
             Tolerance for convergence checkinsg.
@@ -47,7 +44,7 @@ class RepeatedGame:
         max_iter : scalar(int), optional(default=500)
             Maximum number of iterations.
 
-        u : ndarray(float, ndim=1)
+        u : ndarray(float, ndim=1), optional(default=np.zeros(2))
             The initial threat points.
 
         Returns
@@ -112,6 +109,28 @@ def _best_dev_gains(sg, delta):
     """
     Calculate the normalized payoff gains from deviating from the current
     action to the best response for each player.
+
+    Parameters
+    ----------
+    sg : NormalFormGame
+        The stage game.
+
+    delta : scalar(float)
+        The common discount rate at which all players discount the future.
+
+    Returns
+    -------
+    best_dev_gains0 : ndarray(float, ndim=2)
+        The normalized best deviation payoff gain arrays.
+        best_dev_gains[0][a0, a1] is normalized payoff gain
+        player 0 can get if originally players are choosing
+        a0 and a1, and player 0 deviates to the best response action.
+
+    best_dev_gains1 : ndarray(float, ndim=2)
+        The normalized best deviation payoff gain arrays.
+        best_dev_gains[1][a0, a1] is normalized payoff gain
+        player 1 can get if originally players are choosing
+        a0 and a1, and player 1 deviates to the best response action.
     """
     best_dev_gains0 = (1-delta)/delta * \
         (np.max(sg.payoff_arrays[0], 0) - sg.payoff_arrays[0])
@@ -127,6 +146,70 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
     """
     Updating the payoff convex hull by iterating all action pairs.
     Using the R operator proposed by Abreu and Sannikov 2014.
+
+    Parameters
+    ----------
+    delta : scalar(float)
+            The common discount rate at which all players discount
+            the future.
+
+    nums_actions : tuple(int)
+        Tuple of the numbers of actions, one for each player.
+
+    payoff_arrays : tuple(ndarray(float, ndim=2))
+        Tuple of the payoff arrays, one for each player.
+
+    best_dev_gains : tuple(ndarray(float, ndim=2))
+        Tuple of the normalized best deviation payoff gain arrays.
+        best_dev_gains[i][a0, a1] is payoff gain player i
+        can get if originally players are choosing a0 and a1,
+        and player i deviates to the best response action.
+
+    points : ndarray(float, ndim=2)
+        Coordinates of the points in the W, which construct a
+        feasible payoff convex hull.
+
+    vertices : ndarray(float, ndim=1)
+        Indices of points forming the vertices of the convex hull,
+        which are in counterclockwise order.
+
+    equations : ndarray(float, ndim=2)
+        [normal, offset] forming the hyperplane equation of the facet
+
+    u : ndarray(float, ndim=1)
+        The threat points.
+
+    IC : ndarray(float, ndim=1)
+        The minimum IC continuation values.
+
+    action_profile_payoff : ndarray(float, ndim=1)
+        Array of payoff for one action profile.
+
+    extended_payoff : ndarray(float, ndim=2)
+        The array [payoff0, payoff1, 1] for checking if
+        [payoff0, payoff1] is in the feasible payoff convex hull.
+
+    new_pts : ndarray(float, ndim=1)
+        The 4 by 2 array for storing the generated potential
+        extreme points of one action profile. One action profile
+        can only generate at most 4 points.
+
+    W_new : ndarray(float, ndim=2)
+        Array for storing the coordinates of the generated potential
+        extreme points that construct a new feasible payoff convex hull.
+
+    tol: scalar(float), optional(default=1e-10)
+        The tolerance for checking if two values are equal.
+
+    Returns
+    -------
+    W_new : ndarray(float, ndim=2)
+        The coordinates of the generated potential extreme points
+        that construct a new feasible payoff convex hull.
+
+    n_new_pt : scalar(int)
+        The number of points in W_new that construct the feasible
+        payoff convex hull.
     """
     n_new_pt = 0
     for a0 in range(nums_actions[0]):
@@ -161,6 +244,42 @@ def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
     Find all the intersection points between the current polytope
     and the two IC constraints. It is done by iterating simplex
     counterclockwise.
+
+    Parameters
+    ----------
+    C : ndarray(float, ndim=2)
+        The 4 by 2 array for storing the generated potential
+        extreme points of one action profile. One action profile
+        can only generate at most 4 points.
+
+    points : ndarray(float, ndim=2)
+        Coordinates of the points in the W, which construct a
+        feasible payoff convex hull.
+
+    vertices : ndarray(float, ndim=1)
+        Indices of points forming the vertices of the convex hull,
+        which are in counterclockwise order.
+
+    equations : ndarray(float, ndim=2)
+        [normal, offset] forming the hyperplane equation of the facet
+
+    extended_payoff : ndarray(float, ndim=1)
+        The array [payoff0, payoff1, 1] for checking if
+        [payoff0, payoff1] is in the feasible payoff convex hull.
+
+    IC : ndarray(float, ndim=1)
+        The minimum IC continuation values.
+
+    tol : scalar(float)
+        The tolerance for checking if two values are equal.
+
+    Returns
+    -------
+    C : ndarray(float, ndim=2)
+        The generated potential extreme points.
+
+    n : scalar(int)
+        The number of found intersection points.
     """
     # record the number of intersections for each IC.
     n = 0
@@ -188,6 +307,37 @@ def intersect(C, n, weights, IC, pt0, pt1, tol):
     """
     Find the intersection points of a half-closed simplex
     (pt0, pt1] and IC constraints.
+
+    Parameters
+    ----------
+    C : ndarray(float, ndim=2)
+        The 4 by 2 array for storing the generated points of
+        one action profile. One action profile can only
+        generate at most 4 points.
+
+    n : scalar(int)
+        The number of intersection points that have been found.
+
+    weights : ndarray(float, ndim=1)
+        The size 2 array for storing the weights when calculate
+        the intersection point of simplex and IC constraints.
+
+    IC : ndarray(float, ndim=1)
+        The minimum IC continuation values.
+
+    pt0 : ndarray(float, ndim=1)
+        Coordinates of the starting point of the simplex.
+
+    pt1 : ndarray(float, ndim=1)
+        Coordinates of the ending point of the simplex.
+
+    tol : scalar(float)
+        The tolerance for checking if two values are equal.
+
+    Returns
+    -------
+    n : scalar(int)
+        The updated number of found intersection points.
     """
     for i in range(2):
         if (abs(pt0[i] - pt1[i]) < tol):
@@ -217,13 +367,27 @@ def intersect(C, n, weights, IC, pt0, pt1, tol):
     return n
 
 @njit
-def update_u(u, v):
+def update_u(u, W):
     """
-    Update the threat points.
+    Update the threat points if it not feasible in the new W,
+    by the minimum of new feasible payoffs.
+
+    Parameters
+    ----------
+    u : ndarray(float, ndim=1)
+        The threat points.
+
+    W : ndarray(float, ndim=1)
+        The points that construct the feasible payoff convex hull.
+
+    Returns
+    -------
+    u : ndarray(float, ndim=1)
+        The updated threat points.
     """
     for i in range(2):
-        v_min = v[:, i].min()
-        if u[i] < v_min:
-            u[i] = v_min
+        W_min = W[:, i].min()
+        if u[i] < W_min:
+            u[i] = W_min
 
     return u
