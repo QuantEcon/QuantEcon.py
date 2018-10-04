@@ -92,15 +92,31 @@ class Kalman:
         return dedent(m.format(n=self.ss.n, k=self.ss.k))
 
     @property
-    def Sigma_infinity(self):
+    def Sigma_infinity(self,method='doubling'):
+        """
+        Parameters
+        ----------
+        method : str, optional(default="doubling")
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
+
+        """
         if self._Sigma_infinity is None:
-            self.stationary_values()
+            self.stationary_values(method=method)
         return self._Sigma_infinity
 
     @property
-    def K_infinity(self):
+    def K_infinity(self,method='doubling'):
+        """
+        Parameters
+        ----------
+        method : str, optional(default="doubling")
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
+
+        """
         if self._K_infinity is None:
-            self.stationary_values()
+            self.stationary_values(method=method)
         return self._K_infinity
 
     def whitener_lss(self):
@@ -240,12 +256,18 @@ class Kalman:
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
 
-    def stationary_values(self):
+    def stationary_values(self,method='doubling'):
         """
         Computes the limit of :math:`\Sigma_t` as t goes to infinity by
         solving the associated Riccati equation. Computation is via the
-        doubling algorithm (see the documentation in
-        `matrix_eqn.solve_discrete_riccati`).
+        doubling algorithm or a QZ decomposition method (see the documentation
+        in `matrix_eqn.solve_discrete_riccati`).
+
+        Parameters
+        ----------
+        method : str, optional(default="doubling")
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
 
         Returns
         -------
@@ -261,7 +283,7 @@ class Kalman:
         Q, R = np.dot(C, C.T), np.dot(H, H.T)
 
         # === solve Riccati equation, obtain Kalman gain === #
-        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R)
+        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R, method=method)
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)
