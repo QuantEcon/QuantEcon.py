@@ -98,7 +98,7 @@ class Kalman:
         return self._Sigma_infinity
 
     @property
-    def K_infinity(self,method='doubling'):
+    def K_infinity(self):
         if self._K_infinity is None:
             self.stationary_values()
         return self._K_infinity
