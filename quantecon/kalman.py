@@ -92,31 +92,15 @@ class Kalman:
         return dedent(m.format(n=self.ss.n, k=self.ss.k))
 
     @property
-    def Sigma_infinity(self,method='doubling'):
-        """
-        Parameters
-        ----------
-        method : str, optional(default="doubling")
-            Solution method used in solving the associated Riccati
-            equation, str in {'doubling', 'qz'}.
-
-        """
+    def Sigma_infinity(self):
         if self._Sigma_infinity is None:
-            self.stationary_values(method=method)
+            self.stationary_values()
         return self._Sigma_infinity
 
     @property
     def K_infinity(self,method='doubling'):
-        """
-        Parameters
-        ----------
-        method : str, optional(default="doubling")
-            Solution method used in solving the associated Riccati
-            equation, str in {'doubling', 'qz'}.
-
-        """
         if self._K_infinity is None:
-            self.stationary_values(method=method)
+            self.stationary_values()
         return self._K_infinity
 
     def whitener_lss(self):
@@ -259,9 +243,10 @@ class Kalman:
     def stationary_values(self,method='doubling'):
         """
         Computes the limit of :math:`\Sigma_t` as t goes to infinity by
-        solving the associated Riccati equation. Computation is via the
-        doubling algorithm or a QZ decomposition method (see the documentation
-        in `matrix_eqn.solve_discrete_riccati`).
+        solving the associated Riccati equation. The outputs are stored in the
+        attributes `K_infinity` and `Sigma_infinity`. Computation is via the
+        doubling algorithm (default) or a QZ decomposition method (see the
+        documentation in `matrix_eqn.solve_discrete_riccati`).
 
         Parameters
         ----------
