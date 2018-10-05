@@ -240,7 +240,7 @@ class Kalman:
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
 
-    def stationary_values(self,method='doubling'):
+    def stationary_values(self, method='doubling'):
         """
         Computes the limit of :math:`\Sigma_t` as t goes to infinity by
         solving the associated Riccati equation. The outputs are stored in the
