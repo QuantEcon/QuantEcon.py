@@ -37,7 +37,7 @@ def test_lorenz_curve():
 
 def test_gini_coeff():
     """
-    Tests how the `Gini` object calculates the Gini coefficient
+    Tests how the funciton `gini_coefficient` calculates the Gini coefficient
     with the Pareto and the Weibull distribution.
 
     Analytically, we know that Pareto with parameter `a` has

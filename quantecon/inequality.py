@@ -68,8 +68,8 @@ def gini_coefficient(y):
 
     Returns
     -------
-
-
+    Gini index: float
+        The gini index describing the inequality of the array of income/wealth
 
     References
     ----------
