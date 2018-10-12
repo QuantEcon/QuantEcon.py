@@ -45,7 +45,7 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
         def f(x):
             return -(x + 2.0)**2 + 1.0
 
-        xf, fval, info = maximize_scalar(f, -2, 2)
+        xf, fval, info = brent_max(f, -2, 2)
     ```
 
     """
