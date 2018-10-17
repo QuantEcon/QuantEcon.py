@@ -10,7 +10,7 @@ from collections import namedtuple
 results = namedtuple('results', 'x fun success nit final_simplex')
 
 
-#@njit
+@njit
 def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
              tol_x=1e-10, max_iter=1000):
     """
@@ -107,7 +107,7 @@ def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     return results
 
 
-#@njit
+@njit
 def nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
                           args=(), ρ=1., χ=2., γ=0.5, σ=0.5, tol_f=1e-8,
                           tol_x=1e-8, max_iter=1000):
@@ -274,7 +274,7 @@ def nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
                    vertices)
 
 
-#@njit
+@njit
 def _initialize_simplex(x0, bounds):
     """
     Generates an initial simplex for the Nelder-Mead method.
@@ -314,7 +314,7 @@ def _initialize_simplex(x0, bounds):
     return vertices
 
 
-#@njit
+@njit
 def _check_params(ρ, χ, γ, σ, bounds, n):
     """
     Checks whether the parameters for the Nelder-Mead algorithm are valid.
@@ -357,7 +357,7 @@ def _check_params(ρ, χ, γ, σ, bounds, n):
         raise ValueError("Lower bounds must be greater than upper bounds.")
 
 
-#@njit
+@njit
 def _check_bounds(x, bounds):
     """
     Checks whether `x` is within `bounds`.
@@ -383,7 +383,7 @@ def _check_bounds(x, bounds):
                 (x <= np.atleast_2d(bounds)[:, 1]).all())
 
 
-#@njit
+@njit
 def _neg_bounded_fun(fun, bounds, x, args=()):
     """
     Wrapper for bounding and taking the negative of `fun` for the
