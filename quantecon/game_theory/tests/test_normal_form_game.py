@@ -24,6 +24,18 @@ class TestPlayer_1opponent:
         coordination_game_matrix = [[4, 0], [3, 2]]
         self.player = Player(coordination_game_matrix)
 
+    def test_delete_action(self):
+        N = self.player.num_opponents + 1
+        action_to_delete = 0
+        actions_to_remain = \
+            np.setdiff1d(np.arange(self.player.num_actions), action_to_delete)
+        for i in range(N):
+            player_new = self.player.delete_action(action_to_delete, i)
+            assert_array_equal(
+                player_new.payoff_array,
+                self.player.payoff_array.take(actions_to_remain, axis=i)
+            )
+
     def test_best_response_against_pure(self):
         eq_(self.player.best_response(1), 1)
 
@@ -88,6 +100,18 @@ class TestPlayer_2opponents:
                               [[1, 0],
                                [5, 7]]]
         self.player = Player(payoffs_2opponents)
+
+    def test_delete_action(self):
+        N = self.player.num_opponents + 1
+        action_to_delete = 0
+        actions_to_remain = \
+            np.setdiff1d(np.arange(self.player.num_actions), action_to_delete)
+        for i in range(N):
+            player_new = self.player.delete_action(action_to_delete, i)
+            assert_array_equal(
+                player_new.payoff_array,
+                self.player.payoff_array.take(actions_to_remain, axis=i)
+            )
 
     def test_payoff_vector_against_pure(self):
         assert_array_equal(self.player.payoff_vector((0, 1)), [6, 0])
@@ -305,6 +329,18 @@ class TestPlayer_0opponents:
         self.player = Player(self.payoffs)
         self.best_response_action = 1
         self.dominated_actions = [0, 2]
+
+    def test_delete_action(self):
+        N = self.player.num_opponents + 1
+        actions_to_delete = [0, 2]
+        actions_to_remain = \
+            np.setdiff1d(np.arange(self.player.num_actions), actions_to_delete)
+        for i in range(N):
+            player_new = self.player.delete_action(actions_to_delete, i)
+            assert_array_equal(
+                player_new.payoff_array,
+                self.player.payoff_array.take(actions_to_remain, axis=i)
+            )
 
     def test_payoff_vector(self):
         """Trivial player: payoff_vector"""
