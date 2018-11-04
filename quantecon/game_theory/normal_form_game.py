@@ -420,6 +420,8 @@ class Player:
         ind[action] = False
         D = payoff_array[ind]
         D -= payoff_array[action]
+        if D.shape[0] == 0:  # num_actions == 1
+            return False
         if self.num_opponents >= 2:
             D.shape = (D.shape[0], np.prod(D.shape[1:]))
 

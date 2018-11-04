@@ -376,6 +376,24 @@ def test_normalformgame_setitem_1p():
     eq_(g.players[0].payoff_array[0], 10)
 
 
+# Trivial cases with one action #
+
+class TestPlayer_1action:
+    def setUp(self):
+        """Setup a Player instance"""
+        self.payoffs = [[0, 1]]
+        self.player = Player(self.payoffs)
+
+    def test_is_dominated(self):
+        for action in range(self.player.num_actions):
+            for method in LP_METHODS:
+                eq_(self.player.is_dominated(action, method=method), False)
+
+    def test_dominated_actions(self):
+        for method in LP_METHODS:
+            eq_(self.player.dominated_actions(method=method), [])
+
+
 # Test __repr__ #
 
 def test_player_repr():
