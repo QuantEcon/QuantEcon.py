@@ -209,6 +209,17 @@ class TestNormalFormGame_Asym2p:
         assert_array_equal(self.g[action_profile],
                            self.BoS_bimatrix[action_profile])
 
+    def test_delete_action(self):
+        action_to_delete = 0
+        for i, player in enumerate(self.g.players):
+            g_new = self.g.delete_action(i, action_to_delete)
+            actions_to_remain = \
+                np.setdiff1d(np.arange(player.num_actions), action_to_delete)
+            assert_array_equal(
+                g_new.payoff_profile_array,
+                self.g.payoff_profile_array.take(actions_to_remain, axis=i)
+            )
+
     def test_is_nash_pure(self):
         ok_(not self.g.is_nash((1, 0)))
 
@@ -238,6 +249,17 @@ class TestNormalFormGame_3p:
 
     def test_getitem(self):
         assert_array_equal(self.g[0, 0, 1], [6, 4, 1])
+
+    def test_delete_action(self):
+        action_to_delete = 0
+        for i, player in enumerate(self.g.players):
+            g_new = self.g.delete_action(i, action_to_delete)
+            actions_to_remain = \
+                np.setdiff1d(np.arange(player.num_actions), action_to_delete)
+            assert_array_equal(
+                g_new.payoff_profile_array,
+                self.g.payoff_profile_array.take(actions_to_remain, axis=i)
+            )
 
     def test_is_nash_pure(self):
         ok_(self.g.is_nash((0, 0, 0)))
@@ -381,6 +403,17 @@ class TestNormalFormGame_1p:
     def test_getitem(self):
         """Trivial game: __getitem__"""
         eq_(self.g[0], 0)
+
+    def test_delete_action(self):
+        actions_to_delete = [1, 2]
+        for i, player in enumerate(self.g.players):
+            g_new = self.g.delete_action(i, actions_to_delete)
+            actions_to_remain = \
+                np.setdiff1d(np.arange(player.num_actions), actions_to_delete)
+            assert_array_equal(
+                g_new.payoff_profile_array,
+                self.g.payoff_profile_array.take(actions_to_remain, axis=i)
+            )
 
     def test_is_nash_pure(self):
         """Trivial game: is_nash with pure action"""

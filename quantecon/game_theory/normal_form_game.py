@@ -727,6 +727,64 @@ class NormalFormGame:
                 tuple(action_profile[i:]) + tuple(action_profile[:i])
             ] = payoff_profile[i]
 
+    def delete_action(self, player_idx, action):
+        """
+        Return a new `NormalFormGame` instance with the action(s)
+        specified by `action` deleted from the action set of the player
+        specified by `player_idx`. Deletion is not performed in place.
+
+        Parameters
+        ----------
+        player_idx : scalar(int)
+            Index of the player to delete action(s) for.
+
+        action : scalar(int) or array_like(int)
+            Integer or array like of integers representing the action(s)
+            to be deleted.
+
+        Returns
+        -------
+        NormalFormGame
+            Copy of `self` with the action(s) deleted as specified.
+
+        Examples
+        --------
+        >>> g = NormalFormGame(
+        ...     [[(3, 0), (0, 1)], [(0, 0), (3, 1)], [(1, 1), (1, 0)]]
+        ... )
+        >>> print(g)
+        2-player NormalFormGame with payoff profile array:
+        [[[3, 0],  [0, 1]],
+         [[0, 0],  [3, 1]],
+         [[1, 1],  [1, 0]]]
+
+        Delete player `0`'s action `2` from `g`:
+
+        >>> g1 = g.delete_action(0, 2)
+        >>> print(g1)
+        2-player NormalFormGame with payoff profile array:
+        [[[3, 0],  [0, 1]],
+         [[0, 0],  [3, 1]]]
+
+        Then delete player `1`'s action `0` from `g1`:
+
+        >>> g2 = g1.delete_action(1, 0)
+        >>> print(g2)
+        2-player NormalFormGame with payoff profile array:
+        [[[0, 1]],
+         [[3, 1]]]
+
+        """
+        # Allow negative indexing
+        if -self.N <= player_idx < 0:
+            player_idx = player_idx + self.N
+
+        players_new = tuple(
+            player.delete_action(action, player_idx-i)
+            for i, player in enumerate(self.players)
+        )
+        return NormalFormGame(players_new)
+
     def is_nash(self, action_profile, tol=None):
         """
         Return True if `action_profile` is a Nash equilibrium.
