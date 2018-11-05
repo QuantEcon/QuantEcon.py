@@ -26,7 +26,7 @@ class RepeatedGame:
         self.N = stage_game.N
         self.nums_actions = stage_game.nums_actions
 
-    def AS(self, tol=1e-12, max_iter=500, u=np.zeros(2)):
+    def AS(self, tol=1e-12, max_iter=500, u_init=np.zeros(2)):
         """
         Using AS algorithm to compute the set of payoff pairs of all
         pure-strategy subgame-perfect equilibria with public randomization
@@ -44,7 +44,7 @@ class RepeatedGame:
         max_iter : scalar(int), optional(default=500)
             Maximum number of iterations.
 
-        u : ndarray(float, ndim=1), optional(default=np.zeros(2))
+        u_init : ndarray(float, ndim=1), optional(default=np.zeros(2))
             The initial threat points.
 
         Returns
@@ -69,6 +69,9 @@ class RepeatedGame:
         W_old = np.empty((np.prod(sg.nums_actions)*4, 2))
         # count the new points generated in each iteration
         n_new_pt = 0
+
+        # copy the threat points
+        u = np.copy(u_init)
 
         # initialization
         payoff_pts = \
