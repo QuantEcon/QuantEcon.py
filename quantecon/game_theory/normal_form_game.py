@@ -168,6 +168,8 @@ class Player:
 
         if self.payoff_array.ndim == 0:
             raise ValueError('payoff_array must be an array_like')
+        if np.prod(self.payoff_array.shape) == 0:
+            raise ValueError('every player must have at least one action')
 
         self.num_opponents = self.payoff_array.ndim - 1
         self.num_actions = self.payoff_array.shape[0]
@@ -418,6 +420,8 @@ class Player:
         ind[action] = False
         D = payoff_array[ind]
         D -= payoff_array[action]
+        if D.shape[0] == 0:  # num_actions == 1
+            return False
         if self.num_opponents >= 2:
             D.shape = (D.shape[0], np.prod(D.shape[1:]))
 
