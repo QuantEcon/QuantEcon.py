@@ -8,7 +8,8 @@ from numba import njit
 from numpy.testing import assert_allclose
 from nose.tools import raises
 
-from quantecon.optimize import maximize, nelder_mead_algorithm
+from quantecon.optimize import nelder_mead
+from ..nelder_mead import _nelder_mead_algorithm
 
 
 @njit
@@ -38,7 +39,7 @@ def mccormick(x):
 def bohachevsky(x):
     # https://www.sfu.ca/~ssurjano/boha.html
     f = x[0] ** 2 + x[1] ** 2 - 0.3 * np.cos(3 * np.pi * x[0]) - \
-        0.4 * np.cos(4 * np.pi * x[1]) +0.7
+        0.4 * np.cos(4 * np.pi * x[1]) + 0.7
     return -f
 
 
@@ -98,7 +99,7 @@ def colville(x):
     # https://www.sfu.ca/~ssurjano/colville.html
     f = 100 * (x[0] ** 2 - x[1]) ** 2 + (x[0] - 1) ** 2 + (x[2] - 1) ** 2 + \
         90 * (x[2] ** 2 - x[3]) ** 2 + 10.1 * \
-        ((x[1] - 1)** 2 + (x[3] - 1) ** 2)  + 19.8 * (x[1] - 1) * (x[3] - 1)
+        ((x[1] - 1) ** 2 + (x[3] - 1) ** 2) + 19.8 * (x[1] - 1) * (x[3] - 1)
     return -f
 
 
@@ -122,6 +123,7 @@ def goldstein_price(x):
 
     f = (1 + p1 * p2) * (30 + p3 * p4)
     return -f
+
 
 @njit
 def sum_squared(x):
@@ -153,7 +155,7 @@ class TestMaximization():
 
         x0 = np.array([-2, 1])
 
-        results = maximize(rosenbrock, x0, tol_x=1e-20, tol_f=1e-20)
+        results = nelder_mead(rosenbrock, x0, tol_x=1e-20, tol_f=1e-20)
 
         assert_allclose(results.x, sol, atol=1e-4)
         assert_allclose(results.fun, fun, atol=1e-4)
@@ -164,7 +166,7 @@ class TestMaximization():
 
         x0 = np.array([3., -1., 0., 1.])
 
-        results = maximize(powell, x0, tol_x=1e-20, tol_f=1e-20)
+        results = nelder_mead(powell, x0, tol_x=1e-20, tol_f=1e-20)
 
         assert_allclose(results.x, sol, atol=1e-4)
         assert_allclose(results.fun, fun, atol=1e-4)
@@ -177,7 +179,7 @@ class TestMaximization():
         bounds = np.array([[-1.5, 4.],
                            [-3., 4.]])
 
-        results = maximize(mccormick, x0, bounds=bounds)
+        results = nelder_mead(mccormick, x0, bounds=bounds)
 
         assert_allclose(results.x, sol, rtol=1e-3)
         assert_allclose(results.fun, fun, rtol=1e-3)
@@ -189,7 +191,7 @@ class TestMaximization():
         # Starting point makes significant difference
         x0 = np.array([np.pi, -np.pi])
 
-        results = maximize(bohachevsky, x0)
+        results = nelder_mead(bohachevsky, x0)
 
         assert_allclose(results.x, sol, atol=1e-4)
         assert_allclose(results.fun, fun, atol=1e-4)
@@ -200,7 +202,7 @@ class TestMaximization():
 
         x0 = np.array([5, -1])
 
-        results = maximize(easom, x0, tol_x=1e-20, tol_f=1e-20)
+        results = nelder_mead(easom, x0, tol_x=1e-20, tol_f=1e-20)
 
         assert_allclose(results.x, sol, atol=1e-4)
         assert_allclose(results.fun, fun, atol=1e-4)
@@ -213,8 +215,8 @@ class TestMaximization():
         sol = np.array([1 / d for d in range(1, int(d)+1)])
         fun = 0.
 
-        results = maximize(perm_function, x0, bounds=bounds, args=(1., ),
-                           tol_x=1e-30, tol_f=1e-30)
+        results = nelder_mead(perm_function, x0, bounds=bounds, args=(1., ),
+                              tol_x=1e-30, tol_f=1e-30)
 
         assert_allclose(results.x, sol, atol=1e-7)
         assert_allclose(results.fun, fun, atol=1e-7)
@@ -227,8 +229,8 @@ class TestMaximization():
         sol = np.zeros(d)
         fun = 0.
 
-        results = maximize(rotated_hyper_ellipsoid, x0, bounds=bounds,
-                           tol_x=1e-30, tol_f=1e-30)
+        results = nelder_mead(rotated_hyper_ellipsoid, x0, bounds=bounds,
+                              tol_x=1e-30, tol_f=1e-30)
 
         assert_allclose(results.x, sol, atol=1e-7)
         assert_allclose(results.fun, fun, atol=1e-7)
@@ -239,7 +241,7 @@ class TestMaximization():
         sol = np.array([1., 3.])
         fun = 0.
 
-        results = maximize(booth, x0, tol_x=1e-20, tol_f=1e-20)
+        results = nelder_mead(booth, x0, tol_x=1e-20, tol_f=1e-20)
 
         assert_allclose(results.x, sol, atol=1e-7)
         assert_allclose(results.fun, fun, atol=1e-7)
@@ -251,8 +253,8 @@ class TestMaximization():
         sol = np.zeros(5)
         fun = 0.
 
-        results = maximize(zakharov, x0, bounds=bounds, tol_f=1e-30,
-                           tol_x=1e-30)
+        results = nelder_mead(zakharov, x0, bounds=bounds, tol_f=1e-30,
+                              tol_x=1e-30)
 
         assert_allclose(results.x, sol, atol=1e-7)
         assert_allclose(results.fun, fun, atol=1e-7)
@@ -264,8 +266,8 @@ class TestMaximization():
         sol = np.ones(4)
         fun = 0.
 
-        results = maximize(colville, x0, bounds=bounds, tol_f=1e-35,
-                           tol_x=1e-35)
+        results = nelder_mead(colville, x0, bounds=bounds, tol_f=1e-35,
+                              tol_x=1e-35)
 
         assert_allclose(results.x, sol)
         assert_allclose(results.fun, fun, atol=1e-7)
@@ -278,8 +280,8 @@ class TestMaximization():
         sol = np.array([-2.903534] * d)
         fun = 39.16599 * d
 
-        results = maximize(styblinski_tang, x0, bounds=bounds, tol_f=1e-35,
-                           tol_x=1e-35)
+        results = nelder_mead(styblinski_tang, x0, bounds=bounds, tol_f=1e-35,
+                              tol_x=1e-35)
 
         assert_allclose(results.x, sol, rtol=1e-4)
         assert_allclose(results.fun, fun, rtol=1e-5)
@@ -289,7 +291,7 @@ class TestMaximization():
         bounds = np.array([[-2., 2.],
                            [-2., 2.]])
 
-        results = maximize(goldstein_price, x0)
+        results = nelder_mead(goldstein_price, x0)
 
         sol = np.array([0., -1.])
         fun = -3.
@@ -303,10 +305,9 @@ class TestMaximization():
         sol = np.zeros(3)
         fun = 0.
 
-        results = maximize(sum_squared, x0, tol_f=1e-50, tol_x=1e-50)
+        results = nelder_mead(sum_squared, x0, tol_f=1e-50, tol_x=1e-50)
         assert_allclose(results.x, sol, atol=1e-5)
         assert_allclose(results.fun, fun, atol=1e-5)
-
 
     def test_corner_sol(self):
         sol = np.array([0.])
@@ -315,7 +316,7 @@ class TestMaximization():
         x0 = np.array([10.])
         bounds = np.array([[0., np.inf]])
 
-        results = maximize(f, x0, bounds=bounds, tol_f=1e-20)
+        results = nelder_mead(f, x0, bounds=bounds, tol_f=1e-20)
 
         assert_allclose(results.x, sol)
         assert_allclose(results.fun, fun)
@@ -326,7 +327,7 @@ class TestMaximization():
 
         x0 = np.array([-10.])
 
-        results = maximize(g, x0)
+        results = nelder_mead(g, x0)
 
         assert_allclose(results.x, sol)
         assert_allclose(results.fun, fun)
@@ -335,11 +336,11 @@ class TestMaximization():
 @raises(ValueError)
 def test_invalid_bounds_1():
     vertices = np.array([[-2., 1.],
-                              [1.05 * -2., 1.],
-                              [-2., 1.05 * 1.]])
+                         [1.05 * -2., 1.],
+                         [-2., 1.05 * 1.]])
     x0 = np.array([-2., 1.])
     bounds = np.array([[10., -10.], [10., -10.]])
-    maximize(rosenbrock, x0, bounds=bounds)
+    nelder_mead(rosenbrock, x0, bounds=bounds)
 
 
 @raises(ValueError)
@@ -349,7 +350,7 @@ def test_invalid_bounds_2():
                          [-2., 1.05 * 1.]])
     x0 = np.array([-2., 1.])
     bounds = np.array([[10., -10., 10., -10.]])
-    maximize(rosenbrock, x0, bounds=bounds)
+    nelder_mead(rosenbrock, x0, bounds=bounds)
 
 
 @raises(ValueError)
@@ -358,7 +359,7 @@ def test_invalid_ρ():
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_ρ = -1.
-    nelder_mead_algorithm(rosenbrock, vertices, ρ=invalid_ρ)
+    _nelder_mead_algorithm(rosenbrock, vertices, ρ=invalid_ρ)
 
 
 @raises(ValueError)
@@ -367,7 +368,7 @@ def test_invalid_χ():
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_χ = 0.5
-    nelder_mead_algorithm(rosenbrock, vertices, χ=invalid_χ)
+    _nelder_mead_algorithm(rosenbrock, vertices, χ=invalid_χ)
 
 
 @raises(ValueError)
@@ -377,7 +378,7 @@ def test_invalid_ρχ():
                          [-2., 1.05 * 1.]])
     ρ = 2
     χ = 1.5
-    nelder_mead_algorithm(rosenbrock, vertices, ρ=ρ, χ=χ)
+    _nelder_mead_algorithm(rosenbrock, vertices, ρ=ρ, χ=χ)
 
 
 @raises(ValueError)
@@ -386,7 +387,7 @@ def test_invalid_γ():
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_γ = -1e-7
-    nelder_mead_algorithm(rosenbrock, vertices, γ=invalid_γ)
+    _nelder_mead_algorithm(rosenbrock, vertices, γ=invalid_γ)
 
 
 @raises(ValueError)
@@ -395,7 +396,7 @@ def test_invalid_σ():
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_σ = 1. + 1e-7
-    nelder_mead_algorithm(rosenbrock, vertices, σ=invalid_σ)
+    _nelder_mead_algorithm(rosenbrock, vertices, σ=invalid_σ)
 
 
 if __name__ == '__main__':

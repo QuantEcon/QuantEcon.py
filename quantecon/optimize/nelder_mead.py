@@ -1,5 +1,6 @@
 """
-Implements the Nelder-Mead algorithm for maximizing a multivariate function
+Implements the Nelder-Mead algorithm for maximizing a function with one or more
+variables.
 
 """
 
@@ -11,13 +12,15 @@ results = namedtuple('results', 'x fun success nit final_simplex')
 
 
 @njit
-def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
-             tol_x=1e-10, max_iter=1000):
+def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
+                tol_x=1e-10, max_iter=1000):
     """
     .. highlight:: none
 
-    Maximize a scalar function with multiple variables using the Nelder-Mead
-    method.
+    Maximize a scalar-valued function with one or more variables using the
+    Nelder-Mead method.
+
+    This function is JIT-compiled in `nopython` mode using Numba.
 
     Parameters
     ----------
@@ -25,24 +28,26 @@ def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
         The objective function to be maximized.
             `fun(x, *args) -> float`
         where x is an 1-D array with shape (n,) and args is a tuple of the
-        fixed parameters needed to completely specify the function.
+        fixed parameters needed to completely specify the function. This
+        function must be JIT-compiled in `nopython` mode using Numba.
 
     x0 : ndarray(float, ndim=1)
         Initial guess. Array of real elements of size (n,), where ‘n’ is the
         number of independent variables.
 
     bounds: ndarray(float, ndim=2), optional
-        Bounds for each variable for proposed solution. Sequence of (min, max)
-        pairs for each element in x. The default is used to specify no bounds.
+        Bounds for each variable for proposed solution, encoded as a sequence
+        of (min, max) pairs for each element in x. The default option is used
+        to specify no bounds on x.
 
     args : tuple, optional
         Extra arguments passed to the objective function.
 
     tol_f : scalar(float), optional(default=1e-10)
-        Tolerance for the range convergence test.
+        Tolerance to be used for the function value convergence test.
 
     tol_x : scalar(float), optional(default=1e-10)
-        Tolerance for the domain convergence test.
+        Tolerance to be used for the function domain convergence test.
 
     max_iter : scalar(float), optional(default=1000)
         The maximum number of allowed iterations.
@@ -53,11 +58,11 @@ def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
         A namedtuple containing the following items:
         ::
 
-            "x" : Approximate solution
-            "fun" : Approximate local maximum
-            "success" : 1 if successfully terminated, 0 otherwise
+            "x" : Approximate local maximizer
+            "fun" : Approximate local maximum value
+            "success" : 1 if the algorithm successfully terminated, 0 otherwise
             "nit" : Number of iterations
-            "final_simplex" : The vertices of the final simplex
+            "final_simplex" : Vertices of the final simplex
 
     Examples
     --------
@@ -69,6 +74,16 @@ def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     >>> qe.optimize.maximize(rosenbrock, x0)
     results(x=array([0.99999814, 0.99999756]), fun=1.6936258239463265e-10,
             success=True, nit=110)
+
+    Notes
+    --------
+    This algorithm has a long history of successful use in applications, but it
+    will usually be slower than an algorithm that uses first or second
+    derivative information. In practice, it can have poor performance in
+    high-dimensional problems and is not robust to minimizing complicated
+    functions. Additionally, there currently is no complete theory describing
+    when the algorithm will successfully converge to the minimum, or how fast
+    it will if it does.
 
     References
     ----------
@@ -93,38 +108,37 @@ def maximize(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
     .. [7] Chase Coleman's tutorial on Nelder Mead
 
-    .. [8] https://github.com/scipy/scipy/blob/v1.1.0/scipy/optimize/optimize.py
+    .. [8] SciPy's Nelder-Mead implementation
 
     """
-    n = x0.size
-
     vertices = _initialize_simplex(x0, bounds)
 
-    results = nelder_mead_algorithm(fun, vertices, bounds, args=args,
-                                    tol_f=tol_f, tol_x=tol_x,
-                                    max_iter=max_iter)
+    results = _nelder_mead_algorithm(fun, vertices, bounds, args=args,
+                                     tol_f=tol_f, tol_x=tol_x,
+                                     max_iter=max_iter)
 
     return results
 
 
 @njit
-def nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
-                          args=(), ρ=1., χ=2., γ=0.5, σ=0.5, tol_f=1e-8,
-                          tol_x=1e-8, max_iter=1000):
-
+def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
+                           args=(), ρ=1., χ=2., γ=0.5, σ=0.5, tol_f=1e-8,
+                           tol_x=1e-8, max_iter=1000):
     """
     .. highlight:: none
 
     Implements the Nelder-Mead algorithm described in Lagarias et al. (1998)
-    modified to maximize instead of minimizing.
+    modified to maximize instead of minimizing. JIT-compiled in `nopython`
+    mode using Numba.
 
     Parameters
     ----------
     fun : callable
-        The objective function to be minimized.
+        The objective function to be maximized.
             `fun(x, *args) -> float`
         where x is an 1-D array with shape (n,) and args is a tuple of the
-        fixed parameters needed to completely specify the function.
+        fixed parameters needed to completely specify the function. This
+        function must be JIT-compiled in `nopython` mode using Numba.
 
     vertices : ndarray(float, ndim=2)
         Initial simplex with shape (n+1, n) to be modified in-place.
@@ -145,10 +159,10 @@ def nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
         Shrinkage parameter. Must be strictly between 0 and 1.
 
     tol_f : scalar(float), optional(default=1e-10)
-        Tolerance for the range convergence test.
+        Tolerance to be used for the function value convergence test.
 
     tol_x : scalar(float), optional(default=1e-10)
-        Tolerance for the domain convergence test.
+        Tolerance to be used for the function domain convergence test.
 
     max_iter : scalar(float), optional(default=1000)
         The maximum number of allowed iterations.
@@ -277,7 +291,8 @@ def nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
 @njit
 def _initialize_simplex(x0, bounds):
     """
-    Generates an initial simplex for the Nelder-Mead method.
+    Generates an initial simplex for the Nelder-Mead method. JIT-compiled in
+    `nopython` mode using Numba.
 
     Parameters
     ----------
@@ -318,6 +333,7 @@ def _initialize_simplex(x0, bounds):
 def _check_params(ρ, χ, γ, σ, bounds, n):
     """
     Checks whether the parameters for the Nelder-Mead algorithm are valid.
+    JIT-compiled in `nopython` mode using Numba.
 
     Parameters
     ----------
@@ -360,7 +376,8 @@ def _check_params(ρ, χ, γ, σ, bounds, n):
 @njit
 def _check_bounds(x, bounds):
     """
-    Checks whether `x` is within `bounds`.
+    Checks whether `x` is within `bounds`. JIT-compiled in `nopython` mode
+    using Numba.
 
     Parameters
     ----------
@@ -387,7 +404,7 @@ def _check_bounds(x, bounds):
 def _neg_bounded_fun(fun, bounds, x, args=()):
     """
     Wrapper for bounding and taking the negative of `fun` for the
-    Nelder-Mead algorithm.
+    Nelder-Mead algorithm. JIT-compiled in `nopython` mode using Numba.
 
     Parameters
     ----------
@@ -395,7 +412,8 @@ def _neg_bounded_fun(fun, bounds, x, args=()):
         The objective function to be minimized.
             `fun(x, *args) -> float`
         where x is an 1-D array with shape (n,) and args is a tuple of the
-        fixed parameters needed to completely specify the function.
+        fixed parameters needed to completely specify the function. This
+        function must be JIT-compiled in `nopython` mode using Numba.
 
     bounds: ndarray(float, ndim=2)
         Sequence of (min, max) pairs for each element in x.
