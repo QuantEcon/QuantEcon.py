@@ -42,7 +42,7 @@ class TestAS():
     def test_AS(self):
         for d in self.game_dicts:
             rpg = RepeatedGame(d['sg'], d['delta'])
-            hull = rpg.AS(u=d['u'])
+            hull = rpg.AS(u_init=d['u'])
             assert_allclose(hull.points[hull.vertices], d['vertices'])
 
 if __name__ == '__main__':
