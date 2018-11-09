@@ -39,13 +39,13 @@ class RepeatedGame:
             Two player repeated game.
 
         tol : scalar(float), optional(default=1e-12)
-            Tolerance for convergence checkinsg.
+            Tolerance for convergence checking.
 
         max_iter : scalar(int), optional(default=500)
             Maximum number of iterations.
 
         u_init : ndarray(float, ndim=1), optional(default=np.zeros(2))
-            The initial threat points.
+            The initial guess of threat points.
 
         Returns
         -------
@@ -57,8 +57,8 @@ class RepeatedGame:
         C = np.empty((4, 2))
         IC = np.empty(2)
         action_profile_payoff = np.empty(2)
-        # array for checking if payoff is inside the polytope or not
-        # the last entry is set to be 1
+        # auxiliary array for checking if payoff is inside the convex hull
+        # first two entries for payoff point, and the last entry is 1.
         extended_payoff = np.ones(3)
         # array to store new points of C in each intersection
         # at most 4 new points will be generated
@@ -131,9 +131,9 @@ def _best_dev_gains(sg, delta):
 
     best_dev_gains1 : ndarray(float, ndim=2)
         The normalized best deviation payoff gain arrays.
-        best_dev_gains[1][a0, a1] is normalized payoff gain
+        best_dev_gains[1][a1, a0] is normalized payoff gain
         player 1 can get if originally players are choosing
-        a0 and a1, and player 1 deviates to the best response action.
+        a1 and a0, and player 1 deviates to the best response action.
     """
     best_dev_gains0 = (1-delta)/delta * \
         (np.max(sg.payoff_arrays[0], 0) - sg.payoff_arrays[0])
@@ -164,8 +164,8 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
 
     best_dev_gains : tuple(ndarray(float, ndim=2))
         Tuple of the normalized best deviation payoff gain arrays.
-        best_dev_gains[i][a0, a1] is payoff gain player i
-        can get if originally players are choosing a0 and a1,
+        best_dev_gains[i][ai, a-i] is payoff gain player i
+        can get if originally players are choosing ai and a-i,
         and player i deviates to the best response action.
 
     points : ndarray(float, ndim=2)
@@ -244,7 +244,7 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
 @njit
 def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
     """
-    Find all the intersection points between the current polytope
+    Find all the intersection points between the current convex hull
     and the two IC constraints. It is done by iterating simplex
     counterclockwise.
 
@@ -284,7 +284,6 @@ def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
     n : scalar(int)
         The number of found intersection points.
     """
-    # record the number of intersections for each IC.
     n = 0
     weights = np.empty(2)
     # vertices is ordered counterclockwise
@@ -297,7 +296,7 @@ def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
                   points[vertices[-1]],
                   points[vertices[0]], tol)
 
-    # check the case that IC is a interior point of the polytope
+    # check the case that IC is an interior point of the convex hull
     extended_payoff[:2] = IC
     if (np.dot(equations, extended_payoff) <= tol).all():
         C[n, :] = IC
