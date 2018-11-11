@@ -24,6 +24,18 @@ class TestPlayer_1opponent:
         coordination_game_matrix = [[4, 0], [3, 2]]
         self.player = Player(coordination_game_matrix)
 
+    def test_delete_action(self):
+        N = self.player.num_opponents + 1
+        action_to_delete = 0
+        actions_to_remain = \
+            np.setdiff1d(np.arange(self.player.num_actions), action_to_delete)
+        for i in range(N):
+            player_new = self.player.delete_action(action_to_delete, i)
+            assert_array_equal(
+                player_new.payoff_array,
+                self.player.payoff_array.take(actions_to_remain, axis=i)
+            )
+
     def test_best_response_against_pure(self):
         eq_(self.player.best_response(1), 1)
 
@@ -88,6 +100,18 @@ class TestPlayer_2opponents:
                               [[1, 0],
                                [5, 7]]]
         self.player = Player(payoffs_2opponents)
+
+    def test_delete_action(self):
+        N = self.player.num_opponents + 1
+        action_to_delete = 0
+        actions_to_remain = \
+            np.setdiff1d(np.arange(self.player.num_actions), action_to_delete)
+        for i in range(N):
+            player_new = self.player.delete_action(action_to_delete, i)
+            assert_array_equal(
+                player_new.payoff_array,
+                self.player.payoff_array.take(actions_to_remain, axis=i)
+            )
 
     def test_payoff_vector_against_pure(self):
         assert_array_equal(self.player.payoff_vector((0, 1)), [6, 0])
@@ -185,6 +209,17 @@ class TestNormalFormGame_Asym2p:
         assert_array_equal(self.g[action_profile],
                            self.BoS_bimatrix[action_profile])
 
+    def test_delete_action(self):
+        action_to_delete = 0
+        for i, player in enumerate(self.g.players):
+            g_new = self.g.delete_action(i, action_to_delete)
+            actions_to_remain = \
+                np.setdiff1d(np.arange(player.num_actions), action_to_delete)
+            assert_array_equal(
+                g_new.payoff_profile_array,
+                self.g.payoff_profile_array.take(actions_to_remain, axis=i)
+            )
+
     def test_is_nash_pure(self):
         ok_(not self.g.is_nash((1, 0)))
 
@@ -214,6 +249,17 @@ class TestNormalFormGame_3p:
 
     def test_getitem(self):
         assert_array_equal(self.g[0, 0, 1], [6, 4, 1])
+
+    def test_delete_action(self):
+        action_to_delete = 0
+        for i, player in enumerate(self.g.players):
+            g_new = self.g.delete_action(i, action_to_delete)
+            actions_to_remain = \
+                np.setdiff1d(np.arange(player.num_actions), action_to_delete)
+            assert_array_equal(
+                g_new.payoff_profile_array,
+                self.g.payoff_profile_array.take(actions_to_remain, axis=i)
+            )
 
     def test_is_nash_pure(self):
         ok_(self.g.is_nash((0, 0, 0)))
@@ -306,6 +352,18 @@ class TestPlayer_0opponents:
         self.best_response_action = 1
         self.dominated_actions = [0, 2]
 
+    def test_delete_action(self):
+        N = self.player.num_opponents + 1
+        actions_to_delete = [0, 2]
+        actions_to_remain = \
+            np.setdiff1d(np.arange(self.player.num_actions), actions_to_delete)
+        for i in range(N):
+            player_new = self.player.delete_action(actions_to_delete, i)
+            assert_array_equal(
+                player_new.payoff_array,
+                self.player.payoff_array.take(actions_to_remain, axis=i)
+            )
+
     def test_payoff_vector(self):
         """Trivial player: payoff_vector"""
         assert_array_equal(self.player.payoff_vector(None), self.payoffs)
@@ -345,6 +403,17 @@ class TestNormalFormGame_1p:
     def test_getitem(self):
         """Trivial game: __getitem__"""
         eq_(self.g[0], 0)
+
+    def test_delete_action(self):
+        actions_to_delete = [1, 2]
+        for i, player in enumerate(self.g.players):
+            g_new = self.g.delete_action(i, actions_to_delete)
+            actions_to_remain = \
+                np.setdiff1d(np.arange(player.num_actions), actions_to_delete)
+            assert_array_equal(
+                g_new.payoff_profile_array,
+                self.g.payoff_profile_array.take(actions_to_remain, axis=i)
+            )
 
     def test_is_nash_pure(self):
         """Trivial game: is_nash with pure action"""
