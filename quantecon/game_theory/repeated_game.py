@@ -7,6 +7,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 from numba import jit, njit
 
+
 class RepeatedGame:
     """
     Class representing an N-player repeated game.
@@ -50,9 +51,20 @@ class RepeatedGame:
         Returns
         -------
         hull : scipy.spatial.ConvexHull
-            The convex hull of feasible payoff pairs.
+            The convex hull of equilibrium payoff pairs.
+
+        References
+        ----------
+        .. [1] Abreu, Dilip, and Yuliy Sannikov. "An algorithm for
+           two‐player repeated games with perfect monitoring." Theoretical
+           Economics 9.2 (2014): 313-338.
         """
         sg, delta = self.sg, self.delta
+
+        if sg.N != 2:
+            msg = "this algorithm only applies to repeated two-player games."
+            raise NotImplementedError(msg)
+
         best_dev_gains = _best_dev_gains(sg, delta)
         C = np.empty((4, 2))
         IC = np.empty(2)
@@ -86,10 +98,10 @@ class RepeatedGame:
             hull = ConvexHull(W_old[:n_old_pt])
 
             W_new, n_new_pt = \
-                R(delta, sg.nums_actions, sg.payoff_arrays,
-                  best_dev_gains, hull.points, hull.vertices,
-                  hull.equations, u, IC, action_profile_payoff,
-                  extended_payoff, new_pts, W_new)
+                _R(delta, sg.nums_actions, sg.payoff_arrays,
+                   best_dev_gains, hull.points, hull.vertices,
+                   hull.equations, u, IC, action_profile_payoff,
+                   extended_payoff, new_pts, W_new)
 
             n_iter += 1
             if n_iter >= max_iter:
@@ -101,13 +113,13 @@ class RepeatedGame:
                     break
 
             # update threat points
-            update_u(u, W_new[:n_new_pt])
+            _update_u(u, W_new[:n_new_pt])
 
         hull = ConvexHull(W_new[:n_new_pt])
 
         return hull
 
-@jit()
+
 def _best_dev_gains(sg, delta):
     """
     Calculate the normalized payoff gains from deviating from the current
@@ -142,10 +154,11 @@ def _best_dev_gains(sg, delta):
 
     return best_dev_gains0, best_dev_gains1
 
+
 @njit
-def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
-      vertices, equations, u, IC, action_profile_payoff,
-      extended_payoff, new_pts, W_new, tol=1e-10):
+def _R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
+       vertices, equations, u, IC, action_profile_payoff,
+       extended_payoff, new_pts, W_new, tol=1e-10):
     """
     Updating the payoff convex hull by iterating all action pairs.
     Using the R operator proposed by Abreu and Sannikov 2014.
@@ -231,8 +244,8 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
                     n_new_pt += 1
                     continue
 
-            new_pts, n = find_C(new_pts, points, vertices, equations,
-                                extended_payoff, IC, tol)
+            new_pts, n = _find_C(new_pts, points, vertices, equations,
+                                 extended_payoff, IC, tol)
 
             for i in range(n):
                 W_new[n_new_pt] = \
@@ -241,8 +254,9 @@ def R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
 
     return W_new, n_new_pt
 
+
 @njit
-def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
+def _find_C(C, points, vertices, equations, extended_payoff, IC, tol):
     """
     Find all the intersection points between the current convex hull
     and the two IC constraints. It is done by iterating simplex
@@ -288,13 +302,13 @@ def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
     weights = np.empty(2)
     # vertices is ordered counterclockwise
     for i in range(len(vertices)-1):
-        n = intersect(C, n, weights, IC,
-                      points[vertices[i]],
-                      points[vertices[i+1]], tol)
+        n = _intersect(C, n, weights, IC,
+                       points[vertices[i]],
+                       points[vertices[i+1]], tol)
 
-    n = intersect(C, n, weights, IC,
-                  points[vertices[-1]],
-                  points[vertices[0]], tol)
+    n = _intersect(C, n, weights, IC,
+                   points[vertices[-1]],
+                   points[vertices[0]], tol)
 
     # check the case that IC is an interior point of the convex hull
     extended_payoff[:2] = IC
@@ -304,8 +318,9 @@ def find_C(C, points, vertices, equations, extended_payoff, IC, tol):
 
     return C, n
 
+
 @njit
-def intersect(C, n, weights, IC, pt0, pt1, tol):
+def _intersect(C, n, weights, IC, pt0, pt1, tol):
     """
     Find the intersection points of a half-closed simplex
     (pt0, pt1] and IC constraints.
@@ -368,8 +383,9 @@ def intersect(C, n, weights, IC, pt0, pt1, tol):
 
     return n
 
+
 @njit
-def update_u(u, W):
+def _update_u(u, W):
     """
     Update the threat points if it not feasible in the new W,
     by the minimum of new feasible payoffs.
