@@ -6,6 +6,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 from quantecon.game_theory import Player, NormalFormGame, RepeatedGame
 
+
 class TestAS():
     def setUp(self):
         self.game_dicts = []
@@ -29,7 +30,7 @@ class TestAS():
         # Prisoner's dilemma
         bimatrix = [[(9, 9), (1, 10)],
                     [(10, 1), (3, 3)]]
-        vertices = np.array([[3.  , 3.  ],
+        vertices = np.array([[3.  ,   3.],
                              [9.75, 3.  ],
                              [9.  , 9.  ],
                              [3.  , 9.75]])
@@ -39,11 +40,12 @@ class TestAS():
              'u': np.array([3., 3.])}
         self.game_dicts.append(d)
 
-    def test_AS(self):
+    def test_abreu_sannikov(self):
         for d in self.game_dicts:
             rpg = RepeatedGame(d['sg'], d['delta'])
-            hull = rpg.AS(u_init=d['u'])
-            assert_allclose(hull.points[hull.vertices], d['vertices'])
+            for method in ('abreu_sannikov', 'AS'):
+                hull = rpg.equilibrium_payoffs(options={'u_init': d['u']})
+                assert_allclose(hull.points[hull.vertices], d['vertices'])
 
 if __name__ == '__main__':
     import sys

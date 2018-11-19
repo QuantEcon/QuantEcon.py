@@ -27,97 +27,140 @@ class RepeatedGame:
         self.N = stage_game.N
         self.nums_actions = stage_game.nums_actions
 
-    def AS(self, tol=1e-12, max_iter=500, u_init=np.zeros(2)):
+    def equilibrium_payoffs(self, method=None, options=None):
         """
-        Using AS algorithm to compute the set of payoff pairs of all
-        pure-strategy subgame-perfect equilibria with public randomization
-        for any repeated two-player games with perfect monitoring and
-        discounting, following Abreu and Sannikov (2014).
+        Compute the set of payoff pairs of all pure-strategy subgame-perfect
+        equilibria with public randomization for any repeated two-player games
+        with perfect monitoring and discounting.
 
         Parameters
         ----------
-        rpd : RepeatedGame
-            Two player repeated game.
+        method : str, optional(default='abreu_sannikov')
+            The method for solving the equilibrium payoff set.
 
-        tol : scalar(float), optional(default=1e-12)
-            Tolerance for convergence checking.
+        options : dict, optional(default={})
+            A dictionary of method options. For example, 'abreu_sannikov'
+            method accepts the following options:
 
-        max_iter : scalar(int), optional(default=500)
-            Maximum number of iterations.
+                tol : scalar(float)
+                    Tolerance for convergence checking.
+                max_iter : scalar(int)
+                    Maximum number of iterations.
+                u_init : ndarray(float, ndim=1)
+                    The initial guess of threat points.
 
-        u_init : ndarray(float, ndim=1), optional(default=np.zeros(2))
-            The initial guess of threat points.
+        Notes
+        -----
+        Here lists all the implemented methods. The default method
+        is 'abreu_sannikov'.
 
-        Returns
-        -------
-        hull : scipy.spatial.ConvexHull
-            The convex hull of equilibrium payoff pairs.
-
-        References
-        ----------
-        .. [1] Abreu, Dilip, and Yuliy Sannikov. "An algorithm for
-           two‐player repeated games with perfect monitoring." Theoretical
-           Economics 9.2 (2014): 313-338.
+            1. 'abreu_sannikov'
         """
-        sg, delta = self.sg, self.delta
+        if method is None:
+            method = 'abreu_sannikov'
 
-        if sg.N != 2:
-            msg = "this algorithm only applies to repeated two-player games."
+        if options is None:
+            options = {}
+
+        if method in ('abreu_sannikov', 'AS'):
+            return _equilibrium_payoffs_abreu_sannikov(self, **options)
+        else:
+            msg = f"method {method} not supported."
             raise NotImplementedError(msg)
 
-        best_dev_gains = _best_dev_gains(sg, delta)
-        C = np.empty((4, 2))
-        IC = np.empty(2)
-        action_profile_payoff = np.empty(2)
-        # auxiliary array for checking if payoff is inside the convex hull
-        # first two entries for payoff point, and the last entry is 1.
-        extended_payoff = np.ones(3)
-        # array to store new points of C in each intersection
-        # at most 4 new points will be generated
-        new_pts = np.empty((4, 2))
-        # array to store the points of W
-        # the length of v is limited by |A1|*|A2|*4
-        W_new = np.empty((np.prod(sg.nums_actions)*4, 2))
-        W_old = np.empty((np.prod(sg.nums_actions)*4, 2))
-        # count the new points generated in each iteration
-        n_new_pt = 0
 
-        # copy the threat points
-        u = np.copy(u_init)
+def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
+                                        u_init=np.zeros(2)):
+    """
+    Using 'abreu_sannikov' algorithm to compute the set of payoff pairs
+    of all pure-strategy subgame-perfect equilibria with public randomization
+    for any repeated two-player games with perfect monitoring and
+    discounting, following Abreu and Sannikov (2014).
 
-        # initialization
-        payoff_pts = \
-            sg.payoff_profile_array.reshape(np.prod(sg.nums_actions), 2)
-        W_new[:np.prod(sg.nums_actions)] = payoff_pts
-        n_new_pt = np.prod(sg.nums_actions)
+    Parameters
+    ----------
+    rpg : RepeatedGame
+        Two player repeated game.
 
-        n_iter = 0
-        while True:
-            W_old[:n_new_pt] = W_new[:n_new_pt]
-            n_old_pt = n_new_pt
-            hull = ConvexHull(W_old[:n_old_pt])
+    tol : scalar(float), optional(default=1e-12)
+        Tolerance for convergence checking.
 
-            W_new, n_new_pt = \
-                _R(delta, sg.nums_actions, sg.payoff_arrays,
-                   best_dev_gains, hull.points, hull.vertices,
-                   hull.equations, u, IC, action_profile_payoff,
-                   extended_payoff, new_pts, W_new)
+    max_iter : scalar(int), optional(default=500)
+        Maximum number of iterations.
 
-            n_iter += 1
-            if n_iter >= max_iter:
+    u_init : ndarray(float, ndim=1), optional(default=np.zeros(2))
+        The initial guess of threat points.
+
+    Returns
+    -------
+    hull : scipy.spatial.ConvexHull
+        The convex hull of equilibrium payoff pairs.
+
+    References
+    ----------
+    .. [1] Abreu, Dilip, and Yuliy Sannikov. "An algorithm for
+       two‐player repeated games with perfect monitoring." Theoretical
+       Economics 9.2 (2014): 313-338.
+    """
+    sg, delta = rpg.sg, rpg.delta
+
+    if sg.N != 2:
+        msg = "this algorithm only applies to repeated two-player games."
+        raise NotImplementedError(msg)
+
+    best_dev_gains = _best_dev_gains(sg, delta)
+    C = np.empty((4, 2))
+    IC = np.empty(2)
+    action_profile_payoff = np.empty(2)
+    # auxiliary array for checking if payoff is inside the convex hull
+    # first two entries for payoff point, and the last entry is 1.
+    extended_payoff = np.ones(3)
+    # array to store new points of C in each intersection
+    # at most 4 new points will be generated
+    new_pts = np.empty((4, 2))
+    # array to store the points of W
+    # the length of v is limited by |A1|*|A2|*4
+    W_new = np.empty((np.prod(sg.nums_actions)*4, 2))
+    W_old = np.empty((np.prod(sg.nums_actions)*4, 2))
+    # count the new points generated in each iteration
+    n_new_pt = 0
+
+    # copy the threat points
+    u = np.copy(u_init)
+
+    # initialization
+    payoff_pts = \
+        sg.payoff_profile_array.reshape(np.prod(sg.nums_actions), 2)
+    W_new[:np.prod(sg.nums_actions)] = payoff_pts
+    n_new_pt = np.prod(sg.nums_actions)
+
+    n_iter = 0
+    while True:
+        W_old[:n_new_pt] = W_new[:n_new_pt]
+        n_old_pt = n_new_pt
+        hull = ConvexHull(W_old[:n_old_pt])
+
+        W_new, n_new_pt = \
+            _R(delta, sg.nums_actions, sg.payoff_arrays,
+               best_dev_gains, hull.points, hull.vertices,
+               hull.equations, u, IC, action_profile_payoff,
+               extended_payoff, new_pts, W_new)
+
+        n_iter += 1
+        if n_iter >= max_iter:
+            break
+
+        # check convergence
+        if n_new_pt == n_old_pt:
+            if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
                 break
 
-            # check convergence
-            if n_new_pt == n_old_pt:
-                if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
-                    break
+        # update threat points
+        _update_u(u, W_new[:n_new_pt])
 
-            # update threat points
-            _update_u(u, W_new[:n_new_pt])
+    hull = ConvexHull(W_new[:n_new_pt])
 
-        hull = ConvexHull(W_new[:n_new_pt])
-
-        return hull
+    return hull
 
 
 def _best_dev_gains(sg, delta):
