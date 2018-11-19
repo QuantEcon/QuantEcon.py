@@ -35,10 +35,10 @@ class RepeatedGame:
 
         Parameters
         ----------
-        method : str, optional(default='abreu_sannikov')
+        method : str, optional
             The method for solving the equilibrium payoff set.
 
-        options : dict, optional(default={})
+        options : dict, optional
             A dictionary of method options. For example, 'abreu_sannikov'
             method accepts the following options:
 
