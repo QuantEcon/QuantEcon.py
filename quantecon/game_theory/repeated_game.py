@@ -121,7 +121,7 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
         msg = "this algorithm only applies to repeated two-player games."
         raise NotImplementedError(msg)
 
-    best_dev_gains = _best_dev_gains(sg, delta)
+    best_dev_gains = _best_dev_gains(rpg)
     C = np.empty((4, 2))
     IC = np.empty(2)
     action_profile_payoff = np.empty(2)
@@ -176,39 +176,31 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
     return hull
 
 
-def _best_dev_gains(sg, delta):
+def _best_dev_gains(rpg):
     """
     Calculate the normalized payoff gains from deviating from the current
     action to the best response for each player.
 
     Parameters
     ----------
-    sg : NormalFormGame
-        The stage game.
-
-    delta : scalar(float)
-        The common discount rate at which all players discount the future.
+    rpg : RepeatedGame
+        Two player repeated game.
 
     Returns
     -------
-    best_dev_gains0 : ndarray(float, ndim=2)
+    best_dev_gains : tuple(ndarray(float, ndim=2))
         The normalized best deviation payoff gain arrays.
-        best_dev_gains[0][a0, a1] is normalized payoff gain
-        player 0 can get if originally players are choosing
-        a0 and a1, and player 0 deviates to the best response action.
-
-    best_dev_gains1 : ndarray(float, ndim=2)
-        The normalized best deviation payoff gain arrays.
-        best_dev_gains[1][a1, a0] is normalized payoff gain
-        player 1 can get if originally players are choosing
-        a1 and a0, and player 1 deviates to the best response action.
+        best_dev_gains[i][ai, a-i] is normalized payoff gain
+        player i can get if originally players are choosing
+        ai and a-i, and player i deviates to the best response action.
     """
-    best_dev_gains0 = (1-delta)/delta * \
-        (np.max(sg.payoff_arrays[0], 0) - sg.payoff_arrays[0])
-    best_dev_gains1 = (1-delta)/delta * \
-        (np.max(sg.payoff_arrays[1], 0) - sg.payoff_arrays[1])
+    sg, delta = rpg.sg, rpg.delta
 
-    return best_dev_gains0, best_dev_gains1
+    best_dev_gains = ((1-delta)/delta *
+                      (np.max(sg.payoff_arrays[i], 0) - sg.payoff_arrays[i])
+                      for i in range(2))
+
+    return tuple(best_dev_gains)
 
 
 @njit
