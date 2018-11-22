@@ -5,7 +5,7 @@ Tools for repeated game.
 
 import numpy as np
 from scipy.spatial import ConvexHull
-from numba import jit, njit
+from numba import njit
 
 
 class RepeatedGame:
@@ -15,11 +15,24 @@ class RepeatedGame:
     Parameters
     ----------
     stage_game : NormalFormGame
-                 The stage game used to create the repeated game.
+        The stage game used to create the repeated game.
 
     delta : scalar(float)
-            The common discount rate at which all players discount the future.
+        The common discount rate at which all players discount the future.
 
+    Attributes
+    ----------
+    sg : NormalFormGame
+        The stage game. See Parameters.
+
+    delta : scalar(float)
+        See Parameters.
+
+    N : scalar(int)
+        The number of players.
+
+    nums_actions : tuple(int)
+        Tuple of the numbers of actions, one for each player.
     """
     def __init__(self, stage_game, delta):
         self.sg = stage_game
