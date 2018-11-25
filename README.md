@@ -65,6 +65,18 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.4.2 (26-November-2018)
+
+1. FEAT: Add AS algorithm. [\#433](https://github.com/QuantEcon/QuantEcon.py/pull/433) ([shizejin](https://github.com/shizejin))
+1. FEAT: Add method option in robustlq.py [\#437](https://github.com/QuantEcon/QuantEcon.py/pull/437) ([hinayuki64](https://github.com/hinayuki64))
+1. FEAT: Add Player.delete\_action, NormalFormGame.delete\_action [\#444](https://github.com/QuantEcon/QuantEcon.py/pull/444) ([oyamad](https://github.com/oyamad))
+1. FEAT: Add the Nelder-Mead algorithm [\#441](https://github.com/QuantEcon/QuantEcon.py/pull/441) ([QBatista](https://github.com/QBatista))
+1. FEAT: Added basic inequality mesasures: lorenz curve and gini [\#414](https://github.com/QuantEcon/QuantEcon.py/pull/414) ([cdagnino](https://github.com/cdagnino))
+1. MAINT: Remove `from future import ...` [\#436](https://github.com/QuantEcon/QuantEcon.py/pull/436) ([hinayuki64](https://github.com/hinayuki64))
+1. FIX: Force tuple elements to have the same dtype [\#435](https://github.com/QuantEcon/QuantEcon.py/pull/435) ([oyamad](https://github.com/oyamad))
+1. DOC: fix brent\_max docstring [\#440](https://github.com/QuantEcon/QuantEcon.py/pull/440) ([natashawatkins](https://github.com/natashawatkins))
+1. FIX: Disallow Player with 0 actions [\#443](https://github.com/QuantEcon/QuantEcon.py/pull/443) ([oyamad](https://github.com/oyamad))
+
 ### Ver 0.4.1 (17-September-2018)
 
 1. FEAT: add solver for dynamic linear economies as LQ problem [\#426](https://github.com/QuantEcon/QuantEcon.py/pull/426) ([mmcky](https://github.com/mmcky))
