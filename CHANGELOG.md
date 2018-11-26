@@ -1,17 +1,38 @@
 # Change Log
 
-## [Unreleased](https://github.com/QuantEcon/QuantEcon.py/tree/HEAD)
+## [0.4.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.2) (2018-11-25)
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.0...0.4.2)
 
-[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.0...HEAD)
+**Implemented enhancements:**
+
+- kalman.py: Add `method` option [\#367](https://github.com/QuantEcon/QuantEcon.py/issues/367)
+- robustlq.py: Add `method` option [\#366](https://github.com/QuantEcon/QuantEcon.py/issues/366)
+- Add Player.delete\_action, NormalFormGame.delete\_action [\#444](https://github.com/QuantEcon/QuantEcon.py/pull/444) ([oyamad](https://github.com/oyamad))
+- Fix issue\#367 [\#439](https://github.com/QuantEcon/QuantEcon.py/pull/439) ([Yuya-Furusawa](https://github.com/Yuya-Furusawa))
+-  Add method option in robustlq.py [\#437](https://github.com/QuantEcon/QuantEcon.py/pull/437) ([hinayuki64](https://github.com/hinayuki64))
+- ENH: Add AS algorithm. [\#433](https://github.com/QuantEcon/QuantEcon.py/pull/433) ([shizejin](https://github.com/shizejin))
 
 **Closed issues:**
 
+- game\_theory\support\_enumeration.py [\#434](https://github.com/QuantEcon/QuantEcon.py/issues/434)
 - Issue new release of QuantEcon.py [\#425](https://github.com/QuantEcon/QuantEcon.py/issues/425)
+- Add multivariate optimization to quantecon.optimize [\#419](https://github.com/QuantEcon/QuantEcon.py/issues/419)
+- Kalman filter docstring mistake? [\#411](https://github.com/QuantEcon/QuantEcon.py/issues/411)
 
 **Merged pull requests:**
 
+- Release version 0.4.2 [\#445](https://github.com/QuantEcon/QuantEcon.py/pull/445) ([mmcky](https://github.com/mmcky))
+- FIX: Disallow Player with 0 actions [\#443](https://github.com/QuantEcon/QuantEcon.py/pull/443) ([oyamad](https://github.com/oyamad))
+- FEAT: Add the Nelder-Mead algorithm [\#441](https://github.com/QuantEcon/QuantEcon.py/pull/441) ([QBatista](https://github.com/QBatista))
+- fix brent\_max docstring [\#440](https://github.com/QuantEcon/QuantEcon.py/pull/440) ([natashawatkins](https://github.com/natashawatkins))
+- Fix docstring of x\_hat in Kalman class [\#438](https://github.com/QuantEcon/QuantEcon.py/pull/438) ([mirca](https://github.com/mirca))
+- Remove `from future import ...` [\#436](https://github.com/QuantEcon/QuantEcon.py/pull/436) ([hinayuki64](https://github.com/hinayuki64))
+- FIX: Force tuple elements to have the same dtype [\#435](https://github.com/QuantEcon/QuantEcon.py/pull/435) ([oyamad](https://github.com/oyamad))
+- Release of version 0.4.1 [\#432](https://github.com/QuantEcon/QuantEcon.py/pull/432) ([mmcky](https://github.com/mmcky))
 - DOC: Fix the doc of `root\_finding.py` to display nicely [\#431](https://github.com/QuantEcon/QuantEcon.py/pull/431) ([QBatista](https://github.com/QBatista))
+- Add LGTM code quality badges [\#430](https://github.com/QuantEcon/QuantEcon.py/pull/430) ([xcorail](https://github.com/xcorail))
 - add solver for dynamic linear economies as LQ problem [\#426](https://github.com/QuantEcon/QuantEcon.py/pull/426) ([mmcky](https://github.com/mmcky))
+- Added basic inequality mesasures: lorenz curve and gini [\#414](https://github.com/QuantEcon/QuantEcon.py/pull/414) ([cdagnino](https://github.com/cdagnino))
 
 ## [0.4.0](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.0) (2018-08-20)
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.8.1...0.4.0)
