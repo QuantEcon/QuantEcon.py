@@ -30,7 +30,7 @@ class TestAS():
         # Prisoner's dilemma
         bimatrix = [[(9, 9), (1, 10)],
                     [(10, 1), (3, 3)]]
-        vertices = np.array([[3.  ,   3.],
+        vertices = np.array([[3.  , 3.  ],
                              [9.75, 3.  ],
                              [9.  , 9.  ],
                              [3.  , 9.75]])
@@ -44,7 +44,8 @@ class TestAS():
         for d in self.game_dicts:
             rpg = RepeatedGame(d['sg'], d['delta'])
             for method in ('abreu_sannikov', 'AS'):
-                hull = rpg.equilibrium_payoffs(options={'u_init': d['u']})
+                hull = rpg.equilibrium_payoffs(method=method,
+                                               options={'u_init': d['u']})
                 assert_allclose(hull.points[hull.vertices], d['vertices'])
 
 if __name__ == '__main__':
