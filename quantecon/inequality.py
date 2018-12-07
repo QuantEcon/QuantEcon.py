@@ -86,7 +86,7 @@ def gini_coefficient(y):
 
 def shorrocks_index(A):
     """
-    Implements Shorrocks index of inequality
+    Implements Shorrocks mobility index
 
     Parameters
     -----------
@@ -97,7 +97,7 @@ def shorrocks_index(A):
     Returns
     --------
     Shorrocks index: float
-        The Shorrocks index calculated as
+        The Shorrocks mobility index calculated as
 
         .. math::
 
