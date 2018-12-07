@@ -84,3 +84,40 @@ def gini_coefficient(y):
     return np.sum(i_sum) / (2 * n * np.sum(y))
 
 
+def shorrocks_index(A):
+    """
+    Implements Shorrocks index of inequality
+
+    Parameters
+    -----------
+    A : array_like(float)
+        Square matrix with transition probabilities (mobility matrix) of
+        dimension m
+
+    Returns
+    --------
+    Shorrocks index: float
+        The Shorrocks index calculated as
+
+        .. math::
+
+            s(A) = \frac{m - \sum_j a_{jj}}{m - 1} \in (0, 1)
+
+        An index equal to 0 indicates complete immobility.
+
+    References
+    -----------
+    Wealth distribution and social mobility in the US: A quantitative approach
+    (Benhabib, Bisin, Luo, 2017).
+    https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
+    """
+
+    A = np.asarray(A)  # Convert to array if not already
+    m, n = A.shape
+
+    if m != n:
+        raise ValueError('A must be a square matrix')
+
+    diag_sum = np.diag(A).sum()
+
+    return (m - diag_sum) / (m - 1)
