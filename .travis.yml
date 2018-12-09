@@ -5,8 +5,31 @@
 
 sudo: false        #Use new Container Infrastructure
 language: python
-python:
-  - 3.6
+
+cache:
+  pip: true
+  directories:
+    # osx-specific caches
+    - $HOME/Library/Caches/pip
+    - $HOME/Library/Caches/Homebrew
+
+matrix:
+  include:
+    - python: 3.6
+    - os: osx
+      osx_image: xcode10
+      sudo: required
+      env: TRAVIS_PYTHON_VERSION=3.7
+      language: generic
+      before_install:
+      - pip install virtualenv
+      - virtualenv env -p python3
+      - source env/bin/activate
+      - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
+      - chmod +x miniconda.sh
+      - ./miniconda.sh -b -p $HOME/miniconda
+      - export PATH=$HOME/miniconda/bin:$PATH
+      - conda update --yes conda
 
 notifications:
   email: false
