@@ -9,9 +9,9 @@ language: python
 cache:
   pip: true
   directories:
+    - $HOME/miniconda
     # osx-specific caches
     - $HOME/Library/Caches/pip
-    - $HOME/Library/Caches/Homebrew
 
 matrix:
   include:
@@ -27,7 +27,7 @@ matrix:
       - source env/bin/activate
       - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
       - chmod +x miniconda.sh
-      - ./miniconda.sh -b -p $HOME/miniconda
+      - ./miniconda.sh -u -b -p $HOME/miniconda
       - export PATH=$HOME/miniconda/bin:$PATH
       - conda update --yes conda
 
@@ -41,7 +41,7 @@ branches:
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
-  - ./miniconda.sh -b -p /home/travis/miniconda
+  - ./miniconda.sh -u -b -p /home/travis/miniconda
   - export PATH=/home/travis/miniconda/bin:$PATH
   - conda update --yes conda
   #- sudo rm -rf /dev/shm
