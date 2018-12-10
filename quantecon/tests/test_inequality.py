@@ -6,7 +6,7 @@ Tests for inequality.py
 
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon import lorenz_curve, gini_coefficient
+from quantecon import lorenz_curve, gini_coefficient, shorrocks_index
 
 
 def test_lorenz_curve():
@@ -64,3 +64,27 @@ def test_gini_coeff():
     y = np.random.weibull(a, size=n)
     coeff = gini_coefficient(y)
     assert_allclose(expected, coeff, rtol=1e-01)
+
+
+def test_shorrocks_index():
+    """
+    Test Shorrocks mobility index function against the example used in 'Wealth
+    distribution and social mobility in the US: A quantitative approach'
+    (Benhabib, Bisin, Luo, 2017).''
+    https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
+    """
+
+    # Construct the mobility matrix from Benhabib et al.
+    P = [[0.222, 0.222, 0.215, 0.187, 0.081, 0.038, 0.029, 0.006],
+         [0.221, 0.220, 0.215, 0.188, 0.082, 0.039, 0.029, 0.006],
+         [0.207, 0.209, 0.210, 0.194, 0.090, 0.046, 0.036, 0.008],
+         [0.198, 0.201, 0.207, 0.198, 0.095, 0.052, 0.040, 0.009],
+         [0.175, 0.178, 0.197, 0.207, 0.110, 0.067, 0.054, 0.012],
+         [0.182, 0.184, 0.200, 0.205, 0.106, 0.062, 0.050, 0.011],
+         [0.123, 0.125, 0.166, 0.216, 0.141, 0.114, 0.094, 0.021],
+         [0.084, 0.084, 0.142, 0.228, 0.170, 0.143, 0.121, 0.028]]
+
+    expected = 0.98  # result from paper
+    index = shorrocks_index(P)
+    assert_allclose(expected, index, rtol=1e-2)
+

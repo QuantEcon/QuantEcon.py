@@ -23,7 +23,7 @@ from .estspec import smooth, periodogram, ar_periodogram
 # from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.
 from .graph_tools import DiGraph, random_tournament_graph
 from .gridtools import cartesian, mlinspace, simplex_grid, simplex_index
-from .inequality import lorenz_curve, gini_coefficient
+from .inequality import lorenz_curve, gini_coefficient, shorrocks_index
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
