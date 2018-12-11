@@ -73,8 +73,8 @@ def gini_coefficient(y):
 
     References
     ----------
-    .. [1] https://en.wikipedia.org/wiki/Gini_coefficient
 
+    https://en.wikipedia.org/wiki/Gini_coefficient
     """
     n = len(y)
     i_sum = np.zeros(n)
@@ -96,21 +96,20 @@ def shorrocks_index(A):
 
     Returns
     --------
-    Shorrocks index : float
-        The Shorrocks mobility index calculated as:
-        
+    Shorrocks index: float
+        The Shorrocks mobility index calculated as
+
         .. math::
-        
-            s(A) = \frac{m - \sum_j a_{jj}}{m - 1} \in (0, 1)
+            
+            s(A) = \frac{m - \sum_j a_{jj} }{m - 1} \in (0, 1)
 
         An index equal to 0 indicates complete immobility.
 
     References
-    ----------
-
-    .. [1] Benhabib, Bison, and Luo, Wealth distribution and social mobility 
-           in the US:  A quantitative approach (2017), https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
-
+    -----------
+    .. [1] Wealth distribution and social mobility in the US: A quantitative approach
+       (Benhabib, Bisin, Luo, 2017).
+       https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
     """
 
     A = np.asarray(A)  # Convert to array if not already
