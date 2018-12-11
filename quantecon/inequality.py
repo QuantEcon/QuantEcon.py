@@ -85,7 +85,7 @@ def gini_coefficient(y):
 
 
 def shorrocks_index(A):
-    """
+    r"""
     Implements Shorrocks mobility index
 
     Parameters
