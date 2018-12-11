@@ -12,6 +12,14 @@ cache:
     # osx-specific caches
     - $HOME/Library/Caches/pip
 
+addons:
+  apt:
+    packages:
+      - hdf5-tools
+  homebrew:
+    packages:
+      - hdf5
+
 matrix:
   include:
     - python: 3.6
@@ -24,11 +32,6 @@ matrix:
       - pip install virtualenv
       - virtualenv env -p python3
       - source env/bin/activate
-      - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
-      - chmod +x miniconda.sh
-      - ./miniconda.sh -u -b -p $HOME/miniconda
-      - export PATH=$HOME/miniconda/bin:$PATH
-      - conda update --yes conda
 
 notifications:
   email: false
@@ -37,20 +40,9 @@ branches:
   only:
     - master
 
-before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -u -b -p /home/travis/miniconda
-  - export PATH=/home/travis/miniconda/bin:$PATH
-  - conda update --yes conda
-  #- sudo rm -rf /dev/shm
-  #- sudo ln -s /run/shm /dev/shm
-
 install:
-  - pip install -U pip numpy scipy pandas numba sympy ipython statsmodels
-  - conda install --yes nose python=$TRAVIS_PYTHON_VERSION pytables
-    # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
-  - pip install coveralls coverage
+  - pip install -U pip nose coveralls coverage numpy scipy pandas numba sympy ipython statsmodels
+  - pip install tables
   - python setup.py install
 
 script:
