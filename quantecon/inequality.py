@@ -97,11 +97,8 @@ def shorrocks_index(A):
     Returns
     --------
     Shorrocks index: float
-        The Shorrocks mobility index calculated as
-
-        .. math::
-
-            s(A) = \frac{m - \sum_j a_{jj}}{m - 1} \in (0, 1)
+        The Shorrocks mobility index calculated as 
+        :math`s(A) = \frac{m - \sum_j a_{jj}}{m - 1} \in (0, 1)`
 
         An index equal to 0 indicates complete immobility.
 
