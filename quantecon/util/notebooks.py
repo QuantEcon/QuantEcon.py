@@ -20,7 +20,6 @@ TODO
 """
 
 import os
-import requests
 import warnings
 
 #-Remote Structure-#
@@ -72,6 +71,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     by setting ``overwrite=True``.
 
     """
+    import requests
 
     #-Generate Common Data Structure-#
     if type(files) == list:
