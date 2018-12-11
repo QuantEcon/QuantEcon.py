@@ -89,10 +89,12 @@ def _probvec(r, out):
     out[n] = 1 - r[n-1]
 
 _probvec_parallel = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel'
+    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel',
+    cache=True
     )(_probvec)
 _probvec_cpu = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu'
+    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu',
+    cache=True
     )(_probvec)
 
 
