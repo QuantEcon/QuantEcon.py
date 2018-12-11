@@ -1,7 +1,7 @@
-Inquality
+inequality
 ==========
 
-.. automodule:: quantecon.inquality
+.. automodule:: quantecon.inequality
     :members:
     :undoc-members:
     :show-inheritance:

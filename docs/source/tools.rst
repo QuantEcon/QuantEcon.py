@@ -15,6 +15,7 @@ Tools
    tools/filter
    tools/graph_tools
    tools/gridtools
+   tools/inequality
    tools/ivp
    tools/kalman
    tools/lae
