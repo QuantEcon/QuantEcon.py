@@ -34,7 +34,7 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
     info : tuple
         A tuple of the form (status_flag, num_iter).  Here status_flag
         indicates whether or not the maximum number of function calls was
-        attained.  A value of 0 implies that the maximum was not hit.  
+        attained.  A value of 0 implies that the maximum was not hit.
         The value `num_iter` is the number of function calls.
 
     Example
@@ -49,7 +49,15 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
     ```
 
     """
-    
+    if not np.isfinite(a):
+        raise ValueError("a must be finite.")
+
+    if not np.isfinite(b):
+        raise ValueError("b must be finite.")
+
+    if not a < b:
+        raise ValueError("a must be less than b.")
+
     maxfun = maxiter
     status_flag = 0
 
