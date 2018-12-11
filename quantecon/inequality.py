@@ -30,7 +30,7 @@ def lorenz_curve(y):
 
     References
     ----------
-    https://en.wikipedia.org/wiki/Lorenz_curve
+    .. [1] https://en.wikipedia.org/wiki/Lorenz_curve
 
     Examples
     --------
@@ -73,8 +73,8 @@ def gini_coefficient(y):
 
     References
     ----------
+    .. [1] https://en.wikipedia.org/wiki/Gini_coefficient
 
-    https://en.wikipedia.org/wiki/Gini_coefficient
     """
     n = len(y)
     i_sum = np.zeros(n)
@@ -106,10 +106,11 @@ def shorrocks_index(A):
         An index equal to 0 indicates complete immobility.
 
     References
-    -----------
-    Wealth distribution and social mobility in the US: A quantitative approach
-    (Benhabib, Bisin, Luo, 2017).
-    https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
+    ----------
+
+    .. [1] Benhabib, Bison, and Luo, Wealth distribution and social mobility 
+           in the US:  A quantitative approach (2017), https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
+
     """
 
     A = np.asarray(A)  # Convert to array if not already
