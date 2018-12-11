@@ -6,7 +6,6 @@ specified vector of probabilities.
 
 import numpy as np
 from numpy import cumsum
-from numpy.random import uniform
 from .util import check_random_state
 
 
