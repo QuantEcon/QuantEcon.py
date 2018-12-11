@@ -9,7 +9,6 @@ language: python
 cache:
   pip: true
   directories:
-    - $HOME/miniconda
     # osx-specific caches
     - $HOME/Library/Caches/pip
 
@@ -48,8 +47,8 @@ before_install:
   #- sudo ln -s /run/shm /dev/shm
 
 install:
-  - pip install -U pip nose numpy scipy pandas numba sympy ipython
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION pytables statsmodels
+  - pip install -U pip numpy scipy pandas numba sympy ipython
+  - conda install --yes nose python=$TRAVIS_PYTHON_VERSION pytables statsmodels
     # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
   - pip install coveralls coverage
   - python setup.py install
