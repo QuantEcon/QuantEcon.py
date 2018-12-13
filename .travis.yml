@@ -54,7 +54,9 @@ install:
   - python setup.py install
 
 script:
-  - nosetests --with-coverage --cover-package=quantecon
+  - nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
 after_success:
   - coveralls
+  # Enable this to occasionally test performance
+  # - nosetests -a "slow"
