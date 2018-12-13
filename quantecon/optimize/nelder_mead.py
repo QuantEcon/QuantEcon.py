@@ -25,8 +25,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     Parameters
     ----------
     fun : callable
-        The objective function to be maximized.
-            `fun(x, *args) -> float`
+        The objective function to be maximized: `fun(x, *args) -> float`
         where x is an 1-D array with shape (n,) and args is a tuple of the
         fixed parameters needed to completely specify the function. This
         function must be JIT-compiled in `nopython` mode using Numba.
