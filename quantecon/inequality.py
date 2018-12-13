@@ -4,6 +4,7 @@ Implements inequality and segregation measures such as Gini, Lorenz Curve
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from numba import njit, prange
 
 
