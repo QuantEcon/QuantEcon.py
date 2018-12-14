@@ -51,12 +51,8 @@ def get_data_dir():
 
 def get_h5_data_file():
     """
-<<<<<<< HEAD
     return the data file used for holding test data. If the data
     directory or file do not exist, they are created.
-=======
-    return the data file used for holding test data
->>>>>>> master
 
     Notes
     -----
