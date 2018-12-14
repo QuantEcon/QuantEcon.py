@@ -4,7 +4,6 @@ Implements inequality and segregation measures such as Gini, Lorenz Curve
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from numba import njit, prange
 
 
@@ -38,10 +37,6 @@ def lorenz_curve(y):
     >>> a_val, n = 3, 10_000
     >>> y = np.random.pareto(a_val, size=n)
     >>> f_vals, l_vals = lorenz(y)
-    >>> # Plot
-    >>> fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-    >>> ax.plot(f_vals, l_vals, label="Pareto with a={0}".format(a_val))
-    >>> fig.suptitle("Pareto distribution with a={0}".format(a_val))
 
     """
 
