@@ -1,21 +1,7 @@
 # These are the required packages for the quantecon package to build
-
-sphinx
-
-ipython
-
 numpy
-
-numpydoc
-
 scipy
-
 pandas
-
-statsmodels
-
 sympy
-
 numba
-
 requests
