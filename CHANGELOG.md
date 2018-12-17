@@ -1,5 +1,31 @@
 # Change Log
 
+## [0.4.3](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.3) (2018-12-17)
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.2...0.4.3)
+
+**Closed issues:**
+
+- Startup time is slow [\#449](https://github.com/QuantEcon/QuantEcon.py/issues/449)
+- Function value convergence test for `brent\_max` [\#442](https://github.com/QuantEcon/QuantEcon.py/issues/442)
+- Add OSX to travis.yml configuration [\#359](https://github.com/QuantEcon/QuantEcon.py/issues/359)
+- TEST: Tests for grid\_tools take a long time [\#109](https://github.com/QuantEcon/QuantEcon.py/issues/109)
+
+**Merged pull requests:**
+
+- Release for version 0.4.3 [\#465](https://github.com/QuantEcon/QuantEcon.py/pull/465) ([mmcky](https://github.com/mmcky))
+-  Isolate rtd-specific requirements to doc-requirements.txt [\#464](https://github.com/QuantEcon/QuantEcon.py/pull/464) ([rht](https://github.com/rht))
+- fix for lorenz documentation [\#462](https://github.com/QuantEcon/QuantEcon.py/pull/462) ([natashawatkins](https://github.com/natashawatkins))
+- Travis: Disable performance tests [\#461](https://github.com/QuantEcon/QuantEcon.py/pull/461) ([rht](https://github.com/rht))
+- quad: Import sympy only when necessary [\#459](https://github.com/QuantEcon/QuantEcon.py/pull/459) ([rht](https://github.com/rht))
+- Travis: Move dependency installs with wheels available to pip [\#458](https://github.com/QuantEcon/QuantEcon.py/pull/458) ([rht](https://github.com/rht))
+- Update Documentation [\#454](https://github.com/QuantEcon/QuantEcon.py/pull/454) ([mmcky](https://github.com/mmcky))
+- README: Update coveralls badge to use svg [\#453](https://github.com/QuantEcon/QuantEcon.py/pull/453) ([rht](https://github.com/rht))
+- Fix warning in test\_pure\_nash [\#451](https://github.com/QuantEcon/QuantEcon.py/pull/451) ([oyamad](https://github.com/oyamad))
+- ENH: Add errors for invalid inputs for `brent\_max` [\#450](https://github.com/QuantEcon/QuantEcon.py/pull/450) ([QBatista](https://github.com/QBatista))
+- Travis: Add macOS to the build matrix [\#448](https://github.com/QuantEcon/QuantEcon.py/pull/448) ([rht](https://github.com/rht))
+- FEAT: Add Shorrocks mobility index [\#447](https://github.com/QuantEcon/QuantEcon.py/pull/447) ([natashawatkins](https://github.com/natashawatkins))
+- FIX: test `method` keyword of `RepeatedGame.equilibrium\_payoffs\(\)`. [\#446](https://github.com/QuantEcon/QuantEcon.py/pull/446) ([shizejin](https://github.com/shizejin))
+
 ## [0.4.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.2) (2018-11-25)
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.0...0.4.2)
 
