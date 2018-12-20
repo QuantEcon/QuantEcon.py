@@ -3,10 +3,8 @@ Tests for approximation.py file (i.e. tauchen)
 
 """
 import sys
-import os
 import unittest
 import numpy as np
-from numpy.testing import assert_allclose
 from quantecon.markov import tauchen, rouwenhorst
 #from quantecon.markov.approximation import rouwenhorst
 
