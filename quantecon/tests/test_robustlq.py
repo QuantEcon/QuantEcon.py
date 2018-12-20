@@ -3,10 +3,8 @@ Tests for robustlq.py
 
 """
 import sys
-import os
 import unittest
 import numpy as np
-from scipy.linalg import LinAlgError
 from numpy.testing import assert_allclose
 from quantecon.lqcontrol import LQ
 from quantecon.robustlq import RBLQ

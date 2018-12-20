@@ -73,7 +73,6 @@ def test_performance_C():
     # print(prod.shape)
 
     # compute the same produce using numpy:
-    import numpy
 
     t3 = time.time()
     for i in range(100):
@@ -108,7 +107,6 @@ def test_performance_F():
     # print(prod.shape)
 
     # compute the same produce using numpy:
-    import numpy
 
     t3 = time.time()
     for i in range(100):

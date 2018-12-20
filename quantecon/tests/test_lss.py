@@ -3,7 +3,6 @@ Tests for lss.py
 
 """
 import sys
-import os
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose

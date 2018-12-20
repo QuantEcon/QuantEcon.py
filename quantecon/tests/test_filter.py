@@ -4,9 +4,7 @@ Using the data of original paper.
 
 """
 
-import sys
 import os
-import unittest
 import pandas as pd
 import numpy as np
 from numpy.testing import assert_allclose
