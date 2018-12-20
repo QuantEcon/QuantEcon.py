@@ -1,3 +1,4 @@
+# flake8: noqa
 """
 Markov Chain SubPackge API
 """
