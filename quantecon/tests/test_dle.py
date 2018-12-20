@@ -35,7 +35,7 @@ class TestDLE(unittest.TestCase):
         deltah = np.array([[.9]])
         thetah = np.array([[1]]) - deltah
         ub = np.array([[30, 0, 0]])
-        x0 = np.array([[5, 150,1,0,0]]).T
+        x0 = np.array([[5, 150, 1, 0, 0]]).T
 
         information = (a22, c2, ub, ud)
         technology = (phic, phig, phii, gamma, deltak, thetak)

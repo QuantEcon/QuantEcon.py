@@ -26,7 +26,7 @@ class TestKalman(unittest.TestCase):
 
         self.kf = Kalman(ss)
 
-        self.methods = ['doubling','qz']
+        self.methods = ['doubling', 'qz']
 
 
     def tearDown(self):

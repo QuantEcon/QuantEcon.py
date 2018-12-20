@@ -97,7 +97,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
                 if verbose: print("Overwriting file %s ..."%fl)
             if verbose: print("Fetching file: %s"%fl)
             #-Get file in OS agnostic way using requests-#
-            url = "/".join([repo,raw,branch,folder,fl])
+            url = "/".join([repo, raw, branch, folder, fl])
             r = requests.get(url)
             with open(fl, "wb") as fl:
                 fl.write(r.content)
