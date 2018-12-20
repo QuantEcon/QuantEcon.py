@@ -53,7 +53,6 @@ class TestKalman(unittest.TestCase):
 
 
     def test_update_using_stationary(self):
-        A, Q, G, R = self.A, self.Q, self.G, self.R
         kf = self.kf
 
         for method in self.methods:

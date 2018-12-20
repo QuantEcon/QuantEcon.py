@@ -106,7 +106,6 @@ def colville(x):
 @njit
 def styblinski_tang(x):
     # https://www.sfu.ca/~ssurjano/stybtang.html
-    d = x.size
     f = 0.5 * (x ** 4 - 16 * x ** 2 + 5 * x).sum()
     return -f
 
@@ -288,8 +287,6 @@ class TestMaximization():
 
     def test_goldstein_price(self):
         x0 = np.array([-1.5, 0.5])
-        bounds = np.array([[-2., 2.],
-                           [-2., 2.]])
 
         results = nelder_mead(goldstein_price, x0)
 
@@ -335,9 +332,6 @@ class TestMaximization():
 
 @raises(ValueError)
 def test_invalid_bounds_1():
-    vertices = np.array([[-2., 1.],
-                         [1.05 * -2., 1.],
-                         [-2., 1.05 * 1.]])
     x0 = np.array([-2., 1.])
     bounds = np.array([[10., -10.], [10., -10.]])
     nelder_mead(rosenbrock, x0, bounds=bounds)
@@ -345,9 +339,6 @@ def test_invalid_bounds_1():
 
 @raises(ValueError)
 def test_invalid_bounds_2():
-    vertices = np.array([[-2., 1.],
-                         [1.05 * -2., 1.],
-                         [-2., 1.05 * 1.]])
     x0 = np.array([-2., 1.])
     bounds = np.array([[10., -10., 10., -10.]])
     nelder_mead(rosenbrock, x0, bounds=bounds)

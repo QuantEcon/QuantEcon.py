@@ -125,8 +125,8 @@ def test_mlinsplace():
 
     from numpy import linspace
 
-    grid1 = mlinspace([-1, -1], [2, 3], [30, 50])
-    grid2 = cartesian([linspace(-1, 2, 30), linspace(-1, 3, 50)])
+    mlinspace([-1, -1], [2, 3], [30, 50])
+    cartesian([linspace(-1, 2, 30), linspace(-1, 3, 50)])
 
 def test_tile():
 

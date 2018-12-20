@@ -66,7 +66,7 @@ class TestSupportEnumeration():
         n, m = 3, 2
         seed = 7028
         g = random_skew_sym(n, m, random_state=seed)
-        NEs = support_enumeration(g)
+        support_enumeration(g)
 
 
 @raises(TypeError)

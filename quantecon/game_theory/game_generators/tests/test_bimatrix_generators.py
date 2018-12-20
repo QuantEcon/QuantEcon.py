@@ -112,7 +112,7 @@ class TestTournamentGame:
     @raises(ValueError)
     def test_raises_value_error_too_large_inputs(self):
         n, k = 100, 50
-        g = tournament_game(n, k)
+        tournament_game(n, k)
 
 
 class TestUnitVectorGame:
@@ -149,7 +149,7 @@ class TestUnitVectorGame:
     @raises(ValueError)
     def test_raises_value_error_avoid_pure_nash_n_1(self):
         n = 1
-        g = unit_vector_game(n, avoid_pure_nash=True)
+        unit_vector_game(n, avoid_pure_nash=True)
 
 
 def test_payoff_range():

@@ -225,7 +225,6 @@ class _BestResponsePolytope:
         # Shift the payoffs to be nonnegative and have no zero column
         col_mins = B.min(axis=0)
         col_maxs = B.max(axis=0)
-        neg_cols = (col_mins < 0)
         nonpos_const_cols = (col_maxs == col_mins) * (col_mins <= 0)
         shifts = np.zeros(m)
         shifts[col_mins < 0] = -col_mins[col_mins < 0]
