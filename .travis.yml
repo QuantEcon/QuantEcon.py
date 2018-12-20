@@ -46,7 +46,7 @@ install:
   - python setup.py install
 
 script:
-  - flake8 --select F401,E231 quantecon
+  - flake8 --select F401, F405,E231 quantecon
   - nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
 after_success:

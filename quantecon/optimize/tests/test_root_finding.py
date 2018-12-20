@@ -2,7 +2,9 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_allclose
 from numba import njit
 
-from quantecon.optimize import *
+from quantecon.optimize import (
+    newton, newton_halley, newton_secant, bisect, brentq
+)
 
 
 @njit
