@@ -511,7 +511,8 @@ class DiscreteDP:
             R[self.s_indices, self.a_indices] = self.R
             Q = np.zeros((ns, na, ns))
             if self._sparse:
-                _fill_dense_Q(self.s_indices, self.a_indices, self.Q.toarray(), Q)
+                _fill_dense_Q(self.s_indices, self.a_indices,
+                              self.Q.toarray(), Q)
             else:
                 _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
             return DiscreteDP(R, Q, self.beta)

@@ -64,7 +64,8 @@ class TestKalman(unittest.TestCase):
             kf.update(np.zeros((2, 1)))
 
             assert_allclose(kf.Sigma, sig_inf, rtol=1e-4, atol=1e-2)
-            assert_allclose(kf.x_hat.squeeze(), np.zeros(2), rtol=1e-4, atol=1e-2)
+            assert_allclose(kf.x_hat.squeeze(), np.zeros(2),
+                            rtol=1e-4, atol=1e-2)
 
 
     def test_update_nonstationary(self):

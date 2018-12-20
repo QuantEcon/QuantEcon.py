@@ -6,7 +6,8 @@ Import the main names to top level.
 try:
 	import numba
 except:
-	raise ImportError("Cannot import numba from current anaconda distribution. Please run `conda install numba` to install the latest version.")
+	raise ImportError(
+		"Cannot import numba from current anaconda distribution. Please run `conda install numba` to install the latest version.")
 
 #-Modules-#
 from . import distributions
@@ -35,8 +36,10 @@ from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .quadsums import var_quadratic_sum, m_quadratic_sum
 #->Propose Delete From Top Level
-from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, gth_solve, tauchen, rouwenhorst 	 	#Promote to keep current examples working
-from .markov import mc_compute_stationary, mc_sample_path 												#Imports that Should be Deprecated with markov package
+#Promote to keep current examples working
+from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, gth_solve, tauchen, rouwenhorst
+#Imports that Should be Deprecated with markov package
+from .markov import mc_compute_stationary, mc_sample_path
 #<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ

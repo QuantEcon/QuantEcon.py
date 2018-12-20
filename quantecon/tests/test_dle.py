@@ -98,7 +98,8 @@ class TestDLE(unittest.TestCase):
         }
         self.dle.compute_steadystate()
         for item in solutions.keys():
-            assert_allclose(self.dle.__dict__[item], solutions[item], atol=ATOL)
+            assert_allclose(self.dle.__dict__[
+                            item], solutions[item], atol=ATOL)
 
     def test_canonical(self):
         solutions = {
@@ -108,7 +109,8 @@ class TestDLE(unittest.TestCase):
         }
         self.dle.canonical()
         for item in solutions.keys():
-            assert_allclose(self.dle.__dict__[item], solutions[item], atol=ATOL)
+            assert_allclose(self.dle.__dict__[
+                            item], solutions[item], atol=ATOL)
 
 
 if __name__ == '__main__':
