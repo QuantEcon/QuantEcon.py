@@ -71,9 +71,12 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
     ...     return -(100 * (x[1] - x[0] ** 2) ** 2 + (1 - x[0])**2)
     ...
     >>> x0 = np.array([-2, 1])
-    >>> qe.optimize.maximize(rosenbrock, x0)
-    results(x=array([0.99999814, 0.99999756]), fun=1.6936258239463265e-10,
-            success=True, nit=110)
+    >>> qe.optimize.nelder_mead(rosenbrock, x0)
+    results(x=array([0.99999814, 0.99999756]), fun=-1.6936258239463265e-10,
+            success=True, nit=110,
+            final_simplex=array([[0.99998652, 0.9999727],
+                                 [1.00000218, 1.00000301],
+                                 [0.99999814, 0.99999756]]))
 
     Notes
     --------
