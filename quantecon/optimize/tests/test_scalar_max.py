@@ -18,7 +18,7 @@ def f(x):
     return -(x + 2.0)**2 + 1.0
 
 
-def test_brent_max():
+def test_f():
     """
     Uses the function f defined above to test the scalar maximization
     routine.
@@ -38,9 +38,9 @@ def g(x, y):
     return -x**2 + y
 
 
-def test_brent_max():
+def test_g():
     """
-    Uses the function f defined above to test the scalar maximization
+    Uses the function g defined above to test the scalar maximization
     routine.
     """
     y = 5
