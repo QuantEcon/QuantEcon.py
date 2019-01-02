@@ -5,7 +5,7 @@ TODO: 1. Fix warnings concerning casting complex variables back to floats
 
 """
 import numpy as np
-from numpy import conj, pi
+from numpy import conj
 from .util import check_random_state
 
 

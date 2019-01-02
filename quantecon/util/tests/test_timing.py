@@ -6,7 +6,7 @@ Tests for timing.py
 import time
 from sys import platform
 from numpy.testing import assert_allclose
-from nose.tools import eq_, ok_
+from nose.tools import ok_
 from quantecon.util import tic, tac, toc, loop_timer
 
 

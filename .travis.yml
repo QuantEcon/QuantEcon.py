@@ -41,11 +41,12 @@ branches:
     - master
 
 install:
-  - pip install -U pip nose coveralls coverage numpy scipy pandas numba sympy ipython statsmodels
+  - pip install -U pip nose coveralls coverage numpy scipy pandas numba sympy ipython statsmodels flake8
   - pip install tables
   - python setup.py install
 
 script:
+  - flake8 --select F401 quantecon
   - nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
 after_success:

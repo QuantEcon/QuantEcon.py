@@ -3,12 +3,9 @@ Tests for dle.py file
 """
 
 import sys
-import os
 import unittest
 import numpy as np
-from scipy.linalg import LinAlgError
 from numpy.testing import assert_allclose
-from numpy import dot
 from quantecon.dle import DLE
 
 ATOL = 1e-10

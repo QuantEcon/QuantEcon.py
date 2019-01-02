@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit, njit
+from numba import njit
 
 @njit
 def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):

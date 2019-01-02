@@ -1,3 +1,4 @@
+# flake8: noqa
 """
 Initialization of the optimize subpackage
 """

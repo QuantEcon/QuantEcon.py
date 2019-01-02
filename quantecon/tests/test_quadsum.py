@@ -2,9 +2,6 @@
 Tests for quadsums.py
 
 """
-import sys
-import os
-import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 from quantecon.quadsums import var_quadratic_sum, m_quadratic_sum

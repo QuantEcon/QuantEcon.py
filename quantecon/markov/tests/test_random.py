@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import (
     assert_array_equal, assert_raises, assert_array_almost_equal_nulp
 )
-from nose.tools import eq_, ok_, raises
+from nose.tools import eq_, ok_
 
 from quantecon.markov import (
     random_markov_chain, random_stochastic_matrix, random_discrete_dp

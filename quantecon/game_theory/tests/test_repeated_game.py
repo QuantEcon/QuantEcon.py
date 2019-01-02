@@ -4,7 +4,7 @@ Tests for repeated_game.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.game_theory import Player, NormalFormGame, RepeatedGame
+from quantecon.game_theory import NormalFormGame, RepeatedGame
 
 
 class TestAS():

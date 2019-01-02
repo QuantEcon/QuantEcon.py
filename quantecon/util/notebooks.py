@@ -20,7 +20,6 @@ TODO
 """
 
 import os
-import warnings
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
