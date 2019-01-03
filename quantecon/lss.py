@@ -112,8 +112,9 @@ class LinearStateSpace:
             raise ValueError(
                 "Matrix A (shape: %s) needs to be square" % (self.A.shape))
         if ni != self.C.shape[0]:
-            raise ValueError("Matrix C (shape: %s) does not have compatible dimensions with A. It should be shape: %s" % (
-                self.C.shape, (ni, 1)))
+            raise ValueError(
+                "Matrix C (shape: %s) does not have compatible dimensions with A. "
+                "It should be shape: %s" % (self.C.shape, (ni, 1)))
         self.m = self.C.shape[1]
         self.k, self.n = self.G.shape
         if self.n != ni:
