@@ -1,4 +1,4 @@
 sphinx
 ipython
 numpydoc
-matplotlib=2.2.3
+matplotlib==2.2.3
