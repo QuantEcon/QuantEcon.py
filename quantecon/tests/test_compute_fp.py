@@ -137,4 +137,4 @@ def test_raises_value_error_nonpositive_max_iter():
     f = lambda x: 0.5*x
     init = 1.
     max_iter = 0
-    fp = compute_fixed_point(f, init, max_iter=max_iter)
+    compute_fixed_point(f, init, max_iter=max_iter)

@@ -26,7 +26,7 @@ class TestKalman(unittest.TestCase):
 
         self.kf = Kalman(ss)
 
-        self.methods = ['doubling','qz']
+        self.methods = ['doubling', 'qz']
 
 
     def tearDown(self):
@@ -53,7 +53,6 @@ class TestKalman(unittest.TestCase):
 
 
     def test_update_using_stationary(self):
-        A, Q, G, R = self.A, self.Q, self.G, self.R
         kf = self.kf
 
         for method in self.methods:
@@ -64,7 +63,8 @@ class TestKalman(unittest.TestCase):
             kf.update(np.zeros((2, 1)))
 
             assert_allclose(kf.Sigma, sig_inf, rtol=1e-4, atol=1e-2)
-            assert_allclose(kf.x_hat.squeeze(), np.zeros(2), rtol=1e-4, atol=1e-2)
+            assert_allclose(kf.x_hat.squeeze(), np.zeros(2),
+                            rtol=1e-4, atol=1e-2)
 
 
     def test_update_nonstationary(self):

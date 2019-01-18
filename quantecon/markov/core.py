@@ -429,7 +429,6 @@ class MarkovChain:
     def cdfs1d(self):
         if (self._cdfs1d is None) and self.is_sparse:
             data = self.P.data
-            indices = self.P.indices
             indptr = self.P.indptr
 
             cdfs1d = np.empty(self.P.nnz, order='C')

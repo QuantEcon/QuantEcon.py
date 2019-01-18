@@ -288,7 +288,7 @@ def test_node_labels_subgraph():
 @raises(ValueError)
 def test_raises_value_error_non_sym():
     """Test with non symmetric input"""
-    g = DiGraph(np.array([[0.4, 0.6]]))
+    DiGraph(np.array([[0.4, 0.6]]))
 
 
 def test_raises_non_homogeneous_node_labels():

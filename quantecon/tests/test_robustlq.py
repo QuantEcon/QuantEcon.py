@@ -67,7 +67,8 @@ class TestRBLQControl(unittest.TestCase):
             Fr_pf, Kr_pf, Pr_pf = self.rblq_test_pf.robust_rule(method=method)
 
             Fs, Ks, Ps = rblq.robust_rule_simple(P_init=Pr, tol=1e-12)
-            Fs_pf, Ks_pf, Ps_pf = rblq_pf.robust_rule_simple(P_init=Pr_pf, tol=1e-12)
+            Fs_pf, Ks_pf, Ps_pf = rblq_pf.robust_rule_simple(
+                P_init=Pr_pf, tol=1e-12)
 
             assert_allclose(Fr, Fs, rtol=1e-4)
             assert_allclose(Kr, Ks, rtol=1e-4)

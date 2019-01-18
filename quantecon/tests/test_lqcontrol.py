@@ -81,7 +81,6 @@ class TestLQControl(unittest.TestCase):
         lq_mat = self.lq_mat
 
         f_answer = np.array([[-.95, -.95], [0., 0.]])
-        p_answer = np.array([[1., 0], [0., 0.]])
         val_func_answer = x0[0]**2
 
         for method in self.methods:

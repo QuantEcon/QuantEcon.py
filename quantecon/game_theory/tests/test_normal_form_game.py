@@ -482,43 +482,43 @@ def test_player_repr():
 
 @raises(ValueError)
 def test_player_zero_actions():
-    p = Player([[]])
+    Player([[]])
 
 
 @raises(ValueError)
 def test_normalformgame_invalid_input_players_shape_inconsistent():
     p0 = Player(np.zeros((2, 3)))
     p1 = Player(np.zeros((2, 3)))
-    g = NormalFormGame([p0, p1])
+    NormalFormGame([p0, p1])
 
 
 @raises(ValueError)
 def test_normalformgame_invalid_input_players_num_inconsistent():
     p0 = Player(np.zeros((2, 2, 2)))
     p1 = Player(np.zeros((2, 2, 2)))
-    g = NormalFormGame([p0, p1])
+    NormalFormGame([p0, p1])
 
 
 @raises(ValueError)
 def test_normalformgame_invalid_input_players_dtype_inconsistent():
     p0 = Player(np.zeros((2, 2), dtype=int))
     p1 = Player(np.zeros((2, 2), dtype=float))
-    g = NormalFormGame([p0, p1])
+    NormalFormGame([p0, p1])
 
 
 @raises(ValueError)
 def test_normalformgame_invalid_input_nosquare_matrix():
-    g = NormalFormGame(np.zeros((2, 3)))
+    NormalFormGame(np.zeros((2, 3)))
 
 
 @raises(ValueError)
 def test_normalformgame_invalid_input_payoff_profiles():
-    g = NormalFormGame(np.zeros((2, 2, 1)))
+    NormalFormGame(np.zeros((2, 2, 1)))
 
 
 @raises(ValueError)
 def test_normalformgame_zero_actions():
-    g = NormalFormGame((2, 0))
+    NormalFormGame((2, 0))
 
 
 # Utility functions #

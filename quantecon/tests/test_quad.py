@@ -16,7 +16,11 @@ from scipy.io import loadmat
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
-from quantecon.quad import *
+from quantecon.quad import (
+    qnwcheb, qnwequi, qnwlege, qnwnorm, qnwlogn,
+    qnwsimp, qnwtrap, qnwunif, quadrect, qnwbeta,
+    qnwgamma
+)
 from quantecon.tests.util import get_data_dir
 
 ### MATLAB code needed to generate data (in addition to a modified demqua03)

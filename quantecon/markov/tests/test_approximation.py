@@ -48,9 +48,9 @@ class TestTauchen(unittest.TestCase):
 class TestRouwenhorst(unittest.TestCase):
 
     def setUp(self):
-        self.rho, self.sigma = np.random.uniform(0,1, size=2)
-        self.n = np.random.random_integers(3,25)
-        self.ybar = np.random.random_integers(0,10)
+        self.rho, self.sigma = np.random.uniform(0, 1, size=2)
+        self.n = np.random.random_integers(3, 25)
+        self.ybar = np.random.random_integers(0, 10)
         self.tol = 1e-12
 
         mc = rouwenhorst(self.n, self.ybar, self.sigma, self.rho)
@@ -87,10 +87,13 @@ class TestRouwenhorst(unittest.TestCase):
         sigma_y = np.sqrt(sigma**2 / (1-rho**2))
         psi = sigma_y * np.sqrt(n-1)
         known_x = np.array([-psi+5.0, 5., psi+5.0])
-        known_P = np.array([[0.81, 0.18, 0.01], [0.09, 0.82, 0.09], [0.01, 0.18, 0.81]])
-        self.assertTrue(sum(mc_rouwenhorst.x - known_x) < self.tol and sum(sum(mc_rouwenhorst.P - known_P)) < self.tol)
+        known_P = np.array(
+            [[0.81, 0.18, 0.01], [0.09, 0.82, 0.09], [0.01, 0.18, 0.81]])
+        self.assertTrue(sum(mc_rouwenhorst.x - known_x) <
+                        self.tol and sum(sum(mc_rouwenhorst.P - known_P)) < self.tol)
 
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase([TestTauchen, TestRouwenhorst])
+    suite = unittest.TestLoader().loadTestsFromTestCase(
+        [TestTauchen, TestRouwenhorst])
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
