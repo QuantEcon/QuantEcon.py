@@ -122,7 +122,6 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
         raise NotImplementedError(msg)
 
     best_dev_gains = _best_dev_gains(rpg)
-    C = np.empty((4, 2))
     IC = np.empty(2)
     action_profile_payoff = np.empty(2)
     # auxiliary array for checking if payoff is inside the convex hull
