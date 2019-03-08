@@ -146,9 +146,6 @@ def ar_periodogram(x, window='hanning', window_len=7):
     # === compute periodogram on residuals === #
     w, I_w = periodogram(e_hat, window=window, window_len=window_len)
 
-    # === compute periodogram on residuals === #
-    w, I_w = periodogram(e_hat, window=window, window_len=window_len)
-
     # === recolor and return === #
     I_w = I_w / np.abs(1 - phi * np.exp(1j * w))**2
 
