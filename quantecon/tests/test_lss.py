@@ -7,6 +7,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 from quantecon.lss import LinearStateSpace
+from nose.tools import raises
 
 
 class TestLinearStateSpace(unittest.TestCase):
@@ -63,6 +64,15 @@ class TestLinearStateSpace(unittest.TestCase):
 
         assert_allclose(xval[0], expected_output)
         assert_allclose(yval[0], expected_output)
+
+
+@raises(ValueError)
+def test_non_square_A():
+    A = np.zeros((1, 2))
+    C = np.zeros((1, 1))
+    G = np.zeros((1, 1))
+
+    LinearStateSpace(A, C, G)
 
 
 if __name__ == '__main__':
