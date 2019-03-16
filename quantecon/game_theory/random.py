@@ -2,10 +2,12 @@
 Generate random NormalFormGame instances.
 
 """
+
 import numpy as np
 
 from .normal_form_game import Player, NormalFormGame
 from ..util import check_random_state
+from ..random import probvec
 
 
 def random_game(nums_actions, random_state=None):
@@ -92,3 +94,60 @@ def covariance_game(nums_actions, rho, random_state=None):
         random_state.multivariate_normal(mean, cov, nums_actions)
     g = NormalFormGame(payoff_profile_array)
     return g
+
+
+def random_pure_actions(nums_actions, random_state=None):
+    """
+    Return a tuple of random pure actions (integers).
+
+    Parameters
+    ----------
+    nums_actions : tuple(int)
+        Tuple of the numbers of actions, one for each player.
+
+    random_state : int or np.random.RandomState, optional
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    action_profile : Tuple(int)
+        Tuple of actions, one for each player.
+
+    """
+    random_state = check_random_state(random_state)
+    action_profile = tuple(
+        [random_state.randint(num_actions) for num_actions in nums_actions]
+    )
+    return action_profile
+
+
+def random_mixed_actions(nums_actions, random_state=None):
+    """
+    Return a tuple of random mixed actions (vectors of floats).
+
+    Parameters
+    ----------
+    nums_actions : tuple(int)
+        Tuple of the numbers of actions, one for each player.
+
+    random_state : int or np.random.RandomState, optional
+        Random seed (integer) or np.random.RandomState instance to set
+        the initial state of the random number generator for
+        reproducibility. If None, a randomly initialized RandomState is
+        used.
+
+    Returns
+    -------
+    action_profile : tuple(ndarray(float, ndim=1))
+        Tuple of mixed_actions, one for each player.
+
+    """
+    random_state = check_random_state(random_state)
+    action_profile = tuple(
+        [probvec(1, num_actions, random_state).ravel()
+         for num_actions in nums_actions]
+    )
+    return action_profile
