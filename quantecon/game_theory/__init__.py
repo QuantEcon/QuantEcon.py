@@ -15,3 +15,5 @@ from .mclennan_tourky import mclennan_tourky
 from .vertex_enumeration import vertex_enumeration, vertex_enumeration_gen
 from .game_generators import *
 from .repeated_game import RepeatedGame
+from .fictplay import FictitiousPlay, StochasticFictitiousPlay
+from .localint import LocalInteraction
