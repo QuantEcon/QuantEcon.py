@@ -1,6 +1,8 @@
 """
 Filename: test_fictplay.py
+
 Tests for fictplay.py
+
 """
 
 import numpy as np
@@ -15,8 +17,8 @@ class Test_FictitiousPlay_DecreaingGain:
     def setUp(self):
         '''Setup a FictitiousPlay instance'''
         # symmetric 2x2 coordination game
-        matching_pennies = [[( 1, -1), (-1,  1)],
-                            [(-1,  1), ( 1, -1)]]
+        matching_pennies = [[(1, -1), (-1, 1)],
+                            [(-1, 1), (1, -1)]]
         self.fp = FictitiousPlay(matching_pennies)
 
     def test_play(self):
@@ -25,21 +27,19 @@ class Test_FictitiousPlay_DecreaingGain:
 
     def test_time_series(self):
         x = self.fp.time_series(ts_length=3, init_actions=(0, 0))
-        assert_array_almost_equal(x[0],
-            [[1, 0],
-             [1, 0],
-             [1, 0]])
-        assert_array_almost_equal(x[1],
-            [[1,0],
-             [1/2, 1/2],
-             [1/3, 2/3]])
+        assert_array_almost_equal(x[0], [[1, 0],
+                                         [1, 0],
+                                         [1, 0]])
+        assert_array_almost_equal(x[1], [[1, 0],
+                                         [1/2, 1/2],
+                                         [1/3, 2/3]])
 
 
 class Test_FictitiousPlay_ConstantGain:
 
     def setUp(self):
-        matching_pennies = [[( 1, -1), (-1,  1)],
-                            [(-1,  1), ( 1, -1)]]
+        matching_pennies = [[(1, -1), (-1, 1)],
+                            [(-1, 1), (1, -1)]]
         self.fp = FictitiousPlay(matching_pennies, gain=0.1)
 
     def test_play(self):
@@ -48,22 +48,20 @@ class Test_FictitiousPlay_ConstantGain:
 
     def test_time_series(self):
         x = self.fp.time_series(ts_length=3, init_actions=(0, 0))
-        assert_array_almost_equal(x[0],
-            [[1, 0],
-             [1, 0],
-             [1, 0]]
-            )
-        assert_array_almost_equal(x[1],
-            [[1, 0],
-             [0.9, 0.1],
-             [0.81, 0.19]])
+        assert_array_almost_equal(x[0], [[1, 0],
+                                         [1, 0],
+                                         [1, 0]])
+        assert_array_almost_equal(x[1], [[1, 0],
+                                         [0.9, 0.1],
+                                         [0.81, 0.19]])
+
 
 class Test_StochasticFictitiosuPlay_DecreaingGain:
 
     def setUp(self):
-        matching_pennies = [[( 1, -1), (-1,  1)],
-                            [(-1,  1), ( 1, -1)]]
-        distribution= norm()
+        matching_pennies = [[(1, -1), (-1, 1)],
+                            [(-1, 1), (1, -1)]]
+        distribution = norm()
         self.fp = StochasticFictitiousPlay(matching_pennies,
                                            distribution=distribution)
 
@@ -81,16 +79,16 @@ class Test_StochasticFictitiosuPlay_DecreaingGain:
              for i in range(2)]
         assert_array_almost_equal(x[0][0], x[1][0])
         assert_array_almost_equal(x[0][1], x[1][1])
-        
+
 
 class Test_StochasticFictitiosuPlay_ConstantGain:
 
     def setUp(self):
-        matching_pennies = [[( 1, -1), (-1,  1)],
-                            [(-1,  1), ( 1, -1)]]
+        matching_pennies = [[(1, -1), (-1, 1)],
+                            [(-1, 1), (1, -1)]]
         distribution = norm()
         self.fp = StochasticFictitiousPlay(matching_pennies, gain=0.1,
-                                 distribution=distribution)
+                                           distribution=distribution)
 
     def test_play(self):
         seed = 1234
@@ -107,7 +105,6 @@ class Test_StochasticFictitiosuPlay_ConstantGain:
         assert_array_almost_equal(x[0][0], x[1][0])
         assert_array_almost_equal(x[0][1], x[1][1])
 
-# Invalid inputs #
 
 if __name__ == '__main__':
     import sys

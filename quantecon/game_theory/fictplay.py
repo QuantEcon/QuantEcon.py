@@ -158,8 +158,11 @@ class StochasticFictitiousPlay(FictitiousPlay):
 
     def __init__(self, data, distribution, gain=None):
         FictitiousPlay.__init__(self, data, gain)
+
         self.payoff_perturbation_dist = \
-            lambda size: distribution.rvs(size=size, random_state=random_state)
+            lambda size, random_state: distribution.rvs(
+                                        size=size,
+                                        random_state=random_state)
 
         self.tie_breaking = 'smallest'
 
@@ -167,8 +170,7 @@ class StochasticFictitiousPlay(FictitiousPlay):
         random_state = check_random_state(random_state)
         brs = np.zeros(self.N, dtype=int)
         for i, player in enumerate(self.players):
-            index = [j for j in range(i+1, self.N)]
-            index.extend([j for j in range(i)])
+            index = list(range(i+1, self.N)) + list(range(i))
             opponent_actions = np.asarray([actions[i] for i in index])
             payoff_perturbation = \
                 self.payoff_perturbation_dist(size=self.nums_actions[i],
