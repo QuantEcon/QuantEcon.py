@@ -20,6 +20,89 @@ SimplexResult = namedtuple(
 def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                     A_eq=np.empty((0, 0)), b_eq=np.empty((0,)), max_iter=10**6,
                     tableau=None, basis=None, x=None, lambd=None):
+    """
+    Solve a linear program in the following form by the simplex
+    algorithm (with the lexicographic pivoting rule):
+
+    maximize::
+
+        c @ x
+
+    subject to::
+
+        A_ub @ x <= b_ub
+        A_eq @ x == b_eq
+               x >= 0
+
+    Parameters
+    ----------
+    c : ndarray(float, ndim=1)
+        ndarray of shape (n,).
+
+    A_ub : ndarray(float, ndim=2), optional
+        ndarray of shape (m, n).
+
+    b_ub : ndarray(float, ndim=1), optional
+        ndarray of shape (m,).
+
+    A_eq : ndarray(float, ndim=2), optional
+        ndarray of shape (k, n).
+
+    b_eq : ndarray(float, ndim=1), optional
+        ndarray of shape (k,).
+
+    max_iter : int, optional(default=10**6)
+        Maximum number of iteration to perform.
+
+    tableau : ndarray(float, ndim=2), optional
+        Temporary ndarray of shape (L+1, n+m+L+1) to store the tableau,
+        where L=m+k. Modified in place.
+
+    basis : ndarray(int, ndim=1), optional
+        Temporary ndarray of shape (L,) to store the basic variables.
+        Modified in place.
+
+    x : ndarray(float, ndim=1), optional
+        Output ndarray of shape (n,) to store the primal solution.
+
+    lambd : ndarray(float, ndim=1), optional
+        Output ndarray of shape (L,) to store the dual solution.
+
+    Returns
+    -------
+    res : SimplexResult
+        namedtuple consisting of the fields:
+
+            x : ndarray(float, ndim=1)
+                ndarray of shape (n,) containing the primal solution.
+
+            lambd : ndarray(float, ndim=1)
+                ndarray of shape (L,) containing the dual solution.
+
+            fun : float
+                Value of the objective function.
+
+            success : bool
+                True if the algorithm succeeded in finding an optimal
+                solution.
+
+            status : int
+                An integer representing the exit status of the
+                optimization::
+
+                    0 : Optimization terminated successfully
+                    1 : Iteration limit reached
+                    2 : Problem appears to be infeasible
+                    3 : Problem apperas to be unbounded
+
+            num_iter : int
+                The number of iterations performed.
+
+    References
+    ----------
+    * K. C. Border, "The Gauss–Jordan and Simplex Algorithms," 2004.
+
+    """
     n, m, k = c.shape[0], A_ub.shape[0], A_eq.shape[0]
     L = m + k
 
@@ -69,6 +152,81 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
 
 @jit(nopython=True, cache=True)
 def _initialize_tableau(A_ub, b_ub, A_eq, b_eq, tableau, basis):
+    """
+    Initialize the `tableau` and `basis` arrays in place for Phase 1.
+
+    Suppose that the original linear program has the following form:
+
+    maximize::
+
+        c @ x
+
+    subject to::
+
+        A_ub @ x <= b_ub
+        A_eq @ x == b_eq
+               x >= 0
+
+    Let s be a vector of slack variables converting the inequality
+    constraint to an equality constraint so that the problem turns to be
+    the standard form:
+
+    maximize::
+
+        c @ x
+
+    subject to::
+
+        A_ub @ x + s == b_ub
+        A_eq @ x     == b_eq
+        x, s         >= 0
+
+    Then, let (z1, z2) be a vector of artificial variables for Phase 1:
+    we solve the following LP:
+
+    maximize::
+
+        -(1 @ z1 + 1 @ z2)
+
+    subject to::
+
+        A_ub @ x + s + z1 == b_ub
+        A_eq @ x + z2     == b_eq
+        x, s, z1, z2      >= 0
+
+    The tableau needs to be of shape (L+1, n+m+L+1), where L=m+k.
+
+    Parameters
+    ----------
+    A_ub : ndarray(float, ndim=2)
+        ndarray of shape (m, n).
+
+    b_ub : ndarray(float, ndim=1)
+        ndarray of shape (m,).
+
+    A_eq : ndarray(float, ndim=2)
+        ndarray of shape (k, n).
+
+    b_eq : ndarray(float, ndim=1)
+        ndarray of shape (k,).
+
+    tableau : ndarray(float, ndim=2)
+        Empty ndarray of shape (L+1, n+m+L+1) to store the tableau.
+        Modified in place.
+
+    basis : ndarray(int, ndim=1)
+        Empty ndarray of shape (L,) to store the basic variables.
+        Modified in place.
+
+    Returns
+    -------
+    tableau : ndarray(float, ndim=2)
+        View to `tableau`.
+
+    basis : ndarray(int, ndim=1)
+        View to `basis`.
+
+    """
     m, k = A_ub.shape[0], A_eq.shape[0]
     L = m + k
     n = tableau.shape[1] - (m+L+1)
@@ -114,6 +272,27 @@ def _initialize_tableau(A_ub, b_ub, A_eq, b_eq, tableau, basis):
 
 @jit(nopython=True, cache=True)
 def _set_criterion_row(c, basis, tableau):
+    """
+    Modify the criterion row of the tableau for Phase 2.
+
+    Parameters
+    ----------
+    c : ndarray(float, ndim=1)
+        ndarray of shape (n,).
+
+    basis : ndarray(int, ndim=1)
+        ndarray of shape (L,) containing the basis obtained by Phase 1.
+
+    tableau : ndarray(float, ndim=2)
+        ndarray of shape (L+1, n+m+L+1) containing the tableau obtained
+        by Phase 1. Modified in place.
+
+    Returns
+    -------
+    tableau : ndarray(float, ndim=2)
+        View to `tableau`.
+
+    """
     n = c.shape[0]
     L = basis.shape[0]
 
@@ -136,11 +315,15 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
 
     Used to solve a linear program in the following form:
 
-        maximize:     c @ x
+    maximize::
 
-        subject to:   A_ub @ x <= b_ub
-                      A_eq @ x == b_eq
-                      x >= 0
+        c @ x
+
+    subject to::
+
+        A_ub @ x <= b_ub
+        A_eq @ x == b_eq
+               x >= 0
 
     where A_ub is of shape (m, n) and A_eq is of shape (k, n). Thus,
     `tableau` is of shape (L+1, n+m+L+1), where L=m+k, and
@@ -159,12 +342,23 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
         ndarray of shape (L,) containing the basic variables. Modified
         in place.
 
-    max_iter : scalar(int), optional(default=10**6)
+    max_iter : int, optional(default=10**6)
         Maximum number of pivoting steps.
 
     skip_aux : bool, optional(default=True)
         Whether to skip the coefficients of the auxiliary (or
         artificial) variables in pivot column selection.
+
+    Returns
+    -------
+    success : bool
+        True if the algorithm succeeded in finding an optimal solution.
+
+    status : int
+        An integer representing the exit status of the optimization.
+
+    num_iter : int
+        The number of iterations performed.
 
     """
     L = tableau.shape[0] - 1
@@ -203,6 +397,33 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
 
 @jit(nopython=True, cache=True)
 def _pivot_col(tableau, skip_aux):
+    """
+    Choose the column containing the pivot element: the column
+    containing the maximum positive element in the last row of the
+    tableau.
+
+    `skip_aux` should be True in phase 1, and False in phase 2.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        ndarray of shape (L+1, n+m+L+1) containing the tableau.
+
+    skip_aux : bool
+        Whether to skip the coefficients of the auxiliary (or
+        artificial) variables in pivot column selection.
+
+    Returns
+    -------
+    found : bool
+        True iff there is a positive element in the last row of the
+        tableau (and then pivotting should be conducted).
+
+    pivcol : int
+        The index of column containing the pivot element. (-1 if `found
+        == False`.)
+
+    """
     L = tableau.shape[0] - 1
     criterion_row_stop = tableau.shape[1] - 1
     if skip_aux:
@@ -222,6 +443,37 @@ def _pivot_col(tableau, skip_aux):
 
 @jit(nopython=True, cache=True)
 def get_solution(tableau, basis, x, lambd, b_signs):
+    """
+    Fetch the optimal solution and value from an optimal tableau.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        ndarray of shape (L+1, n+m+L+1) containing the optimal tableau,
+        where L=m+k.
+
+    basis : ndarray(int, ndim=1)
+        Empty ndarray of shape (L,) to store the basic variables.
+        Modified in place.
+
+    x : ndarray(float, ndim=1)
+        Empty ndarray of shape (n,) to store the primal solution.
+        Modified in place.
+
+    lambd : ndarray(float, ndim=1)
+        Empty ndarray of shape (L,) to store the dual solution. Modified
+        in place.
+
+    b_signs : ndarray(bool, ndim=1)
+        ndarray of shape (L,) whose i-th element is True iff the i-th
+        element of the vector (b_ub, b_eq) is positive.
+
+    Returns
+    -------
+    fun : float
+        The optimal value.
+
+    """
     n, L = x.size, lambd.size
     aux_start = tableau.shape[1] - L - 1
 
