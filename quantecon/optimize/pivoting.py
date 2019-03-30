@@ -12,7 +12,7 @@ TOL_RATIO_DIFF = 1e-15
 
 
 @jit(nopython=True, cache=True)
-def _pivoting(tableau, pivot, pivot_row):
+def _pivoting(tableau, pivot_col, pivot_row):
     """
     Perform a pivoting step. Modify `tableau` in place.
 
@@ -21,8 +21,8 @@ def _pivoting(tableau, pivot, pivot_row):
     tableau : ndarray(float, ndim=2)
         Array containing the tableau.
 
-    pivot : scalar(int)
-        Pivot.
+    pivot_col : scalar(int)
+        Pivot column index.
 
     pivot_row : scalar(int)
         Pivot row index.
@@ -35,14 +35,14 @@ def _pivoting(tableau, pivot, pivot_row):
     """
     nrows, ncols = tableau.shape
 
-    pivot_elt = tableau[pivot_row, pivot]
+    pivot_elt = tableau[pivot_row, pivot_col]
     for j in range(ncols):
         tableau[pivot_row, j] /= pivot_elt
 
     for i in range(nrows):
         if i == pivot_row:
             continue
-        multiplier = tableau[i, pivot]
+        multiplier = tableau[i, pivot_col]
         if multiplier == 0:
             continue
         for j in range(ncols):
@@ -53,7 +53,8 @@ def _pivoting(tableau, pivot, pivot_row):
 
 @jit(nopython=True, cache=True)
 def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
-                                    argmins, num_candidates):
+                                    argmins, num_candidates,
+                                    tol_piv, tol_ratio_diff):
     """
     Perform the minimum ratio test, without tie breaking, for the
     candidate rows in `argmins[:num_candidates]`. Return the number
@@ -78,6 +79,13 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
     num_candidates : scalar(int)
         Number of candidate rows in `argmins`.
 
+    tol_piv : scalar(float)
+        Pivot tolerance below which a number is considered to be
+        nonpositive.
+
+    tol_ratio_diff : scalar(float)
+        Tolerance to determine a tie between ratio values.
+
     Returns
     -------
     num_argmins : scalar(int)
@@ -89,12 +97,12 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
 
     for k in range(num_candidates):
         i = argmins[k]
-        if tableau[i, pivot] <= TOL_PIV:  # Treated as nonpositive
+        if tableau[i, pivot] <= tol_piv:  # Treated as nonpositive
             continue
         ratio = tableau[i, test_col] / tableau[i, pivot]
-        if ratio > ratio_min + TOL_RATIO_DIFF:  # Ratio large for i
+        if ratio > ratio_min + tol_ratio_diff:  # Ratio large for i
             continue
-        elif ratio < ratio_min - TOL_RATIO_DIFF:  # Ratio smaller for i
+        elif ratio < ratio_min - tol_ratio_diff:  # Ratio smaller for i
             ratio_min = ratio
             num_argmins = 1
         else:  # Ratio equal
@@ -105,7 +113,8 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
 
 
 @jit(nopython=True, cache=True)
-def _lex_min_ratio_test(tableau, pivot, slack_start, argmins):
+def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
+                        tol_piv=TOL_PIV, tol_ratio_diff=TOL_RATIO_DIFF):
     """
     Perform the lexico-minimum ratio test.
 
@@ -123,6 +132,14 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins):
     argmins : ndarray(int, ndim=1)
         Empty array used to store the row indices. Its length must be no
         smaller than the number of the rows of `tableau`.
+
+    tol_piv : scalar(float), optional
+        Pivot tolerance below which a number is considered to be
+        nonpositive. Default value is {TOL_PIV}.
+
+    tol_ratio_diff : scalar(float), optional
+        Tolerance to determine a tie between ratio values. Default value
+        is {TOL_RATIO_DIFF}.
 
     Returns
     -------
@@ -142,17 +159,25 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins):
     for i in range(nrows):
         argmins[i] = i
 
-    num_argmins = _min_ratio_test_no_tie_breaking(tableau, pivot, -1,
-                                                  argmins, num_candidates)
+    num_argmins = _min_ratio_test_no_tie_breaking(
+        tableau, pivot, -1, argmins, num_candidates, tol_piv, tol_ratio_diff
+    )
     if num_argmins == 1:
         found = True
     elif num_argmins >= 2:
         for j in range(slack_start, slack_start+nrows):
             if j == pivot:
                 continue
-            num_argmins = _min_ratio_test_no_tie_breaking(tableau, pivot, j,
-                                                          argmins, num_argmins)
+            num_argmins = _min_ratio_test_no_tie_breaking(
+                tableau, pivot, j, argmins, num_argmins,
+                tol_piv, tol_ratio_diff
+            )
             if num_argmins == 1:
                 found = True
                 break
     return found, argmins[0]
+
+
+_lex_min_ratio_test.__doc__ = _lex_min_ratio_test.__doc__.format(
+    TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+)
