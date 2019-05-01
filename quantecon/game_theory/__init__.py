@@ -18,3 +18,4 @@ from .repeated_game import RepeatedGame
 from .fictplay import FictitiousPlay, StochasticFictitiousPlay
 from .localint import LocalInteraction
 from .brd import BRD, KMR, SamplingBRD
+from .logitdyn import LogitDynamics
