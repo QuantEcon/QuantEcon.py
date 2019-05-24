@@ -135,20 +135,22 @@ def rouwenhorst(n, ybar, sigma, rho):
     return MarkovChain(theta, bar)
 
 
-def tauchen(rho, sigma_u, m=3, n=7):
+def tauchen(rho, sigma_u, b=0., m=3, n=7):
     r"""
     Computes a Markov chain associated with a discretized version of
     the linear Gaussian AR(1) process
 
     .. math::
 
-        y_{t+1} = \rho y_t + u_{t+1}
+        y_{t+1} = b + \rho y_t + u_{t+1}
 
     using Tauchen's method. Here :math:`{u_t}` is an i.i.d. Gaussian process
     with zero mean.
 
     Parameters
     ----------
+    b : scalar(float)
+        The constant term of {y_t}
     rho : scalar(float)
         The autocorrelation coefficient
     sigma_u : scalar(float)
@@ -167,25 +169,31 @@ def tauchen(rho, sigma_u, m=3, n=7):
 
     """
 
-    # standard deviation of y_t
+    # standard deviation of demeaned y_t
     std_y = np.sqrt(sigma_u**2 / (1 - rho**2))
 
-    # top of discrete state space
+    # top of discrete state space for demeaned y_t
     x_max = m * std_y
 
-    # bottom of discrete state space
+    # bottom of discrete state space for demeaned y_t
     x_min = -x_max
 
-    # discretized state space
+    # discretized state space for demeaned y_t
     x = np.linspace(x_min, x_max, n)
 
     step = (x_max - x_min) / (n - 1)
     half_step = 0.5 * step
     P = np.empty((n, n))
 
+    # approximate Markov transition matrix for
+    # demeaned y_t
     _fill_tauchen(x, P, n, rho, sigma_u, half_step)
 
-    mc = MarkovChain(P, state_values=x)
+    # shifts the state values by the long run mean of y_t
+    mu = b / (1 - rho)
+
+    mc = MarkovChain(P, state_values=x+mu)
+
     return mc
 
 
