@@ -65,6 +65,19 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.4.4 (24-May-2019)
+
+1. FEAT: Add drift term keyword to `markov.tauchen`. [\#484](https://github.com/QuantEcon/QuantEcon.py/pull/484) ([shizejin](https://github.com/shizejin))
+1. FIX: Import scipy.sparse.linalg [\#482](https://github.com/QuantEcon/QuantEcon.py/pull/482) ([oyamad](https://github.com/oyamad))
+1. FIX: `sample\_without\_replacement` using guvectorize [\#479](https://github.com/QuantEcon/QuantEcon.py/pull/479) ([oyamad](https://github.com/oyamad))
+1. FEAT: Add `random\_pure\_actions` and `random\_mixed\_actions` [\#477](https://github.com/QuantEcon/QuantEcon.py/pull/477) ([okuchap](https://github.com/okuchap))
+1. FIX: Raise correct error when `A` is not square in `LinearStateSpace` [\#475](https://github.com/QuantEcon/QuantEcon.py/pull/475) ([QBatista](https://github.com/QBatista))
+1. FIX: alerts by lgtm [\#474](https://github.com/QuantEcon/QuantEcon.py/pull/474) ([okuchap](https://github.com/okuchap))
+1. Fix flake8 errors [\#470](https://github.com/QuantEcon/QuantEcon.py/pull/470) ([rht](https://github.com/rht))
+1. TEST: Fix the names of tests for `brent\_max` [\#469](https://github.com/QuantEcon/QuantEcon.py/pull/469) ([QBatista](https://github.com/QBatista))
+1. DOC: Update example for `nelder\_mead` [\#468](https://github.com/QuantEcon/QuantEcon.py/pull/468) ([QBatista](https://github.com/QBatista))
+1. FIX: all F401 unused imports [\#467](https://github.com/QuantEcon/QuantEcon.py/pull/467) ([rht](https://github.com/rht))
+
 ### Ver 0.4.3 (17-December-2018)
 
 1.  INFRA: Isolate rtd-specific requirements to doc-requirements.txt [\#464](https://github.com/QuantEcon/QuantEcon.py/pull/464) ([rht](https://github.com/rht))

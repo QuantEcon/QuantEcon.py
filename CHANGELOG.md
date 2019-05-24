@@ -1,5 +1,33 @@
 # Change Log
 
+## [0.4.4](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.4) (2019-05-24)
+
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.3...0.4.4)
+
+**Fixed bugs:**
+
+- Error resulting from DiscreteDP? [\#481](https://github.com/QuantEcon/QuantEcon.py/issues/481)
+
+**Closed issues:**
+
+- Error in `sample\_without\_replacement` with Numba 0.43.0 [\#478](https://github.com/QuantEcon/QuantEcon.py/issues/478)
+- Add random action profile generator [\#473](https://github.com/QuantEcon/QuantEcon.py/issues/473)
+- Different functions have the same name in test\_scalar\_max [\#452](https://github.com/QuantEcon/QuantEcon.py/issues/452)
+
+**Merged pull requests:**
+
+- Add drift term keyword to `markov.tauchen`. [\#484](https://github.com/QuantEcon/QuantEcon.py/pull/484) ([shizejin](https://github.com/shizejin))
+- FIX: Import scipy.sparse.linalg [\#482](https://github.com/QuantEcon/QuantEcon.py/pull/482) ([oyamad](https://github.com/oyamad))
+- Fix `sample\_without\_replacement` using guvectorize [\#479](https://github.com/QuantEcon/QuantEcon.py/pull/479) ([oyamad](https://github.com/oyamad))
+- FEAT: Add `random\_pure\_actions` and `random\_mixed\_actions` [\#477](https://github.com/QuantEcon/QuantEcon.py/pull/477) ([okuchap](https://github.com/okuchap))
+- FIX: Raise correct error when `A` is not square in `LinearStateSpace` [\#475](https://github.com/QuantEcon/QuantEcon.py/pull/475) ([QBatista](https://github.com/QBatista))
+- Fix alerts by lgtm [\#474](https://github.com/QuantEcon/QuantEcon.py/pull/474) ([okuchap](https://github.com/okuchap))
+- FIX: RTD not compiling  [\#472](https://github.com/QuantEcon/QuantEcon.py/pull/472) ([mmcky](https://github.com/mmcky))
+- Fix flake8 errors [\#470](https://github.com/QuantEcon/QuantEcon.py/pull/470) ([rht](https://github.com/rht))
+- TEST: Fix the names of tests for `brent\_max` [\#469](https://github.com/QuantEcon/QuantEcon.py/pull/469) ([QBatista](https://github.com/QBatista))
+- DOC: Update example for `nelder\_mead` [\#468](https://github.com/QuantEcon/QuantEcon.py/pull/468) ([QBatista](https://github.com/QBatista))
+- Fix all F401 unused imports [\#467](https://github.com/QuantEcon/QuantEcon.py/pull/467) ([rht](https://github.com/rht))
+
 ## [0.4.3](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.3) (2018-12-17)
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.2...0.4.3)
 
