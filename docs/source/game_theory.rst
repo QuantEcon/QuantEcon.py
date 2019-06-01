@@ -4,7 +4,11 @@ Game theory
 .. toctree::
    :maxdepth: 2
 
+   game_theory/brd
+   game_theory/fictplay
    game_theory/lemke_howson
+   game_theory/localint
+   game_theory/logitdyn
    game_theory/mclennan_tourky
    game_theory/normal_form_game
    game_theory/pure_nash
