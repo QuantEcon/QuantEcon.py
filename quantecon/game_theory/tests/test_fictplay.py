@@ -12,7 +12,7 @@ from scipy.stats import norm
 from quantecon.game_theory import FictitiousPlay, StochasticFictitiousPlay
 
 
-class Test_FictitiousPlay_DecreaingGain:
+class TestFictitiousPlayDecreaingGain:
 
     def setUp(self):
         '''Setup a FictitiousPlay instance'''
@@ -22,8 +22,8 @@ class Test_FictitiousPlay_DecreaingGain:
         self.fp = FictitiousPlay(matching_pennies)
 
     def test_play(self):
-        x = [np.asarray([1, 0]), np.asarray([0.5, 0.5])]
-        assert_array_almost_equal(self.fp.play(init_actions=(0, 0)), x)
+        x = (np.array([1, 0]), np.array([0.5, 0.5]))
+        assert_array_almost_equal(self.fp.play(actions=(0, 0)), x)
 
     def test_time_series(self):
         x = self.fp.time_series(ts_length=3, init_actions=(0, 0))
@@ -35,7 +35,7 @@ class Test_FictitiousPlay_DecreaingGain:
                                          [1/3, 2/3]])
 
 
-class Test_FictitiousPlay_ConstantGain:
+class TestFictitiousPlayConstantGain:
 
     def setUp(self):
         matching_pennies = [[(1, -1), (-1, 1)],
@@ -43,8 +43,8 @@ class Test_FictitiousPlay_ConstantGain:
         self.fp = FictitiousPlay(matching_pennies, gain=0.1)
 
     def test_play(self):
-        x = [np.asarray([1, 0]), np.asarray([0.9, 0.1])]
-        assert_array_almost_equal(self.fp.play(init_actions=(0, 0)), x)
+        x = (np.array([1, 0]), np.array([0.9, 0.1]))
+        assert_array_almost_equal(self.fp.play(actions=(0, 0)), x)
 
     def test_time_series(self):
         x = self.fp.time_series(ts_length=3, init_actions=(0, 0))
@@ -56,7 +56,7 @@ class Test_FictitiousPlay_ConstantGain:
                                          [0.81, 0.19]])
 
 
-class Test_StochasticFictitiosuPlay_DecreaingGain:
+class TestStochasticFictitiosuPlayDecreaingGain:
 
     def setUp(self):
         matching_pennies = [[(1, -1), (-1, 1)],
@@ -67,7 +67,7 @@ class Test_StochasticFictitiosuPlay_DecreaingGain:
 
     def test_play(self):
         seed = 1234
-        x = [self.fp.play(init_actions=(0, 0),
+        x = [self.fp.play(actions=(0, 0),
                           random_state=np.random.RandomState(seed))
              for i in range(2)]
         assert_array_almost_equal(x[0], x[1])
@@ -81,7 +81,7 @@ class Test_StochasticFictitiosuPlay_DecreaingGain:
         assert_array_almost_equal(x[0][1], x[1][1])
 
 
-class Test_StochasticFictitiosuPlay_ConstantGain:
+class TestStochasticFictitiosuPlayConstantGain:
 
     def setUp(self):
         matching_pennies = [[(1, -1), (-1, 1)],
@@ -92,7 +92,7 @@ class Test_StochasticFictitiosuPlay_ConstantGain:
 
     def test_play(self):
         seed = 1234
-        x = [self.fp.play(init_actions=(0, 0),
+        x = [self.fp.play(actions=(0, 0),
                           random_state=np.random.RandomState(seed))
              for i in range(2)]
         assert_array_almost_equal(x[0], x[1])

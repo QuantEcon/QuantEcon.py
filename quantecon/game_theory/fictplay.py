@@ -1,44 +1,45 @@
 import numpy as np
-from .normal_form_game import NormalFormGame, pure2mixed
+from .normal_form_game import NormalFormGame
 from ..util import check_random_state
-from .random import random_pure_actions
+from .random import _random_mixed_actions
+from .utilities import _copy_action_profile_to
 
 
 class FictitiousPlay:
     """
-    Class representing the fictitious play model.
+    Class representing a fictitious play model.
 
     Parameters
     ----------
-    data : NormalFormGame or array-like
-        The game played in fictitious play model
+    data : NormalFormGame, or array_like
+        The game played in a fictitious play model. `data` must be either
+        `NormalFormGame` or an array. See `NormalFormGame`.
 
     gain : scalar(float), optional(default=None)
-        The gain of fictitous play model. If gain is None, the model becomes
-        decreasing gain model. If gain is scalar, the model becomes constant
-        constant gain model.
+        The gain of fictitous play model. If gain is None, the model becomes a
+        decreasing gain model. If gain is a scalar, the model becomes a constant
+        gain model.
 
     Attributes
     ----------
     g : NomalFormGame
-        The game. See Parameters.
+        The game played in the model.
 
     N : scalar(int)
         The number of players in the model.
 
-    players : Player
-        Player instance in the model.
+    players : tuple(Player)
+        Tuple of the Player instances in the model.
 
     nums_actions : tuple(int)
         Tuple of the number of actions, one for each player.
-    """
 
+    """
     def __init__(self, data, gain=None):
         if isinstance(data, NormalFormGame):
             self.g = data
-        else:  # data must be array_like
-            payoffs = np.asarray(data)
-            self.g = NormalFormGame(payoffs)
+        else:
+            self.g = NormalFormGame(data)
 
         self.N = self.g.N
         self.players = self.g.players
@@ -46,61 +47,76 @@ class FictitiousPlay:
         self.tie_breaking = 'smallest'
 
         if gain is None:
-            self.step_size = lambda t: 1 / (t+1)  # decreasing gain
+            self.step_size = lambda t: 1 / (t+2)  # decreasing gain
         else:
             self.step_size = lambda t: gain  # constant gain
 
-    def _play(self, actions, t, random_state=None):
-        brs = np.zeros(self.N, dtype=int)
+    def _play(self, actions, t, brs, tie_breaking, tol, random_state):
         for i, player in enumerate(self.players):
-            index = [j for j in range(i+1, self.N)]
-            index.extend([j for j in range(i)])
-            opponent_actions = np.asarray([actions[i] for i in index])
+            opponents_actions = tuple(actions[i+1:]) + tuple(actions[:i])
             brs[i] = player.best_response(
-                opponent_actions if self.N > 2 else opponent_actions[0],
-                tie_breaking=self.tie_breaking)
+                opponents_actions if self.N > 2 else opponents_actions[0],
+                tie_breaking=tie_breaking, tol=tol, random_state=random_state
+            )
 
         for i in range(self.N):
-            actions[i][:] *= 1 - self.step_size(t+1)
-            actions[i][brs[i]] += self.step_size(t+1)
+            actions[i][:] *= 1 - self.step_size(t)
+            actions[i][brs[i]] += self.step_size(t)
 
         return actions
 
-    def play(self, init_actions=None, num_reps=1, t_init=0, random_state=None):
+    def play(self, actions=None, num_reps=1, t_init=0, out=None, **options):
         """
         Return a new action profile which is updated by playing the game
         `num_reps` times.
 
         Parameters
         ----------
-        init_actions : tuple(int), optional(default=None)
-            The action profile in the first period. If None, selected randomly.
+        actions : tuple(array_like(float)), optional(default=None)
+            The action profile in the initial period. If None, selected
+            randomly.
 
         num_reps : scalar(int), optional(default=1)
             The number of iterations.
 
         t_init : scalar(int), optional(default=0)
-            The period the game starts.
+            The period when the game starts.
+
+        out : tuple(array_like(float)), optional(default=None)
+            Alternative output tuple of arrays in which to place the result.
+            Must be of the same shape as the expected output. 
+
+        **options : Keyword arguments passed to the best response method and
+                    other methods.
 
         Returns
         -------
-        tuple(int)
-            The action profile after iteration.
-        """
-        random_state = check_random_state(random_state)
-        if init_actions is None:
-            init_actions = random_pure_actions(self.nums_actions, random_state)
-        actions = [i for i in init_actions]
-        for i in range(self.N):
-            actions[i] = pure2mixed(self.nums_actions[i], init_actions[i])
-        for t in range(num_reps):
-            actions = self._play(actions, t+t_init, random_state)
-        return actions
+        tuple(ndarray(float, ndim=1))
+            The mixed action profile after iteration.
 
-    def time_series(self, ts_length, init_actions=None, t_init=0,
-                    random_state=None):
         """
-        Return the array representing time series of normalized action history.
+        tie_breaking = options.get('tie_breaking', self.tie_breaking)
+        tol = options.get('tol', None)
+        random_state = check_random_state(options.get('random_state', None))
+
+        if out is None:
+            out = tuple(np.empty(n) for n in self.nums_actions)
+
+        if actions is None:
+            _random_mixed_actions(out, random_state)
+        else:
+            _copy_action_profile_to(out, actions)
+
+        brs = np.empty(self.N, dtype=int)
+        for t in range(t_init, t_init+num_reps):
+            out = self._play(out, t, brs, tie_breaking, tol, random_state)
+
+        return out
+
+    def time_series(self, ts_length, init_actions=None, t_init=0, **options):
+        """
+        Return a tuple of arrays representing a time series of mixed action
+        profiles.
 
         Parameters
         ----------
@@ -108,54 +124,66 @@ class FictitiousPlay:
             The number of iterations.
 
         init_actions : tuple(int), optional(default=None)
-            The action profile in the first period. If None, selected randomly.
+            The action profile in the initial period. If None, selected
+            randomly.
 
         t_init : scalar(int), optional(default=0)
-            The period the game starts.
+            The period when the game starts.
+
+        **options : Keyword arguments passed to the best response method and
+                    other methods.
 
         Returns
         -------
-        Array
-            The array representing time series of normalized action history.
+        tuple(ndarray(float, ndim=2))
+            Tuple of arrays representing time series of mixed action profile.
+
         """
-        random_state = check_random_state(random_state)
+        tie_breaking = options.get('tie_breaking', self.tie_breaking)
+        tol = options.get('tol', None)
+        random_state = check_random_state(options.get('random_state', None))
+
+        out = tuple(np.empty((ts_length, n)) for n in self.nums_actions)
+        out_init = tuple(out[i][0, :] for i in range(self.N))
+
         if init_actions is None:
-            init_actions = random_pure_actions(self.nums_actions, random_state)
-        out = [np.empty((ts_length, self.nums_actions[i]))
-               for i in range(self.N)]
-        actions = [np.empty(self.nums_actions[i]) for i in range(self.N)]
-        for i in range(self.N):
-            actions[i] = pure2mixed(self.nums_actions[i], init_actions[i])[:]
-        for t in range(ts_length):
+            _random_mixed_actions(out_init, random_state)
+        else:
+            _copy_action_profile_to(out_init, init_actions)
+
+        actions = tuple(np.copy(action) for action in out_init)
+        brs = np.empty(self.N, dtype=int)
+        for j in range(1, ts_length):
+            self._play(actions, t_init+j-1, brs,
+                       tie_breaking, tol, random_state)
             for i in range(self.N):
-                out[i][t, :] = actions[i][:]
-            actions = self._play(actions, t+t_init, random_state)
+                np.copyto(out[i][j, :], actions[i])
+
         return out
 
 
 class StochasticFictitiousPlay(FictitiousPlay):
     """
-    Class representing the stoochastic fictitous play model.
-    Subclass of FictitiousPlay.
+    Class representing a stochastic fictitious play model.
 
     Parameters
     ----------
-    data : NormalFormGame or array-like
+    data : NormalFormGame or array_like
         The game played in the stochastic fictitious play model.
 
     distribution : scipy.stats object
-        statistical distribution from scipy.stats
+        The distribution of payoff shocks, which is a `scipy.stats` object.
 
-    gain : scalar(int), optional(default=None)
-        The gain of fictitous play model. If gain is None, the model becomes
-        decreasing gain model. If gain is scalar, the model becomes constant
-        constant gain model.
+    gain : scalar(scalar), optional(default=None)
+        The gain of fictitious play model. If gain is None, the model becomes a
+        decreasing gain model. If gain is a scalar, the model becomes a constant
+        gain model.
 
     Attributes
     ----------
-    See attributes of FictitousPlay.
-    """
+    See attributes of `FictitousPlay`.
 
+    """
     def __init__(self, data, distribution, gain=None):
         FictitiousPlay.__init__(self, data, gain)
 
@@ -164,24 +192,21 @@ class StochasticFictitiousPlay(FictitiousPlay):
                                         size=size,
                                         random_state=random_state)
 
-        self.tie_breaking = 'smallest'
-
-    def _play(self, actions, t, random_state=None):
-        random_state = check_random_state(random_state)
-        brs = np.zeros(self.N, dtype=int)
+    def _play(self, actions, t, brs, tie_breaking, tol, random_state):
         for i, player in enumerate(self.players):
-            index = list(range(i+1, self.N)) + list(range(i))
-            opponent_actions = np.asarray([actions[i] for i in index])
+            opponents_actions = tuple(actions[i+1:]) + tuple(actions[:i])
             payoff_perturbation = \
                 self.payoff_perturbation_dist(size=self.nums_actions[i],
                                               random_state=random_state)
             brs[i] = player.best_response(
-                opponent_actions if self.N > 2 else opponent_actions[0],
-                tie_breaking=self.tie_breaking,
-                payoff_perturbation=payoff_perturbation)
+                opponents_actions if self.N > 2 else opponents_actions[0],
+                tie_breaking=tie_breaking,
+                payoff_perturbation=payoff_perturbation,
+                tol=tol, random_state=random_state
+            )
 
         for i in range(self.N):
-            actions[i][:] *= 1 - self.step_size(t+1)
-            actions[i][brs[i]] += self.step_size(t+1)
+            actions[i][:] *= 1 - self.step_size(t)
+            actions[i][brs[i]] += self.step_size(t)
 
         return actions
