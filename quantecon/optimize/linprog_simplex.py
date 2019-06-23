@@ -8,17 +8,24 @@ from numba import jit
 from .pivoting import _pivoting, _lex_min_ratio_test
 
 
-FEA_TOL = 1e-6
-
-
 SimplexResult = namedtuple(
     'SimplexResult', ['x', 'lambd', 'fun', 'success', 'status', 'num_iter']
 )
 
+FEA_TOL = 1e-6
+TOL_PIV = 1e-7
+TOL_RATIO_DIFF = 1e-13
+
+PivOptions = namedtuple(
+    'PivOptions', ['fea_tol', 'tol_piv', 'tol_ratio_diff']
+)
+PivOptions.__new__.__defaults__ = (FEA_TOL, TOL_PIV, TOL_RATIO_DIFF)
+
 
 @jit(nopython=True, cache=True)
 def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
-                    A_eq=np.empty((0, 0)), b_eq=np.empty((0,)), max_iter=10**6,
+                    A_eq=np.empty((0, 0)), b_eq=np.empty((0,)),
+                    max_iter=10**6, piv_options=PivOptions(),
                     tableau=None, basis=None, x=None, lambd=None):
     """
     Solve a linear program in the following form by the simplex
@@ -53,6 +60,19 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
 
     max_iter : int, optional(default=10**6)
         Maximum number of iteration to perform.
+
+    piv_options : PivOptions, optional
+        PivOptions namedtuple to set the following tolerance values:
+
+            fea_tol : float
+                Feasibility tolerance (default={FEA_TOL}).
+
+            tol_piv : float
+                Pivot tolerance (default={TOL_PIV}).
+
+            tol_ratio_diff : float
+                Tolerance used in the the lexicographic pivoting
+                (default={TOL_RATIO_DIFF}).
 
     tableau : ndarray(float, ndim=2), optional
         Temporary ndarray of shape (L+1, n+m+L+1) to store the tableau,
@@ -129,11 +149,12 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
 
     # Phase 1
     success, status, num_iter_1 = \
-        solve_tableau(tableau, basis, max_iter, skip_aux=False)
+        solve_tableau(tableau, basis, max_iter, skip_aux=False,
+                      piv_options=piv_options)
     num_iter += num_iter_1
     if not success:  # max_iter exceeded
         return SimplexResult(x, lambd, fun, success, status, num_iter)
-    if tableau[-1, -1] > FEA_TOL:  # Infeasible
+    if tableau[-1, -1] > piv_options.fea_tol:  # Infeasible
         success = False
         status = 2
         return SimplexResult(x, lambd, fun, success, status, num_iter)
@@ -143,11 +164,17 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
 
     # Phase 2
     success, status, num_iter_2 = \
-        solve_tableau(tableau, basis, max_iter-num_iter, skip_aux=True)
+        solve_tableau(tableau, basis, max_iter-num_iter, skip_aux=True,
+                      piv_options=piv_options)
     num_iter += num_iter_2
     fun = get_solution(tableau, basis, x, lambd, b_signs)
 
     return SimplexResult(x, lambd, fun, success, status, num_iter)
+
+
+linprog_simplex.__doc__ = linprog_simplex.__doc__.format(
+    FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+)
 
 
 @jit(nopython=True, cache=True)
@@ -309,7 +336,8 @@ def _set_criterion_row(c, basis, tableau):
 
 
 @jit(nopython=True, cache=True)
-def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
+def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True,
+                  piv_options=PivOptions()):
     """
     Perform the simplex algorithm on a given tableau in canonical form.
 
@@ -349,6 +377,9 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
         Whether to skip the coefficients of the auxiliary (or
         artificial) variables in pivot column selection.
 
+    piv_options : PivOptions, optional
+        PivOptions namedtuple to set the tolerance values.
+
     Returns
     -------
     success : bool
@@ -373,7 +404,7 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
     while num_iter < max_iter:
         num_iter += 1
 
-        pivcol_found, pivcol = _pivot_col(tableau, skip_aux)
+        pivcol_found, pivcol = _pivot_col(tableau, skip_aux, piv_options)
 
         if not pivcol_found:  # Optimal
             success = True
@@ -381,8 +412,10 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
             break
 
         aux_start = tableau.shape[1] - L - 1
-        pivrow_found, pivrow = _lex_min_ratio_test(tableau[:-1, :], pivcol,
-                                                   aux_start, argmins)
+        pivrow_found, pivrow = _lex_min_ratio_test(
+            tableau[:-1, :], pivcol, aux_start, argmins,
+            piv_options.tol_piv, piv_options.tol_ratio_diff
+        )
 
         if not pivrow_found:  # Unbounded
             success = False
@@ -396,7 +429,7 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True):
 
 
 @jit(nopython=True, cache=True)
-def _pivot_col(tableau, skip_aux):
+def _pivot_col(tableau, skip_aux, piv_options):
     """
     Choose the column containing the pivot element: the column
     containing the maximum positive element in the last row of the
@@ -412,6 +445,9 @@ def _pivot_col(tableau, skip_aux):
     skip_aux : bool
         Whether to skip the coefficients of the auxiliary (or
         artificial) variables in pivot column selection.
+
+    piv_options : PivOptions, optional
+        PivOptions namedtuple to set the tolerance values.
 
     Returns
     -------
@@ -431,7 +467,7 @@ def _pivot_col(tableau, skip_aux):
 
     found = False
     pivcol = -1
-    coeff = FEA_TOL
+    coeff = piv_options.fea_tol
     for j in range(criterion_row_stop):
         if tableau[-1, j] > coeff:
             coeff = tableau[-1, j]
