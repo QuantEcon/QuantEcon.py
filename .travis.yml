@@ -50,6 +50,9 @@ script:
   - nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
 after_success:
-  - coveralls
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        coveralls
+    fi
   # Enable this to occasionally test performance
   # - nosetests -a "slow"
