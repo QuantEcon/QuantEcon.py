@@ -37,16 +37,13 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
         attained.  A value of 0 implies that the maximum was not hit.
         The value `num_iter` is the number of function calls.
 
-    Example
-    -------
-
-    ```
-        @njit
-        def f(x):
-            return -(x + 2.0)**2 + 1.0
-
-        xf, fval, info = brent_max(f, -2, 2)
-    ```
+    Examples
+    --------
+    >>> @njit
+    ... def f(x):
+    ...     return -(x + 2.0)**2 + 1.0
+    ...
+    >>> xf, fval, info = brent_max(f, -2, 2)
 
     """
     if not np.isfinite(a):
