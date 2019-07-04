@@ -29,7 +29,7 @@ from .inequality import lorenz_curve, gini_coefficient, shorrocks_index
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
-from .lqcontrol import LQ
+from .lqcontrol import LQ, LQMarkov
 from .filter import hamilton_filter
 from .lqnash import nnash
 from .lss import LinearStateSpace
