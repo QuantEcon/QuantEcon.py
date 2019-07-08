@@ -223,3 +223,91 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
             i += 1
 
     return H1 + gamma * I  # Return X
+
+
+def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
+                                  tolerance=1e-10, max_iter=1000):
+    """
+    Solves the stacked system of algebraic matrix Riccati equations
+    in the Markov Jump linear quadratic control problems, by iterating
+    Ps matrices until convergence.
+
+    Parameters
+    ----------
+    Π : array_like(float, ndim=2)
+        The Markov chain transition matrix with dimension m x m.
+    As : array_like(float)
+        Consists of m state transition matrices A(s) with dimension
+        n x n for each Markov state s
+    Bs : array_like(float)
+        Consists of m state transition matrices B(s) with dimension
+        n x k for each Markov state s
+    Cs : array_like(float), optional(default=None)
+        Consists of m state transition matrices C(s) with dimension
+        n x j for each Markov state s. If the model is deterministic
+        then Cs should take default value of None
+    Qs : array_like(float)
+        Consists of m symmetric and non-negative definite payoff
+        matrices Q(s) with dimension k x k that corresponds with
+        the control variable u for each Markov state s
+    Rs : array_like(float)
+        Consists of m symmetric and non-negative definite payoff
+        matrices R(s) with dimension n x n that corresponds with
+        the state variable x for each Markov state s
+    Ns : array_like(float), optional(default=None)
+        Consists of m cross product term matrices N(s) with dimension
+        k x n for each Markov state,
+    beta : scalar(float), optional(default=1)
+        beta is the discount parameter
+    tolerance : scalar(float), optional(default=1e-10)
+        The tolerance level for convergence
+    max_iter : scalar(int), optional(default=500)
+        The maximum number of iterations allowed
+
+    Returns
+    -------
+    Ps : array_like(float, ndim=2)
+        The fixed point of the stacked system of algebraic matrix
+        Riccati equations, consists of m n x n P(s) matrices
+
+    """
+    m = Qs.shape[0]
+    k, n = Qs.shape[1], Rs.shape[1]
+    # Create the Ps matrices, initialize as identity matrix
+    Ps = np.array([np.eye(n) for i in range(m)])
+    Ps1 = np.copy(Ps)
+
+    # == Set up for iteration on Riccati equations system == #
+    error = tolerance + 1
+    fail_msg = "Convergence failed after {} iterations."
+
+    # == Prepare array for iteration == #
+    sum1, sum2 = np.empty((n, n)), np.empty((n, n))
+
+    # == Main loop == #
+    iteration = 0
+    while error > tolerance:
+
+        if iteration > max_iter:
+            raise ValueError(fail_msg.format(max_iter))
+
+        else:
+            error = 0
+            for i in range(m):
+                # Initialize arrays
+                sum1[:, :] = 0.
+                sum2[:, :] = 0.
+                for j in range(m):
+                    sum1 += beta * Π[i, j] * As[i].T @ Ps[j] @ As[i]
+                    sum2 += Π[i, j] * \
+                            (beta * As[i].T @ Ps[j] @ Bs[i] + Ns[i].T) @ \
+                            solve(Qs[i] + beta * Bs[i].T @ Ps[j] @ Bs[i],
+                                  beta * Bs[i].T @ Ps[j] @ As[i] + Ns[i])
+
+                Ps1[i][:, :] = Rs[i] + sum1 - sum2
+                error += np.max(np.abs(Ps1[i] - Ps[i]))
+
+            Ps[:, :, :] = Ps1[:, :, :]
+            iteration += 1
+
+    return Ps
