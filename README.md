@@ -65,6 +65,15 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.4.5 (08-July-2019)
+
+**Merged pull requests:**
+
+- ENH: Add `LQMarkov`. [\#489](https://github.com/QuantEcon/QuantEcon.py/pull/489) ([shizejin](https://github.com/shizejin))
+- FIX: Increase `tol` in `rouwenhorst` test. [\#492](https://github.com/QuantEcon/QuantEcon.py/pull/492) ([shizejin](https://github.com/shizejin)) to fix [\#491](https://github.com/QuantEcon/QuantEcon.py/issues/491)
+- TRAVIS: Set coverage branch as `linux`. [\#490](https://github.com/QuantEcon/QuantEcon.py/pull/490) ([shizejin](https://github.com/shizejin))
+- FIX: DOC: Remove `matplotlib.sphinxext.only\_directives` [\#488](https://github.com/QuantEcon/QuantEcon.py/pull/488) ([oyamad](https://github.com/oyamad))
+
 ### Ver 0.4.4 (24-May-2019)
 
 1. FEAT: Add drift term keyword to `markov.tauchen`. [\#484](https://github.com/QuantEcon/QuantEcon.py/pull/484) ([shizejin](https://github.com/shizejin))
