@@ -59,7 +59,7 @@ class TestRouwenhorst(unittest.TestCase):
         self.rho, self.sigma = np.random.uniform(0, 1, size=2)
         self.n = np.random.random_integers(3, 25)
         self.ybar = np.random.random_integers(0, 10)
-        self.tol = 1e-12
+        self.tol = 1e-10
 
         mc = rouwenhorst(self.n, self.ybar, self.sigma, self.rho)
         self.x, self.P = mc.state_values, mc.P
