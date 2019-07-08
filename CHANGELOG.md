@@ -1,7 +1,21 @@
 # Change Log
 
-## [0.4.4](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.4) (2019-05-24)
+## [0.4.5](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.5) (2019-07-08)
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.4...0.4.5)
 
+**Closed issues:**
+
+- Tests of `rouwenhorst` fails occasionally [\#491](https://github.com/QuantEcon/QuantEcon.py/issues/491)
+
+**Merged pull requests:**
+
+- Release of version 0.4.5 [\#493](https://github.com/QuantEcon/QuantEcon.py/pull/493) ([mmcky](https://github.com/mmcky))
+- FIX: Increase `tol` in `rouwenhorst` test. [\#492](https://github.com/QuantEcon/QuantEcon.py/pull/492) ([shizejin](https://github.com/shizejin))
+- TRAVIS: Set coverage branch as `linux`. [\#490](https://github.com/QuantEcon/QuantEcon.py/pull/490) ([shizejin](https://github.com/shizejin))
+- Add `LQMarkov`. [\#489](https://github.com/QuantEcon/QuantEcon.py/pull/489) ([shizejin](https://github.com/shizejin))
+- FIX: DOC: Remove `matplotlib.sphinxext.only\_directives` [\#488](https://github.com/QuantEcon/QuantEcon.py/pull/488) ([oyamad](https://github.com/oyamad))
+
+## [0.4.4](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.4) (2019-05-24)
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.3...0.4.4)
 
 **Fixed bugs:**
@@ -16,6 +30,7 @@
 
 **Merged pull requests:**
 
+- Release of version 0.4.4 [\#485](https://github.com/QuantEcon/QuantEcon.py/pull/485) ([mmcky](https://github.com/mmcky))
 - Add drift term keyword to `markov.tauchen`. [\#484](https://github.com/QuantEcon/QuantEcon.py/pull/484) ([shizejin](https://github.com/shizejin))
 - FIX: Import scipy.sparse.linalg [\#482](https://github.com/QuantEcon/QuantEcon.py/pull/482) ([oyamad](https://github.com/oyamad))
 - Fix `sample\_without\_replacement` using guvectorize [\#479](https://github.com/QuantEcon/QuantEcon.py/pull/479) ([oyamad](https://github.com/oyamad))
