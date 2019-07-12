@@ -1,0 +1,9 @@
+INSTALLING LIBRARIES
+
+Suppose we want to install the library called QuantEcon.py. Type the following into a terminal:
+
+pip install quantecon
+
+To upgrade the library to the latest version, use:
+
+pip install --upgrade quantecon  
