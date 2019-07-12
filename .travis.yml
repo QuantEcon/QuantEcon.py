@@ -5,6 +5,7 @@
 
 sudo: false        #Use new Container Infrastructure
 language: python
+dist: xenial
 
 cache:
   pip: true
