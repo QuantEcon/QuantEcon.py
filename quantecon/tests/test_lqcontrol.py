@@ -95,7 +95,7 @@ class TestLQMarkov(unittest.TestCase):
 
     def setUp(self):
 
-        # Markove chain transition matrix
+        # Markov chain transition matrix
         Π = np.array([[0.8, 0.2],
                       [0.2, 0.8]])
 
@@ -153,7 +153,7 @@ class TestLQMarkov(unittest.TestCase):
         lq_markov_scalar = self.lq_markov_scalar
         x0 = 2
 
-        expected_x_seq = np.array([[2., 1.15977567, 1.20677567]])
+        expected_x_seq = np.array([[2., 1.15977567, 0.6725398]])
         expected_u_seq = np.array([[1.28044866, 0.7425166]])
         expected_w_seq = np.array([[1.3486939, 0.55721062, 0.53423587]])
         expected_state = np.array([1, 1, 1])
@@ -188,8 +188,8 @@ class TestLQMarkov(unittest.TestCase):
         lq_markov_mat = self.lq_markov_mat1
         x0 = np.array([[1000, 1, 25]])
 
-        expected_x_seq = np.array([[1.00000000e+03, 1.01490556e+03],
-                                   [1.00000000e+00, 2.18454431e+00],
+        expected_x_seq = np.array([[1.00000000e+03, 1.01372101e+03],
+                                   [1.00000000e+00, 1.00000000e+00],
                                    [2.50000000e+01, 2.61845443e+01]])
         expected_u_seq = np.array([[1013.72101253]])
         expected_w_seq = np.array([[0.41782708, 1.18454431]])

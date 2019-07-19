@@ -605,6 +605,6 @@ class LQMarkov:
             u_path[:, t] = - (Fs[state[t]] @ x_path[:, t])
         Ax = As[state[T]] @ x_path[:, T-1]
         Bu = Bs[state[T]] @ u_path[:, T-1]
-        x_path[:, T] = Ax + Bu + w_path[:, T]
+        x_path[:, T] = Ax + Bu + Cw_path[:, T]
 
         return x_path, u_path, w_path, state
