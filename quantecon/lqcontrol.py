@@ -298,7 +298,8 @@ class LQ:
         # == Preliminaries, infinite horizon case == #
         else:
             T = ts_length if ts_length else 100
-            self.stationary_values(method=method)
+            if self.P is None:
+                self.stationary_values(method=method)
 
         # == Set up initial condition and arrays to store paths == #
         random_state = check_random_state(random_state)
@@ -570,7 +571,8 @@ class LQMarkov:
         """
 
         # === solve for optimal policies === #
-        self.stationary_values()
+        if self.Ps is None:
+            self.stationary_values()
 
         # === Simplify notation === #
         As, Bs, Cs = self.As, self.Bs, self.Cs
