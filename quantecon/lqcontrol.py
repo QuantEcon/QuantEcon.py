@@ -298,7 +298,8 @@ class LQ:
         # == Preliminaries, infinite horizon case == #
         else:
             T = ts_length if ts_length else 100
-            self.stationary_values(method=method)
+            if self.P is None:
+                self.stationary_values(method=method)
 
         # == Set up initial condition and arrays to store paths == #
         random_state = check_random_state(random_state)
@@ -570,7 +571,8 @@ class LQMarkov:
         """
 
         # === solve for optimal policies === #
-        self.stationary_values()
+        if self.Ps is None:
+            self.stationary_values()
 
         # === Simplify notation === #
         As, Bs, Cs = self.As, self.Bs, self.Cs
@@ -605,6 +607,6 @@ class LQMarkov:
             u_path[:, t] = - (Fs[state[t]] @ x_path[:, t])
         Ax = As[state[T]] @ x_path[:, T-1]
         Bu = Bs[state[T]] @ u_path[:, T-1]
-        x_path[:, T] = Ax + Bu + w_path[:, T]
+        x_path[:, T] = Ax + Bu + Cw_path[:, T]
 
         return x_path, u_path, w_path, state
