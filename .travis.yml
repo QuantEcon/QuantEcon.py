@@ -5,6 +5,7 @@
 
 sudo: false        #Use new Container Infrastructure
 language: python
+dist: xenial
 
 cache:
   pip: true
@@ -22,7 +23,7 @@ addons:
 
 matrix:
   include:
-    - python: 3.6
+    - python: 3.7
     - os: osx
       osx_image: xcode10
       sudo: required
