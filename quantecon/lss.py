@@ -75,10 +75,12 @@ class LinearStateSpace:
 
       y_t = G x_t + H v_t
 
-    where :math:`{w_t}` and :math:`{v_t}` are independent and standard normal
-    with dimensions k and l respectively.  The initial conditions are
-    :math:`\mu_0` and :math:`\Sigma_0` for :math:`x_0 \sim N(\mu_0, \Sigma_0)`.
-    When :math:`\Sigma_0=0`, the draw of :math:`x_0` is exactly :math:`\mu_0`.
+    where :math:`{w_t}` and :math:`{v_t}` are standard normal with dimensions k
+    and l respectively, and the covariance matrix between the state noise
+    :math:`C w_{t+1}` and the measurement noise :math:`H v_t` is denoted by
+    :math:`V`.The initial conditions are :math:`\mu_0` and :math:`\Sigma_0`
+    for :math:`x_0 \sim N(\mu_0, \Sigma_0)`. When :math:`\Sigma_0=0`, the draw
+    of :math:`x_0` is exactly :math:`\mu_0`.
 
     Parameters
     ----------
@@ -90,6 +92,9 @@ class LinearStateSpace:
         Part of the observation equation.  It should be `k x n`
     H : array_like or scalar(float), optional(default=None)
         Part of the observation equation.  It should be `k x l`
+    V : array_like or scalar(float), optional(default=None)
+        Covariance matrix between :math:`C w_{t+1}` and :math:`H v_t`.
+        It should be `n x k`.
     mu_0 : array_like or scalar(float), optional(default=None)
         This is the mean of initial draw and is `n x 1`
     Sigma_0 : array_like or scalar(float), optional(default=None)
@@ -98,13 +103,13 @@ class LinearStateSpace:
 
     Attributes
     ----------
-    A, C, G, H, mu_0, Sigma_0 : see Parameters
+    A, C, G, H, V, mu_0, Sigma_0 : see Parameters
     n, k, m, l : scalar(int)
         The dimensions of x_t, y_t, w_t and v_t respectively
 
     """
 
-    def __init__(self, A, C, G, H=None, mu_0=None, Sigma_0=None):
+    def __init__(self, A, C, G, H=None, V=None, mu_0=None, Sigma_0=None):
         self.A, self.G, self.C = list(map(self.convert, (A, G, C)))
         # = Check Input Shapes = #
         ni, nj = self.A.shape
@@ -127,6 +132,10 @@ class LinearStateSpace:
         else:
             self.H = self.convert(H)
             self.l = self.H.shape[1]
+        if V is None:
+            self.V = None
+        else:
+            self.V = self.convert(V)
         if mu_0 is None:
             self.mu_0 = np.zeros((self.n, 1))
         else:
@@ -185,17 +194,28 @@ class LinearStateSpace:
         """
         random_state = check_random_state(random_state)
 
-        x0 = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
-        w = random_state.randn(self.m, ts_length-1)
-        v = self.C.dot(w)  # Multiply each w_t by C to get v_t = C w_t
-        # == simulate time series == #
-        x = simulate_linear_model(self.A, x0, v, ts_length)
+        x0 = random_state.multivariate_normal(self.mu_0.flatten(),
+                                              self.Sigma_0)
 
+        # == simulate state and measurement noises == #
+        n, k = self.n, self.k
+        mu_noise = np.zeros(n+k)
+        Sigma_noise = np.zeros((n+k, n+k))
+        Sigma_noise[:n, :n] = self.C @ self.C.T
         if self.H is not None:
-            v = random_state.randn(self.l, ts_length)
-            y = self.G.dot(x) + self.H.dot(v)
-        else:
-            y = self.G.dot(x)
+            Sigma_noise[n:, n:] = self.H @ self.H.T
+        if self.V is not None:
+            Sigma_noise[:n, n:] = self.V
+            Sigma_noise[n:, :n] = self.V.T
+        noise_seq = random_state.multivariate_normal(mu_noise,
+                                                     Sigma_noise,
+                                                     ts_length).T
+        Cw = noise_seq[:n, :]
+        Hv = noise_seq[n:, :]
+
+        # == simulate time series == #
+        x = simulate_linear_model(self.A, x0, Cw[:, :-1], ts_length)
+        y = self.G.dot(x) + Hv
 
         return x, y
 
@@ -230,14 +250,11 @@ class LinearStateSpace:
         random_state = check_random_state(random_state)
 
         x = np.empty((self.n, num_reps))
+        y = np.empty((self.k, num_reps))
         for j in range(num_reps):
-            x_T, _ = self.simulate(ts_length=T+1, random_state=random_state)
+            x_T, y_T = self.simulate(ts_length=T+1, random_state=random_state)
             x[:, j] = x_T[:, -1]
-        if self.H is not None:
-            v = random_state.randn(self.l, num_reps)
-            y = self.G.dot(x) + self.H.dot(v)
-        else:
-            y = self.G.dot(x)
+            y[:, j] = y_T[:, -1]
 
         return x, y
 
@@ -264,7 +281,7 @@ class LinearStateSpace:
 
         """
         # == Simplify names == #
-        A, C, G, H = self.A, self.C, self.G, self.H
+        A, C, G, H, V = self.A, self.C, self.G, self.H, self.V
         # == Initial moments == #
         mu_x, Sigma_x = self.mu_0, self.Sigma_0
 
@@ -273,7 +290,7 @@ class LinearStateSpace:
             if H is None:
                 Sigma_y = G.dot(Sigma_x).dot(G.T)
             else:
-                Sigma_y = G.dot(Sigma_x).dot(G.T) + H.dot(H.T)
+                Sigma_y = G.dot(Sigma_x).dot(G.T) + G.dot(V) + H.dot(H.T)
 
             yield mu_x, mu_y, Sigma_x, Sigma_y
 

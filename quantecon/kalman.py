@@ -25,8 +25,10 @@ class Kalman:
         y_t = G x_t + H v_t
 
     Here :math:`x_t` is the hidden state and :math:`y_t` is the measurement.
-    The shocks :math:`w_t` and :math:`v_t` are iid standard normals. Below
-    we use the notation
+    The shocks :math:`w_t` and :math:`v_t` are standard normals. And the
+    covariance matrix between the state noise :math:`C w_{t+1}` and the
+    measurement noise :math:`H v_t` is denoted by :math:`V`. Below we use
+    the notation
 
     .. math::
 
@@ -118,7 +120,7 @@ class Kalman:
 
         .. math::
 
-            \tilde{x}_t = [x+{t}, \hat{x}_{t}, v_{t}]
+            \tilde{x}_t = [x_{t}, \hat{x}_{t}, v_{t}]
 
         and
 
@@ -263,12 +265,15 @@ class Kalman:
         """
 
         # === simplify notation === #
-        A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
-        Q, R = np.dot(C, C.T), np.dot(H, H.T)
+        A, C, G, H, V = self.ss.A, self.ss.C, self.ss.G, self.ss.H, self.ss.V
+        Q, R = dot(C, C.T), dot(H, H.T)
+        if V is None:
+            V = np.zeros((C.shape[0], H.shape[0]))
 
         # === solve Riccati equation, obtain Kalman gain === #
-        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R, method=method)
-        temp1 = dot(dot(A, Sigma_infinity), G.T)
+        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R, N=V.T,
+                                                method=method)
+        temp1 = dot(dot(A, Sigma_infinity), G.T) + V
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)
 
