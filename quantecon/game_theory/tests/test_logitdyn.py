@@ -7,7 +7,6 @@ Tests for logitdyn.py
 
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal_nulp
-from nose.tools import eq_, ok_, raises
 
 from quantecon.game_theory import NormalFormGame, LogitDynamics
 
@@ -21,8 +20,8 @@ class TestLogitDynamics:
         payoff_matrix = [[4, 0],
                          [3, 2]]
         beta = 4.0
-        g = NormalFormGame(payoff_matrix)
-        self.ld = LogitDynamics(g, beta=beta)
+        data = NormalFormGame(payoff_matrix)
+        self.ld = LogitDynamics(data, beta=beta)
 
     def test_play(self):
         seed = 1234
@@ -43,8 +42,8 @@ def test_set_choice_probs_with_asymmetric_payoff_matrix():
     bimatrix = np.array([[(4, 4), (1, 1), (0, 3)],
                          [(3, 0), (1, 1), (2, 2)]])
     beta = 1.0
-    g = NormalFormGame(bimatrix)
-    ld = LogitDynamics(g, beta=beta)
+    data = NormalFormGame(bimatrix)
+    ld = LogitDynamics(data, beta=beta)
 
     # (Normalized) CDFs of logit choice
     cdfs = np.ones((bimatrix.shape[1], bimatrix.shape[0]))
