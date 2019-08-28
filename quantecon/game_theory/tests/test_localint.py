@@ -25,7 +25,7 @@ class TestLocalInteraction:
     def test_play(self):
         init_actions = (0, 0, 1)
         x = (1, 0, 0)
-        assert_equal(self.li.play(init_actions=init_actions), x)
+        assert_equal(self.li.play(actions=init_actions), x)
 
     def test_time_series_simultaneous_revision(self):
         init_actions = (0, 0, 1)
@@ -33,14 +33,14 @@ class TestLocalInteraction:
              [1, 0, 0],
              [0, 1, 1]]
         assert_array_equal(self.li.time_series(ts_length=3,
-                                               init_actions=init_actions), x)
+                                               actions=init_actions), x)
 
     def test_time_series_asynchronous_revision(self):
         seed = 1234
         init_actions = (0, 0, 1)
         x = [self.li.time_series(ts_length=3,
                                  revision='asynchronous',
-                                 init_actions=init_actions,
+                                 actions=init_actions,
                                  random_state=np.random.RandomState(seed))
              for i in range(2)]
         assert_array_equal(x[0], x[1])
@@ -53,7 +53,7 @@ class TestLocalInteraction:
              [1, 1, 1]]
         assert_array_equal(self.li.time_series(ts_length=3,
                                                revision='asynchronous',
-                                               init_actions=init_actions,
+                                               actions=init_actions,
                                                player_ind_seq=player_ind_seq),
                            x)
 
