@@ -6,7 +6,6 @@ Tests for brd.py
 """
 import numpy as np
 from numpy.testing import assert_array_equal
-from nose.tools import eq_
 
 from quantecon.game_theory import BRD, KMR, SamplingBRD
 
