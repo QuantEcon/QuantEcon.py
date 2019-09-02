@@ -13,7 +13,7 @@ from quantecon.game_theory import (
 
 # Player #
 
-LP_METHODS = [None, 'simplex', 'interior-point']
+LP_METHODS = [None, 'simplex', 'interior-point', 'revised simplex']
 
 
 class TestPlayer_1opponent:
