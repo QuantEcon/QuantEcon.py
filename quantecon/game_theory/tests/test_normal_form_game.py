@@ -162,7 +162,7 @@ def test_player_corner_cases():
         for method in LP_METHODS:
             eq_(player.is_dominated(action, method=method), False)
 
-    e = 1e-8
+    e = 1e-8 * 2
     player = Player([[-e, -e], [1, -1], [-1, 1]])
     action = 0
     eq_(player.is_best_response(action, [1/2, 1/2], tol=e), True)
