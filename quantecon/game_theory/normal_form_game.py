@@ -436,9 +436,9 @@ class Player:
         method : str, optional(default=None)
             If None, `lemke_howson` from `quantecon.game_theory` is used
             to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'` or
-            `'interior-point'`, `scipy.optimize.linprog` is used with
-            the method as specified by `method`.
+            game. If `method` is set to `'simplex'`, `'interior-point'`,
+            or `'revised simplex'`, then `scipy.optimize.linprog` is
+            used with the method as specified by `method`.
 
         Returns
         -------
@@ -469,20 +469,21 @@ class Player:
             g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
             NE = lemke_howson(g_zero_sum)
             return NE[0] @ D @ NE[1] > tol
-        elif method in ['simplex', 'interior-point']:
+        elif method in ['simplex', 'interior-point', 'revised simplex']:
             from scipy.optimize import linprog
             m, n = D.shape
-            A = np.empty((n+2, m+1))
-            A[:n, :m] = -D.T
-            A[:n, -1] = 1  # Slack variable
-            A[n, :m], A[n+1, :m] = 1, -1  # Equality constraint
-            A[n:, -1] = 0
-            b = np.empty(n+2)
-            b[:n] = 0
-            b[n], b[n+1] = 1, -1
+            A_ub = np.empty((n, m+1))
+            A_ub[:, :m] = -D.T
+            A_ub[:, -1] = 1  # Slack variable
+            b_ub = np.zeros(n)
+            A_eq = np.empty((1, m+1))
+            A_eq[:, :m] = 1  # Equality constraint
+            A_eq[:, -1] = 0
+            b_eq = np.ones(1)
             c = np.zeros(m+1)
             c[-1] = -1
-            res = linprog(c, A_ub=A, b_ub=b, method=method)
+            res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                          method=method)
             if res.success:
                 return res.x[-1] > tol
             elif res.status == 2:  # infeasible
@@ -507,9 +508,9 @@ class Player:
         method : str, optional(default=None)
             If None, `lemke_howson` from `quantecon.game_theory` is used
             to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'` or
-            `'interior-point'`, `scipy.optimize.linprog` is used with
-            the method as specified by `method`.
+            game. If `method` is set to `'simplex'`, `'interior-point'`,
+            or `'revised simplex'`, then `scipy.optimize.linprog` is
+            used with the method as specified by `method`.
 
         Returns
         -------
