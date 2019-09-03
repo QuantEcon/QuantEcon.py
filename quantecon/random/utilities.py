@@ -200,13 +200,13 @@ def draw(cdf, size=None):
     """
     if isinstance(size, types.Integer):
         def draw_impl(cdf, size):
-            rs = np.random.random_sample(size)
+            rs = np.random.random(size)
             out = np.empty(size, dtype=np.int_)
             for i in range(size):
                 out[i] = searchsorted(cdf, rs[i])
             return out
     else:
         def draw_impl(cdf, size):
-            r = np.random.random_sample()
+            r = np.random.random()
             return searchsorted(cdf, r)
     return draw_impl
