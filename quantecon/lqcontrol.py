@@ -241,7 +241,10 @@ class LQ:
         F = solve(S1, S2)
 
         # == Compute d == #
-        d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
+        if self.beta == 1:
+            d = 0
+        else:
+            d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
 
         # == Bind states and return values == #
         self.P, self.F, self.d = P, F, d
