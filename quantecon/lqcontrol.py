@@ -147,7 +147,7 @@ class LQ:
 
             if (self.C != 0).any() and beta >= 1:
                 raise ValueError('beta must be strictly smaller than 1 if ' +
-                'T = None and C != 0.')
+                    'T = None and C != 0.')
 
         self.F = None
 
