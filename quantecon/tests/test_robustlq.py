@@ -48,7 +48,7 @@ class TestRBLQControl(unittest.TestCase):
         # (see p171 in Robustness)
         self.rblq_test = RBLQ(Q, R, A, B, C, beta, theta)
         self.rblq_test_pf = RBLQ(Q_pf, R, A, B_pf, C, beta, theta)
-        self.lq_test = LQ(Q, R, A, B, C, beta)
+        self.lq_test = LQ(Q, R, A, B, C, beta=beta)
         self.methods = ['doubling', 'qz']
 
     def tearDown(self):

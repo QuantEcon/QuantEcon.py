@@ -127,8 +127,8 @@ class IVP(integrate.ode):
 
         # rhs of ode evaluated along approximate solution
         T = ti.size
-        rhs_ode = np.vstack(self.f(ti[i], soln[i, 1:], *self.f_params)
-                            for i in range(T))
+        rhs_ode = np.vstack([self.f(ti[i], soln[i, 1:], *self.f_params)
+                            for i in range(T)])
         rhs_ode = np.hstack((ti[:, np.newaxis], rhs_ode))
 
         # should be roughly zero everywhere (if approximation is any good!)

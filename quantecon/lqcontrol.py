@@ -145,6 +145,10 @@ class LQ:
             self.d = None
             self.T = None
 
+            if (self.C != 0).any() and beta >= 1:
+                raise ValueError('beta must be strictly smaller than 1 if ' +
+                    'T = None and C != 0.')
+
         self.F = None
 
     def __repr__(self):
@@ -241,7 +245,10 @@ class LQ:
         F = solve(S1, S2)
 
         # == Compute d == #
-        d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
+        if self.beta == 1:
+            d = 0
+        else:
+            d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
 
         # == Bind states and return values == #
         self.P, self.F, self.d = P, F, d
