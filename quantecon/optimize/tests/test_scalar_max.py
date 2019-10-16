@@ -4,9 +4,11 @@ Tests for scalar maximization.
 """
 import numpy as np
 from numpy.testing import assert_almost_equal
+from nose.tools import raises
 from numba import njit
 
 from quantecon.optimize import brent_max
+
 
 @njit
 def f(x):
@@ -15,9 +17,10 @@ def f(x):
     """
     return -(x + 2.0)**2 + 1.0
 
-def test_brent_max():
+
+def test_f():
     """
-    Uses the function f defined above to test the scalar maximization 
+    Uses the function f defined above to test the scalar maximization
     routine.
     """
     true_fval = 1.0
@@ -25,17 +28,19 @@ def test_brent_max():
     xf, fval, info = brent_max(f, -2, 2)
     assert_almost_equal(true_fval, fval, decimal=4)
     assert_almost_equal(true_xf, xf, decimal=4)
-    
+
+
 @njit
 def g(x, y):
     """
     A multivariate function for testing on.
     """
     return -x**2 + y
-    
-def test_brent_max():
+
+
+def test_g():
     """
-    Uses the function f defined above to test the scalar maximization 
+    Uses the function g defined above to test the scalar maximization
     routine.
     """
     y = 5
@@ -46,6 +51,21 @@ def test_brent_max():
     assert_almost_equal(true_xf, xf, decimal=4)
 
 
+@raises(ValueError)
+def test_invalid_a_brent_max():
+    brent_max(f, -np.inf, 2)
+
+
+@raises(ValueError)
+def test_invalid_b_brent_max():
+    brent_max(f, -2, np.inf)
+
+
+@raises(ValueError)
+def test_invalid_a_b_brent_max():
+    brent_max(f, 1, 0)
+
+
 if __name__ == '__main__':
     import sys
     import nose
@@ -54,5 +74,3 @@ if __name__ == '__main__':
     argv.append('--verbose')
     argv.append('--nocapture')
     nose.main(argv=argv, defaultTest=__file__)
-
-

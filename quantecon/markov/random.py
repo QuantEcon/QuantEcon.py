@@ -4,7 +4,6 @@ Generate MarkovChain and DiscreteDP instances randomly.
 """
 import numpy as np
 import scipy.sparse
-from numba import jit
 
 from .core import MarkovChain
 from .ddp import DiscreteDP

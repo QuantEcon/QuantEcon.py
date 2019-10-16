@@ -12,11 +12,13 @@ See the [library website](http://quantecon.org/python_index.html) for instructio
 #### Build and Coverage Status:
 
 [![Build Status](https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master)](https://travis-ci.org/QuantEcon/QuantEcon.py)
-[![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
+[![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.svg)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
+[![Code Quality: Python](https://img.shields.io/lgtm/grade/python/g/QuantEcon/QuantEcon.py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/QuantEcon/QuantEcon.py/context:python)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/QuantEcon/QuantEcon.py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/QuantEcon/QuantEcon.py/alerts)
 
 #### ReadTheDocs Status:
 
-[![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](http://quanteconpy.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](https://quanteconpy.readthedocs.io/en/latest/?badge=latest)
 
 #### Gitter
 
@@ -62,6 +64,76 @@ modification, are permitted provided that the following conditions are met:
  POSSIBILITY OF SUCH DAMAGE.
 
 ## Major Changes
+
+### Ver 0.4.5 (08-July-2019)
+
+**Merged pull requests:**
+
+- ENH: Add `LQMarkov`. [\#489](https://github.com/QuantEcon/QuantEcon.py/pull/489) ([shizejin](https://github.com/shizejin))
+- FIX: Increase `tol` in `rouwenhorst` test. [\#492](https://github.com/QuantEcon/QuantEcon.py/pull/492) ([shizejin](https://github.com/shizejin)) to fix [\#491](https://github.com/QuantEcon/QuantEcon.py/issues/491)
+- TRAVIS: Set coverage branch as `linux`. [\#490](https://github.com/QuantEcon/QuantEcon.py/pull/490) ([shizejin](https://github.com/shizejin))
+- FIX: DOC: Remove `matplotlib.sphinxext.only\_directives` [\#488](https://github.com/QuantEcon/QuantEcon.py/pull/488) ([oyamad](https://github.com/oyamad))
+
+### Ver 0.4.4 (24-May-2019)
+
+1. FEAT: Add drift term keyword to `markov.tauchen`. [\#484](https://github.com/QuantEcon/QuantEcon.py/pull/484) ([shizejin](https://github.com/shizejin))
+1. FIX: Import scipy.sparse.linalg [\#482](https://github.com/QuantEcon/QuantEcon.py/pull/482) ([oyamad](https://github.com/oyamad))
+1. FIX: `sample\_without\_replacement` using guvectorize [\#479](https://github.com/QuantEcon/QuantEcon.py/pull/479) ([oyamad](https://github.com/oyamad))
+1. FEAT: Add `random\_pure\_actions` and `random\_mixed\_actions` [\#477](https://github.com/QuantEcon/QuantEcon.py/pull/477) ([okuchap](https://github.com/okuchap))
+1. FIX: Raise correct error when `A` is not square in `LinearStateSpace` [\#475](https://github.com/QuantEcon/QuantEcon.py/pull/475) ([QBatista](https://github.com/QBatista))
+1. FIX: alerts by lgtm [\#474](https://github.com/QuantEcon/QuantEcon.py/pull/474) ([okuchap](https://github.com/okuchap))
+1. Fix flake8 errors [\#470](https://github.com/QuantEcon/QuantEcon.py/pull/470) ([rht](https://github.com/rht))
+1. TEST: Fix the names of tests for `brent\_max` [\#469](https://github.com/QuantEcon/QuantEcon.py/pull/469) ([QBatista](https://github.com/QBatista))
+1. DOC: Update example for `nelder\_mead` [\#468](https://github.com/QuantEcon/QuantEcon.py/pull/468) ([QBatista](https://github.com/QBatista))
+1. FIX: all F401 unused imports [\#467](https://github.com/QuantEcon/QuantEcon.py/pull/467) ([rht](https://github.com/rht))
+
+### Ver 0.4.3 (17-December-2018)
+
+1.  INFRA: Isolate rtd-specific requirements to doc-requirements.txt [\#464](https://github.com/QuantEcon/QuantEcon.py/pull/464) ([rht](https://github.com/rht))
+1. DOCS: fix for lorenz documentation [\#462](https://github.com/QuantEcon/QuantEcon.py/pull/462) ([natashawatkins](https://github.com/natashawatkins))
+1. INFRA: Disable performance tests [\#461](https://github.com/QuantEcon/QuantEcon.py/pull/461) ([rht](https://github.com/rht))
+1. ENH: quad: Import sympy only when necessary [\#459](https://github.com/QuantEcon/QuantEcon.py/pull/459) ([rht](https://github.com/rht))
+1. INFRA: Travis: Move dependency installs with wheels available to pip [\#458](https://github.com/QuantEcon/QuantEcon.py/pull/458) ([rht](https://github.com/rht))
+1. DOCS: Update Documentation [\#454](https://github.com/QuantEcon/QuantEcon.py/pull/454) ([mmcky](https://github.com/mmcky))
+1. README: Update coveralls badge to use svg [\#453](https://github.com/QuantEcon/QuantEcon.py/pull/453) ([rht](https://github.com/rht))
+1. FIX: Fix warning in test\_pure\_nash [\#451](https://github.com/QuantEcon/QuantEcon.py/pull/451) ([oyamad](https://github.com/oyamad))
+1. ENH: Add errors for invalid inputs for `brent\_max` [\#450](https://github.com/QuantEcon/QuantEcon.py/pull/450) ([QBatista](https://github.com/QBatista))
+1. INFRA: Travis: Add macOS to the build matrix [\#448](https://github.com/QuantEcon/QuantEcon.py/pull/448) ([rht](https://github.com/rht))
+1. FEAT: Add Shorrocks mobility index [\#447](https://github.com/QuantEcon/QuantEcon.py/pull/447) ([natashawatkins](https://github.com/natashawatkins))
+1. FIX: test `method` keyword of `RepeatedGame.equilibrium\_payoffs\(\)`. [\#446](https://github.com/QuantEcon/QuantEcon.py/pull/446) ([shizejin](https://github.com/shizejin))
+
+
+### Ver 0.4.2 (26-November-2018)
+
+1. FEAT: Add AS algorithm. [\#433](https://github.com/QuantEcon/QuantEcon.py/pull/433) ([shizejin](https://github.com/shizejin))
+1. FEAT: Add method option in robustlq.py [\#437](https://github.com/QuantEcon/QuantEcon.py/pull/437) ([hinayuki64](https://github.com/hinayuki64))
+1. FEAT: Add Player.delete\_action, NormalFormGame.delete\_action [\#444](https://github.com/QuantEcon/QuantEcon.py/pull/444) ([oyamad](https://github.com/oyamad))
+1. FEAT: Add the Nelder-Mead algorithm [\#441](https://github.com/QuantEcon/QuantEcon.py/pull/441) ([QBatista](https://github.com/QBatista))
+1. FEAT: Added basic inequality mesasures: lorenz curve and gini [\#414](https://github.com/QuantEcon/QuantEcon.py/pull/414) ([cdagnino](https://github.com/cdagnino))
+1. MAINT: Remove `from future import ...` [\#436](https://github.com/QuantEcon/QuantEcon.py/pull/436) ([hinayuki64](https://github.com/hinayuki64))
+1. FIX: Force tuple elements to have the same dtype [\#435](https://github.com/QuantEcon/QuantEcon.py/pull/435) ([oyamad](https://github.com/oyamad))
+1. DOC: fix brent\_max docstring [\#440](https://github.com/QuantEcon/QuantEcon.py/pull/440) ([natashawatkins](https://github.com/natashawatkins))
+1. FIX: Disallow Player with 0 actions [\#443](https://github.com/QuantEcon/QuantEcon.py/pull/443) ([oyamad](https://github.com/oyamad))
+
+### Ver 0.4.1 (17-September-2018)
+
+1. FEAT: add solver for dynamic linear economies as LQ problem [\#426](https://github.com/QuantEcon/QuantEcon.py/pull/426) ([mmcky](https://github.com/mmcky))
+1. DOC: Fix the doc of `root\_finding.py` to display nicely [\#431](https://github.com/QuantEcon/QuantEcon.py/pull/431) ([QBatista](https://github.com/QBatista))
+
+### Ver 0.4.0 (20-August-2018)
+
+1. FEAT: Add bisection and brent's method for root finding. See PR [\#424](https://github.com/QuantEcon/QuantEcon.py/pull/424) ([spvdchachan](https://github.com/spvdchachan))
+1. FEAT: Add `qhull\_options` to `game\_theory.vertex\_enumeration`. See PR [\#421](https://github.com/QuantEcon/QuantEcon.py/pull/421) ([oyamad](https://github.com/oyamad))
+1. FEAT: Root finding. See PR [\#417](https://github.com/QuantEcon/QuantEcon.py/pull/417) ([chrishyland](https://github.com/chrishyland))
+1. FEAT: Add `'interior-point'` option to `is\_dominated`; add `dominated\_actions`. See PR [\#415](https://github.com/QuantEcon/QuantEcon.py/pull/415) ([oyamad](https://github.com/oyamad))
+1. FEAT: Add hamilton filter. See PR [\#405](https://github.com/QuantEcon/QuantEcon.py/pull/405) ([Shunsuke-Hori](https://github.com/Shunsuke-Hori))
+1. FEAT: Add sample game generators from bimatrix-generators. See PR [\#392](https://github.com/QuantEcon/QuantEcon.py/pull/392) ([oyamad](https://github.com/oyamad))
+1. MAINT: update to new rtd requirements spec. See PR [\#427](https://github.com/QuantEcon/QuantEcon.py/pull/427) ([mmcky](https://github.com/mmcky))
+1. MAINT: Add `requests` to setup.py. See PR [\#420](https://github.com/QuantEcon/QuantEcon.py/pull/420) ([oyamad](https://github.com/oyamad))
+1. MAINT: Add `mock` to the dependencies list. See PR [\#418](https://github.com/QuantEcon/QuantEcon.py/pull/418) ([oyamad](https://github.com/oyamad))
+1. TEST: Fix test\_discrete\_rv. See PR [\#412](https://github.com/QuantEcon/QuantEcon.py/pull/412) ([oyamad](https://github.com/oyamad))
+1. MAINT: add minimum version number for numba support. See PR [\#409](https://github.com/QuantEcon/QuantEcon.py/pull/409) ([mmcky](https://github.com/mmcky))
+1. MAINT: Setup an auto-generate changelog for releases. See PR [\#403](https://github.com/QuantEcon/QuantEcon.py/pull/403) ([mmcky](https://github.com/mmcky))
 
 ### Ver 0.3.8 (14-March-2018)
 1. FEAT: Add random.draw. See [PR #397](https://github.com/QuantEcon/QuantEcon.py/pull/397)

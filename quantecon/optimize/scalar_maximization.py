@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit, njit
+from numba import njit
 
 @njit
 def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
@@ -34,22 +34,27 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
     info : tuple
         A tuple of the form (status_flag, num_iter).  Here status_flag
         indicates whether or not the maximum number of function calls was
-        attained.  A value of 0 implies that the maximum was not hit.  
+        attained.  A value of 0 implies that the maximum was not hit.
         The value `num_iter` is the number of function calls.
 
-    Example
-    -------
-
-    ```
-        @njit
-        def f(x):
-            return -(x + 2.0)**2 + 1.0
-
-        xf, fval, info = maximize_scalar(f, -2, 2)
-    ```
+    Examples
+    --------
+    >>> @njit
+    ... def f(x):
+    ...     return -(x + 2.0)**2 + 1.0
+    ...
+    >>> xf, fval, info = brent_max(f, -2, 2)
 
     """
-    
+    if not np.isfinite(a):
+        raise ValueError("a must be finite.")
+
+    if not np.isfinite(b):
+        raise ValueError("b must be finite.")
+
+    if not a < b:
+        raise ValueError("a must be less than b.")
+
     maxfun = maxiter
     status_flag = 0
 

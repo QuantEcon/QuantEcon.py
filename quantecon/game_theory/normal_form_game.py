@@ -168,6 +168,8 @@ class Player:
 
         if self.payoff_array.ndim == 0:
             raise ValueError('payoff_array must be an array_like')
+        if np.prod(self.payoff_array.shape) == 0:
+            raise ValueError('every player must have at least one action')
 
         self.num_opponents = self.payoff_array.ndim - 1
         self.num_actions = self.payoff_array.shape[0]
@@ -191,6 +193,45 @@ class Player:
         s += ' with payoff array:\n'
         s += np.array2string(self.payoff_array, separator=', ')
         return s
+
+    def delete_action(self, action, player_idx=0):
+        """
+        Return a new `Player` instance with the action(s) specified by
+        `action` deleted from the action set of the player specified by
+        `player_idx`. Deletion is not performed in place.
+
+        Parameters
+        ----------
+        action : scalar(int) or array_like(int)
+            Integer or array like of integers representing the action(s)
+            to be deleted.
+
+        player_idx : scalar(int), optional(default=0)
+            Index of the player to delete action(s) for.
+
+        Returns
+        -------
+        Player
+            Copy of `self` with the action(s) deleted as specified.
+
+        Examples
+        --------
+        >>> player = Player([[3, 0], [0, 3], [1, 1]])
+        >>> player
+        Player([[3, 0],
+                [0, 3],
+                [1, 1]])
+        >>> player.delete_action(2)
+        Player([[3, 0],
+                [0, 3]])
+        >>> player.delete_action(0, player_idx=1)
+        Player([[0],
+                [3],
+                [1]])
+
+        """
+        payoff_array_new = np.delete(self.payoff_array, action, player_idx)
+        return Player(payoff_array_new)
 
     def payoff_vector(self, opponents_actions):
         """
@@ -395,9 +436,9 @@ class Player:
         method : str, optional(default=None)
             If None, `lemke_howson` from `quantecon.game_theory` is used
             to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'` or
-            `'interior-point'`, `scipy.optimize.linprog` is used with
-            the method as specified by `method`.
+            game. If `method` is set to `'simplex'`, `'interior-point'`,
+            or `'revised simplex'`, then `scipy.optimize.linprog` is
+            used with the method as specified by `method`.
 
         Returns
         -------
@@ -418,6 +459,8 @@ class Player:
         ind[action] = False
         D = payoff_array[ind]
         D -= payoff_array[action]
+        if D.shape[0] == 0:  # num_actions == 1
+            return False
         if self.num_opponents >= 2:
             D.shape = (D.shape[0], np.prod(D.shape[1:]))
 
@@ -426,20 +469,21 @@ class Player:
             g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
             NE = lemke_howson(g_zero_sum)
             return NE[0] @ D @ NE[1] > tol
-        elif method in ['simplex', 'interior-point']:
+        elif method in ['simplex', 'interior-point', 'revised simplex']:
             from scipy.optimize import linprog
             m, n = D.shape
-            A = np.empty((n+2, m+1))
-            A[:n, :m] = -D.T
-            A[:n, -1] = 1  # Slack variable
-            A[n, :m], A[n+1, :m] = 1, -1  # Equality constraint
-            A[n:, -1] = 0
-            b = np.empty(n+2)
-            b[:n] = 0
-            b[n], b[n+1] = 1, -1
+            A_ub = np.empty((n, m+1))
+            A_ub[:, :m] = -D.T
+            A_ub[:, -1] = 1  # Slack variable
+            b_ub = np.zeros(n)
+            A_eq = np.empty((1, m+1))
+            A_eq[:, :m] = 1  # Equality constraint
+            A_eq[:, -1] = 0
+            b_eq = np.ones(1)
             c = np.zeros(m+1)
             c[-1] = -1
-            res = linprog(c, A_ub=A, b_ub=b, method=method)
+            res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                          method=method)
             if res.success:
                 return res.x[-1] > tol
             elif res.status == 2:  # infeasible
@@ -464,9 +508,9 @@ class Player:
         method : str, optional(default=None)
             If None, `lemke_howson` from `quantecon.game_theory` is used
             to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'` or
-            `'interior-point'`, `scipy.optimize.linprog` is used with
-            the method as specified by `method`.
+            game. If `method` is set to `'simplex'`, `'interior-point'`,
+            or `'revised simplex'`, then `scipy.optimize.linprog` is
+            used with the method as specified by `method`.
 
         Returns
         -------
@@ -683,6 +727,64 @@ class NormalFormGame:
             player.payoff_array[
                 tuple(action_profile[i:]) + tuple(action_profile[:i])
             ] = payoff_profile[i]
+
+    def delete_action(self, player_idx, action):
+        """
+        Return a new `NormalFormGame` instance with the action(s)
+        specified by `action` deleted from the action set of the player
+        specified by `player_idx`. Deletion is not performed in place.
+
+        Parameters
+        ----------
+        player_idx : scalar(int)
+            Index of the player to delete action(s) for.
+
+        action : scalar(int) or array_like(int)
+            Integer or array like of integers representing the action(s)
+            to be deleted.
+
+        Returns
+        -------
+        NormalFormGame
+            Copy of `self` with the action(s) deleted as specified.
+
+        Examples
+        --------
+        >>> g = NormalFormGame(
+        ...     [[(3, 0), (0, 1)], [(0, 0), (3, 1)], [(1, 1), (1, 0)]]
+        ... )
+        >>> print(g)
+        2-player NormalFormGame with payoff profile array:
+        [[[3, 0],  [0, 1]],
+         [[0, 0],  [3, 1]],
+         [[1, 1],  [1, 0]]]
+
+        Delete player `0`'s action `2` from `g`:
+
+        >>> g1 = g.delete_action(0, 2)
+        >>> print(g1)
+        2-player NormalFormGame with payoff profile array:
+        [[[3, 0],  [0, 1]],
+         [[0, 0],  [3, 1]]]
+
+        Then delete player `1`'s action `0` from `g1`:
+
+        >>> g2 = g1.delete_action(1, 0)
+        >>> print(g2)
+        2-player NormalFormGame with payoff profile array:
+        [[[0, 1]],
+         [[3, 1]]]
+
+        """
+        # Allow negative indexing
+        if -self.N <= player_idx < 0:
+            player_idx = player_idx + self.N
+
+        players_new = tuple(
+            player.delete_action(action, player_idx-i)
+            for i, player in enumerate(self.players)
+        )
+        return NormalFormGame(players_new)
 
     def is_nash(self, action_profile, tol=None):
         """

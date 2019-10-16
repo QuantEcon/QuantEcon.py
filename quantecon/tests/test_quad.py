@@ -10,14 +10,17 @@ For all other tests, the MATLAB code is provided here in
 a section of comments.
 
 """
-from __future__ import division
 import os
 import unittest
 from scipy.io import loadmat
 import numpy as np
 from numpy.testing import assert_allclose
 import pandas as pd
-from quantecon.quad import *
+from quantecon.quad import (
+    qnwcheb, qnwequi, qnwlege, qnwnorm, qnwlogn,
+    qnwsimp, qnwtrap, qnwunif, quadrect, qnwbeta,
+    qnwgamma
+)
 from quantecon.tests.util import get_data_dir
 
 ### MATLAB code needed to generate data (in addition to a modified demqua03)
@@ -112,7 +115,7 @@ class TestQuadrect(unittest.TestCase):
             for kind in kinds:
                 for num in n:
                     num_in = num ** 2 if len(kind) == 1 else num
-                    quad_rect_res1d.ix[func_name, num][kind] = quadrect(func,
+                    quad_rect_res1d.loc[func_name, num][kind] = quadrect(func,
                                                                         num_in,
                                                                         a, b,
                                                                         kind)
@@ -133,10 +136,10 @@ class TestQuadrect(unittest.TestCase):
 
         for num in n:
             for kind in kinds2[:4]:
-                data2.ix[num**2][kind] = quadrect(f1_2, [num, num],
+                data2.loc[num**2][kind] = quadrect(f1_2, [num, num],
                                                   a[0], b[0], kind)
             for kind in kinds2[4:]:
-                data2.ix[num**2][kind] = quadrect(f1_2, num**2, a[0],
+                data2.loc[num**2][kind] = quadrect(f1_2, num**2, a[0],
                                                   b[0], kind)
 
         cls.data2d1 = data2
@@ -148,7 +151,7 @@ class TestQuadrect(unittest.TestCase):
 
         for num in n3:
             for kind in kinds2[3:]:
-                data3.ix[num][kind] = quadrect(f2_2, num, a[1], b[1], kind)
+                data3.loc[num][kind] = quadrect(f2_2, num, a[1], b[1], kind)
 
         cls.data2d2 = data3
 

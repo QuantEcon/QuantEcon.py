@@ -20,14 +20,13 @@ TODO
 """
 
 import os
-import requests
-import warnings
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
 RAW = "raw"
 BRANCH = "master"
-FOLDER = "dependencies"          #Hard Coded Dependencies Folder on QuantEcon.notebooks
+#Hard Coded Dependencies Folder on QuantEcon.notebooks
+FOLDER = "dependencies"
 
 
 def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False, verbose=True):
@@ -72,6 +71,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     by setting ``overwrite=True``.
 
     """
+    import requests
 
     #-Generate Common Data Structure-#
     if type(files) == list:
@@ -89,14 +89,15 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
             #-Check for Local Copy of File (Default Behaviour is to Skip)-#
             if not overwrite:
                 if os.path.isfile(fl):
-                    if verbose: print("A file named %s already exists in the specified directory ... skipping download." % fl)
+                    if verbose: print(
+                        "A file named %s already exists in the specified directory ... skipping download." % fl)
                     status.append(False)
                     continue
             else:
                 if verbose: print("Overwriting file %s ..."%fl)
             if verbose: print("Fetching file: %s"%fl)
             #-Get file in OS agnostic way using requests-#
-            url = "/".join([repo,raw,branch,folder,fl])
+            url = "/".join([repo, raw, branch, folder, fl])
             r = requests.get(url)
             with open(fl, "wb") as fl:
                 fl.write(r.content)

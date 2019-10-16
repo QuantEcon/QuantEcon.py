@@ -2,7 +2,6 @@
 Solves robust LQ control problems.
 
 """
-from __future__ import division  # Remove for Python 3.sx
 from textwrap import dedent
 import numpy as np
 from .lqcontrol import LQ
@@ -147,12 +146,13 @@ class RBLQ:
         S1 = Q + beta * dot(B.T, dot(P, B))
         S2 = beta * dot(B.T, dot(P, A))
         S3 = beta * dot(A.T, dot(P, A))
-        F = solve(S1, S2) if not self.pure_forecasting else np.zeros((self.k, self.n))
+        F = solve(S1, S2) if not self.pure_forecasting else np.zeros(
+            (self.k, self.n))
         new_P = R - dot(S2.T, F) + S3
 
         return F, new_P
 
-    def robust_rule(self):
+    def robust_rule(self, method='doubling'):
         """
         This method solves the robust control problem by tricking it
         into a stacked LQ problem, as described in chapter 2 of Hansen-
@@ -165,6 +165,12 @@ class RBLQ:
 
         And the value function is :math:`-x'Px`
 
+        Parameters
+        ----------
+        method : str, optional(default='doubling')
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
+            
         Returns
         -------
         F : array_like(float, ndim=2)
@@ -189,7 +195,7 @@ class RBLQ:
             lq = LQ(-beta*I*theta, R, A, C, beta=beta)
 
             # == Solve and convert back to robust problem == #
-            P, f, d = lq.stationary_values()
+            P, f, d = lq.stationary_values(method=method)
             F = np.zeros((self.k, self.n))
             K = -f[:k, :]
 
@@ -199,7 +205,7 @@ class RBLQ:
             lq = LQ(Qa, R, A, Ba, beta=beta)
 
             # == Solve and convert back to robust problem == #
-            P, f, d = lq.stationary_values()
+            P, f, d = lq.stationary_values(method=method)
             F = f[:k, :]
             K = -f[k:f.shape[0], :]
 
@@ -254,7 +260,7 @@ class RBLQ:
 
         return F, K, P
 
-    def F_to_K(self, F):
+    def F_to_K(self, F, method='doubling'):
         """
         Compute agent 2's best cost-minimizing response K, given F.
 
@@ -262,6 +268,9 @@ class RBLQ:
         ----------
         F : array_like(float, ndim=2)
             A k x n array
+        method : str, optional(default='doubling')
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
 
         Returns
         -------
@@ -276,11 +285,11 @@ class RBLQ:
         A2 = self.A - dot(self.B, F)
         B2 = self.C
         lq = LQ(Q2, R2, A2, B2, beta=self.beta)
-        neg_P, neg_K, d = lq.stationary_values()
+        neg_P, neg_K, d = lq.stationary_values(method=method)
 
         return -neg_K, -neg_P
 
-    def K_to_F(self, K):
+    def K_to_F(self, K, method='doubling'):
         """
         Compute agent 1's best value-maximizing response F, given K.
 
@@ -288,6 +297,9 @@ class RBLQ:
         ----------
         K : array_like(float, ndim=2)
             A j x n array
+        method : str, optional(default='doubling')
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
 
         Returns
         -------
@@ -302,7 +314,7 @@ class RBLQ:
         Q1 = self.Q
         R1 = self.R - self.beta * self.theta * dot(K.T, K)
         lq = LQ(Q1, R1, A1, B1, beta=self.beta)
-        P, F, d = lq.stationary_values()
+        P, F, d = lq.stationary_values(method=method)
 
         return F, P
 

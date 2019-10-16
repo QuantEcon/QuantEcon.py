@@ -79,7 +79,6 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 :math:`\sum_{j \in S_{m+1}} P[i, j] = 1`, where :math:`S_d = S_0`.
 
 """
-from __future__ import division
 import numbers
 from fractions import gcd
 import numpy as np
@@ -430,7 +429,6 @@ class MarkovChain:
     def cdfs1d(self):
         if (self._cdfs1d is None) and self.is_sparse:
             data = self.P.data
-            indices = self.P.indices
             indptr = self.P.indptr
 
             cdfs1d = np.empty(self.P.nnz, order='C')

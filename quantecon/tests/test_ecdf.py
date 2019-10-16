@@ -2,7 +2,6 @@
 Tests for ecdf.py
 
 """
-from __future__ import division
 import unittest
 import numpy as np
 from quantecon import ECDF

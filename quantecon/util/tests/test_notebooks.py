@@ -23,15 +23,18 @@ class TestNotebookUtils(unittest.TestCase):
         """
         Run First and Test Download
         """
-        status = fetch_nb_dependencies(files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)
+        status = fetch_nb_dependencies(
+            files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)
         self.assertFalse(False in status)
 
     def test_fetch_nb_dependencies_overwrite(self):
         """
         Run Second and Ensure file is skipped by checking a False is found in status
         """
-        status = fetch_nb_dependencies(files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #First will succeed
-        status = fetch_nb_dependencies(files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #Second should skip
+        status = fetch_nb_dependencies(
+            files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #First will succeed
+        status = fetch_nb_dependencies(
+            files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #Second should skip
         self.assertTrue(False in status)
 
     def tearDown(self):

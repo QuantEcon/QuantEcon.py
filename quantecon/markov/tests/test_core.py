@@ -7,8 +7,6 @@ Functions
     mc_sample_path          [Status: Tested in test_mc_sample_path]
 
 """
-from __future__ import division
-
 import numpy as np
 from scipy import sparse
 import itertools
@@ -514,7 +512,7 @@ def test_get_index():
 @raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
-    mc = MarkovChain(np.array([0.4, 0.6]))
+    MarkovChain(np.array([0.4, 0.6]))
 
 
 def test_raises_value_error_non_sym():

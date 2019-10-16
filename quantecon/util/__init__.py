@@ -1,3 +1,4 @@
+# flake8: noqa
 """
 API for QuantEcon Utilities
 """

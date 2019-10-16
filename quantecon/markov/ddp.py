@@ -104,7 +104,6 @@ M. L. Puterman, Markov Decision Processes: Discrete Stochastic Dynamic
 Programming, Wiley-Interscience, 2005.
 
 """
-from __future__ import division
 import warnings
 import numpy as np
 import scipy.sparse as sp
@@ -418,7 +417,8 @@ class DiscreteDP:
 
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
-            self._lineq_solve = sp.linalg.spsolve
+            import scipy.sparse.linalg
+            self._lineq_solve = scipy.sparse.linalg.spsolve
             self._I = sp.identity(self.num_states, format='csr')
         else:
             self._lineq_solve = np.linalg.solve
@@ -512,7 +512,8 @@ class DiscreteDP:
             R[self.s_indices, self.a_indices] = self.R
             Q = np.zeros((ns, na, ns))
             if self._sparse:
-                _fill_dense_Q(self.s_indices, self.a_indices, self.Q.toarray(), Q)
+                _fill_dense_Q(self.s_indices, self.a_indices,
+                              self.Q.toarray(), Q)
             else:
                 _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
             return DiscreteDP(R, Q, self.beta)

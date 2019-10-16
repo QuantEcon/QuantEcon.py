@@ -5,8 +5,7 @@ TODO: 1. Fix warnings concerning casting complex variables back to floats
 
 """
 import numpy as np
-from numpy import conj, pi
-from scipy.signal import dimpulse, freqz, dlsim
+from numpy import conj
 from .util import check_random_state
 
 
@@ -61,7 +60,6 @@ class ARMA:
         processing we desire.  Corresponds with the theta values
 
     """
-
     def __init__(self, phi, theta=0, sigma=1):
         self._phi, self._theta = phi, theta
         self.sigma = sigma
@@ -165,6 +163,7 @@ class ARMA:
             We take psi[0] as unity.
 
         """
+        from scipy.signal import dimpulse
         sys = self.ma_poly, self.ar_poly, 1
         times, psi = dimpulse(sys, n=impulse_length)
         psi = psi[0].flatten()  # Simplify return value into flat array
@@ -205,6 +204,7 @@ class ARMA:
             The frequency response
 
         """
+        from scipy.signal import freqz
         w, h = freqz(self.ma_poly, self.ar_poly, worN=res, whole=two_pi)
         spect = h * conj(h) * self.sigma**2
 
@@ -249,6 +249,7 @@ class ARMA:
             A simulation of the model that corresponds to this class
 
         """
+        from scipy.signal import dlsim
         random_state = check_random_state(random_state)
 
         sys = self.ma_poly, self.ar_poly, 1

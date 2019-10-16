@@ -85,7 +85,7 @@ def _support_enumeration_gen(payoff_matrices):
     n_min = min(nums_actions)
 
     for k in range(1, n_min+1):
-        supps = (np.arange(k), np.empty(k, np.int_))
+        supps = (np.arange(0, k, 1, np.int_), np.empty(k, np.int_))
         actions = (np.empty(k+1), np.empty(k+1))
         A = np.empty((k+1, k+1))
 

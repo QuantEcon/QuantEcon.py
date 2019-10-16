@@ -10,13 +10,10 @@ Miranda, Mario J, and Paul L Fackler. Applied Computational Economics
 and Finance, MIT Press, 2002.
 
 """
-from __future__ import division
-
 import math
 import numpy as np
 import scipy.linalg as la
 from numba import jit, vectorize
-import sympy as sym
 from .ce_util import ckron, gridmake
 from .util import check_random_state
 
@@ -143,6 +140,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     random_state = check_random_state(random_state)
 
     if equidist_pp is None:
+        import sympy as sym
         equidist_pp = np.sqrt(np.array(list(sym.primerange(0, 7920))))
 
     n, a, b = list(map(np.atleast_1d, list(map(np.asarray, [n, a, b]))))

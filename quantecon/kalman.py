@@ -39,9 +39,8 @@ class Kalman:
     ss : instance of LinearStateSpace
         An instance of the quantecon.lss.LinearStateSpace class
     x_hat : scalar(float) or array_like(float), optional(default=None)
-        An n x 1 array representing the mean x_hat and covariance
-        matrix Sigma of the prior/predictive density.  Set to zero if
-        not supplied.
+        An n x 1 array representing the mean x_hat of the
+        prior/predictive density.  Set to zero if not supplied.
     Sigma : scalar(float) or array_like(float), optional(default=None)
         An n x n array representing the covariance matrix Sigma of
         the prior/predictive density.  Must be positive definite.
@@ -240,12 +239,19 @@ class Kalman:
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
 
-    def stationary_values(self):
+    def stationary_values(self, method='doubling'):
         """
         Computes the limit of :math:`\Sigma_t` as t goes to infinity by
-        solving the associated Riccati equation. Computation is via the
-        doubling algorithm (see the documentation in
-        `matrix_eqn.solve_discrete_riccati`).
+        solving the associated Riccati equation. The outputs are stored in the
+        attributes `K_infinity` and `Sigma_infinity`. Computation is via the
+        doubling algorithm (default) or a QZ decomposition method (see the
+        documentation in `matrix_eqn.solve_discrete_riccati`).
+
+        Parameters
+        ----------
+        method : str, optional(default="doubling")
+            Solution method used in solving the associated Riccati
+            equation, str in {'doubling', 'qz'}.
 
         Returns
         -------
@@ -261,7 +267,7 @@ class Kalman:
         Q, R = np.dot(C, C.T), np.dot(H, H.T)
 
         # === solve Riccati equation, obtain Kalman gain === #
-        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R)
+        Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R, method=method)
         temp1 = dot(dot(A, Sigma_infinity), G.T)
         temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
         K_infinity = dot(temp1, temp2)

@@ -3,11 +3,9 @@ Tests for rank_nullspace.py
 
 """
 import sys
-import os
 import unittest
 import numpy as np
 from numpy.linalg import matrix_rank as np_rank
-from numpy.testing import assert_allclose
 from quantecon.rank_nullspace import rank_est, nullspace
 
 

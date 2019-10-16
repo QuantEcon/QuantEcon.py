@@ -4,9 +4,7 @@ Using the data of original paper.
 
 """
 
-import sys
 import os
-import unittest
 import pandas as pd
 import numpy as np
 from numpy.testing import assert_allclose
@@ -20,8 +18,10 @@ def test_hamilton_filter():
     data = pd.read_csv(os.path.join(data_dir, "employment.csv"),
                        names = ['year', 'employment', 'matlab_cyc', 'matlab_cyc_rw'])
 
-    data['hamilton_cyc'], data['hamilton_trend'] =  hamilton_filter(100*np.log(data['employment']), 8, 4)
-    data['hamilton_cyc_rw'], data['hamilton_trend_rw'] = hamilton_filter(100*np.log(data['employment']), 8)
+    data['hamilton_cyc'], data['hamilton_trend'] =  hamilton_filter(
+        100*np.log(data['employment']), 8, 4)
+    data['hamilton_cyc_rw'], data['hamilton_trend_rw'] = hamilton_filter(
+        100*np.log(data['employment']), 8)
     assert_allclose(data['matlab_cyc'], data['hamilton_cyc'],
                     rtol = 1e-07, atol = 1e-07)
     assert_allclose(data['matlab_cyc_rw'], data['hamilton_cyc_rw'])

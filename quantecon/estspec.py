@@ -2,8 +2,6 @@
 Functions for working with periodograms of scalar data.
 
 """
-
-from __future__ import division, print_function
 import numpy as np
 from numpy.fft import fft
 
@@ -144,9 +142,6 @@ def ar_periodogram(x, window='hanning', window_len=7):
     beta_hat = np.linalg.solve(X.T @ X, X.T @ y)  # solve for beta hat
     e_hat = y - X @ beta_hat  # compute residuals
     phi = beta_hat[1]  # pull out phi parameter
-
-    # === compute periodogram on residuals === #
-    w, I_w = periodogram(e_hat, window=window, window_len=window_len)
 
     # === compute periodogram on residuals === #
     w, I_w = periodogram(e_hat, window=window, window_len=window_len)

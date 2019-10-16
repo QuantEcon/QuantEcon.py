@@ -120,7 +120,6 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
 
     # method == 'iteration'
     iterate = 0
-    error = error_tol + 1
 
     if verbose == 2:
         start_time = time.time()

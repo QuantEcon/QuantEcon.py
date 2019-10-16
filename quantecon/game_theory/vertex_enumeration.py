@@ -14,7 +14,7 @@ import scipy.spatial
 from numba import jit, guvectorize
 
 
-def vertex_enumeration(g):
+def vertex_enumeration(g, qhull_options=None):
     """
     Compute mixed-action Nash equilibria of a 2-player normal form game
     by enumeration and matching of vertices of the best response
@@ -32,16 +32,20 @@ def vertex_enumeration(g):
     g : NormalFormGame
         NormalFormGame instance with 2 players.
 
+    qhull_options : str, optional(default=None)
+        Options to pass to `scipy.spatial.ConvexHull`. See the `Qhull
+        manual <http://www.qhull.org>`_  for details.
+
     Returns
     -------
     list(tuple(ndarray(float, ndim=1)))
         List containing tuples of Nash equilibrium mixed actions.
 
     """
-    return list(vertex_enumeration_gen(g))
+    return list(vertex_enumeration_gen(g, qhull_options=qhull_options))
 
 
-def vertex_enumeration_gen(g):
+def vertex_enumeration_gen(g, qhull_options=None):
     """
     Generator version of `vertex_enumeration`.
 
@@ -49,6 +53,10 @@ def vertex_enumeration_gen(g):
     ----------
     g : NormalFormGame
         NormalFormGame instance with 2 players.
+
+    qhull_options : str, optional(default=None)
+        Options to pass to `scipy.spatial.ConvexHull`. See the `Qhull
+        manual <http://www.qhull.org>`_  for details.
 
     Yields
     -------
@@ -63,7 +71,9 @@ def vertex_enumeration_gen(g):
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')
 
-    brps = [_BestResponsePolytope(g.players[1-i], idx=i) for i in range(N)]
+    brps = [_BestResponsePolytope(
+        g.players[1-i], idx=i, qhull_options=qhull_options
+    ) for i in range(N)]
 
     labelings_bits_tup = \
         tuple(_ints_arr_to_bits(brps[i].labelings) for i in range(N))
@@ -166,6 +176,10 @@ class _BestResponsePolytope:
     idx : scalar(int), optional(default=0)
         Player index in the normal form game, either 0 or 1.
 
+    qhull_options : str, optional(default=None)
+        Options to pass to `scipy.spatial.ConvexHull`. See the `Qhull
+        manual <http://www.qhull.org>`_  for details.
+
     Attributes
     ----------
     ndim : scalar(int)
@@ -191,7 +205,7 @@ class _BestResponsePolytope:
         `-equations[k, :-1]/equations[k, -1] + 1/trans_recip`.
 
     """
-    def __init__(self, opponent_player, idx=0):
+    def __init__(self, opponent_player, idx=0, qhull_options=None):
         try:
             num_opponents = opponent_player.num_opponents
         except AttributeError:
@@ -211,7 +225,6 @@ class _BestResponsePolytope:
         # Shift the payoffs to be nonnegative and have no zero column
         col_mins = B.min(axis=0)
         col_maxs = B.max(axis=0)
-        neg_cols = (col_mins < 0)
         nonpos_const_cols = (col_maxs == col_mins) * (col_mins <= 0)
         shifts = np.zeros(m)
         shifts[col_mins < 0] = -col_mins[col_mins < 0]
@@ -232,7 +245,7 @@ class _BestResponsePolytope:
         )
 
         # Create scipy.spatial.ConvexHull
-        self.hull = scipy.spatial.ConvexHull(D)
+        self.hull = scipy.spatial.ConvexHull(D, qhull_options=qhull_options)
 
         self.equations = self.hull.equations
         self.labelings = self.hull.simplices

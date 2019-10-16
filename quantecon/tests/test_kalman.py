@@ -3,7 +3,6 @@ Tests for the kalman.py
 
 """
 import sys
-import os
 import unittest
 import numpy as np
 from numpy.testing import assert_allclose
@@ -27,6 +26,8 @@ class TestKalman(unittest.TestCase):
 
         self.kf = Kalman(ss)
 
+        self.methods = ['doubling', 'qz']
+
 
     def tearDown(self):
         del self.kf
@@ -36,32 +37,34 @@ class TestKalman(unittest.TestCase):
         A, Q, G, R = self.A, self.Q, self.G, self.R
         kf = self.kf
 
-        sig_inf, kal_gain = kf.stationary_values()
+        for method in self.methods:
+            sig_inf, kal_gain = kf.stationary_values(method=method)
 
-        mat_inv = np.linalg.inv(G.dot(sig_inf).dot(G.T) + R)
+            mat_inv = np.linalg.inv(G.dot(sig_inf).dot(G.T) + R)
 
-        # Compute the kalmain gain and sigma infinity according to the
-        # recursive equations and compare
-        kal_recursion = np.dot(A, sig_inf).dot(G.T).dot(mat_inv)
-        sig_recursion = (A.dot(sig_inf).dot(A.T) -
-                            kal_recursion.dot(G).dot(sig_inf).dot(A.T) + Q)
+            # Compute the kalmain gain and sigma infinity according to the
+            # recursive equations and compare
+            kal_recursion = np.dot(A, sig_inf).dot(G.T).dot(mat_inv)
+            sig_recursion = (A.dot(sig_inf).dot(A.T) -
+                                kal_recursion.dot(G).dot(sig_inf).dot(A.T) + Q)
 
-        assert_allclose(kal_gain, kal_recursion, rtol=1e-4, atol=1e-2)
-        assert_allclose(sig_inf, sig_recursion, rtol=1e-4, atol=1e-2)
+            assert_allclose(kal_gain, kal_recursion, rtol=1e-4, atol=1e-2)
+            assert_allclose(sig_inf, sig_recursion, rtol=1e-4, atol=1e-2)
 
 
     def test_update_using_stationary(self):
-        A, Q, G, R = self.A, self.Q, self.G, self.R
         kf = self.kf
 
-        sig_inf, kal_gain = kf.stationary_values()
+        for method in self.methods:
+            sig_inf, kal_gain = kf.stationary_values(method=method)
 
-        kf.set_state(np.zeros((2, 1)), sig_inf)
+            kf.set_state(np.zeros((2, 1)), sig_inf)
 
-        kf.update(np.zeros((2, 1)))
+            kf.update(np.zeros((2, 1)))
 
-        assert_allclose(kf.Sigma, sig_inf, rtol=1e-4, atol=1e-2)
-        assert_allclose(kf.x_hat.squeeze(), np.zeros(2), rtol=1e-4, atol=1e-2)
+            assert_allclose(kf.Sigma, sig_inf, rtol=1e-4, atol=1e-2)
+            assert_allclose(kf.x_hat.squeeze(), np.zeros(2),
+                            rtol=1e-4, atol=1e-2)
 
 
     def test_update_nonstationary(self):

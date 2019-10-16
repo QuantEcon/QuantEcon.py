@@ -4,9 +4,11 @@ Tests for game_theory/random.py
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_raises
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
-from quantecon.game_theory import random_game, covariance_game
+from quantecon.game_theory import (
+    random_game, covariance_game, random_pure_actions, random_mixed_actions
+)
 
 
 def test_random_game():
@@ -57,6 +59,25 @@ def test_covariance_game_value_error():
 
     rho = -1  # < -1/(N-1)
     assert_raises(ValueError, covariance_game, nums_actions, rho)
+
+
+def test_random_pure_actions():
+    nums_actions = (2, 3, 4)
+    N = len(nums_actions)
+    seed = 1234
+    action_profiles = [
+        random_pure_actions(nums_actions, seed) for i in range(2)
+    ]
+    for i in range(N):
+        ok_(action_profiles[0][i] < nums_actions[i])
+    eq_(action_profiles[0], action_profiles[1])
+
+
+def test_random_mixed_actions():
+    nums_actions = (2, 3, 4)
+    seed = 1234
+    action_profile = random_mixed_actions(nums_actions, seed)
+    eq_(tuple([len(action) for action in action_profile]), nums_actions)
 
 
 if __name__ == '__main__':

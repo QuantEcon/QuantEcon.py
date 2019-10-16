@@ -5,8 +5,34 @@
 
 sudo: false        #Use new Container Infrastructure
 language: python
-python:
-  - 3.6
+dist: xenial
+
+cache:
+  pip: true
+  directories:
+    # osx-specific caches
+    - $HOME/Library/Caches/pip
+
+addons:
+  apt:
+    packages:
+      - hdf5-tools
+  homebrew:
+    packages:
+      - hdf5
+
+matrix:
+  include:
+    - python: 3.7
+    - os: osx
+      osx_image: xcode10
+      sudo: required
+      env: TRAVIS_PYTHON_VERSION=3.7
+      language: generic
+      before_install:
+      - pip install virtualenv
+      - virtualenv env -p python3
+      - source env/bin/activate
 
 notifications:
   email: false
@@ -15,23 +41,19 @@ branches:
   only:
     - master
 
-before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b -p /home/travis/miniconda
-  - export PATH=/home/travis/miniconda/bin:$PATH
-  - conda update --yes conda
-  #- sudo rm -rf /dev/shm
-  #- sudo ln -s /run/shm /dev/shm
-
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython numpy scipy nose pandas pip sympy pytables statsmodels numba
-    # To Install Full Anaconda Stack (conda install --yes python=$TRAVIS_PYTHON_VERSION anaconda)
-  - pip install coveralls coverage
+  - pip install -U pip nose coveralls coverage numpy scipy pandas numba sympy ipython statsmodels flake8
+  - pip install tables
   - python setup.py install
 
 script:
-  - nosetests --with-coverage --cover-package=quantecon
+  - flake8 --select F401, F405,E231 quantecon
+  - nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
 after_success:
-  - coveralls
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        coveralls
+    fi
+  # Enable this to occasionally test performance
+  # - nosetests -a "slow"

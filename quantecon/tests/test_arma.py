@@ -4,7 +4,6 @@ covered by the numpy tests since we rely on much of their code.
 
 """
 import sys
-import os
 import unittest
 import numpy as np
 from numpy.testing import assert_array_equal

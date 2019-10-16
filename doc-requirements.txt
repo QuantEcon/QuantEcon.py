@@ -1,0 +1,4 @@
+sphinx
+ipython
+numpydoc
+matplotlib==2.2.3

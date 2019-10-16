@@ -4,7 +4,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import numpy as np
-from numba import jit, guvectorize, generated_jit, types
+from numba import guvectorize, generated_jit, types
 
 from ..util import check_random_state, searchsorted
 
@@ -89,14 +89,15 @@ def _probvec(r, out):
     out[n] = 1 - r[n-1]
 
 _probvec_parallel = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel'
+    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel',
+    cache=True
     )(_probvec)
 _probvec_cpu = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu'
+    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu',
+    cache=True
     )(_probvec)
 
 
-@jit
 def sample_without_replacement(n, k, num_trials=None, random_state=None):
     """
     Randomly choose k integers without replacement from 0, ..., n-1.
@@ -142,26 +143,30 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     if k > n:
         raise ValueError('k must be smaller than or equal to n')
 
-    m = 1 if num_trials is None else num_trials
+    size = k if num_trials is None else (num_trials, k)
 
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=(m, k))
+    r = random_state.random_sample(size=size)
+    result = _sample_without_replacement(n, r)
+
+    return result
+
+
+@guvectorize(['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True)
+def _sample_without_replacement(n, r, out):
+    """
+    Main body of `sample_without_replacement`. To be complied as a ufunc
+    by guvectorize of Numba.
+
+    """
+    k = r.shape[0]
 
     # Logic taken from random.sample in the standard library
-    result = np.empty((m, k), dtype=int)
-    pool = np.empty(n, dtype=int)
-    for i in range(m):
-        for j in range(n):
-            pool[j] = j
-        for j in range(k):
-            idx = int(np.floor(r[i, j] * (n-j)))  # np.floor returns a float
-            result[i, j] = pool[idx]
-            pool[idx] = pool[n-j-1]
-
-    if num_trials is None:
-        return result[0]
-    else:
-        return result
+    pool = np.arange(n)
+    for j in range(k):
+        idx = int(np.floor(r[j] * (n-j)))  # np.floor returns a float
+        out[j] = pool[idx]
+        pool[idx] = pool[n-j-1]
 
 
 @generated_jit(nopython=True)
@@ -195,13 +200,13 @@ def draw(cdf, size=None):
     """
     if isinstance(size, types.Integer):
         def draw_impl(cdf, size):
-            rs = np.random.random_sample(size)
+            rs = np.random.random(size)
             out = np.empty(size, dtype=np.int_)
             for i in range(size):
                 out[i] = searchsorted(cdf, rs[i])
             return out
     else:
         def draw_impl(cdf, size):
-            r = np.random.random_sample()
+            r = np.random.random()
             return searchsorted(cdf, r)
     return draw_impl

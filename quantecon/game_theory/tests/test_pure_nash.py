@@ -39,7 +39,7 @@ class TestPureNashBruteForce():
         for k in range(2, N-2+1):
             for ind in itertools.combinations(range(N), k):
                 a = np.ones(N, dtype=int)
-                a[[ind]] = 0
+                a[list(ind)] = 0
                 Unanimity_NE.append(tuple(a))
         Unanimity_NE.append((1,)*N)
 

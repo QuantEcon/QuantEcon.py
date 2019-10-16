@@ -36,7 +36,7 @@ except ImportError:
 #         def __getattr__(cls, name):
 #             return Mock()
 
-#     MOCK_MODULES = ['pandas', 'statsmodels', 'numba'] 						 
+#     MOCK_MODULES = ['pandas', 'statsmodels', 'numba']
 #     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -82,7 +82,7 @@ extensions = [
     # 'ipython_console_highlighting',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
-    'matplotlib.sphinxext.only_directives',
+    # 'matplotlib.sphinxext.only_directives',
     'matplotlib.sphinxext.plot_directive',
 ]
 

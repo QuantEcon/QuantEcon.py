@@ -147,7 +147,7 @@ def test_best_response_selection_no_indptr():
                 [(0, 3), (6, 1)]]
     g = NormalFormGame(bimatrix)
 
-    test_obj = _best_response_selection([1/3, 1/3, 1/3, 1/2,1/2], g)
+    test_obj = _best_response_selection([1/3, 1/3, 1/3, 1/2, 1/2], g)
     expected_output = np.array([0., 1., 0., 0., 1.])
 
     assert_array_equal(test_obj, expected_output)

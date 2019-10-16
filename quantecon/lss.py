@@ -109,13 +109,18 @@ class LinearStateSpace:
         # = Check Input Shapes = #
         ni, nj = self.A.shape
         if ni != nj:
-            raise ValueError("Matrix A (shape: %s) needs to be square" % (self.A.shape))
+            raise ValueError(
+                "Matrix A (shape: %s) needs to be square" % (self.A.shape, ))
         if ni != self.C.shape[0]:
-            raise ValueError("Matrix C (shape: %s) does not have compatible dimensions with A. It should be shape: %s" % (self.C.shape, (ni,1)))
+            raise ValueError(
+                "Matrix C (shape: %s) does not have compatible dimensions "
+                "with A. It should be shape: %s" % (self.C.shape, (ni, 1)))
         self.m = self.C.shape[1]
         self.k, self.n = self.G.shape
         if self.n != ni:
-            raise ValueError("Matrix G (shape: %s) does not have compatible dimensions with A (%s)"%(self.G.shape, self.A.shape))
+            raise ValueError("Matrix G (shape: %s) does not have compatible"
+                             "dimensions with A (%s)" % (self.G.shape,
+                                                         self.A.shape))
         if H is None:
             self.H = None
             self.l = None
