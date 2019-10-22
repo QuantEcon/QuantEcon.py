@@ -3,7 +3,7 @@
 
 A code library for quantitative economic modeling in Python
 
-Libary Website: [http://quantecon.org/python_index.html](http://quantecon.org/python_index.html)
+Libary Website: [https://quantecon.org/quantecon-py/](https://quantecon.org/quantecon-py/)
 
 ### Installation
 
