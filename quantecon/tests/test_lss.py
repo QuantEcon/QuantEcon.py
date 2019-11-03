@@ -47,7 +47,7 @@ class TestLinearStateSpace(unittest.TestCase):
 
             sim = ss.simulate(ts_length=250)
             for arr in sim:
-                self.assertTrue(len(arr[0])==250)
+                self.assertTrue(len(arr[0]) == 250)
 
     def test_simulate_with_seed(self):
         expected_xval = np.array([[0.75, 0.6959564924, 0.6485540613,
@@ -61,7 +61,6 @@ class TestLinearStateSpace(unittest.TestCase):
         for i, ss in enumerate(self.ss_vec):
 
             xval, yval = ss.simulate(ts_length=5, random_state=5)
-            
 
             assert_allclose(xval[0], expected_xval[i])
             assert_allclose(yval[0], expected_yval[i])
@@ -87,8 +86,9 @@ class TestLinearStateSpace(unittest.TestCase):
         for i, ss in enumerate(self.ss_vec):
 
             xval, yval = ss.replicate(T=100, num_reps=5, random_state=5)
-            expected_output = np.array([0.0251787033, 0.1908734072, -0.1813300321,
-                                        0.2305923028, -0.0412238313])
+            expected_output = np.array([0.0251787033, 0.1908734072,
+                                        -0.1813300321, 0.2305923028,
+                                        -0.0412238313])
 
             assert_allclose(xval[0], expected_xval[i])
             assert_allclose(yval[0], expected_yval[i])
@@ -106,4 +106,3 @@ def test_non_square_A():
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearStateSpace)
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
-
