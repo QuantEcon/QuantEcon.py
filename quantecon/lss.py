@@ -10,7 +10,6 @@ https://lectures.quantecon.org/py/linear_models.html
 
 from textwrap import dedent
 import numpy as np
-from numpy.random import multivariate_normal
 from scipy.linalg import solve
 from numba import jit
 from .util import check_random_state
