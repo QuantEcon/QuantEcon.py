@@ -7,4 +7,4 @@ python:
   version: 3.6
   setup_py_install: true
 
-requirements_file: doc-requirements.txt
+requirements_file: rtd-requirements.txt
