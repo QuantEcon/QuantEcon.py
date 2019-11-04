@@ -9,9 +9,6 @@ quantecon.egg-info/
 *.noseids
 *.coverage
 *.h5
-examples/solow_model/depreciation_rates.dta
-examples/solow_model/pwt80.dta
-examples/*.png
 
 # Numba cache files
 *.nbc
