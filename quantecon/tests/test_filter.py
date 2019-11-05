@@ -14,7 +14,6 @@ from quantecon.tests.util import get_data_dir
 def test_hamilton_filter():
     # read data
     data_dir = get_data_dir()
-    data_dir = 'data'
     data = pd.read_csv(os.path.join(data_dir, "employment.csv"),
                        names = ['year', 'employment', 'matlab_cyc', 'matlab_cyc_rw'])
 
