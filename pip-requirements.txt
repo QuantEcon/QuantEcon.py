@@ -1,7 +1,0 @@
-# These are the required packages for the quantecon package to build
-numpy
-scipy
-pandas
-sympy
-numba
-requests

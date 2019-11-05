@@ -44,7 +44,6 @@ def capture(command, *args, **kwargs):
 def get_data_dir():
     "Return directory where data is stored"
     this_dir = os.path.dirname(__file__)
-    # this_dir = os.path.abspath(".")
     data_dir = os.path.join(this_dir, "data")
     return data_dir
 

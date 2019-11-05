@@ -1,12 +1,8 @@
 # Use setuptools in preference to distutils
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 import os
 
 #-Write Versions File-#
-#~~~~~~~~~~~~~~~~~~~~~#
 
 VERSION = '0.4.5'
 
@@ -15,7 +11,7 @@ def write_version_py(filename=None):
     This constructs a version file for the project
     """
     doc = "\"\"\"\nThis is a VERSION file and should NOT be manually altered\n\"\"\""
-    doc += "\nversion = '%s'" % VERSION
+    doc += "\nversion = '%s'\n" % VERSION
 
     if not filename:
         filename = os.path.join(os.path.dirname(__file__), 'quantecon', 'version.py')
@@ -94,15 +90,7 @@ CLASSIFIERS = [
 #~~~~~~~#
 
 setup(name='quantecon',
-      packages=['quantecon',
-                'quantecon.game_theory',
-                'quantecon.game_theory.game_generators',
-                'quantecon.markov',
-                'quantecon.optimize',
-                'quantecon.random',
-                'quantecon.tests',
-                'quantecon.util',
-                ],
+      packages=find_packages(),
       version=VERSION,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
@@ -119,5 +107,6 @@ setup(name='quantecon',
           'requests',
           'scipy>=1.0.0',
           'sympy',
-          ]
+          ],
+      include_package_data=True
       )
