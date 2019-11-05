@@ -11,7 +11,7 @@ def write_version_py(filename=None):
     This constructs a version file for the project
     """
     doc = "\"\"\"\nThis is a VERSION file and should NOT be manually altered\n\"\"\""
-    doc += "\nversion = '%s'" % VERSION
+    doc += "\nversion = '%s'\n" % VERSION
 
     if not filename:
         filename = os.path.join(os.path.dirname(__file__), 'quantecon', 'version.py')
