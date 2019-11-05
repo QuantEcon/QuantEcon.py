@@ -90,7 +90,7 @@ CLASSIFIERS = [
 #~~~~~~~#
 
 setup(name='quantecon',
-      packages=find_packages('quantecon'),
+      packages=find_packages(),
       version=VERSION,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
