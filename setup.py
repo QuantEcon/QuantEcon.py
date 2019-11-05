@@ -109,4 +109,4 @@ setup(name='quantecon',
           'sympy',
           ]
       include_package_data=True
-)
+     )
