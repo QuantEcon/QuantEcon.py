@@ -90,7 +90,7 @@ CLASSIFIERS = [
 #~~~~~~~#
 
 setup(name='quantecon',
-      packages=find_packages('quantecon')
+      packages=find_packages('quantecon'),
       version=VERSION,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
@@ -107,6 +107,6 @@ setup(name='quantecon',
           'requests',
           'scipy>=1.0.0',
           'sympy',
-          ]
+          ],
       include_package_data=True
-     )
+      )
