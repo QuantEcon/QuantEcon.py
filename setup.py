@@ -1,12 +1,8 @@
 # Use setuptools in preference to distutils
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 import os
 
 #-Write Versions File-#
-#~~~~~~~~~~~~~~~~~~~~~#
 
 VERSION = '0.4.5'
 
@@ -94,15 +90,7 @@ CLASSIFIERS = [
 #~~~~~~~#
 
 setup(name='quantecon',
-      packages=['quantecon',
-                'quantecon.game_theory',
-                'quantecon.game_theory.game_generators',
-                'quantecon.markov',
-                'quantecon.optimize',
-                'quantecon.random',
-                'quantecon.tests',
-                'quantecon.util',
-                ],
+      packages=find_packages('quantecon')
       version=VERSION,
       description=DESCRIPTION,
       long_description=LONG_DESCRIPTION,
@@ -120,4 +108,5 @@ setup(name='quantecon',
           'scipy>=1.0.0',
           'sympy',
           ]
-      )
+      include_package_data=True
+)
