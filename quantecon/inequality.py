@@ -117,3 +117,40 @@ def shorrocks_index(A):
     diag_sum = np.diag(A).sum()
 
     return (m - diag_sum) / (m - 1)
+
+
+def rank_size_plot(data, ax, label=None, c=1.0):
+    """
+    Generate rank-size data corresponding to distribution data.
+
+    Examples
+    --------
+
+    > import numpy as np
+    > import matplotlib.pyplot as plt
+    > y = np.exp(np.random.randn(1000))  # simulate data
+    > fig, ax = plt.subplots()
+    > rank_size_plot(y, ax)
+    > plt.show()
+
+    Parameters
+    ----------
+
+    data : array_like
+        the set of observations
+    c : int or float
+        restrict plot to top (c x 100)% of the distribution
+    ax : axis object
+        for plotting on, has method ax.loglog
+    """
+    w = - np.sort(- data)                  # Reverse sort
+    w = w[:int(len(w) * c)]                # extract top c%
+    rank_data = np.arange(len(w)) + 1
+    size_data = w
+    ax.loglog(rank_data, size_data, 'o', markersize=3.0, alpha=0.5, label=label)
+    if label:
+        ax.legend()
+    ax.set_xlabel("log rank")
+    ax.set_ylabel("log size")
+
+
