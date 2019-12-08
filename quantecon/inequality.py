@@ -122,10 +122,10 @@ def shorrocks_index(A):
 def rank_size_plot(data, ax, label=None, c=1.0):
     """
     Generate rank-size data corresponding to distribution data.
-    
+
     Examples
     --------
-    
+
     > import numpy as np
     > import matplotlib.pyplot as plt
     > y = np.exp(np.random.randn(1000))  # simulate data
@@ -135,13 +135,11 @@ def rank_size_plot(data, ax, label=None, c=1.0):
 
     Parameters
     ----------
-    
+
     data : array_like
         the set of observations
-        
     c : int or float
         restrict plot to top (c x 100)% of the distribution
-          
     ax : axis object
         for plotting on, has method ax.loglog
     """
