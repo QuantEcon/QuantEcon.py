@@ -65,14 +65,22 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+### Ver 0.4.6 (09-December-2019)
+
+1. Adds a rank size plot to inequality [\#518](https://github.com/QuantEcon/QuantEcon.py/pull/518) ([jstac](https://github.com/jstac))
+1. General cleanup of Package [\#515](https://github.com/QuantEcon/QuantEcon.py/pull/515) ([mmcky](https://github.com/mmcky))
+1. \[FIX\] Fix Future Warnings in ivp.py and test\_quad.py and RuntimeError in lq\_control.py. [\#509](https://github.com/QuantEcon/QuantEcon.py/pull/509) ([duncanhobbs](https://github.com/duncanhobbs))
+1. FIX: Player.is\_dominated: Fix warnings [\#504](https://github.com/QuantEcon/QuantEcon.py/pull/504) ([oyamad](https://github.com/oyamad))
+1. FIX: random.draw: Replace `random\_sample` with `random` [\#503](https://github.com/QuantEcon/QuantEcon.py/pull/503) ([oyamad](https://github.com/oyamad))
+1. FIX: two minor modifications in `lqcontrol` [\#498](https://github.com/QuantEcon/QuantEcon.py/pull/498) ([shizejin](https://github.com/shizejin))
+1. UPD: Update travis to use python=3.7 [\#494](https://github.com/QuantEcon/QuantEcon.py/pull/494) ([mmcky](https://github.com/mmcky))
+
 ### Ver 0.4.5 (08-July-2019)
 
-**Merged pull requests:**
-
-- ENH: Add `LQMarkov`. [\#489](https://github.com/QuantEcon/QuantEcon.py/pull/489) ([shizejin](https://github.com/shizejin))
-- FIX: Increase `tol` in `rouwenhorst` test. [\#492](https://github.com/QuantEcon/QuantEcon.py/pull/492) ([shizejin](https://github.com/shizejin)) to fix [\#491](https://github.com/QuantEcon/QuantEcon.py/issues/491)
-- TRAVIS: Set coverage branch as `linux`. [\#490](https://github.com/QuantEcon/QuantEcon.py/pull/490) ([shizejin](https://github.com/shizejin))
-- FIX: DOC: Remove `matplotlib.sphinxext.only\_directives` [\#488](https://github.com/QuantEcon/QuantEcon.py/pull/488) ([oyamad](https://github.com/oyamad))
+1. ENH: Add `LQMarkov`. [\#489](https://github.com/QuantEcon/QuantEcon.py/pull/489) ([shizejin](https://github.com/shizejin))
+1. FIX: Increase `tol` in `rouwenhorst` test. [\#492](https://github.com/QuantEcon/QuantEcon.py/pull/492) ([shizejin](https://github.com/shizejin)) to fix [\#491](https://github.com/QuantEcon/QuantEcon.py/issues/491)
+1. TRAVIS: Set coverage branch as `linux`. [\#490](https://github.com/QuantEcon/QuantEcon.py/pull/490) ([shizejin](https://github.com/shizejin))
+1. FIX: DOC: Remove `matplotlib.sphinxext.only\_directives` [\#488](https://github.com/QuantEcon/QuantEcon.py/pull/488) ([oyamad](https://github.com/oyamad))
 
 ### Ver 0.4.4 (24-May-2019)
 
