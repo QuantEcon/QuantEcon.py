@@ -107,6 +107,7 @@ setup(name='quantecon',
           'requests',
           'scipy>=1.0.0',
           'sympy',
+          'matplotlib',
           ],
       include_package_data=True
       )
