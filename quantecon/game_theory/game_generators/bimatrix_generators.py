@@ -99,6 +99,11 @@ from ...gridtools import simplex_grid
 from ...graph_tools import random_tournament_graph
 from ...util.combinatorics import next_k_array, k_array_rank_jit
 
+__all__ = [
+    'blotto_game', 'ranking_game', 'sgc_game', 'tournament_game',
+    'unit_vector_game'
+]
+
 
 def blotto_game(h, t, rho, mu=0, random_state=None):
     """
