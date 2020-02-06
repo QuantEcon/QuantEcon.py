@@ -392,7 +392,6 @@ class RBLQ:
         d_F = log(det(H))
 
         # == Compute O_F and o_F == #
-        sig = -1.0 / theta
         AO = sqrt(beta) * (A - dot(B, F) + dot(C, K_F))
         O_F = solve_discrete_lyapunov(AO.T, beta * dot(K_F.T, K_F))
         ho = (trace(H - 1) - d_F) / 2.0
