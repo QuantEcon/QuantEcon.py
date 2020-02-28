@@ -22,7 +22,7 @@ def check_random_state(seed):
         1. This code was sourced from scikit-learn
 
     """
-    if seed is None or seed is np.random:
+    if seed is None or seed == np.random:
         return np.random.mtrand._rand
     if isinstance(seed, (numbers.Integral, np.integer)):
         return np.random.RandomState(seed)
