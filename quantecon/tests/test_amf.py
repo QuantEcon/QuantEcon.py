@@ -41,12 +41,12 @@ class TestAMFLSSVAR:
         assert_array_equal(x0, x0_sol)
 
     def test__construct_A_bar(self):
-        x0 = np.ones(2 + self.amf._nx + 2 * self.amf._ny)
-        nx0c = 3 * np.ones((self.amf._nx, 1))
+        x0 = np.ones(2 + self.amf.nx + 2 * self.amf.ny)
+        nx0c = 3 * np.ones((self.amf.nx, 1))
         nyx0m = 4 * np.ones_like(self.D)
-        ny0c = 5 * np.ones((self.amf._ny, 1))
-        ny1m = 6 * np.eye(self.amf._ny)
-        ny0m = 7 * np.ones((self.amf._ny, self.amf._ny))
+        ny0c = 5 * np.ones((self.amf.ny, 1))
+        ny1m = 6 * np.eye(self.amf.ny)
+        ny0m = 7 * np.ones((self.amf.ny, self.amf.ny))
 
         A_bar = self.amf._construct_A_bar(x0, nx0c, nyx0m, ny0c, ny1m, ny0m)
 
@@ -68,8 +68,8 @@ class TestAMFLSSVAR:
         assert_array_equal(A_bar, A_bar_sol)
 
     def test__construct_B_bar(self):
-        nk0 = np.ones(self.amf._nk)
-        H = 2 * np.ones((self.amf._nk, self.amf._nk))
+        nk0 = np.ones(self.amf.nk)
+        H = 2 * np.ones((self.amf.nk, self.amf.nk))
         B_bar = self.amf._construct_B_bar(nk0, H)
 
         B_bar_sol = np.vstack([nk0, nk0, self.B, self.F, H])
@@ -77,14 +77,14 @@ class TestAMFLSSVAR:
         assert_array_equal(B_bar, B_bar_sol)
 
     def test__construct_G_bar(self):
-        nx0c = np.ones((self.amf._nx, 1))
+        nx0c = np.ones((self.amf.nx, 1))
         nyx0m = 2 * np.ones_like(self.D)
-        ny0c = 3 * np.ones((self.amf._ny, 1))
-        ny1m = 4 * np.eye(self.amf._ny)
-        ny0m = 5 * np.ones((self.amf._ny, self.amf._ny))
+        ny0c = 3 * np.ones((self.amf.ny, 1))
+        ny1m = 4 * np.eye(self.amf.ny)
+        ny0m = 5 * np.ones((self.amf.ny, self.amf.ny))
         g = self.amf.additive_decomp[2]
 
-        G_bar = self.amf._construct_G_bar(nx0c, self.amf._nx, nyx0m, ny0c,
+        G_bar = self.amf._construct_G_bar(nx0c, self.amf.nx, nyx0m, ny0c,
                                           ny1m, ny0m, g)
 
         G_1_2_3_sol = np.array([[1., 1., 1., 0., 0., 0., 2., 2.],
