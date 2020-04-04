@@ -82,21 +82,21 @@ class AMF_LSS_VAR:
     """
     def __init__(self, A, B, D, F=None, ν=None):
         # = Set Inputs = #
-        self.A = np.asarray(A)
-        self.B = np.asarray(B)
-        self._nx, self._nk = self.B.shape
-        self.D = np.asarray(D)
-        self._ny = self.D.shape[0]
+        self.A = np.atleast_2d(A)
+        self.B = np.atleast_2d(B)
+        self.nx, self.nk = self.B.shape
+        self.D = np.atleast_2d(D)
+        self.ny = self.D.shape[0]
 
         if hasattr(F, '__getitem__'):
-            self.F = np.asarray(F)  # F is array_like
+            self.F = np.atleast_2d(F)  # F is array_like
         else:
-            self.F = np.zeros((self._nk, self._nk))
+            self.F = np.zeros((self.nk, self.nk))
 
         if hasattr(ν, '__getitem__') or isinstance(ν, float):
-            self.ν = np.asarray(ν)  # ν is array_like or float
+            self.ν = np.atleast_2d(ν)  # ν is array_like or float
         else:
-            self.ν = np.zeros((self._ny, 1))
+            self.ν = np.zeros((self.ny, 1))
 
         # = Check dimensions = #
         self._attr_dims_check()
@@ -105,38 +105,38 @@ class AMF_LSS_VAR:
         self._attr_shape_check()
 
         # = Compute Additive Decomposition = #
-        eye = np.identity(self._nx)
+        eye = np.identity(self.nx)
         A_res = la.solve(eye - self.A, eye)
         g = self.D @ A_res
-        H = F + D @ A_res @ self.B
+        H = self.F + self.D @ A_res @ self.B
 
-        self.additive_decomp = ad_lss_var(ν, H, g)
+        self.additive_decomp = ad_lss_var(self.ν, H, g)
 
         # = Compute Multiplicative Decomposition = #
-        ν_tilde = ν + (.5) * np.expand_dims(np.diag(H @ H.T), 1)
+        ν_tilde = self.ν + (.5) * np.expand_dims(np.diag(H @ H.T), 1)
         self.multiplicative_decomp = md_lss_var(ν_tilde, H, g)
 
         # = Construct LSS = #
-        nx0c = np.zeros((self._nx, 1))
-        nx0r = np.zeros(self._nx)
-        nx1 = np.ones(self._nx)
-        nk0 = np.zeros(self._nk)
-        ny0c = np.zeros((self._ny, 1))
-        ny0r = np.zeros(self._ny)
-        ny1m = np.eye(self._ny)
-        ny0m = np.zeros((self._ny, self._ny))
+        nx0c = np.zeros((self.nx, 1))
+        nx0r = np.zeros(self.nx)
+        nx1 = np.ones(self.nx)
+        nk0 = np.zeros(self.nk)
+        ny0c = np.zeros((self.ny, 1))
+        ny0r = np.zeros(self.ny)
+        ny1m = np.eye(self.ny)
+        ny0m = np.zeros((self.ny, self.ny))
         nyx0m = np.zeros_like(self.D)
 
         x0 = self._construct_x0(nx0r, ny0r)
         A_bar = self._construct_A_bar(x0, nx0c, nyx0m, ny0c, ny1m, ny0m)
         B_bar = self._construct_B_bar(nk0, H)
-        G_Bar = self._construct_G_bar(nx0c, self._nx, nyx0m, ny0c, ny1m, ny0m,
+        G_Bar = self._construct_G_bar(nx0c, self.nx, nyx0m, ny0c, ny1m, ny0m,
                                       g)
-        H_bar = self._construct_H_bar(self._nx, self._ny, self._nk)
+        H_bar = self._construct_H_bar(self.nx, self.ny, self.nk)
         Sigma_0 = self._construct_Sigma_0(x0)
 
-        self._lss = qe.LinearStateSpace(A_bar, B_bar, G_Bar, H_bar, mu_0=x0,
-                                        Sigma_0=Sigma_0)
+        self.lss = qe.LinearStateSpace(A_bar, B_bar, G_Bar, H_bar, mu_0=x0,
+                                       Sigma_0=Sigma_0)
 
     def _construct_x0(self, nx0r, ny0r):
         x0 = np.hstack([1, 0, nx0r, ny0r, ny0r])
