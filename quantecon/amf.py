@@ -61,7 +61,10 @@ class AMF_LSS_VAR:
 
     Attributes
     ----------
-    A, B, D, F, ν : See Parameters.
+    A, B, D, F, ν, nx, nk, ny : See Parameters.
+
+    lss : Instance of `LinearStateSpace`.
+        LSS representation of the additive (multiplicative) functional.
 
     additive_decomp : namedtuple
         A namedtuple containing the following items:
@@ -78,6 +81,42 @@ class AMF_LSS_VAR:
             "ν_tilde" : eigenvalue
             "H" : coefficient for the (linear) martingale component
             "g" : coefficient for the stationary component g(x)
+
+    Examples
+    ----------
+    Consider the following example:
+
+    >>> ϕ_1, ϕ_2, ϕ_3, ϕ_4 = 0.5, -0.2, 0, 0.5
+    >>> σ = 0.01
+    >>> ν = 0.01   # Growth rate
+    >>> A = np.array([[ϕ_1, ϕ_2, ϕ_3, ϕ_4],
+    ...               [  1,   0,   0,   0],
+    ...               [  0,   1,   0,   0],
+    ...               [  0,   0,   1,   0]])
+    >>> B = np.array([[σ, 0, 0, 0]]).T
+    >>> D = np.array([[1, 0, 0, 0]]) @ A
+    >>> F = np.array([[1, 0, 0, 0]]) @ B
+    >>> amf = qe.AMF_LSS_VAR(A, B, D, F, ν=ν)
+
+    The additive decomposition can be accessed by:
+
+    >>> amf.multiplicative_decomp
+    additive_decomp(ν=array([[0.01]]), H=array([[0.05]]),
+    g=array([[4. , 1.5, 2.5, 2.5]]))
+
+    The multiplicative decomposition can be accessed by:
+
+    >>> amf.multiplicative_decomp
+    multiplicative_decomp(ν_tilde=array([[0.01125]]), H=array([[0.05]]),
+    g=array([[4. , 1.5, 2.5, 2.5]]))
+
+    References
+    ----------
+    .. [1] Lars Peter Hansen and Thomas J Sargent. Robustness. Princeton
+       university press, 2008.
+
+    .. [2] Lars Peter Hansen and José A Scheinkman. Long-term risk: An operator
+       approach. Econometrica, 77(1):177–234, 2009.
 
     """
     def __init__(self, A, B, D, F=None, ν=None):
@@ -130,23 +169,25 @@ class AMF_LSS_VAR:
         x0 = self._construct_x0(nx0r, ny0r)
         A_bar = self._construct_A_bar(x0, nx0c, nyx0m, ny0c, ny1m, ny0m)
         B_bar = self._construct_B_bar(nk0, H)
-        G_Bar = self._construct_G_bar(nx0c, self.nx, nyx0m, ny0c, ny1m, ny0m,
+        G_bar = self._construct_G_bar(nx0c, self.nx, nyx0m, ny0c, ny1m, ny0m,
                                       g)
         H_bar = self._construct_H_bar(self.nx, self.ny, self.nk)
         Sigma_0 = self._construct_Sigma_0(x0)
 
-        self.lss = qe.LinearStateSpace(A_bar, B_bar, G_Bar, H_bar, mu_0=x0,
+        self.lss = qe.LinearStateSpace(A_bar, B_bar, G_bar, H_bar, mu_0=x0,
                                        Sigma_0=Sigma_0)
 
     def _construct_x0(self, nx0r, ny0r):
+        "Construct initial state x0 for LSS instance."
+
         x0 = np.hstack([1, 0, nx0r, ny0r, ny0r])
 
         return x0
 
     def _construct_A_bar(self, x0, nx0c, nyx0m, ny0c, ny1m, ny0m):
-        # Build A matrix for LSS
-        # Order of states is: [1, t, x_{t}, y_{t}, m_{t}]
+        "Construct A matrix for LSS instance."
 
+        # Order of states is: [1, t, x_{t}, y_{t}, m_{t}]
         # Transition for 1
         A1 = x0.copy()
 
@@ -168,15 +209,15 @@ class AMF_LSS_VAR:
         return A_bar
 
     def _construct_B_bar(self, nk0, H):
-        # Build B matrix for LSS
+        "Construct B matrix for LSS instance."
         B_bar = np.vstack([nk0, nk0, self.B, self.F, H])
 
         return B_bar
 
     def _construct_G_bar(self, nx0c, nx, nyx0m, ny0c, ny1m, ny0m, g):
-        # Build G matrix for LSS
-        # Order of observation is: [x_{t}, y_{t}, m_{t}, s_{t}, tau_{t}]
+        "Construct G matrix for LSS instance."
 
+        # Order of observation is: [x_{t}, y_{t}, m_{t}, s_{t}, tau_{t}]
         # Selector for x_{t}
         G1 = np.hstack([nx0c, nx0c, np.eye(nx), nyx0m.T, nyx0m.T])
 
@@ -197,18 +238,21 @@ class AMF_LSS_VAR:
         return G_bar
 
     def _construct_H_bar(self, nx, ny, nk):
-        # Build H matrix for LSS
+        "Construct H matrix for LSS instance."
+
         H_bar = np.zeros((2 + nx + 2 * ny, nk))
 
         return H_bar
 
     def _construct_Sigma_0(self, x0):
+        "Construct initial covariance matrix Sigma_0 for LSS instance."
+
         Sigma_0 = np.zeros((len(x0), len(x0)))
 
         return Sigma_0
 
     def _attr_dims_check(self):
-        """Check the dimensions of attributes."""
+        "Check the dimensions of attributes."
 
         inputs = {'A': self.A, 'B': self.B, 'D': self.D, 'F': self.F,
                   'ν': self.ν}
@@ -218,7 +262,7 @@ class AMF_LSS_VAR:
                 raise ValueError(input_name + ' must have 2 dimensions.')
 
     def _attr_shape_check(self):
-        """Check the shape of attributes."""
+        "Check the shape of attributes."
 
         same_dim_pairs = {'first': (0, {'A and B': [self.A, self.B],
                                         'D and F': [self.D, self.F],
@@ -270,93 +314,3 @@ class AMF_LSS_VAR:
         llh = (-0.5) * (obssum + scalar)
 
         return llh
-
-
-def pth_order_to_stacked_1st_order(ζ_hat, A_hats):
-    """
-    Construct the first order stacked representation of a VAR from the pth
-    order representation.
-
-    Parameters
-    ----------
-    ζ_hat : ndarray(float, ndim=1)
-        Vector of constants of the pth order VAR.
-
-    A_hats : tuple
-        Sequence of `ρ` matrices of shape `n x n` of lagged coefficients of
-        the pth order VAR.
-
-    Returns
-    ----------
-    ζ : ndarray(float, ndim=1)
-        Vector of constants of the 1st order stacked VAR.
-
-    A : ndarray(float, ndim=2)
-        Matrix of coefficients of the 1st order stacked VAR.
-
-    """
-    ρ = len(A_hats)
-    n = A_hats[0].shape[0]
-
-    A = np.zeros((n * ρ, n * ρ))
-    A[:n, :] = np.hstack(A_hats)
-    A[n:, :n*(ρ-1)] = np.eye(n * (ρ - 1))
-
-    ζ = np.zeros(n * ρ)
-    ζ[:n] = np.eye(n) @ ζ_hat
-
-    return ζ, A
-
-
-def compute_BQ_restricted_B_0(A_hats, Ω_hat):
-    """
-    Compute the `B_0` matrix for `AMF_LSS_VAR` using the Blanchard and Quah
-    method to impose long-run restrictions.
-
-    Parameters
-    ----------
-    A_hats : tuple
-        Sequence of `ρ` matrices of shape `n x n` of lagged coefficients of
-        the pth order VAR.
-
-    Ω_hat : ndarray(float, ndim=2)
-        Covariance matrix of the error term.
-
-    Returns
-    ----------
-    B_0 : ndarray(float, ndim=2)
-        Matrix satisfying :math:`\hat{\Omega}=B_{0}B_{0}^{\intercal}`, where
-        :math:`B_{0}` is identified using the Blanchard and Quah method.
-
-    References
-    ----------
-    .. [1] Lars Peter Hansen and Thomas J. Sargent. Risk, Uncertainty, and
-           Value. Princeton, New Jersey: Princeton University Press., 2018.
-
-    """
-    ρ = len(A_hats)
-
-    # Step 1: Compute the spectral density of V_{t} at frequency zero
-    def A_hat(z):
-        return np.eye(ρ) - sum([A_hats[i] * z ** i for i in range(ρ)])
-    A_hat_1 = A_hat(1)
-
-    accuracy_loss = np.log10(np.linalg.cond(A_hat_1)).round().astype(int)
-    if accuracy_loss >= 8:
-        warnings.warn('The `A_hat(1)` matrix is ill-conditioned. ' +
-                      ' Approximately ' + accuracy_loss + ' digits may be' +
-                      ' lost due to matrix inversion.')
-
-    A_hat_1_inv = np.linalg.inv(A_hat_1)
-    R = A_hat_1_inv @ Ω_hat @ A_hat_1_inv.T
-
-    # Step 2: Compute the Cholesky decomposition of R
-    R_chol = np.linalg.cholesky(R)
-
-    # Step 3: Compute B_0
-    B_0 = A_hat_1 @ R_chol
-
-    if not np.abs(B_0 @ B_0.T - Ω_hat).max() < 1e-10:
-        raise ValueError('The process of identifying `B_0` failed.')
-
-    return B_0

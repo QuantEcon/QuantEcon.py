@@ -5,8 +5,7 @@ Tests for amf.py
 
 import numpy as np
 from numpy.testing import assert_array_equal, assert_allclose
-from quantecon import (AMF_LSS_VAR, pth_order_to_stacked_1st_order,
-                       compute_BQ_restricted_B_0)
+from quantecon import AMF_LSS_VAR
 from scipy.stats import multivariate_normal as mvn
 from nose.tools import assert_raises
 
@@ -178,68 +177,3 @@ class TestAMFLSSVAR:
                                           for obs in temp]))
 
         assert_allclose(llh, llh_sol_scipy)
-
-
-def test_pth_order_to_stacked_1st_order():
-    # First test
-    n = 2
-    p = 5
-
-    ζ_hat = np.array([1., 2.])
-
-    A_hats = ([(i + 1) * np.eye(n) for i in range(p)])
-
-    ζ, A = pth_order_to_stacked_1st_order(ζ_hat, A_hats)
-
-    A_sol = np.array([[1., 0., 2., 0., 3., 0., 4., 0., 5., 0.],
-                      [0., 1., 0., 2., 0., 3., 0., 4., 0., 5.],
-                      [1., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-                      [0., 1., 0., 0., 0., 0., 0., 0., 0., 0.],
-                      [0., 0., 1., 0., 0., 0., 0., 0., 0., 0.],
-                      [0., 0., 0., 1., 0., 0., 0., 0., 0., 0.],
-                      [0., 0., 0., 0., 1., 0., 0., 0., 0., 0.],
-                      [0., 0., 0., 0., 0., 1., 0., 0., 0., 0.],
-                      [0., 0., 0., 0., 0., 0., 1., 0., 0., 0.],
-                      [0., 0., 0., 0., 0., 0., 0., 1., 0., 0.]])
-
-    ζ_sol = np.array([1., 2., 0., 0., 0., 0., 0., 0., 0., 0.])
-
-    assert_array_equal(ζ, ζ_sol)
-    assert_array_equal(A, A_sol)
-
-    # Second test
-    A_hats = (np.array([[.1, -.07, .03], [.4, .01, -.05], [.01, -.1, .6]]),
-              np.array([[-.8, .2, .02], [-.3, -.07, 0.05], [-.02, .1, -.09]]))
-
-    ζ_hat = np.array([0.01, 0.02, 0.03])
-
-    ζ, A = pth_order_to_stacked_1st_order(ζ_hat, A_hats)
-
-    ζ_sol = np.array([0.01, 0.02, 0.03, 0., 0., 0.])
-
-    A_sol = np.array([[.1, -.07, .03, -.8, .2, .02],
-                      [.4, .01, -.05, -.3, -.07, 0.05],
-                      [.01, -.1, .6, -.02, .1, -.09],
-                      [1., 0., 0., 0., 0., 0.],
-                      [0., 1., 0., 0., 0., 0.],
-                      [0., 0., 1., 0., 0., 0.]])
-
-    assert_array_equal(ζ, ζ_sol)
-    assert_array_equal(A, A_sol)
-
-
-def test_compute_BQ_restricted_B_0():
-    A = np.array([[0.9, -0.2],
-                  [0.3, 0.6]])
-
-    Ω_hat = np.array([[0.001, -0.0005],
-                      [-0.0005, 0.001]])
-
-    A_hats = (A, )
-
-    B_0 = compute_BQ_restricted_B_0(A_hats, Ω_hat)
-
-    B_0_sol = np.array([[-0.02192645, 0.02278664],
-                        [0.03069703, 0.00759555]])
-
-    assert_allclose(B_0, B_0_sol, rtol=1e-6)

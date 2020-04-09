@@ -18,8 +18,7 @@ from . import random
 from . import optimize
 
 #-Objects-#
-from .amf import (AMF_LSS_VAR, pth_order_to_stacked_1st_order,
-                  compute_BQ_restricted_B_0)
+from .amf import AMF_LSS_VAR
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
 from .dle import DLE
