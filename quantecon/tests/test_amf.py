@@ -144,7 +144,7 @@ class TestAMFLSSVAR:
     def test_invalid_shape(self):
         inputs = (self.A, self.B, self.D, self.F, self.ν)
         inputs_passed = list(inputs)
-        invalid_input = np.eye(10)
+        invalid_input = np.ones((10, 10, 10))
 
         for i in range(len(inputs)):
             inputs_passed[i] = invalid_input  # Set input i to be invalid
@@ -162,6 +162,12 @@ class TestAMFLSSVAR:
 
         with assert_raises(ValueError):
             AMF_LSS_VAR(A, B, D, F, ν)
+
+    def test_default_kwargs(self):
+        amf = AMF_LSS_VAR(self.A, self.B, self.D)
+
+        assert_array_equal(amf.F, np.zeros((amf.nk, amf.nk)))
+        assert_array_equal(amf.ν, np.zeros((amf.ny, 1)))
 
     def test_loglikelihood(self):
         x = np.random.rand(4, 10) * 0.005
