@@ -7,7 +7,6 @@ import numpy as np
 import scipy.linalg as la
 import quantecon as qe
 from collections import namedtuple
-import warnings
 
 
 ad_lss_var = namedtuple('additive_decomp', 'ν H g')
