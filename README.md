@@ -7,7 +7,7 @@ Libary Website: [https://quantecon.org/quantecon-py/](https://quantecon.org/quan
 
 ### Installation
 
-See the [library website](http://quantecon.org/python_index.html) for instructions
+See the [library website](https://quantecon.org/quantecon-py/) for instructions
 
 #### Build and Coverage Status:
 
