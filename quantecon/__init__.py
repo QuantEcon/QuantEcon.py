@@ -18,7 +18,7 @@ from . import random
 from . import optimize
 
 #-Objects-#
-from .amf import AMF_LSS_VAR
+from .amf import AMF
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
 from .dle import DLE

@@ -9,11 +9,11 @@ import quantecon as qe
 from collections import namedtuple
 
 
-ad_lss_var = namedtuple('additive_decomp', 'ν H g')
-md_lss_var = namedtuple('multiplicative_decomp', 'ν_tilde H g')
+add_decomp = namedtuple('additive_decomp', 'ν H g')
+mult_decomp = namedtuple('multiplicative_decomp', 'ν_tilde H g')
 
 
-class AMF_LSS_VAR:
+class AMF:
     """
     A class for transforming an additive (multiplicative) functional into a
     QuantEcon linear state space system. It uses the first-order VAR
@@ -95,11 +95,11 @@ class AMF_LSS_VAR:
     >>> B = np.array([[σ, 0, 0, 0]]).T
     >>> D = np.array([[1, 0, 0, 0]]) @ A
     >>> F = np.array([[1, 0, 0, 0]]) @ B
-    >>> amf = qe.AMF_LSS_VAR(A, B, D, F, ν=ν)
+    >>> amf = qe.AMF(A, B, D, F, ν=ν)
 
     The additive decomposition can be accessed by:
 
-    >>> amf.multiplicative_decomp
+    >>> amf.additive_decomp
     additive_decomp(ν=array([[0.01]]), H=array([[0.05]]),
     g=array([[4. , 1.5, 2.5, 2.5]]))
 
@@ -148,11 +148,11 @@ class AMF_LSS_VAR:
         g = self.D @ A_res
         H = self.F + self.D @ A_res @ self.B
 
-        self.additive_decomp = ad_lss_var(self.ν, H, g)
+        self.additive_decomp = add_decomp(self.ν, H, g)
 
         # = Compute Multiplicative Decomposition = #
         ν_tilde = self.ν + (.5) * np.expand_dims(np.diag(H @ H.T), 1)
-        self.multiplicative_decomp = md_lss_var(ν_tilde, H, g)
+        self.multiplicative_decomp = mult_decomp(ν_tilde, H, g)
 
         # = Construct LSS = #
         nx0c = np.zeros((self.nx, 1))

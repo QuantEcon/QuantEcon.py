@@ -5,12 +5,12 @@ Tests for amf.py
 
 import numpy as np
 from numpy.testing import assert_array_equal, assert_allclose
-from quantecon import AMF_LSS_VAR
+from quantecon import AMF
 from scipy.stats import multivariate_normal as mvn
 from nose.tools import assert_raises
 
 
-class TestAMFLSSVAR:
+class TestAMF:
     def setUp(self):
         ϕ_1, ϕ_2, ϕ_3, ϕ_4 = 0.5, -0.2, 0, 0.5
         σ = 0.01
@@ -28,7 +28,7 @@ class TestAMFLSSVAR:
         self.D = np.array([[1, 0, 0, 0]]) @ self.A
         self.F = np.array([[1, 0, 0, 0]]) @ self.B
 
-        self.amf = AMF_LSS_VAR(self.A, self.B, self.D, self.F, self.ν)
+        self.amf = AMF(self.A, self.B, self.D, self.F, self.ν)
 
     def test__construct_x0(self):
         ny0r = np.ones(2)
@@ -137,7 +137,7 @@ class TestAMFLSSVAR:
             for i in range(len(inputs)):
                 inputs_passed[i] = invalid_input  # Set input i to be invalid
                 with assert_raises(ValueError):
-                    AMF_LSS_VAR(*inputs_passed)
+                    AMF(*inputs_passed)
 
                 inputs_passed[i] = inputs[i]  # Restore original input
 
@@ -149,7 +149,7 @@ class TestAMFLSSVAR:
         for i in range(len(inputs)):
             inputs_passed[i] = invalid_input  # Set input i to be invalid
             with assert_raises(ValueError):
-                AMF_LSS_VAR(*inputs_passed)
+                AMF(*inputs_passed)
 
             inputs_passed[i] = inputs[i]  # Restore original input
 
@@ -161,10 +161,10 @@ class TestAMFLSSVAR:
         ν = np.zeros((2, 1))
 
         with assert_raises(ValueError):
-            AMF_LSS_VAR(A, B, D, F, ν)
+            AMF(A, B, D, F, ν)
 
     def test_default_kwargs(self):
-        amf = AMF_LSS_VAR(self.A, self.B, self.D)
+        amf = AMF(self.A, self.B, self.D)
 
         assert_array_equal(amf.F, np.zeros((amf.nk, amf.nk)))
         assert_array_equal(amf.ν, np.zeros((amf.ny, 1)))
