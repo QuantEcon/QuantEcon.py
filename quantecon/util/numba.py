@@ -4,7 +4,10 @@ Utilities to support Numba jitted functions
 """
 import numpy as np
 from numba import jit, generated_jit, types
-from numba.targets.linalg import _LAPACK
+try:
+    from numba.np.linalg import _LAPACK  # for Numba >= 0.49.0
+except ModuleNotFoundError:
+    from numba.targets.linalg import _LAPACK  # for Numba < 0.49.0
 
 
 # BLAS kinds as letters
