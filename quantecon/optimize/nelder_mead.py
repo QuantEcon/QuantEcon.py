@@ -232,7 +232,8 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
 
         # Step 3: Expansion
         elif f_r < f_val[best_val_idx]:
-            temp = χ * (x_r - x_bar)  # https://github.com/QuantEcon/QuantEcon.py/issues/530
+            # https://github.com/QuantEcon/QuantEcon.py/issues/530
+            temp = χ * (x_r - x_bar)
             x_e = x_bar + temp
             f_e = _neg_bounded_fun(fun, bounds, x_e, args=args)
             if f_e < f_r:  # Greedy minimization
