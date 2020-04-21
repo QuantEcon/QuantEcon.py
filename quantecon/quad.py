@@ -784,7 +784,9 @@ def _qnwlege1(n, a, b):
             p2 = p1
             p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j
 
-        pp = n * (z * p1 - p2)/(z * z - 1.0)
+        top = n * (z * p1 - p2)
+        bottom = z ** 2 - 1.0
+        pp = top / bottom  # https://github.com/QuantEcon/QuantEcon.py/issues/530
         z1 = z.copy()
         z = z1 - p1/pp
         if np.all(np.abs(z - z1) < 1e-14):
@@ -796,7 +798,8 @@ def _qnwlege1(n, a, b):
     nodes[i] = xm - xl * z
     nodes[- i - 1] = xm + xl * z
 
-    weights[i] = 2 * xl / ((1 - z * z) * pp * pp)
+    # https://github.com/QuantEcon/QuantEcon.py/issues/530
+    weights[i] = 2 * xl / ((1 - z ** 2) * pp * pp)
     weights[- i - 1] = weights[i]
 
     return nodes, weights
