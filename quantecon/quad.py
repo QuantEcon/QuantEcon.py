@@ -21,6 +21,7 @@ __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
            'qnwsimp', 'qnwtrap', 'qnwunif', 'quadrect', 'qnwbeta',
            'qnwgamma']
 
+
 @vectorize(nopython=True)
 def gammaln(x):
     return math.lgamma(x)
@@ -681,6 +682,7 @@ def _make_multidim_func(one_d_func, n, *args):
     nodes = gridmake(*nodes)
     return nodes, weights
 
+
 @jit(nopython=True)
 def _qnwcheb1(n, a, b):
     """
@@ -728,6 +730,7 @@ def _qnwcheb1(n, a, b):
     weights = ((b-a)/n)*np.cos(np.pi/n*np.outer(t1, t2)) @ t3
 
     return nodes, weights
+
 
 @jit(nopython=True)
 def _qnwlege1(n, a, b):
@@ -784,7 +787,10 @@ def _qnwlege1(n, a, b):
             p2 = p1
             p1 = ((2 * j - 1) * z * p2 - (j - 1) * p3) / j
 
-        pp = n * (z * p1 - p2)/(z * z - 1.0)
+        # https://github.com/QuantEcon/QuantEcon.py/issues/530
+        top = n * (z * p1 - p2)
+        bottom = z ** 2 - 1.0
+        pp = top / bottom
         z1 = z.copy()
         z = z1 - p1/pp
         if np.all(np.abs(z - z1) < 1e-14):
@@ -796,10 +802,12 @@ def _qnwlege1(n, a, b):
     nodes[i] = xm - xl * z
     nodes[- i - 1] = xm + xl * z
 
-    weights[i] = 2 * xl / ((1 - z * z) * pp * pp)
+    # https://github.com/QuantEcon/QuantEcon.py/issues/530
+    weights[i] = 2 * xl / ((1 - z ** 2) * pp * pp)
     weights[- i - 1] = weights[i]
 
     return nodes, weights
+
 
 @jit(nopython=True)
 def _qnwnorm1(n):
@@ -879,6 +887,7 @@ def _qnwnorm1(n):
 
     return nodes, weights
 
+
 @jit(nopython=True)
 def _qnwsimp1(n, a, b):
     """
@@ -927,6 +936,7 @@ def _qnwsimp1(n, a, b):
 
     return nodes, weights
 
+
 @jit(nopython=True)
 def _qnwtrap1(n, a, b):
     """
@@ -973,6 +983,7 @@ def _qnwtrap1(n, a, b):
     weights[-1] *= 0.5
 
     return nodes, weights
+
 
 @jit(nopython=True)
 def _qnwbeta1(n, a=1.0, b=1.0):
@@ -1090,12 +1101,13 @@ def _qnwbeta1(n, a=1.0, b=1.0):
         weights[i] = temp/(pp*p2)
 
     nodes = (1-nodes)/2
-    weights = weights * math.exp(gammaln(a+n) + gammaln(b+n)
-                                 - gammaln(n+1) - gammaln(n+ab+1))
-    weights = weights / (2*math.exp(gammaln(a+1) + gammaln(b+1)
-                         - gammaln(ab+2)))
+    weights = weights * math.exp(gammaln(a+n) + gammaln(b+n) -
+                                 gammaln(n+1) - gammaln(n+ab+1))
+    weights = weights / (2*math.exp(gammaln(a+1) + gammaln(b+1) -
+                         gammaln(ab+2)))
 
     return nodes, weights
+
 
 @jit(nopython=True)
 def _qnwgamma1(n, a=1.0, b=1.0, tol=3e-14):

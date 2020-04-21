@@ -220,7 +220,9 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
             break
 
         # Step 2: Reflection
-        x_r = x_bar + ρ * (x_bar - vertices[worst_val_idx])
+        # https://github.com/QuantEcon/QuantEcon.py/issues/530
+        temp = ρ * (x_bar - vertices[worst_val_idx])
+        x_r = x_bar + temp
         f_r = _neg_bounded_fun(fun, bounds, x_r, args=args)
 
         if f_r >= f_val[best_val_idx] and f_r < f_val[sort_ind[n-1]]:
@@ -230,7 +232,9 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
 
         # Step 3: Expansion
         elif f_r < f_val[best_val_idx]:
-            x_e = x_bar + χ * (x_r - x_bar)
+            # https://github.com/QuantEcon/QuantEcon.py/issues/530
+            temp = χ * (x_r - x_bar)
+            x_e = x_bar + temp
             f_e = _neg_bounded_fun(fun, bounds, x_e, args=args)
             if f_e < f_r:  # Greedy minimization
                 vertices[worst_val_idx] = x_e
@@ -242,11 +246,13 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
         # Step 4 & 5: Contraction and Shrink
         else:
             # Step 4: Contraction
+            # https://github.com/QuantEcon/QuantEcon.py/issues/530
+            temp = γ * (x_r - x_bar)
             if f_r < f_val[worst_val_idx]:  # Step 4.a: Outside Contraction
-                x_c = x_bar + γ * (x_r - x_bar)
+                x_c = x_bar + temp
                 LV_ratio_update = ργ
             else:  # Step 4.b: Inside Contraction
-                x_c = x_bar - γ * (x_r - x_bar)
+                x_c = x_bar - temp
                 LV_ratio_update = γ
 
             f_c = _neg_bounded_fun(fun, bounds, x_c, args=args)
