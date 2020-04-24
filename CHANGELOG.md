@@ -1,6 +1,59 @@
-# Change Log
+# Changelog
+
+## [0.4.7](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.7) (2020-04-24)
+
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.6...0.4.7)
+
+**Closed issues:**
+
+- \[Tests\] Build fails with Numba 0.49.0 [\#530](https://github.com/QuantEcon/QuantEcon.py/issues/530)
+- Review notes on learning algorithms [\#528](https://github.com/QuantEcon/QuantEcon.py/issues/528)
+- Make test-all [\#523](https://github.com/QuantEcon/QuantEcon.py/issues/523)
+- make test-all not running  [\#522](https://github.com/QuantEcon/QuantEcon.py/issues/522)
+
+**Merged pull requests:**
+
+- Release of version 0.4.7 [\#534](https://github.com/QuantEcon/QuantEcon.py/pull/534) ([mmcky](https://github.com/mmcky))
+- FIX: Updates for Numba 0.49.0 [\#531](https://github.com/QuantEcon/QuantEcon.py/pull/531) ([oyamad](https://github.com/oyamad))
+- Fix a link on README [\#529](https://github.com/QuantEcon/QuantEcon.py/pull/529) ([oyamad](https://github.com/oyamad))
+- Remove unused variable [\#526](https://github.com/QuantEcon/QuantEcon.py/pull/526) ([MKobayashi23m](https://github.com/MKobayashi23m))
+- MAINT: bimatrix\_generators: Define `\_\_all\_\_` [\#525](https://github.com/QuantEcon/QuantEcon.py/pull/525) ([oyamad](https://github.com/oyamad))
+- remove old test commands from Makefile [\#524](https://github.com/QuantEcon/QuantEcon.py/pull/524) ([mmcky](https://github.com/mmcky))
+
+## [0.4.6](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.6) (2019-12-09)
+
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.5...0.4.6)
+
+**Fixed bugs:**
+
+- Issue with numba=0.43.1 with scalar maximisation [\#495](https://github.com/QuantEcon/QuantEcon.py/issues/495)
+
+**Closed issues:**
+
+- Failed to import LinearStateSpace [\#513](https://github.com/QuantEcon/QuantEcon.py/issues/513)
+- Link to python lectures on GitHub page not working [\#511](https://github.com/QuantEcon/QuantEcon.py/issues/511)
+- Setting up anaconda environment with QuantEcon.py [\#510](https://github.com/QuantEcon/QuantEcon.py/issues/510)
+- \[Tests\] Fix FutureWarning in ivp.py [\#507](https://github.com/QuantEcon/QuantEcon.py/issues/507)
+- \[Tests\] Fix RuntimeWarning in lqcontrol.py [\#506](https://github.com/QuantEcon/QuantEcon.py/issues/506)
+- \[Tests\] Fix Pandas related FutureWarnings [\#505](https://github.com/QuantEcon/QuantEcon.py/issues/505)
+- \[Tests\] Errors with `numba=0.45.1` [\#502](https://github.com/QuantEcon/QuantEcon.py/issues/502)
+- \[Tests\] Warnings that should be resolved [\#501](https://github.com/QuantEcon/QuantEcon.py/issues/501)
+- TypingError appearing on Python lectures on stochastic growth [\#499](https://github.com/QuantEcon/QuantEcon.py/issues/499)
+- Cleanup of QuantEcon.py - November [\#410](https://github.com/QuantEcon/QuantEcon.py/issues/410)
+
+**Merged pull requests:**
+
+- update version to 0.4.6 [\#520](https://github.com/QuantEcon/QuantEcon.py/pull/520) ([mmcky](https://github.com/mmcky))
+- Adds a rank size plot to inequality [\#518](https://github.com/QuantEcon/QuantEcon.py/pull/518) ([jstac](https://github.com/jstac))
+- General cleanup of Package [\#515](https://github.com/QuantEcon/QuantEcon.py/pull/515) ([mmcky](https://github.com/mmcky))
+- \[FIX\] Fix Future Warnings in ivp.py and test\_quad.py and RuntimeError in lq\_control.py. [\#509](https://github.com/QuantEcon/QuantEcon.py/pull/509) ([duncanhobbs](https://github.com/duncanhobbs))
+- FIX: Player.is\_dominated: Fix warnings [\#504](https://github.com/QuantEcon/QuantEcon.py/pull/504) ([oyamad](https://github.com/oyamad))
+- FIX: random.draw: Replace `random\_sample` with `random` [\#503](https://github.com/QuantEcon/QuantEcon.py/pull/503) ([oyamad](https://github.com/oyamad))
+- FIX: two minor modifications in `lqcontrol` [\#498](https://github.com/QuantEcon/QuantEcon.py/pull/498) ([shizejin](https://github.com/shizejin))
+- UPD: Update travis to use python=3.7 [\#494](https://github.com/QuantEcon/QuantEcon.py/pull/494) ([mmcky](https://github.com/mmcky))
 
 ## [0.4.5](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.5) (2019-07-08)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.4...0.4.5)
 
 **Closed issues:**
@@ -16,6 +69,7 @@
 - FIX: DOC: Remove `matplotlib.sphinxext.only\_directives` [\#488](https://github.com/QuantEcon/QuantEcon.py/pull/488) ([oyamad](https://github.com/oyamad))
 
 ## [0.4.4](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.4) (2019-05-24)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.3...0.4.4)
 
 **Fixed bugs:**
@@ -44,6 +98,7 @@
 - Fix all F401 unused imports [\#467](https://github.com/QuantEcon/QuantEcon.py/pull/467) ([rht](https://github.com/rht))
 
 ## [0.4.3](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.3) (2018-12-17)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.2...0.4.3)
 
 **Closed issues:**
@@ -70,6 +125,7 @@
 - FIX: test `method` keyword of `RepeatedGame.equilibrium\_payoffs\(\)`. [\#446](https://github.com/QuantEcon/QuantEcon.py/pull/446) ([shizejin](https://github.com/shizejin))
 
 ## [0.4.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.2) (2018-11-25)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.0...0.4.2)
 
 **Implemented enhancements:**
@@ -104,6 +160,7 @@
 - Added basic inequality mesasures: lorenz curve and gini [\#414](https://github.com/QuantEcon/QuantEcon.py/pull/414) ([cdagnino](https://github.com/cdagnino))
 
 ## [0.4.0](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.0) (2018-08-20)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.8.1...0.4.0)
 
 **Implemented enhancements:**
@@ -140,9 +197,11 @@
 - Add sample game generators from bimatrix-generators [\#392](https://github.com/QuantEcon/QuantEcon.py/pull/392) ([oyamad](https://github.com/oyamad))
 
 ## [0.3.8.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.8.1) (2018-03-13)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.8...0.3.8.1)
 
 ## [0.3.8](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.8) (2018-03-12)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.7...0.3.8)
 
 **Fixed bugs:**
@@ -180,6 +239,7 @@
 - Add bugfix PR 364 to Major Changes for v0.3.7 [\#372](https://github.com/QuantEcon/QuantEcon.py/pull/372) ([oyamad](https://github.com/oyamad))
 
 ## [0.3.7](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.7) (2017-11-01)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.6.2...0.3.7)
 
 **Implemented enhancements:**
@@ -229,6 +289,7 @@
 - FEAT: Add random\_state option \(issue \#153\) [\#329](https://github.com/QuantEcon/QuantEcon.py/pull/329) ([QBatista](https://github.com/QBatista))
 
 ## [0.3.6.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.6.2) (2017-08-28)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.6.1...0.3.6.2)
 
 **Merged pull requests:**
@@ -237,6 +298,7 @@
 - rtd needs matplotlib for some sphinx extensions to work properly [\#336](https://github.com/QuantEcon/QuantEcon.py/pull/336) ([mmcky](https://github.com/mmcky))
 
 ## [0.3.6.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.6.1) (2017-08-28)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.6...0.3.6.1)
 
 **Merged pull requests:**
@@ -244,6 +306,7 @@
 - update to version 0.3.6 for new release to pypi and conda-forge [\#335](https://github.com/QuantEcon/QuantEcon.py/pull/335) ([mmcky](https://github.com/mmcky))
 
 ## [0.3.6](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.6) (2017-08-28)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.5.1...0.3.6)
 
 **Implemented enhancements:**
@@ -277,6 +340,7 @@
 - FIX: support\_enumeration: Use `\_numba\_linalg\_solve` [\#311](https://github.com/QuantEcon/QuantEcon.py/pull/311) ([oyamad](https://github.com/oyamad))
 
 ## [0.3.5.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.5.1) (2017-05-17)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.5...0.3.5.1)
 
 **Merged pull requests:**
@@ -284,6 +348,7 @@
 - remove dependency on statsmodels and use matrices to run OLS [\#310](https://github.com/QuantEcon/QuantEcon.py/pull/310) ([natashawatkins](https://github.com/natashawatkins))
 
 ## [0.3.5](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.5) (2017-05-16)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.4...0.3.5)
 
 **Implemented enhancements:**
@@ -319,6 +384,7 @@
 - Add rouwenhorst method for approx AR\(1\) with MC [\#282](https://github.com/QuantEcon/QuantEcon.py/pull/282) ([sglyon](https://github.com/sglyon))
 
 ## [0.3.4](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.4) (2017-02-23)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.3...0.3.4)
 
 **Implemented enhancements:**
@@ -330,10 +396,6 @@
 - Test: lae [\#52](https://github.com/QuantEcon/QuantEcon.py/issues/52)
 - Test: estspec [\#51](https://github.com/QuantEcon/QuantEcon.py/issues/51)
 - Profiling [\#44](https://github.com/QuantEcon/QuantEcon.py/issues/44)
-
-**Fixed bugs:**
-
-- Python 3: The models/jv.py optimization [\#56](https://github.com/QuantEcon/QuantEcon.py/issues/56)
 
 **Closed issues:**
 
@@ -360,6 +422,7 @@
 - Remove warnings supression as noted by Issue \#229 [\#231](https://github.com/QuantEcon/QuantEcon.py/pull/231) ([mmcky](https://github.com/mmcky))
 
 ## [0.3.3](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.3) (2016-07-21)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.2...0.3.3)
 
 **Closed issues:**
@@ -373,6 +436,7 @@
 - probvec: Use guvectorize with target='parallel' [\#253](https://github.com/QuantEcon/QuantEcon.py/pull/253) ([oyamad](https://github.com/oyamad))
 
 ## [0.3.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.2) (2016-04-25)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3.1...0.3.2)
 
 **Implemented enhancements:**
@@ -413,6 +477,7 @@
 - Changes in normal\_form\_game [\#226](https://github.com/QuantEcon/QuantEcon.py/pull/226) ([oyamad](https://github.com/oyamad))
 
 ## [0.3.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.3.1) (2016-01-22)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.3...0.3.1)
 
 **Merged pull requests:**
@@ -424,6 +489,7 @@
 - Update docs to remove models subpackage and update the qe\_api.py scri… [\#219](https://github.com/QuantEcon/QuantEcon.py/pull/219) ([mmcky](https://github.com/mmcky))
 
 ## [0.3](https://github.com/QuantEcon/QuantEcon.py/tree/0.3) (2016-01-07)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/pre-migrate-applications...0.3)
 
 **Closed issues:**
@@ -440,6 +506,7 @@
 - Migrate applications .. examples/ and quantecon/models/ to QuantEcon.applications [\#211](https://github.com/QuantEcon/QuantEcon.py/pull/211) ([mmcky](https://github.com/mmcky))
 
 ## [pre-migrate-applications](https://github.com/QuantEcon/QuantEcon.py/tree/pre-migrate-applications) (2015-11-23)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.2.2...pre-migrate-applications)
 
 **Fixed bugs:**
@@ -460,9 +527,11 @@
 - Fix optgrowth solution notebook [\#188](https://github.com/QuantEcon/QuantEcon.py/pull/188) ([oyamad](https://github.com/oyamad))
 
 ## [0.2.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.2.2) (2015-10-06)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.2.1...0.2.2)
 
 ## [0.2.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.2.1) (2015-10-05)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.10...0.2.1)
 
 **Implemented enhancements:**
@@ -493,6 +562,7 @@
 - MDP [\#171](https://github.com/QuantEcon/QuantEcon.py/pull/171) ([oyamad](https://github.com/oyamad))
 
 ## [0.1.10](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.10) (2015-08-28)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.9...0.1.10)
 
 **Implemented enhancements:**
@@ -536,6 +606,7 @@
 - Numba improvements [\#144](https://github.com/QuantEcon/QuantEcon.py/pull/144) ([sglyon](https://github.com/sglyon))
 
 ## [0.1.9](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.9) (2015-04-17)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.8...0.1.9)
 
 **Closed issues:**
@@ -548,6 +619,7 @@
 - Update kalman [\#134](https://github.com/QuantEcon/QuantEcon.py/pull/134) ([jstac](https://github.com/jstac))
 
 ## [0.1.8](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.8) (2015-04-07)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.7...0.1.8)
 
 **Closed issues:**
@@ -565,6 +637,7 @@
 - Convert longdescription from markdown to rst [\#119](https://github.com/QuantEcon/QuantEcon.py/pull/119) ([mmcky](https://github.com/mmcky))
 
 ## [0.1.7](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.7) (2015-02-09)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.6...0.1.7)
 
 **Implemented enhancements:**
@@ -602,6 +675,7 @@
 - Add solow model [\#74](https://github.com/QuantEcon/QuantEcon.py/pull/74) ([davidrpugh](https://github.com/davidrpugh))
 
 ## [0.1.6](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.6) (2014-11-04)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.5...0.1.6)
 
 **Implemented enhancements:**
@@ -632,7 +706,6 @@
 
 - MARKOV: Minor corrections [\#86](https://github.com/QuantEcon/QuantEcon.py/pull/86) ([oyamad](https://github.com/oyamad))
 - ENH: added tic, tac, toc functions [\#83](https://github.com/QuantEcon/QuantEcon.py/pull/83) ([albop](https://github.com/albop))
-- Rtfd: Bring in some of the working files. [\#82](https://github.com/QuantEcon/QuantEcon.py/pull/82) ([cc7768](https://github.com/cc7768))
 - MARKOV: More efficient implementation for computing stationary distributions [\#79](https://github.com/QuantEcon/QuantEcon.py/pull/79) ([oyamad](https://github.com/oyamad))
 - Closes issue \#77. [\#78](https://github.com/QuantEcon/QuantEcon.py/pull/78) ([davidrpugh](https://github.com/davidrpugh))
 - Hotfix for slight notebook issues raised by @jstac. [\#73](https://github.com/QuantEcon/QuantEcon.py/pull/73) ([davidrpugh](https://github.com/davidrpugh))
@@ -644,6 +717,7 @@
 - CAREER: Changed all occurences of bellman to bellman\_operator for unifie... [\#60](https://github.com/QuantEcon/QuantEcon.py/pull/60) ([cc7768](https://github.com/cc7768))
 
 ## [0.1.5](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.5) (2014-08-20)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.4...0.1.5)
 
 **Closed issues:**
@@ -657,6 +731,7 @@
 - Lyapunov [\#48](https://github.com/QuantEcon/QuantEcon.py/pull/48) ([cc7768](https://github.com/cc7768))
 
 ## [0.1.4](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.4) (2014-08-10)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.3...0.1.4)
 
 **Implemented enhancements:**
@@ -695,6 +770,7 @@
 - Updates to examples/ and solutions/stand\_alone\_programs to use quantecon as a package [\#5](https://github.com/QuantEcon/QuantEcon.py/pull/5) ([sanguineturtle](https://github.com/sanguineturtle))
 
 ## [0.1.3](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.3) (2014-06-10)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.2...0.1.3)
 
 **Merged pull requests:**
@@ -702,6 +778,7 @@
 - Changed build dependencies to reduced requirements and re-added run dependencies  [\#4](https://github.com/QuantEcon/QuantEcon.py/pull/4) ([sanguineturtle](https://github.com/sanguineturtle))
 
 ## [0.1.2](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.2) (2014-05-26)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1.1...0.1.2)
 
 **Merged pull requests:**
@@ -709,9 +786,13 @@
 - Added \_\_init\_\_.py with import statements and updated .gitignore [\#3](https://github.com/QuantEcon/QuantEcon.py/pull/3) ([sanguineturtle](https://github.com/sanguineturtle))
 
 ## [0.1.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.1.1) (2014-05-21)
+
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.1...0.1.1)
 
 ## [0.1](https://github.com/QuantEcon/QuantEcon.py/tree/0.1) (2014-05-21)
 
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/da54172a80ec50b8caf8732297c9a68f8ea427eb...0.1)
 
-\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
+
+
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
