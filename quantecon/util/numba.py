@@ -3,7 +3,9 @@ Utilities to support Numba jitted functions
 
 """
 import numpy as np
+import numba
 from numba import jit, generated_jit, types
+from packaging import version
 try:
     from numba.np.linalg import _LAPACK  # for Numba >= 0.49.0
 except ModuleNotFoundError:
@@ -11,12 +13,20 @@ except ModuleNotFoundError:
 
 
 # BLAS kinds as letters
-_blas_kinds = {
+if version.parse(numba.__version__) < version.parse('0.49'):
+    _blas_kinds = {
     types.float32: 's',
     types.float64: 'd',
     types.complex64: 'c',
     types.complex128: 'z',
 }
+else:
+    _blas_kinds = {
+        numba.float32: 's',
+        numba.float64: 'd',
+        numba.complex64: 'c',
+        numba.complex128: 'z',
+    }
 
 
 @generated_jit(nopython=True, cache=True)
