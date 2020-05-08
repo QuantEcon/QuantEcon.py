@@ -29,7 +29,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest pip install 
+        pip install -U pip nose coveralls coverage numpy scipy pandas numba sympy ipython statsmodels flake8
 #    - name: Lint with flake8
 #      run: |
 #        # stop the build if there are Python syntax errors or undefined names
