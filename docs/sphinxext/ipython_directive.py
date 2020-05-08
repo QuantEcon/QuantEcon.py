@@ -728,7 +728,7 @@ class IpythonDirective(Directive):
         #print lines
         if len(lines)>2:
             if debug:
-                print '\n'.join(lines)
+                print('\n'.join(lines))
             else: #NOTE: this raises some errors, what's it for?
                 #print 'INSERTING %d lines'%len(lines)
                 self.state_machine.insert_input(
