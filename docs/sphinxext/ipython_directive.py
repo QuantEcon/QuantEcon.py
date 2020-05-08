@@ -906,4 +906,4 @@ if __name__=='__main__':
     if not os.path.isdir('_static'):
         os.mkdir('_static')
     test()
-    print 'All OK? Check figures in _static/'
+    print('All OK? Check figures in _static/')
