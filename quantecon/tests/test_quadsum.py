@@ -61,3 +61,4 @@ if __name__ == '__main__':
     test_var_identitysum()
     test_m_simplesum()
     test_m_matsum()
+    
