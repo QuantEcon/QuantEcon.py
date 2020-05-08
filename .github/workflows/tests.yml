@@ -41,6 +41,6 @@ jobs:
     - name: Test with pytest
       run: |
         
-        pytest --durations=10 --cov=quantecon --cov-report=xml --cov-report=term-missing --ignore=tests/test_pdf.py
+        pytest --durations=10 --cov-report=xml --cov-report=term-missing --ignore=tests/test_pdf.py
 
         coverage xml
