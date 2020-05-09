@@ -69,7 +69,7 @@ class DLE(object):
         self.nb, self.nh = self.llambda.shape
         self.nd, self.nc = self.phic.shape
         self.nz, self.nw = self.c2.shape
-        self.junk, self.ng = self.phig.shape
+        _, self.ng = self.phig.shape
         self.nk, self.ni = self.thetak.shape
 
         # === Creation of various useful matrices === #
