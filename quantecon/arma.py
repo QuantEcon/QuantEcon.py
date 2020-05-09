@@ -5,7 +5,6 @@ TODO: 1. Fix warnings concerning casting complex variables back to floats
 
 """
 import numpy as np
-from numpy import conj
 from .util import check_random_state
 
 
@@ -206,7 +205,7 @@ class ARMA:
         """
         from scipy.signal import freqz
         w, h = freqz(self.ma_poly, self.ar_poly, worN=res, whole=two_pi)
-        spect = h * conj(h) * self.sigma**2
+        spect = h * np.conj(h) * self.sigma**2
 
         return w, spect
 
