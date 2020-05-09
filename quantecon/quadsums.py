@@ -6,7 +6,6 @@ in the docstrings.
 
 
 import numpy as np
-from numpy import sqrt, dot
 import scipy.linalg
 from .matrix_eqn import solve_discrete_lyapunov
 
@@ -54,10 +53,10 @@ def var_quadratic_sum(A, C, H, beta, x0):
     A, C, H = list(map(np.atleast_2d, (A, C, H)))
     x0 = np.atleast_1d(x0)
     # == Start computations == #
-    Q = scipy.linalg.solve_discrete_lyapunov(sqrt(beta) * A.T, H)
-    cq = dot(dot(C.T, Q), C)
+    Q = scipy.linalg.solve_discrete_lyapunov(np.sqrt(beta) * A.T, H)
+    cq = np.dot(np.dot(C.T, Q), C)
     v = np.trace(cq) * beta / (1 - beta)
-    q0 = dot(dot(x0.T, Q), x0) + v
+    q0 = np.dot(np.dot(x0.T, Q), x0) + v
 
     return q0
 
