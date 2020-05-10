@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest tables
         python setup.py develop
-        pip install -U pip coverage numpy scipy pandas numba sympy ipython statsmodels
+        pip install -U nose pip coverage numpy scipy pandas numba sympy ipython statsmodels
         python setup.py install
 
     - name: Run Tests
