@@ -1,0 +1,34 @@
+name: continuous-integration
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest tables
+        python setup.py develop
+        pip install -U pip coverage numpy scipy pandas numba sympy ipython statsmodels
+        python setup.py install
+
+    - name: Run Tests
+      run: |
+        flake8 --select F401, F405,E231 quantecon
+
+        pytest --with-coverage -a "!slow" --cover-package=quantecon
