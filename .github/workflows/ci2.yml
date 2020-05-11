@@ -31,4 +31,4 @@ jobs:
       run: |
         flake8 --select F401, F405,E231 quantecon
 
-        pytest PY_IGNORE_IMPORTMISMATCH=1
+        pytest --PY_IGNORE_IMPORTMISMATCH=1
