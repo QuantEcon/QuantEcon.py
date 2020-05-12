@@ -144,7 +144,7 @@ def rank_size_plot(data, ax, label=None, c=1.0):
         for plotting on, has method ax.loglog
     """
     w = - np.sort(- data)                  # Reverse sort
-    w = w[:int(len(w) * c)]                # extract top c%
+    w = w[:int(len(w) * c)]                # extract top (c * 100)%
     rank_data = np.arange(len(w)) + 1
     size_data = w
     ax.loglog(rank_data, size_data, 'o', markersize=3.0, alpha=0.5, label=label)
