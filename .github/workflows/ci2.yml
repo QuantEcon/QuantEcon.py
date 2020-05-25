@@ -31,4 +31,4 @@ jobs:
       run: |
         flake8 --select F401, F405,E231 quantecon
 
-        pytest 
+        pytest --with-coverage -a "!slow" --cover-package=quantecon
