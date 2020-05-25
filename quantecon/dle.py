@@ -1,5 +1,5 @@
 """
-Provides a class called DLE to convert and solve dynamic linear economics 
+Provides a class called DLE to convert and solve dynamic linear economies
 (as set out in Hansen & Sargent (2013)) as LQ problems.
 """
 
@@ -69,7 +69,7 @@ class DLE(object):
         self.nb, self.nh = self.llambda.shape
         self.nd, self.nc = self.phic.shape
         self.nz, self.nw = self.c2.shape
-        junk, self.ng = self.phig.shape
+        _, self.ng = self.phig.shape
         self.nk, self.ni = self.thetak.shape
 
         # === Creation of various useful matrices === #
@@ -77,7 +77,6 @@ class DLE(object):
         ug = np.hstack((np.zeros((self.ng, self.nc)), np.eye(self.ng)))
         phiin = np.linalg.inv(np.hstack((self.phic, self.phig)))
         phiinc = uc.dot(phiin)
-        phiing = ug.dot(phiin)
         b11 = - self.thetah.dot(phiinc).dot(self.phii)
         a1 = self.thetah.dot(phiinc).dot(self.gamma)
         a12 = np.vstack((self.thetah.dot(phiinc).dot(
@@ -306,7 +305,6 @@ class DLE(object):
         Ac2 = np.hstack((np.zeros((self.nz, self.nh)), self.a22))
         Ac = np.vstack((Ac1, Ac2))
         Bc = np.vstack((self.thetah, np.zeros((self.nz, self.nc))))
-        Cc = np.vstack((np.zeros((self.nh, self.nw)), self.c2))
         Rc1 = np.hstack((self.llambda.T.dot(self.llambda), -
                          self.llambda.T.dot(self.ub)))
         Rc2 = np.hstack((-self.ub.T.dot(self.llambda), self.ub.T.dot(self.ub)))
