@@ -172,7 +172,7 @@ def test_repeat():
 
 
 class TestSimplexGrid:
-    def setUp(self):
+    def setup_method(self):
         self.simplex_grid_3_4 = np.array([[0, 0, 4],
                                           [0, 1, 3],
                                           [0, 2, 2],
