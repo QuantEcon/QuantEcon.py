@@ -32,4 +32,4 @@ jobs:
       run: |
         flake8 --select F401, F405,E231 quantecon
 
-        pytest --cov=quantecon coverage xml
+        pytest --cov=quantecon 
