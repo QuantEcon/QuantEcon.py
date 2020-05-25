@@ -32,4 +32,4 @@ jobs:
       run: |
         flake8 --select F401, F405,E231 quantecon
 
-        pytest --cov=quantecon alias py-clean=find -name "*.pyc" -delete
+        pytest --cov=quantecon
