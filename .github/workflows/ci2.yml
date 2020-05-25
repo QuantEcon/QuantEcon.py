@@ -32,4 +32,8 @@ jobs:
       run: |
         flake8 --select F401, F405,E231 quantecon
 
-        pytest --cov=quantecon
+        pytest quantecon/game_theory/tests 
+        pytest quantecon/markov/tests 
+        pytest quantecon/optimize/tests 
+        pytest quantecon/random/tests 
+        pytest quantecon/tests
