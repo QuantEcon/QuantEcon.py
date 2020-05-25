@@ -10,7 +10,7 @@ from quantecon.distributions import BetaBinomial
 
 
 class TestBetaBinomial:
-    def setup_method(self):
+    def setUp(self):
         self.n = 100
         self.a = 5
         self.b = 5

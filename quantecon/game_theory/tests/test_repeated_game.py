@@ -8,7 +8,7 @@ from quantecon.game_theory import NormalFormGame, RepeatedGame
 
 
 class TestAS():
-    def setup_method(self):
+    def setUp(self):
         self.game_dicts = []
 
         # Example from Abreu and Sannikov (2014)

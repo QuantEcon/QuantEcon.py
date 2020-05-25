@@ -10,7 +10,7 @@ from quantecon.game_theory.vertex_enumeration import _BestResponsePolytope
 
 
 class TestVertexEnumeration:
-    def setup_method(self):
+    def setUp(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
@@ -72,7 +72,7 @@ def test_vertex_enumeration_invalid_g():
 
 
 class TestBestResponsePolytope:
-    def setup_method(self):
+    def setUp(self):
         # From von Stengel 2007 in Algorithmic Game Theory
         bimatrix = [[(3, 3), (3, 2)],
                     [(2, 2), (5, 6)],

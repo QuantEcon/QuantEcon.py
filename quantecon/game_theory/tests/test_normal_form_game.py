@@ -19,7 +19,7 @@ LP_METHODS = [None, 'simplex', 'interior-point', 'revised simplex']
 class TestPlayer_1opponent:
     """Test the methods of Player with one opponent player"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a Player instance"""
         coordination_game_matrix = [[4, 0], [3, 2]]
         self.player = Player(coordination_game_matrix)
@@ -93,7 +93,7 @@ class TestPlayer_1opponent:
 class TestPlayer_2opponents:
     """Test the methods of Player with two opponent players"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a Player instance"""
         payoffs_2opponents = [[[3, 6],
                                [4, 2]],
@@ -180,7 +180,7 @@ def test_player_corner_cases():
 class TestNormalFormGame_Sym2p:
     """Test the methods of NormalFormGame with symmetric two players"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a NormalFormGame instance"""
         coordination_game_matrix = [[4, 0], [3, 2]]
         self.g = NormalFormGame(coordination_game_matrix)
@@ -198,7 +198,7 @@ class TestNormalFormGame_Sym2p:
 class TestNormalFormGame_Asym2p:
     """Test the methods of NormalFormGame with asymmetric two players"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a NormalFormGame instance"""
         self.BoS_bimatrix = np.array([[(3, 2), (1, 1)],
                                       [(0, 0), (2, 3)]])
@@ -238,7 +238,7 @@ class TestNormalFormGame_Asym2p:
 class TestNormalFormGame_3p:
     """Test the methods of NormalFormGame with three players"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a NormalFormGame instance"""
         payoffs_2opponents = [[[3, 6],
                                [4, 2]],
@@ -345,7 +345,7 @@ def test_normalformgame_payoff_profile_array_c_contiguous():
 class TestPlayer_0opponents:
     """Test for trivial Player with no opponent player"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a Player instance"""
         self.payoffs = [0, 1, -1]
         self.player = Player(self.payoffs)
@@ -390,7 +390,7 @@ class TestPlayer_0opponents:
 class TestNormalFormGame_1p:
     """Test for trivial NormalFormGame with a single player"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup a NormalFormGame instance"""
         data = [[0], [1], [1]]
         self.g = NormalFormGame(data)
@@ -448,7 +448,7 @@ def test_normalformgame_setitem_1p():
 # Trivial cases with one action #
 
 class TestPlayer_1action:
-    def setup_method(self):
+    def setUp(self):
         """Setup a Player instance"""
         self.payoffs = [[0, 1]]
         self.player = Player(self.payoffs)

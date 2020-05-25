@@ -11,7 +11,7 @@ from quantecon.markov import DiscreteDP, backward_induction
 
 
 class TestDiscreteDP:
-    def setup_method(self):
+    def setUp(self):
         # From Puterman 2005, Section 3.1
         beta = 0.95
 
@@ -169,7 +169,7 @@ def test_ddp_sorting():
 
 
 class TestFiniteHorizon:
-    def setup_method(self):
+    def setUp(self):
         # From Puterman 2005, Section 3.2, Section 4.6.1
         # "single-product stochastic inventory control"
         s_indices = [0, 0, 0, 0, 1, 1, 1, 2, 2, 3]

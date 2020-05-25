@@ -91,7 +91,7 @@ class TestFPLogisticEquation(unittest.TestCase):
 
 
 class TestComputeFPContraction():
-    def setup_method(self):
+    def setUp(self):
         self.coeff = 0.5
         self.methods = ['iteration', 'imitation_game']
 

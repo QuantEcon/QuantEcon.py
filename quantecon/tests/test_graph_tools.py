@@ -130,7 +130,7 @@ class Graphs:
 class TestDiGraph:
     """Test the methods in Digraph"""
 
-    def setup_method(self):
+    def setUp(self):
         """Setup Digraph instances"""
         self.graphs = Graphs()
         for graph_dict in self.graphs.graph_dicts:
@@ -298,7 +298,7 @@ def test_raises_non_homogeneous_node_labels():
 
 
 class TestRandomTournamentGraph:
-    def setup_method(self):
+    def setUp(self):
         n = 5
         g = random_tournament_graph(n)
         self.adj_matrix = g.csgraph.toarray()
