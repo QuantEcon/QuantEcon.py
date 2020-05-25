@@ -189,7 +189,7 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
     p = 1/3
     TOL = 1e-2
 
-    def setUp(self):
+    def setup_method(self):
         """ Setup a KMRMarkovMatrix and Compute Stationary Values """
         self.P = KMR_Markov_matrix_sequential(self.N, self.p, self.epsilon)
         self.mc = MarkovChain(self.P)
@@ -380,7 +380,7 @@ def test_mc_sample_path_lln():
 
 
 class TestMCStateValues:
-    def setUp(self):
+    def setup_method(self):
         state_values = [[0, 1], [2, 3], [4, 5]]  # Pass python list
         self.state_values = np.array(state_values)
 

@@ -12,7 +12,7 @@ from quantecon.util.combinatorics import (
 
 
 class TestKArray:
-    def setUp(self):
+    def setup_method(self):
         self.k_arrays = np.array(
             [[0, 1, 2],
              [0, 1, 3],
