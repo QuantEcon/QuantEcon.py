@@ -30,7 +30,7 @@ def random_skew_sym(n, m=None, random_state=None):
 
 
 class TestSupportEnumeration():
-    def setUp(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
