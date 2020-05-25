@@ -27,7 +27,6 @@ jobs:
         python setup.py develop
         pip install -U pip nose coverage numpy scipy pandas numba sympy ipython statsmodels flake8 
         python setup.py install
-        rm -r __pycache__/
 
     - name: Run Tests
       run: |
