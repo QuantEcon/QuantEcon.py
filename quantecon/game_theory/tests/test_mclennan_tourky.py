@@ -12,7 +12,7 @@ from quantecon.game_theory.mclennan_tourky import (
 
 
 class TestMclennanTourky():
-    def setUp(self):
+    def setup_method(self):
         def anti_coordination(N, v):
             payoff_array = np.empty((2,)*N)
             payoff_array[0, :] = 1
@@ -58,7 +58,7 @@ class TestMclennanTourky():
 
 
 class TestMclennanTourkyInvalidInputs():
-    def setUp(self):
+    def setup_method(self):
             self.bimatrix = [[(3, 3), (3, 2)],
                              [(2, 2), (5, 6)],
                              [(0, 3), (6, 1)]]
@@ -78,7 +78,7 @@ class TestMclennanTourkyInvalidInputs():
 
 
 class TestEpsilonNash():
-    def setUp(self):
+    def setup_method(self):
         def anti_coordination(N, v):
             payoff_array = np.empty((2,)*N)
             payoff_array[0, :] = 1
