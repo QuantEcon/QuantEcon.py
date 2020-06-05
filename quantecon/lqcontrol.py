@@ -426,7 +426,7 @@ class LQMarkov:
 
     """
 
-    def __init__(self, Π, Qs, Rs, As, Bs, Cs=None, Ns=None, beta=1):
+    def __init__(self, Π, Qs, Rs, As, Bs, Cs=None, Ns=None, beta=1, max_iter=1000):
 
         # == Make sure all matrices for each state are 2D arrays == #
         def converter(Xs):
@@ -455,6 +455,7 @@ class LQMarkov:
         self.j = self.Cs.shape[2]
 
         self.beta = beta
+        self.max_iter = max_iter
 
         self.Π = np.asarray(Π, dtype='float')
 
@@ -510,9 +511,10 @@ class LQMarkov:
         m, n, k = self.m, self.n, self.k
         As, Bs, Cs = self.As, self.Bs, self.Cs
         Qs, Rs, Ns = self.Qs, self.Rs, self.Ns
+        max_iter = self.max_iter
 
         # == Solve for P(s) by iterating discrete riccati system== #
-        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta)
+        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta, max_iter=max_iter)
 
         # == calculate F and d == #
         Fs = np.array([np.empty((k, n)) for i in range(m)])
