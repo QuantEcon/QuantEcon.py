@@ -406,6 +406,8 @@ class LQMarkov:
         k x n for each Markov state,
     beta : scalar(float), optional(default=1)
         beta is the discount parameter
+    max_iter : scalar(int), optional(default=1000)
+        The maximum number of iterations allowed
 
     Attributes
     ----------
