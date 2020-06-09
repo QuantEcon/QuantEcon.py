@@ -406,8 +406,6 @@ class LQMarkov:
         k x n for each Markov state,
     beta : scalar(float), optional(default=1)
         beta is the discount parameter
-    max_iter : scalar(int), optional(default=1000)
-        The maximum number of iterations allowed
 
     Attributes
     ----------
@@ -428,8 +426,7 @@ class LQMarkov:
 
     """
 
-    def __init__(self, Π, Qs, Rs, As, Bs, Cs=None, Ns=None, beta=1,
-                    max_iter=1000):
+    def __init__(self, Π, Qs, Rs, As, Bs, Cs=None, Ns=None, beta=1):
 
         # == Make sure all matrices for each state are 2D arrays == #
         def converter(Xs):
@@ -458,7 +455,6 @@ class LQMarkov:
         self.j = self.Cs.shape[2]
 
         self.beta = beta
-        self.max_iter = max_iter
 
         self.Π = np.asarray(Π, dtype='float')
 
@@ -483,7 +479,7 @@ class LQMarkov:
         return dedent(m.format(b=self.beta, m=self.m, n=self.n, k=self.k,
                                j=self.j, t=t))
 
-    def stationary_values(self):
+    def stationary_values(self, max_iter=1000):
         """
         Computes the matrix :math:`P(s)` and scalar :math:`d(s)` that
         represent the value function
@@ -494,6 +490,11 @@ class LQMarkov:
 
         in the infinite horizon case.  Also computes the control matrix
         :math:`F` from :math:`u = - F(s) x`.
+
+        Parameters
+        ----------
+        max_iter : scalar(int), optional(default=1000)
+            The maximum number of iterations allowed
 
         Returns
         -------
@@ -514,11 +515,10 @@ class LQMarkov:
         m, n, k = self.m, self.n, self.k
         As, Bs, Cs = self.As, self.Bs, self.Cs
         Qs, Rs, Ns = self.Qs, self.Rs, self.Ns
-        max_iter = self.max_iter
 
         # == Solve for P(s) by iterating discrete riccati system== #
-        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
-                                            max_iter=max_iter)
+        Ps = solve_discrete_riccati_system(
+            Π, As, Bs, Cs, Qs, Rs, Ns, beta, max_iter=max_iter)
 
         # == calculate F and d == #
         Fs = np.array([np.empty((k, n)) for i in range(m)])
