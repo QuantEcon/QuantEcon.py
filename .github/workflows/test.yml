@@ -23,12 +23,14 @@ jobs:
         python setup.py develop
         pip install -U pip nose coverage numpy scipy pandas numba sympy ipython statsmodels flake8 
         python setup.py install
+        pip install coveralls
     - name: Run Tests
       run: |
         flake8 --select F401, F405,E231 quantecon
-        pytest quantecon/game_theory/tests 
-        pytest quantecon/markov/tests 
-        pytest quantecon/optimize/tests 
-        pytest quantecon/random/tests 
-        pytest quantecon/tests
-        pytest quantecon/util/tests
+        coverage run --source=quantecon -m pytest quantecon/game_theory/tests 
+        coverage run --source=quantecon -m pytest quantecon/markov/tests 
+        coverage run --source=quantecon -m pytest quantecon/optimize/tests 
+        coverage run --source=quantecon -m pytest quantecon/random/tests 
+        coverage run --source=quantecon -m pytest quantecon/tests
+        coverage run --source=quantecon -m pytest quantecon/util/tests
+        coveralls
