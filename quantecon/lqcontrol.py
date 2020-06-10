@@ -517,8 +517,8 @@ class LQMarkov:
         Qs, Rs, Ns = self.Qs, self.Rs, self.Ns
 
         # == Solve for P(s) by iterating discrete riccati system== #
-        Ps = solve_discrete_riccati_system(
-            Π, As, Bs, Cs, Qs, Rs, Ns, beta, max_iter=max_iter)
+        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
+                                           max_iter=max_iter)
 
         # == calculate F and d == #
         Fs = np.array([np.empty((k, n)) for i in range(m)])
