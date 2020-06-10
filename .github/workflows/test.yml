@@ -27,7 +27,7 @@ jobs:
     - name: Run Tests
       
       env:
-          COVERALLS_REPO_TOKEN: 7f8JDNk6BsPMESy0URL3W00zlazzRcuzR 
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }} 
       
       run: |
         flake8 --select F401, F405,E231 quantecon
