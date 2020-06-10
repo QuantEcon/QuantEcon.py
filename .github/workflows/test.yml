@@ -25,6 +25,10 @@ jobs:
         python setup.py install
         pip install coveralls
     - name: Run Tests
+      
+      env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      
       run: |
         flake8 --select F401, F405,E231 quantecon
         coverage run --source=quantecon -m pytest quantecon/game_theory/tests 
