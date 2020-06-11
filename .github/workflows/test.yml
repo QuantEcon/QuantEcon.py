@@ -1,7 +1,12 @@
 name: continuous-integration
 
-on: [pull_request , push]
 
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+   
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
