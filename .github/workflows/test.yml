@@ -26,9 +26,9 @@ jobs:
         pip install pytest tables
         pip install pytest-cov
         python setup.py develop
-        pip install -U pip nose coverage numpy scipy pandas numba sympy ipython statsmodels flake8 
+        pip install -U pip nose coverage numpy scipy pandas numba sympy ipython statsmodels flake8 PyYAML
         python setup.py install
-        pip install coveralls
+        pip install coveralls 
     - name: Run Tests
       
       env:
