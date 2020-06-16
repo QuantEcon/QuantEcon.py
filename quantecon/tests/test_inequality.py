@@ -5,8 +5,10 @@ Tests for inequality.py
 """
 
 import numpy as np
-from numpy.testing import assert_allclose
-from quantecon import lorenz_curve, gini_coefficient, shorrocks_index
+from numpy.testing import assert_allclose, assert_raises
+from scipy.stats import linregress
+from quantecon import lorenz_curve, gini_coefficient, \
+     shorrocks_index, rank_size
 
 
 def test_lorenz_curve():
@@ -37,7 +39,7 @@ def test_lorenz_curve():
 
 def test_gini_coeff():
     """
-    Tests how the funciton `gini_coefficient` calculates the Gini coefficient
+    Tests how the function `gini_coefficient` calculates the Gini coefficient
     with the Pareto and the Weibull distribution.
 
     Analytically, we know that Pareto with parameter `a` has
@@ -87,4 +89,46 @@ def test_shorrocks_index():
     expected = 0.98  # result from paper
     index = shorrocks_index(P)
     assert_allclose(expected, index, rtol=1e-2)
+
+
+def test_rank_size():
+    """
+    Tests `rank_size` function, which generates rank-size data for
+    a Pareto distribution.
+
+    The rank-size plot for a sample drawn from a Pareto distribution
+    should be a straight line.
+
+    The length of the `rank_data` array should be within (c x 100)%
+    of the size of the distribution.
+    """
+
+    sample_size = 1000
+    c = 0.74
+
+    # Tests Pareto; r_squared ~ 1
+    pareto_draw = np.exp(np.random.exponential(scale=1.0, size=sample_size))
+    rank_data, size_data = rank_size(pareto_draw, c=c)
+
+    assert len(rank_data) == len(size_data)
+    assert_allclose(c*sample_size, len(rank_data), rtol=1e-3)
+
+    _, _, r_value, _, _ = linregress(np.log(rank_data), np.log(size_data))
+    r_sqval = r_value**2
+
+    assert_allclose(r_sqval, 1, rtol=1e-4)
+
+    # Tests Exponential; r_squared < 1
+    np.random.seed(13)
+    z = np.random.randn(sample_size)
+
+    exp_draw = np.exp(z)
+    rank_data_exp, size_data_exp = rank_size(exp_draw, c=c)
+
+    _, _, r_value_exp, _, _ = linregress(np.log(rank_data_exp),
+                                         np.log(size_data_exp))
+    r_sqval_exp = r_value_exp**2
+
+    assert_raises(AssertionError, assert_allclose, r_sqval_exp, 1, rtol=1e-4)
+
 

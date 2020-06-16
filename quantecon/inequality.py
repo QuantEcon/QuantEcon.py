@@ -10,15 +10,17 @@ from numba import njit, prange
 @njit
 def lorenz_curve(y):
     """
-    Calculates the Lorenz Curve, a graphical representation of the distribution of income
-    or wealth.
+    Calculates the Lorenz Curve, a graphical representation of
+    the distribution of income or wealth.
 
-    It returns the cumulative share of people (x-axis) and the cumulative share of income earned
+    It returns the cumulative share of people (x-axis) and
+    the cumulative share of income earned.
 
     Parameters
     ----------
     y : array_like(float or int, ndim=1)
-        Array of income/wealth for each individual. Unordered or ordered is fine.
+        Array of income/wealth for each individual.
+        Unordered or ordered is fine.
 
     Returns
     -------
@@ -60,7 +62,8 @@ def gini_coefficient(y):
     Parameters
     -----------
     y : array_like(float)
-        Array of income/wealth for each individual. Ordered or unordered is fine
+        Array of income/wealth for each individual.
+        Ordered or unordered is fine
 
     Returns
     -------
@@ -96,15 +99,15 @@ def shorrocks_index(A):
         The Shorrocks mobility index calculated as
 
         .. math::
-            
+
             s(A) = \frac{m - \sum_j a_{jj} }{m - 1} \in (0, 1)
 
         An index equal to 0 indicates complete immobility.
 
     References
     -----------
-    .. [1] Wealth distribution and social mobility in the US: A quantitative approach
-       (Benhabib, Bisin, Luo, 2017).
+    .. [1] Wealth distribution and social mobility in the US:
+       A quantitative approach (Benhabib, Bisin, Luo, 2017).
        https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
     """
 
@@ -119,38 +122,32 @@ def shorrocks_index(A):
     return (m - diag_sum) / (m - 1)
 
 
-def rank_size_plot(data, ax, label=None, c=1.0):
+def rank_size(data, c=1.0):
     """
     Generate rank-size data corresponding to distribution data.
 
     Examples
     --------
-
-    > import numpy as np
-    > import matplotlib.pyplot as plt
-    > y = np.exp(np.random.randn(1000))  # simulate data
-    > fig, ax = plt.subplots()
-    > rank_size_plot(y, ax)
-    > plt.show()
+    >>> y = np.exp(np.random.randn(1000))  # simulate data
+    >>> rank_data, size_data = rank_size(y, c=0.85)
 
     Parameters
     ----------
-
     data : array_like
         the set of observations
     c : int or float
         restrict plot to top (c x 100)% of the distribution
-    ax : axis object
-        for plotting on, has method ax.loglog
+
+    Returns
+    -------
+    rank_data : array_like(float, ndim=1)
+        Location in the population when sorted from smallest to largest
+    size_data : array_like(float, ndim=1)
+        Size data for top (c x 100)% of the observations
     """
     w = - np.sort(- data)                  # Reverse sort
     w = w[:int(len(w) * c)]                # extract top (c * 100)%
     rank_data = np.arange(len(w)) + 1
     size_data = w
-    ax.loglog(rank_data, size_data, 'o', markersize=3.0, alpha=0.5, label=label)
-    if label:
-        ax.legend()
-    ax.set_xlabel("log rank")
-    ax.set_ylabel("log size")
-
+    return rank_data, size_data
 
