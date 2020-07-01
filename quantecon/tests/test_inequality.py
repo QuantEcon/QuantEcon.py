@@ -103,7 +103,8 @@ def test_rank_size():
     of the size of the distribution.
     """
 
-    sample_size = 1000
+    np.random.seed(15)
+    sample_size = 10000
     c = 0.74
 
     # Tests Pareto; r_squared ~ 1
@@ -116,10 +117,9 @@ def test_rank_size():
     _, _, r_value, _, _ = linregress(np.log(rank_data), np.log(size_data))
     r_sqval = r_value**2
 
-    assert_allclose(r_sqval, 1, rtol=1e-4)
+    assert_allclose(r_sqval, 1, rtol=1e-3)
 
     # Tests Exponential; r_squared < 1
-    np.random.seed(13)
     z = np.random.randn(sample_size)
 
     exp_draw = np.exp(z)
@@ -129,6 +129,5 @@ def test_rank_size():
                                          np.log(size_data_exp))
     r_sqval_exp = r_value_exp**2
 
-    assert_raises(AssertionError, assert_allclose, r_sqval_exp, 1, rtol=1e-4)
-
+    assert_raises(AssertionError, assert_allclose, r_sqval_exp, 1, rtol=1e-3)
 
