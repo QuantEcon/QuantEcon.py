@@ -70,11 +70,11 @@ class Kalman:
 
     def set_state(self, x_hat, Sigma):
         if Sigma is None:
-            Sigma = np.identity(self.ss.n)
+            self.Sigma = np.identity(self.ss.n)
         else:
             self.Sigma = np.atleast_2d(Sigma)
         if x_hat is None:
-            x_hat = np.zeros((self.ss.n, 1))
+            self.x_hat = np.zeros((self.ss.n, 1))
         else:
             self.x_hat = np.atleast_2d(x_hat)
             self.x_hat.shape = self.ss.n, 1
