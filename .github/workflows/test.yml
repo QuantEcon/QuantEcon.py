@@ -32,12 +32,7 @@ jobs:
     - name: Run Tests
       run: |
         flake8 --select F401, F405,E231 quantecon
-        coverage run --source=quantecon -m pytest quantecon/game_theory/tests 
-        coverage run --source=quantecon -m pytest quantecon/markov/tests 
-        coverage run --source=quantecon -m pytest quantecon/optimize/tests 
-        coverage run --source=quantecon -m pytest quantecon/random/tests 
-        coverage run --source=quantecon -m pytest quantecon/tests
-        coverage run --source=quantecon -m pytest quantecon/util/tests
+        nosetests --with-coverage -a "!slow" --cover-package=quantecon
     - name: Coveralls
       uses: coverallsapp/github-action@master
       with:
