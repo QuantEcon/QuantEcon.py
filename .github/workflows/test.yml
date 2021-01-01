@@ -8,6 +8,9 @@ name: continuous-integration
 #   AssertionError:
 #   Not equal to tolerance rtol=1e-07, atol=0
 # - The last error can't be found from the log
+#
+# Run this occasionally to test performance:
+# nosetests -a "slow"
 
 on:
   push:
