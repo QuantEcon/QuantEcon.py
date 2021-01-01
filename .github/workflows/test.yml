@@ -39,7 +39,6 @@ jobs:
         python setup.py develop
         pip install -U pip nose coverage numpy scipy pandas numba sympy ipython statsmodels flake8 
         python setup.py install
-        pip install coveralls
     - name: Run Tests
       run: |
         flake8 --select F401, F405,E231 quantecon
