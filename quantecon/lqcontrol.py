@@ -479,7 +479,7 @@ class LQMarkov:
         return dedent(m.format(b=self.beta, m=self.m, n=self.n, k=self.k,
                                j=self.j, t=t))
 
-    def stationary_values(self):
+    def stationary_values(self, max_iter=1000):
         """
         Computes the matrix :math:`P(s)` and scalar :math:`d(s)` that
         represent the value function
@@ -490,6 +490,11 @@ class LQMarkov:
 
         in the infinite horizon case.  Also computes the control matrix
         :math:`F` from :math:`u = - F(s) x`.
+
+        Parameters
+        ----------
+        max_iter : scalar(int), optional(default=1000)
+            The maximum number of iterations allowed
 
         Returns
         -------
@@ -512,7 +517,8 @@ class LQMarkov:
         Qs, Rs, Ns = self.Qs, self.Rs, self.Ns
 
         # == Solve for P(s) by iterating discrete riccati system== #
-        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta)
+        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
+                                           max_iter=max_iter)
 
         # == calculate F and d == #
         Fs = np.array([np.empty((k, n)) for i in range(m)])

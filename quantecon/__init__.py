@@ -27,7 +27,7 @@ from .estspec import smooth, periodogram, ar_periodogram
 from .graph_tools import DiGraph, random_tournament_graph
 from .gridtools import cartesian, mlinspace, simplex_grid, simplex_index
 from .inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
-	rank_size_plot
+	rank_size
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA

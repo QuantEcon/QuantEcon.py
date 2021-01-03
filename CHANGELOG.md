@@ -1,5 +1,31 @@
 # Changelog
 
+## [v0.4.8](https://github.com/QuantEcon/QuantEcon.py/tree/v0.4.8) (2020-07-02)
+
+[Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.7...v0.4.8)
+
+**Closed issues:**
+
+- Issue with test for rank\_size [\#553](https://github.com/QuantEcon/QuantEcon.py/issues/553)
+- publish newer version \(quantecon 0.4.7\) on conda-forge? [\#546](https://github.com/QuantEcon/QuantEcon.py/issues/546)
+- a\_small\_typo\_in\_quantecon.inequality.rank\_size\_plot [\#543](https://github.com/QuantEcon/QuantEcon.py/issues/543)
+- \[test\_quadsum.py \] undefined name [\#538](https://github.com/QuantEcon/QuantEcon.py/issues/538)
+- Quantecon and numba error [\#536](https://github.com/QuantEcon/QuantEcon.py/issues/536)
+- \[Test\] Setup test for `add\_rank\_size`  [\#519](https://github.com/QuantEcon/QuantEcon.py/issues/519)
+
+**Merged pull requests:**
+
+- FIX: rank-size test by inc. sample size [\#556](https://github.com/QuantEcon/QuantEcon.py/pull/556) ([bktaha](https://github.com/bktaha))
+- update version for new release of 0.4.8 [\#555](https://github.com/QuantEcon/QuantEcon.py/pull/555) ([mmcky](https://github.com/mmcky))
+- Revert "update version for new release 0.4.8" [\#554](https://github.com/QuantEcon/QuantEcon.py/pull/554) ([mmcky](https://github.com/mmcky))
+- update version for new release 0.4.8 [\#552](https://github.com/QuantEcon/QuantEcon.py/pull/552) ([mmcky](https://github.com/mmcky))
+- REF and TEST: rank\_size in inequality.py [\#551](https://github.com/QuantEcon/QuantEcon.py/pull/551) ([bktaha](https://github.com/bktaha))
+- FIX: ValueError `LQMarkov` convergence failed, Closes \#508 [\#550](https://github.com/QuantEcon/QuantEcon.py/pull/550) ([bktaha](https://github.com/bktaha))
+- rank\_size\_plot\_typo [\#545](https://github.com/QuantEcon/QuantEcon.py/pull/545) ([shlff](https://github.com/shlff))
+- Fix variables never used lgtm warnings in dle.py. [\#542](https://github.com/QuantEcon/QuantEcon.py/pull/542) ([duncanhobbs](https://github.com/duncanhobbs))
+- Fix lgtm warnings in quadsums.py. [\#541](https://github.com/QuantEcon/QuantEcon.py/pull/541) ([duncanhobbs](https://github.com/duncanhobbs))
+- Fix lgtm warning for arma.py. [\#540](https://github.com/QuantEcon/QuantEcon.py/pull/540) ([duncanhobbs](https://github.com/duncanhobbs))
+
 ## [0.4.7](https://github.com/QuantEcon/QuantEcon.py/tree/0.4.7) (2020-04-24)
 
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.6...0.4.7)
