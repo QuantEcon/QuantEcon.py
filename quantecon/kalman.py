@@ -9,7 +9,6 @@ https://lectures.quantecon.org/py/kalman.html
 """
 from textwrap import dedent
 import numpy as np
-from numpy import dot
 from scipy.linalg import inv
 from quantecon.lss import LinearStateSpace
 from quantecon.matrix_eqn import solve_discrete_riccati
@@ -163,7 +162,9 @@ class Kalman:
         A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
 
         Atil = np.vstack([np.hstack([A, np.zeros((n, n)), np.zeros((n, l))]),
-                          np.hstack([dot(K, G), A-dot(K, G), dot(K, H)]),
+                          np.hstack([np.dot(K, G),
+                                     A-np.dot(K, G),
+                                     np.dot(K, H)]),
                           np.zeros((l, 2*n + l))])
 
         Ctil = np.vstack([np.hstack([C, np.zeros((n, l))]),
@@ -204,11 +205,11 @@ class Kalman:
         # === and then update === #
         y = np.atleast_2d(y)
         y.shape = self.ss.k, 1
-        E = dot(self.Sigma, G.T)
-        F = dot(dot(G, self.Sigma), G.T) + R
-        M = dot(E, inv(F))
-        self.x_hat = self.x_hat + dot(M, (y - dot(G, self.x_hat)))
-        self.Sigma = self.Sigma - dot(M, dot(G,  self.Sigma))
+        E = np.dot(self.Sigma, G.T)
+        F = np.dot(np.dot(G, self.Sigma), G.T) + R
+        M = np.dot(E, inv(F))
+        self.x_hat = self.x_hat + np.dot(M, (y - np.dot(G, self.x_hat)))
+        self.Sigma = self.Sigma - np.dot(M, np.dot(G,  self.Sigma))
 
     def filtered_to_forecast(self):
         """
@@ -222,8 +223,8 @@ class Kalman:
         Q = np.dot(C, C.T)
 
         # === and then update === #
-        self.x_hat = dot(A, self.x_hat)
-        self.Sigma = dot(A, dot(self.Sigma, A.T)) + Q
+        self.x_hat = np.dot(A, self.x_hat)
+        self.Sigma = np.dot(A, np.dot(self.Sigma, A.T)) + Q
 
     def update(self, y):
         """
@@ -268,9 +269,9 @@ class Kalman:
 
         # === solve Riccati equation, obtain Kalman gain === #
         Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R, method=method)
-        temp1 = dot(dot(A, Sigma_infinity), G.T)
-        temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
-        K_infinity = dot(temp1, temp2)
+        temp1 = np.dot(np.dot(A, Sigma_infinity), G.T)
+        temp2 = inv(np.dot(G, np.dot(Sigma_infinity, G.T)) + R)
+        K_infinity = np.dot(temp1, temp2)
 
         # == record as attributes and return == #
         self._Sigma_infinity, self._K_infinity = Sigma_infinity, K_infinity
@@ -300,14 +301,14 @@ class Kalman:
             P_mat = A
             P = np.identity(self.ss.n)  # Create a copy
         elif coeff_type == 'var':
-            coeffs.append(dot(G, K_infinity))
-            P_mat = A - dot(K_infinity, G)
+            coeffs.append(np.dot(G, K_infinity))
+            P_mat = A - np.dot(K_infinity, G)
             P = np.copy(P_mat)  # Create a copy
         else:
             raise ValueError("Unknown coefficient type")
         while i <= j:
-            coeffs.append(dot(dot(G, P), K_infinity))
-            P = dot(P, P_mat)
+            coeffs.append(np.dot(np.dot(G, P), K_infinity))
+            P = np.dot(P, P_mat)
             i += 1
         return coeffs
 
@@ -317,4 +318,4 @@ class Kalman:
         R = np.dot(H, H.T)
         Sigma_infinity = self.Sigma_infinity
 
-        return dot(G, dot(Sigma_infinity, G.T)) + R
+        return np.dot(G, np.dot(Sigma_infinity, G.T)) + R
