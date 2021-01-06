@@ -11,7 +11,7 @@ See the [library website](https://quantecon.org/quantecon-py/) for instructions
 
 #### Build and Coverage Status:
 
-[![Build Status](https://github.com/QuantEcon/QuantEcon.py/workflows/continuous-integration/badge.svg)](https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Acontinuous-integration)
+[![Build Status](https://github.com/QuantEcon/QuantEcon.py/workflows/build/badge.svg)](https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Abuild)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.svg)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 [![Code Quality: Python](https://img.shields.io/lgtm/grade/python/g/QuantEcon/QuantEcon.py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/QuantEcon/QuantEcon.py/context:python)
 [![Total Alerts](https://img.shields.io/lgtm/alerts/g/QuantEcon/QuantEcon.py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/QuantEcon/QuantEcon.py/alerts)

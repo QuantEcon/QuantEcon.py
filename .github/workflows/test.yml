@@ -1,4 +1,4 @@
-name: continuous-integration
+name: build
 
 # We ignore Python 3.7 on windows-latest because 3 tests are failing:
 # - FAIL: test_quadrect_2d_H (quantecon.tests.test_quad.TestQuadrect)
