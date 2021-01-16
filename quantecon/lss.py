@@ -285,8 +285,8 @@ class LinearStateSpace:
     def stationary_distributions(self):
         r"""
         Compute the moments of the stationary distributions of :math:`x_t` and
-        :math:`y_t` if possible. Computation is by solving the discrete Lyapunov
-        equation.
+        :math:`y_t` if possible. Computation is by solving the discrete
+        Lyapunov equation.
 
         Parameters
         ----------
@@ -319,9 +319,9 @@ class LinearStateSpace:
         n = self.n
 
         if num_const > 0:
-        	μ = solve(np.eye(n-num_const) - A22, A21)
+            μ = solve(np.eye(n-num_const) - A22, A21)
         else:
-        	μ = solve(np.eye(n-num_const) - A22, np.zeros((n, 1)))
+            μ = solve(np.eye(n-num_const) - A22, np.zeros((n, 1)))
         Σ = solve_discrete_lyapunov(A22, CC2, method='bartels-stewart')
 
         mu_x = np.empty((n, 1))
@@ -331,7 +331,7 @@ class LinearStateSpace:
         Sigma_x = np.zeros((n, n))
         Sigma_x[num_const:, num_const:] = Σ
 
-        mu_x =self.P.T @ mu_x
+        mu_x = self.P.T @ mu_x
         Sigma_x = self.P.T @ Sigma_x @ self.P
 
         mu_y = self.G @ mu_x
@@ -419,33 +419,33 @@ class LinearStateSpace:
 
     def __partition(self):
         r"""
-	    Reorder the states by shifting the constant terms to the
-	    top of the state vector. Then partition the linear state
-	    space model following Appendix C in RMT Ch2 such that the
-	    A22 matrix associated with non-constant states have eigenvalues
-		all strictly smaller than 1.
+        Reorder the states by shifting the constant terms to the
+        top of the state vector. Then partition the linear state
+        space model following Appendix C in RMT Ch2 such that the
+        A22 matrix associated with non-constant states have eigenvalues
+        all strictly smaller than 1.
 
-		.. math::
-			\left[\begin{array}{c}
-			const\\
-			x_{2,t+1}
-			\end{array}\right]=\left[\begin{array}{cc}
-			I & 0\\
-			A_{21} & A_{22}
-			\end{array}\right]\left[\begin{array}{c}
-			1\\
-			x_{2,t}
-			\end{array}\right]+\left[\begin{array}{c}
-			0\\
-			C_{2}
-			\end{array}\right]w_{t+1}
+        .. math::
+            \left[\begin{array}{c}
+            const\\
+            x_{2,t+1}
+            \end{array}\right]=\left[\begin{array}{cc}
+            I & 0\\
+            A_{21} & A_{22}
+            \end{array}\right]\left[\begin{array}{c}
+            1\\
+            x_{2,t}
+            \end{array}\right]+\left[\begin{array}{c}
+            0\\
+            C_{2}
+            \end{array}\right]w_{t+1}
 
-		Returns
-		-------
-		A22 : array_like(float)
-			Lower right part of the reordered matrix A.
-		A21 : array_like(float)
-			Lower left part of the reordered matrix A.
+        Returns
+        -------
+        A22 : array_like(float)
+            Lower right part of the reordered matrix A.
+        A21 : array_like(float)
+            Lower left part of the reordered matrix A.
         """
         A, C = self.A, self.C
         n = self.n
