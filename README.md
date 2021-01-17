@@ -3,7 +3,7 @@
 
 A code library for quantitative economic modeling in Python
 
-Libary Website: [https://quantecon.org/quantecon-py/](https://quantecon.org/quantecon-py/)
+Library Website: [https://quantecon.org/quantecon-py/](https://quantecon.org/quantecon-py/)
 
 ### Installation
 
@@ -171,7 +171,7 @@ Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com
 ### Ver 0.3.7 (01-November-2017)
 1. FEAT: Add random_state option to arma.py with tests. See [PR #329](https://github.com/QuantEcon/QuantEcon.py/pull/329)
 2. FEAT: New features for timing functions. See [PR #340](https://github.com/QuantEcon/QuantEcon.py/pull/340)
-3. Improved test coverage ([PR #343](https://github.com/QuantEcon/QuantEcon.py/pull/343)) 
+3. Improved test coverage ([PR #343](https://github.com/QuantEcon/QuantEcon.py/pull/343))
 4. FEAT: Add option to supply a random seed for discrete_rv, lqcontrol, lqnash, lss, and quad ([PR #346](https://github.com/QuantEcon/QuantEcon.py/pull/346))
 5. FIX: RBLQ: add pure forecasting case ([PR #355](https://github.com/QuantEcon/QuantEcon.py/pull/355))
 6. FEAT: jit the 1d quadrature routines ([PR #352](https://github.com/QuantEcon/QuantEcon.py/pull/352))
@@ -193,7 +193,7 @@ Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com
 
 ### Ver 0.3.5.1 (17-May-2017)
 1. Add rouwenhorst method for approx AR(1) with MC. See [PR #282](https://github.com/QuantEcon/QuantEcon.py/pull/282)
-2. Added tests to improve coverage ([PR #282](https://github.com/QuantEcon/QuantEcon.py/pull/282), 
+2. Added tests to improve coverage ([PR #282](https://github.com/QuantEcon/QuantEcon.py/pull/282),
 [PR #303](https://github.com/QuantEcon/QuantEcon.py/pull/303), [PR #309](https://github.com/QuantEcon/QuantEcon.py/pull/309))
 3. Minor Fixes ([PR #296](https://github.com/QuantEcon/QuantEcon.py/pull/296), [PR #297](https://github.com/QuantEcon/QuantEcon.py/pull/297))
 
@@ -221,7 +221,7 @@ Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com
 6. Remove ``num_actions`` from DiscreteDP. See [PR #236](https://github.com/QuantEcon/QuantEcon.py/pull/236)
 7. Add states/nodes to ``MarkovChain``/``DiGraph``. See [PR #237](https://github.com/QuantEcon/QuantEcon.py/pull/237)
 8. Updated ``DiscreteDP`` to include ``backward_induction`` (DiscreteDP now accepts beta=1). See [PR #244](https://github.com/QuantEcon/QuantEcon.py/pull/244)
-9. ``Numba`` is now a formal dependency. 
+9. ``Numba`` is now a formal dependency.
 10. Modified ``tauchen`` to return a ``MarkovChain`` instance. See [PR #250](https://github.com/QuantEcon/QuantEcon.py/pull/250)
 
 ### Ver. 0.3.1 (22-January-2016)
@@ -233,4 +233,3 @@ Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com
 
 1. Removes ``quantecon/models`` subpackage and the collection of code examples. Code has been migrated to the [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) repository.
 2. Adds a utility for fetching notebook dependencies from [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) to support community contributed notebooks.
-
