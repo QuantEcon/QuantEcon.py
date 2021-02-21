@@ -288,13 +288,6 @@ class LinearStateSpace:
         :math:`y_t` if possible. Computation is by solving the discrete
         Lyapunov equation.
 
-        Parameters
-        ----------
-        max_iter : scalar(int), optional(default=200)
-            The maximum number of iterations allowed
-        tol : scalar(float), optional(default=1e-5)
-            The tolerance level that one wishes to achieve
-
         Returns
         -------
         mu_x : array_like(float)
