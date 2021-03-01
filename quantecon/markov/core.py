@@ -80,7 +80,7 @@ classes*. For each :math:`S_m` and each :math:`i \in S_m`, we have
 
 """
 import numbers
-from fractions import gcd
+from math import gcd
 import numpy as np
 from scipy import sparse
 from numba import jit
