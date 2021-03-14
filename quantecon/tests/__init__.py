@@ -6,5 +6,4 @@ namespace for quantecon.tests
 @date : 2014-08-01 13:13:59
 
 """
-from . util import (capture, get_data_dir, get_h5_data_file, write_array,
-                    max_abs_diff, get_h5_data_group)
+from . util import capture, get_data_dir, max_abs_diff
