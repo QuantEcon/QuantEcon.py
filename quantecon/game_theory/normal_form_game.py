@@ -127,10 +127,17 @@ action, while `k` refers to the opponent player's action.
 """
 import re
 import numbers
+from typing import List, Optional, Union, Tuple
+
 import numpy as np
+import numpy.typing as npt
 from numba import jit
 
 from ..util import check_random_state
+
+
+# Mypy
+IntOrArrayT = Union[int, npt.ArrayLike]
 
 
 class Player:
@@ -163,21 +170,21 @@ class Player:
         Default tolerance value used in determining best responses.
 
     """
-    def __init__(self, payoff_array):
-        self.payoff_array = np.asarray(payoff_array, order='C')
+    def __init__(self, payoff_array: np.ndarray):
+        self.payoff_array: np.ndarray = np.asarray(payoff_array, order='C')
 
         if self.payoff_array.ndim == 0:
             raise ValueError('payoff_array must be an array_like')
         if np.prod(self.payoff_array.shape) == 0:
             raise ValueError('every player must have at least one action')
 
-        self.num_opponents = self.payoff_array.ndim - 1
-        self.num_actions = self.payoff_array.shape[0]
-        self.dtype = self.payoff_array.dtype
+        self.num_opponents: int = self.payoff_array.ndim - 1
+        self.num_actions: int = self.payoff_array.shape[0]
+        self.dtype: np.dtype = self.payoff_array.dtype
 
-        self.tol = 1e-8
+        self.tol: float = 1e-8
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         # From numpy.matrix.__repr__
         # Print also dtype, except for int64, float64
         s = repr(self.payoff_array).replace('array', 'Player')
@@ -187,14 +194,14 @@ class Player:
                 l[i] = ' ' + l[i]
         return '\n'.join(l)
 
-    def __str__(self):
+    def __str__(self) -> str:
         N = self.num_opponents + 1
         s = 'Player in a {N}-player normal form game'.format(N=N)
         s += ' with payoff array:\n'
         s += np.array2string(self.payoff_array, separator=', ')
         return s
 
-    def delete_action(self, action, player_idx=0):
+    def delete_action(self, action: IntOrArrayT, player_idx: int = 0) -> "Player":
         """
         Return a new `Player` instance with the action(s) specified by
         `action` deleted from the action set of the player specified by
@@ -233,7 +240,7 @@ class Player:
         payoff_array_new = np.delete(self.payoff_array, action, player_idx)
         return Player(payoff_array_new)
 
-    def payoff_vector(self, opponents_actions):
+    def payoff_vector(self, opponents_actions: npt.ArrayLike) -> np.ndarray:
         """
         Return an array of payoff values, one for each own action, given
         a profile of the opponents' actions.
@@ -249,7 +256,7 @@ class Player:
             profile of the opponents' actions.
 
         """
-        def reduce_last_player(payoff_array, action):
+        def reduce_last_player(payoff_array: np.ndarray, action: IntOrArrayT) -> np.ndarray:
             """
             Given `payoff_array` with ndim=M, return the payoff array
             with ndim=M-1 fixing the last player's action to be `action`.
@@ -273,7 +280,12 @@ class Player:
 
         return payoff_vector
 
-    def is_best_response(self, own_action, opponents_actions, tol=None):
+    def is_best_response(
+        self,
+        own_action: IntOrArrayT,
+        opponents_actions: IntOrArrayT,
+        tol: Optional[float] = None,
+    ) -> bool:
         """
         Return True if `own_action` is a best response to
         `opponents_actions`.
@@ -308,8 +320,14 @@ class Player:
         else:
             return np.dot(own_action, payoff_vector) >= payoff_max - tol
 
-    def best_response(self, opponents_actions, tie_breaking='smallest',
-                      payoff_perturbation=None, tol=None, random_state=None):
+    def best_response(
+        self,
+        opponents_actions: IntOrArrayT,
+        tie_breaking: str = 'smallest',
+        payoff_perturbation: Optional[np.ndarray] = None,
+        tol: Optional[float] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
+    ) -> IntOrArrayT:
         """
         Return the best response action(s) to `opponents_actions`.
 
@@ -379,7 +397,11 @@ class Player:
             msg = "tie_breaking must be one of 'smallest', 'random', or False"
             raise ValueError(msg)
 
-    def random_choice(self, actions=None, random_state=None):
+    def random_choice(
+        self,
+        actions: Optional[npt.ArrayLike] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
+    ) -> int:
         """
         Return a pure action chosen randomly from `actions`.
 
@@ -419,7 +441,12 @@ class Player:
         else:
             return idx
 
-    def is_dominated(self, action, tol=None, method=None):
+    def is_dominated(
+        self,
+        action: int,
+        tol: Optional[float] = None,
+        method: Optional[str] = None,
+    ) -> bool:
         """
         Determine whether `action` is strictly dominated by some mixed
         action.
@@ -494,7 +521,8 @@ class Player:
         else:
             raise ValueError('Unknown method {0}'.format(method))
 
-    def dominated_actions(self, tol=None, method=None):
+    def dominated_actions(
+        self, tol: Optional[float] = None, method: Optional[str] = None) -> List[int]:
         """
         Return a list of actions that are strictly dominated by some
         mixed actions.
@@ -564,7 +592,7 @@ class NormalFormGame:
         Tuple of the payoff arrays, one for each player.
 
     """
-    def __init__(self, data, dtype=None):
+    def __init__(self, data: npt.ArrayLike, dtype: Optional[np.dtype] = None):
         # data represents an array_like of Players
         if hasattr(data, '__getitem__') and isinstance(data[0], Player):
             N = len(data)
@@ -657,7 +685,7 @@ class NormalFormGame:
         )
 
     @property
-    def payoff_profile_array(self):
+    def payoff_profile_array(self) -> np.ndarray:
         N = self.N
         dtype = self.dtype
         payoff_profile_array = \
@@ -668,18 +696,18 @@ class NormalFormGame:
                                               list(range(N-i)))
         return payoff_profile_array
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         s = '<{nums_actions} {N}-player NormalFormGame of dtype {dtype}>'
         return s.format(nums_actions=_nums_actions2string(self.nums_actions),
                         N=self.N,
                         dtype=self.dtype)
 
-    def __str__(self):
+    def __str__(self) -> str:
         s = '{N}-player NormalFormGame with payoff profile array:\n'
         s += _payoff_profile_array2string(self.payoff_profile_array)
         return s.format(N=self.N)
 
-    def __getitem__(self, action_profile):
+    def __getitem__(self, action_profile: IntOrArrayT) -> np.ndarray:
         if self.N == 1:  # Trivial game with 1 player
             if not isinstance(action_profile, numbers.Integral):
                 raise TypeError('index must be an integer')
@@ -701,7 +729,7 @@ class NormalFormGame:
 
         return payoff_profile
 
-    def __setitem__(self, action_profile, payoff_profile):
+    def __setitem__(self, action_profile: IntOrArrayT, payoff_profile: npt.ArrayLike) -> None:
         if self.N == 1:  # Trivial game with 1 player
             if not isinstance(action_profile, numbers.Integral):
                 raise TypeError('index must be an integer')
@@ -728,7 +756,7 @@ class NormalFormGame:
                 tuple(action_profile[i:]) + tuple(action_profile[:i])
             ] = payoff_profile[i]
 
-    def delete_action(self, player_idx, action):
+    def delete_action(self, player_idx: int, action: IntOrArrayT) -> "NormalFormGame":
         """
         Return a new `NormalFormGame` instance with the action(s)
         specified by `action` deleted from the action set of the player
@@ -786,7 +814,7 @@ class NormalFormGame:
         )
         return NormalFormGame(players_new)
 
-    def is_nash(self, action_profile, tol=None):
+    def is_nash(self, action_profile: npt.ArrayLike, tol: Optional[float] = None) -> bool:
         """
         Return True if `action_profile` is a Nash equilibrium.
 
@@ -833,7 +861,7 @@ class NormalFormGame:
         return True
 
 
-def _nums_actions2string(nums_actions):
+def _nums_actions2string(nums_actions: Tuple[int, ...]) -> str:
     if len(nums_actions) == 1:
         s = '{0}-action'.format(nums_actions[0])
     else:
@@ -841,7 +869,9 @@ def _nums_actions2string(nums_actions):
     return s
 
 
-def _payoff_profile_array2string(payoff_profile_array, class_name=None):
+def _payoff_profile_array2string(
+    payoff_profile_array: np.ndarray, class_name: Optional[str] = None
+) -> str:
     s = np.array2string(payoff_profile_array, separator=', ')
 
     # Remove one linebreak
@@ -862,7 +892,7 @@ def _payoff_profile_array2string(payoff_profile_array, class_name=None):
     return s
 
 
-def pure2mixed(num_actions, action):
+def pure2mixed(num_actions: int, action: int) -> np.ndarray:
     """
     Convert a pure action to the corresponding mixed action.
 
@@ -888,7 +918,9 @@ def pure2mixed(num_actions, action):
 # Numba jitted functions #
 
 @jit(nopython=True, cache=True)
-def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
+def best_response_2p(
+    payoff_matrix: np.ndarray, opponent_mixed_action: np.ndarray, tol: float = 1e-8
+) -> int:
     """
     Numba-optimized version of `Player.best_response` compilied in
     nopython mode, specialized for 2-player games (where there is only
