@@ -65,6 +65,35 @@ modification, are permitted provided that the following conditions are met:
 
 ## Major Changes
 
+For a complete list of changes please refer to the [CHANGELOG.md](CHANGELOG.md)
+
+### Ver 0.5.0 (19-April-2021)
+
+**Breaking Changes:**
+
+1. ENH: Extend `LinearStateSpace` class [\#569](https://github.com/QuantEcon/QuantEcon.py/pull/569) ([shizejin](https://github.com/shizejin))
+
+**Other Changes:**
+
+- FIX: [kalman] Always initialize self.Sigma and self.x\_hat [\#562](https://github.com/QuantEcon/QuantEcon.py/pull/562) ([rht](https://github.com/rht))
+- TST: Setup Tests via Github Actions [\#561](https://github.com/QuantEcon/QuantEcon.py/pull/561) ([rht](https://github.com/rht))
+- ENH: Update root\_finding.py [\#560](https://github.com/QuantEcon/QuantEcon.py/pull/560) ([alanlujan91](https://github.com/alanlujan91))
+
+Special thanks for contributions by [rht](https://github.com/rht), [shizejin](https://github.com/shizejin), [alanlujan91](https://github.com/alanlujan91), and [oyamad](https://github.com/oyamad)
+
+
+### Ver 0.4.8 (02-July-2020)
+
+- FIX: rank-size test by inc. sample size [\#556](https://github.com/QuantEcon/QuantEcon.py/pull/556) ([bktaha](https://github.com/bktaha))
+- REF and TEST: rank\_size in inequality.py [\#551](https://github.com/QuantEcon/QuantEcon.py/pull/551) ([bktaha](https://github.com/bktaha))
+- FIX: ValueError `LQMarkov` convergence failed, Closes \#508 [\#550](https://github.com/QuantEcon/QuantEcon.py/pull/550) ([bktaha](https://github.com/bktaha))
+- rank\_size\_plot\_typo [\#545](https://github.com/QuantEcon/QuantEcon.py/pull/545) ([shlff](https://github.com/shlff))
+- Fix variables never used lgtm warnings in dle.py. [\#542](https://github.com/QuantEcon/QuantEcon.py/pull/542) ([duncanhobbs](https://github.com/duncanhobbs))
+- Fix lgtm warnings in quadsums.py. [\#541](https://github.com/QuantEcon/QuantEcon.py/pull/541) ([duncanhobbs](https://github.com/duncanhobbs))
+- Fix lgtm warning for arma.py. [\#540](https://github.com/QuantEcon/QuantEcon.py/pull/540) ([duncanhobbs](https://github.com/duncanhobbs))
+
+Special thanks for contributions by [bktaha](https://github.com/bktaha), [duncanhobbs](https://github.com/duncanhobbs), and [shlff](https://github.com/shlff).
+
 ### Ver 0.4.7 (24-Apr-2020)
 
 1. FIX: Updates for Numba 0.49.0 [\#531](https://github.com/QuantEcon/QuantEcon.py/pull/531) ([oyamad](https://github.com/oyamad))
