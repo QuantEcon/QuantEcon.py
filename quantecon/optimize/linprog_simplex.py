@@ -120,7 +120,7 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
 
     References
     ----------
-    * K. C. Border, "The Gauss–Jordan and Simplex Algorithms," 2004.
+    * K. C. Border, "The Gauss–Jordan and Simplex Algorithms" 2004.
 
     """
     n, m, k = c.shape[0], A_ub.shape[0], A_eq.shape[0]
@@ -208,8 +208,8 @@ def _initialize_tableau(A_ub, b_ub, A_eq, b_eq, tableau, basis):
         A_eq @ x     == b_eq
         x, s         >= 0
 
-    Then, let (z1, z2) be a vector of artificial variables for Phase 1:
-    we solve the following LP:
+    Then, let (z1, z2) be a vector of artificial variables for Phase 1.
+    We solve the following LP:
 
     maximize::
 
@@ -453,7 +453,7 @@ def _pivot_col(tableau, skip_aux, piv_options):
     -------
     found : bool
         True iff there is a positive element in the last row of the
-        tableau (and then pivotting should be conducted).
+        tableau (and then pivoting should be conducted).
 
     pivcol : int
         The index of column containing the pivot element. (-1 if `found
@@ -489,8 +489,7 @@ def get_solution(tableau, basis, x, lambd, b_signs):
         where L=m+k.
 
     basis : ndarray(int, ndim=1)
-        Empty ndarray of shape (L,) to store the basic variables.
-        Modified in place.
+        ndarray of shape (L,) containing the optimal basis.
 
     x : ndarray(float, ndim=1)
         Empty ndarray of shape (n,) to store the primal solution.
