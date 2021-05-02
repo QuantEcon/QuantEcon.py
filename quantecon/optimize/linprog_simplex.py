@@ -1,5 +1,6 @@
 """
-Contain a linear programming solver routine based on the Simplex Method.
+Contain a Numba-jitted linear programming solver based on the Simplex
+Method.
 
 """
 from collections import namedtuple
@@ -11,6 +12,8 @@ from .pivoting import _pivoting, _lex_min_ratio_test
 SimplexResult = namedtuple(
     'SimplexResult', ['x', 'lambd', 'fun', 'success', 'status', 'num_iter']
 )
+SimplexResult.__doc__ = \
+    'namedtuple containing the result from `linprog_simplex`.'
 
 FEA_TOL = 1e-6
 TOL_PIV = 1e-7
@@ -20,6 +23,17 @@ PivOptions = namedtuple(
     'PivOptions', ['fea_tol', 'tol_piv', 'tol_ratio_diff']
 )
 PivOptions.__new__.__defaults__ = (FEA_TOL, TOL_PIV, TOL_RATIO_DIFF)
+PivOptions.__doc__ = 'namedtuple to hold tolerance values for pivoting'
+
+
+# Delete useless docstring for fields of namedtuple
+def _del_field_docstring(nt):
+    for field in nt._fields:
+        getattr(nt, field).__doc__ = ''
+
+
+for nt in [SimplexResult, PivOptions]:
+    _del_field_docstring(nt)
 
 
 @jit(nopython=True, cache=True)
