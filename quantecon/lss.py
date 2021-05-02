@@ -447,8 +447,8 @@ class LinearStateSpace:
         A_diag = np.diag(A)
         num_const = 0
         for idx in range(n):
-            if (A_diag[idx] == 1) and (C[idx, :] == 0).all() \
-            	and np.linalg.norm(A[idx, :]) == 1:
+            if (A_diag[idx] == 1) and (C[idx, :] == 0).all() and \
+                    np.linalg.norm(A[idx, :]) == 1:
                 sorted_idx.insert(0, idx)
                 num_const += 1
             else:
