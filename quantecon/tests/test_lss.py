@@ -52,7 +52,10 @@ class TestLinearStateSpace(unittest.TestCase):
 
         assert_allclose(ssmux.flatten(), np.array([2.5, 2.5, 1]))
         assert_allclose(ssmuy.flatten(), np.array([2.5]))
-        assert_allclose(sssigx, self.ss2.A @ sssigx @ self.ss2.A.T + self.ss2.C @ self.ss2.C.T)
+        assert_allclose(
+            sssigx,
+            self.ss2.A @ sssigx @ self.ss2.A.T + self.ss2.C @ self.ss2.C.T
+        )
         assert_allclose(sssigy, self.ss2.G @ sssigx @ self.ss2.G.T)
         assert_allclose(sssigyx, self.ss2.G @ sssigx)
 
@@ -61,14 +64,14 @@ class TestLinearStateSpace(unittest.TestCase):
 
         sim = ss.simulate(ts_length=250)
         for arr in sim:
-            self.assertTrue(len(arr[0])==250)
+            self.assertTrue(len(arr[0]) == 250)
 
     def test_simulate_with_seed(self):
         ss = self.ss1
 
         xval, yval = ss.simulate(ts_length=5, random_state=5)
-        expected_output = np.array([0.75 , 0.73456137, 0.6812898, 0.76876387,
-                                    .71772107])
+        expected_output = np.array([0.75, 0.69595649, 0.78269723, 0.73095776,
+                                    0.69989036])
 
         assert_allclose(xval[0], expected_output)
         assert_allclose(yval[0], expected_output)
@@ -82,8 +85,8 @@ class TestLinearStateSpace(unittest.TestCase):
 
     def test_replicate_with_seed(self):
         xval, yval = self.ss1.replicate(T=100, num_reps=5, random_state=5)
-        expected_output = np.array([0.06871204, 0.06937119, -0.1478022,
-                                    0.23841252, -0.06823762])
+        expected_output = np.array([0.10498898, 0.02892168, 0.04915998,
+                                    0.18568489, 0.04541764])
 
         assert_allclose(xval[0], expected_output)
         assert_allclose(yval[0], expected_output)
@@ -101,4 +104,3 @@ def test_non_square_A():
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearStateSpace)
     unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
-
