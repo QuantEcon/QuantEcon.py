@@ -434,11 +434,10 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `lemke_howson` from `quantecon.game_theory` is used
-            to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'`, `'interior-point'`,
-            or `'revised simplex'`, then `scipy.optimize.linprog` is
-            used with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used. If
+            `method` is set to `'simplex'`, `'interior-point'`, or
+            `'revised simplex'`, then `scipy.optimize.linprog` is used
+            with the method as specified by `method`.
 
         Returns
         -------
@@ -465,10 +464,9 @@ class Player:
             D.shape = (D.shape[0], np.prod(D.shape[1:]))
 
         if method is None:
-            from .lemke_howson import lemke_howson
-            g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
-            NE = lemke_howson(g_zero_sum)
-            return NE[0] @ D @ NE[1] > tol
+            from ..optimize.minmax import minmax
+            v, _, _ = minmax(D)
+            return v > tol
         elif method in ['simplex', 'interior-point', 'revised simplex']:
             from scipy.optimize import linprog
             m, n = D.shape
@@ -506,11 +504,10 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `lemke_howson` from `quantecon.game_theory` is used
-            to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'`, `'interior-point'`,
-            or `'revised simplex'`, then `scipy.optimize.linprog` is
-            used with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used. If
+            `method` is set to `'simplex'`, `'interior-point'`, or
+            `'revised simplex'`, then `scipy.optimize.linprog` is used
+            with the method as specified by `method`.
 
         Returns
         -------
