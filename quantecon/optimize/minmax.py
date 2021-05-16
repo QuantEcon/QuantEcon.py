@@ -4,7 +4,7 @@ Contain a minmax problem solver routine.
 """
 import numpy as np
 from numba import jit
-from .linprog_simplex import _set_criterion_row, solve_tableau, PivOptions
+from .linprog_simplex import solve_tableau, PivOptions
 from .pivoting import _pivoting
 
 
@@ -45,10 +45,10 @@ def minmax(A, max_iter=10**6, piv_options=PivOptions()):
         Value :math:`v^*` of the minmax problem.
 
     x : ndarray(float, ndim=1)
-        Optimal solution :math:`x^*`, of shape (,m).
+        Optimal solution :math:`x^*`, of shape (m,).
 
     y : ndarray(float, ndim=1)
-        Optimal solution :math:`y^*`, of shape (,n).
+        Optimal solution :math:`y^*`, of shape (n,).
 
     """
     m, n = A.shape
@@ -68,6 +68,7 @@ def minmax(A, max_iter=10**6, piv_options=PivOptions()):
 
     tableau[-2, :n] = 1
     tableau[-2, -1] = 1
+    tableau[-1, n] = -1
 
     # Phase 1
     pivcol = 0
@@ -85,11 +86,6 @@ def minmax(A, max_iter=10**6, piv_options=PivOptions()):
     basis = np.arange(n+1, n+1+m+1)
     basis[pivrow] = n
     basis[-1] = 0
-
-    # Modify the criterion row for Phase 2
-    c = np.zeros(n+1)
-    c[-1] = -1
-    _set_criterion_row(c, basis, tableau)
 
     # Phase 2
     solve_tableau(tableau, basis, max_iter-2, skip_aux=False,
