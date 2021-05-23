@@ -241,7 +241,7 @@ def test_solve_variable_trajectory():
 
 
 def test_interpolation():
-    """Testing parameteric B-spline interpolation methods."""
+    """Testing parametric B-spline interpolation methods."""
 
     # compute some fixed length trajectories
     t0, k0 = 0, np.array([5.0])

@@ -13,7 +13,7 @@ def hamilton_filter(data, h, *args):
     
     Parameters
     ----------
-    data : arrray or dataframe
+    data : array or dataframe
     h : integer
         Time horizon that we are likely to predict incorrectly.
         Original paper recommends 2 for annual data, 8 for quarterly data,

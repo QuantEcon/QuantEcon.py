@@ -245,7 +245,7 @@ class LinearStateSpace:
     def moment_sequence(self):
         r"""
         Create a generator to calculate the population mean and
-        variance-convariance matrix for both :math:`x_t` and :math:`y_t`
+        variance-covariance matrix for both :math:`x_t` and :math:`y_t`
         starting at the initial condition (self.mu_0, self.Sigma_0).
         Each iteration produces a 4-tuple of items (mu_x, mu_y, Sigma_x,
         Sigma_y) for the next period.

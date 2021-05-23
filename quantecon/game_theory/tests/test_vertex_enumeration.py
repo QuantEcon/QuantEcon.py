@@ -79,7 +79,7 @@ class TestBestResponsePolytope:
                     [(0, 3), (6, 1)]]
         g = NormalFormGame(bimatrix)
 
-        # Original best reponse polytope for player 0
+        # Original best response polytope for player 0
         vertices_P = np.array([
             [0, 0, 0],       # 0
             [1/3, 0, 0],     # a
@@ -103,7 +103,7 @@ class TestBestResponsePolytope:
         self.labelings_P = labelings_P[ind]
         self.vertices_P = vertices_P[ind]
 
-        # Translated best reponse polytope for player 0
+        # Translated best response polytope for player 0
         self.brp0 = _BestResponsePolytope(g.players[1], idx=0)
 
     def test_best_response_polytope(self):

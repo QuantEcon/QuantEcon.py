@@ -56,7 +56,7 @@ class TestDiscreteDP:
             res_init = ddp.solve(method='value_iteration', v_init=v_init,
                                  epsilon=self.epsilon)
 
-            # Check v is an epsilon/2-approxmation of v_star
+            # Check v is an epsilon/2-approximation of v_star
             ok_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
             ok_(np.abs(res_init.v - self.v_star).max() < self.epsilon/2)
 
@@ -89,7 +89,7 @@ class TestDiscreteDP:
                                  v_init=v_init,
                                  epsilon=self.epsilon)
 
-            # Check v is an epsilon/2-approxmation of v_star
+            # Check v is an epsilon/2-approximation of v_star
             ok_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
             ok_(np.abs(res_init.v - self.v_star).max() < self.epsilon/2)
 
@@ -103,7 +103,7 @@ class TestDiscreteDP:
             res = ddp.solve(method='modified_policy_iteration',
                             epsilon=self.epsilon, k=k)
 
-            # Check v is an epsilon/2-approxmation of v_star
+            # Check v is an epsilon/2-approximation of v_star
             ok_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
 
             # Check sigma == sigma_star
