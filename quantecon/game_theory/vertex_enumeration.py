@@ -186,7 +186,7 @@ class _BestResponsePolytope:
         Dimension of the polytope.
 
     hull : scipy.spatial.ConvexHull
-        `ConvexHull` instance reprensenting the polar polytope.
+        `ConvexHull` instance representing the polar polytope.
 
     num_vertices : scalar(int)
         Number of the vertices identified by `ConvexHull`.

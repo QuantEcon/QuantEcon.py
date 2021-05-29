@@ -39,7 +39,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
                 A list of files to specify a collection of filenames	
                 A dict of dir : list(files) to specify a directory
     repo        str, optional(default=REPO)
-    raw 		str, optional(defualt=RAW)
+    raw 		str, optional(default=RAW)
     			This is here in case github changes access to their raw files through web links
     branch      str, optional(default=BRANCH)
     folder      str, optional(default=FOLDER)

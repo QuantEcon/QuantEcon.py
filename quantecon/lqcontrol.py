@@ -71,7 +71,7 @@ class LQ:
         non-negative definite
     R : array_like(float)
         R is the payoff (or cost) matrix that corresponds with the
-        state variable x and is n x n. Should be symetric and
+        state variable x and is n x n. Should be symmetric and
         non-negative definite
     A : array_like(float)
         A is part of the state transition as described above. It should
@@ -93,7 +93,7 @@ class LQ:
     Rf : array_like(float), optional(default=None)
         Rf is the final (in a finite horizon model) payoff(or cost)
         matrix that corresponds with the control variable u and is n x
-        n.  Should be symetric and non-negative definite
+        n.  Should be symmetric and non-negative definite
 
     Attributes
     ----------

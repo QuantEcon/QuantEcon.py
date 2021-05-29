@@ -35,7 +35,7 @@ def pure_nash_brute(g, tol=None):
     [(1, 1)]
 
     If we consider the "Matching Pennies" game, which has no pure nash
-    equilibirum:
+    equilibrium:
 
     >>> MP_bimatrix = [[(1, -1), (-1, 1)],
     ...                [(-1, 1), (1, -1)]]
