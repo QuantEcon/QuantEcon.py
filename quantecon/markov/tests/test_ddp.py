@@ -109,6 +109,26 @@ class TestDiscreteDP:
             # Check sigma == sigma_star
             assert_array_equal(res.sigma, self.sigma_star)
 
+    def test_linear_programming(self):
+        for ddp in self.ddps:
+            if ddp._sparse:
+                assert_raises(NotImplementedError, ddp.solve,
+                              method='linear_programming')
+            else:
+                res = ddp.solve(method='linear_programming')
+
+                v_init = [0, 1]
+                res_init = ddp.solve(method='linear_programming',
+                                     v_init=v_init)
+
+                # Check v == v_star
+                assert_allclose(res.v, self.v_star)
+                assert_allclose(res_init.v, self.v_star)
+
+                # Check sigma == sigma_star
+                assert_array_equal(res.sigma, self.sigma_star)
+                assert_array_equal(res_init.sigma, self.sigma_star)
+
 
 def test_ddp_beta_0():
     n, m = 3, 2
@@ -122,13 +142,18 @@ def test_ddp_beta_0():
 
     ddp0 = DiscreteDP(R, Q, beta)
     ddp1 = ddp0.to_sa_pair_form()
-    methods = ['vi', 'pi', 'mpi']
+    ddp2 = ddp0.to_sa_pair_form(sparse=False)
+    methods = ['vi', 'pi', 'mpi', 'lp']
 
-    for ddp in [ddp0, ddp1]:
+    for ddp in [ddp0, ddp1, ddp2]:
         for method in methods:
-            res = ddp.solve(method=method, v_init=v_init)
-            assert_array_equal(res.sigma, sigma_star)
-            assert_array_equal(res.v, v_star)
+            if method == 'lp' and ddp._sparse:
+                assert_raises(NotImplementedError, ddp.solve,
+                              method=method, v_init=v_init)
+            else:
+                res = ddp.solve(method=method, v_init=v_init)
+                assert_array_equal(res.sigma, sigma_star)
+                assert_array_equal(res.v, v_star)
 
 
 def test_ddp_sorting():
