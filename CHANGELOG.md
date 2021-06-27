@@ -1,5 +1,33 @@
 # Changelog
 
+## Ver 0.5.1 (27-June-2021)
+
+**New:**
+
+1. ENH: [Add Numba-jitted linprog solver](https://github.com/QuantEcon/QuantEcon.py/pull/532) ([[oyamad](https://github.com/oyamad)])
+2. EHN: [Add minmax solver](https://github.com/QuantEcon/QuantEcon.py/pull/579) ([[oyamad](https://github.com/oyamad)])
+3. ENH: [Add LP solution method to DiscreteDP](https://github.com/QuantEcon/QuantEcon.py/pull/585) ([[oyamad](https://github.com/oyamad)])
+
+**Maintain:**
+
+1. MAINT: [Use multivariate_normal via random_state](https://github.com/QuantEcon/QuantEcon.py/pull/581) ([[oyamad](https://github.com/oyamad)])
+2. FIX: [minmax: Fix redundancy](https://github.com/QuantEcon/QuantEcon.py/pull/582) ([[oyamad](https://github.com/oyamad)])
+3. DOCS: [Fix typos in Docs](https://github.com/QuantEcon/QuantEcon.py/pull/584) ([[timgates42](https://github.com/timgates42)])
+
+## Ver 0.5.0 (19-April-2021)
+
+**Breaking Changes:**
+
+1. ENH: Extend `LinearStateSpace` class [\#569](https://github.com/QuantEcon/QuantEcon.py/pull/569) ([shizejin](https://github.com/shizejin))
+
+**Other Changes:**
+
+- FIX: [kalman] Always initialize self.Sigma and self.x\_hat [\#562](https://github.com/QuantEcon/QuantEcon.py/pull/562) ([rht](https://github.com/rht))
+- TST: Setup Tests via Github Actions [\#561](https://github.com/QuantEcon/QuantEcon.py/pull/561) ([rht](https://github.com/rht))
+- ENH: Update root\_finding.py [\#560](https://github.com/QuantEcon/QuantEcon.py/pull/560) ([alanlujan91](https://github.com/alanlujan91))
+
+Special thanks for contributions by [rht](https://github.com/rht), [shizejin](https://github.com/shizejin), [alanlujan91](https://github.com/alanlujan91), and [oyamad](https://github.com/oyamad)
+
 ## [v0.4.8](https://github.com/QuantEcon/QuantEcon.py/tree/v0.4.8) (2020-07-02)
 
 [Full Changelog](https://github.com/QuantEcon/QuantEcon.py/compare/0.4.7...v0.4.8)
