@@ -13,5 +13,7 @@ from .support_enumeration import support_enumeration, support_enumeration_gen
 from .lemke_howson import lemke_howson
 from .mclennan_tourky import mclennan_tourky
 from .vertex_enumeration import vertex_enumeration, vertex_enumeration_gen
-from .game_generators import *
+from .game_generators import (
+    blotto_game, ranking_game, sgc_game, tournament_game, unit_vector_game
+)
 from .repeated_game import RepeatedGame
