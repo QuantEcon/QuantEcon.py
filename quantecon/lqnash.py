@@ -1,5 +1,4 @@
 import numpy as np
-from numpy import dot, eye
 from scipy.linalg import solve
 from .util import check_random_state
 
@@ -107,8 +106,8 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         k_2 = B2.shape[1]
 
     random_state = check_random_state(random_state)
-    v1 = eye(k_1)
-    v2 = eye(k_2)
+    v1 = np.eye(k_1)
+    v2 = np.eye(k_2)
     P1 = np.zeros((n, n))
     P2 = np.zeros((n, n))
     F1 = random_state.randn(k_1, n)
@@ -119,28 +118,28 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         F10 = F1
         F20 = F2
 
-        G2 = solve(dot(B2.T, P2.dot(B2))+Q2, v2)
-        G1 = solve(dot(B1.T, P1.dot(B1))+Q1, v1)
-        H2 = dot(G2, B2.T.dot(P2))
-        H1 = dot(G1, B1.T.dot(P1))
+        G2 = solve(np.dot(B2.T, P2.dot(B2))+Q2, v2)
+        G1 = solve(np.dot(B1.T, P1.dot(B1))+Q1, v1)
+        H2 = np.dot(G2, B2.T.dot(P2))
+        H1 = np.dot(G1, B1.T.dot(P1))
 
         # break up the computation of F1, F2
-        F1_left = v1 - dot(H1.dot(B2)+G1.dot(M1.T),
+        F1_left = v1 - np.dot(H1.dot(B2)+G1.dot(M1.T),
                            H2.dot(B1)+G2.dot(M2.T))
-        F1_right = H1.dot(A)+G1.dot(W1.T) - dot(H1.dot(B2)+G1.dot(M1.T),
+        F1_right = H1.dot(A)+G1.dot(W1.T) - np.dot(H1.dot(B2)+G1.dot(M1.T),
                                                 H2.dot(A)+G2.dot(W2.T))
         F1 = solve(F1_left, F1_right)
-        F2 = H2.dot(A)+G2.dot(W2.T) - dot(H2.dot(B1)+G2.dot(M2.T), F1)
+        F2 = H2.dot(A)+G2.dot(W2.T) - np.dot(H2.dot(B1)+G2.dot(M2.T), F1)
 
         Lambda1 = A - B2.dot(F2)
         Lambda2 = A - B1.dot(F1)
-        Pi1 = R1 + dot(F2.T, S1.dot(F2))
-        Pi2 = R2 + dot(F1.T, S2.dot(F1))
+        Pi1 = R1 + np.dot(F2.T, S1.dot(F2))
+        Pi2 = R2 + np.dot(F1.T, S2.dot(F1))
 
-        P1 = dot(Lambda1.T, P1.dot(Lambda1)) + Pi1 - \
-             dot(dot(Lambda1.T, P1.dot(B1)) + W1 - F2.T.dot(M1), F1)
-        P2 = dot(Lambda2.T, P2.dot(Lambda2)) + Pi2 - \
-             dot(dot(Lambda2.T, P2.dot(B2)) + W2 - F1.T.dot(M2), F2)
+        P1 = np.dot(Lambda1.T, P1.dot(Lambda1)) + Pi1 - \
+             np.dot(np.dot(Lambda1.T, P1.dot(B1)) + W1 - F2.T.dot(M1), F1)
+        P2 = np.dot(Lambda2.T, P2.dot(Lambda2)) + Pi2 - \
+             np.dot(np.dot(Lambda2.T, P2.dot(B2)) + W2 - F1.T.dot(M2), F2)
 
         dd = np.max(np.abs(F10 - F1)) + np.max(np.abs(F20 - F2))
 
