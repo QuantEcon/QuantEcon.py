@@ -6,7 +6,6 @@ from textwrap import dedent
 import numpy as np
 from .lqcontrol import LQ
 from .quadsums import var_quadratic_sum
-from numpy import dot, log, sqrt, identity, hstack, vstack, trace
 from scipy.linalg import solve, inv, det
 from .matrix_eqn import solve_discrete_lyapunov
 
@@ -108,10 +107,10 @@ class RBLQ:
         """
         C, theta = self.C, self.theta
         I = np.identity(self.j)
-        S1 = dot(P, C)
-        S2 = dot(C.T, S1)
+        S1 = np.dot(P, C)
+        S2 = np.dot(C.T, S1)
 
-        dP = P + dot(S1, solve(theta * I - S2, S1.T))
+        dP = P + np.dot(S1, solve(theta * I - S2, S1.T))
 
         return dP
 
@@ -143,12 +142,12 @@ class RBLQ:
 
         """
         A, B, Q, R, beta = self.A, self.B, self.Q, self.R, self.beta
-        S1 = Q + beta * dot(B.T, dot(P, B))
-        S2 = beta * dot(B.T, dot(P, A))
-        S3 = beta * dot(A.T, dot(P, A))
+        S1 = Q + beta * np.dot(B.T, np.dot(P, B))
+        S2 = beta * np.dot(B.T, np.dot(P, A))
+        S3 = beta * np.dot(A.T, np.dot(P, A))
         F = solve(S1, S2) if not self.pure_forecasting else np.zeros(
             (self.k, self.n))
-        new_P = R - dot(S2.T, F) + S3
+        new_P = R - np.dot(S2.T, F) + S3
 
         return F, new_P
 
@@ -188,7 +187,7 @@ class RBLQ:
         beta, theta = self.beta, self.theta
         k, j = self.k, self.j
         # == Set up LQ version == #
-        I = identity(j)
+        I = np.identity(j)
         Z = np.zeros((k, j))
 
         if self.pure_forecasting:
@@ -200,8 +199,8 @@ class RBLQ:
             K = -f[:k, :]
 
         else:
-            Ba = hstack([B, C])
-            Qa = vstack([hstack([Q, Z]), hstack([Z.T, -beta*I*theta])])
+            Ba = np.hstack([B, C])
+            Qa = np.vstack([np.hstack([Q, Z]), np.hstack([Z.T, -beta*I*theta])])
             lq = LQ(Qa, R, A, Ba, beta=beta)
 
             # == Solve and convert back to robust problem == #
@@ -281,8 +280,8 @@ class RBLQ:
 
         """
         Q2 = self.beta * self.theta
-        R2 = - self.R - dot(F.T, dot(self.Q, F))
-        A2 = self.A - dot(self.B, F)
+        R2 = - self.R - np.dot(F.T, np.dot(self.Q, F))
+        A2 = self.A - np.dot(self.B, F)
         B2 = self.C
         lq = LQ(Q2, R2, A2, B2, beta=self.beta)
         neg_P, neg_K, d = lq.stationary_values(method=method)
@@ -309,10 +308,10 @@ class RBLQ:
             The value function for a given K
 
         """
-        A1 = self.A + dot(self.C, K)
+        A1 = self.A + np.dot(self.C, K)
         B1 = self.B
         Q1 = self.Q
-        R1 = self.R - self.beta * self.theta * dot(K.T, K)
+        R1 = self.R - self.beta * self.theta * np.dot(K.T, K)
         lq = LQ(Q1, R1, A1, B1, beta=self.beta)
         P, F, d = lq.stationary_values(method=method)
 
@@ -349,9 +348,9 @@ class RBLQ:
             The deterministic entropy
 
         """
-        H0 = dot(K.T, K)
+        H0 = np.dot(K.T, K)
         C0 = np.zeros((self.n, 1))
-        A0 = self.A - dot(self.B, F) + dot(self.C, K)
+        A0 = self.A - np.dot(self.B, F) + np.dot(self.C, K)
         e = var_quadratic_sum(A0, C0, H0, self.beta, x0)
 
         return e
@@ -389,13 +388,13 @@ class RBLQ:
         K_F, P_F = self.F_to_K(F)
         I = np.identity(self.j)
         H = inv(I - C.T.dot(P_F.dot(C)) / theta)
-        d_F = log(det(H))
+        d_F = np.log(det(H))
 
         # == Compute O_F and o_F == #
-        AO = sqrt(beta) * (A - dot(B, F) + dot(C, K_F))
-        O_F = solve_discrete_lyapunov(AO.T, beta * dot(K_F.T, K_F))
-        ho = (trace(H - 1) - d_F) / 2.0
-        tr = trace(dot(O_F, C.dot(H.dot(C.T))))
+        AO = np.sqrt(beta) * (A - np.dot(B, F) + np.dot(C, K_F))
+        O_F = solve_discrete_lyapunov(AO.T, beta * np.dot(K_F.T, K_F))
+        ho = (np.trace(H - 1) - d_F) / 2.0
+        tr = np.trace(np.dot(O_F, C.dot(H.dot(C.T))))
         o_F = (ho + beta * tr) / (1 - beta)
 
         return K_F, P_F, d_F, O_F, o_F
