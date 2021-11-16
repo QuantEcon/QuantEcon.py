@@ -273,7 +273,6 @@ class MarkovChain:
         else:
             raise ValueError('invalid value')
 
-
     def _get_index(self, value):
         """
         Return the index of the given value in `state_values`.
@@ -420,7 +419,7 @@ class MarkovChain:
     def cdfs(self):
         if (self._cdfs is None) and not self.is_sparse:
             # See issue #137#issuecomment-96128186
-            cdfs = np.empty((self.n, self.n), order='C')
+            cdfs = np.empty((self.n, self.n), order='C', dtype=self.P.dtype)
             np.cumsum(self.P, axis=-1, out=cdfs)
             self._cdfs = cdfs
         return self._cdfs
@@ -431,7 +430,7 @@ class MarkovChain:
             data = self.P.data
             indptr = self.P.indptr
 
-            cdfs1d = np.empty(self.P.nnz, order='C')
+            cdfs1d = np.empty(self.P.nnz, order='C', dtype=data.dtype)
             for i in range(self.n):
                 cdfs1d[indptr[i]:indptr[i+1]] = \
                     data[indptr[i]:indptr[i+1]].cumsum()

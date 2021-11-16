@@ -10,7 +10,9 @@ Functions
 import numpy as np
 from scipy import sparse
 import itertools
-from numpy.testing import assert_allclose, assert_array_equal, assert_raises
+from numpy.testing import (
+    assert_allclose, assert_array_equal, assert_array_less, assert_raises
+)
 from nose.tools import eq_, ok_, raises
 
 from quantecon.markov import (
@@ -337,6 +339,33 @@ def test_simulate_for_matrices_with_C_F_orders():
     computed_F = MarkovChain(P_F).simulate(ts_length, init=init)
     assert_array_equal(computed_C, sample_path)
     assert_array_equal(computed_F, sample_path)
+
+
+def test_simulate_issue591():
+    """
+    Test MarkovChasin.simulate for P with dtype=np.float32
+    https://github.com/QuantEcon/QuantEcon.py/issues/591
+    """
+    num_states = 5
+    transition_states = 4
+
+    transition_seed = 2
+    random_state = np.random.RandomState(transition_seed)
+    transitions = random_state.uniform(0., 1., transition_states)
+    transitions /= np.sum(transitions)
+    P = np.zeros((num_states, num_states), dtype=np.float32)
+    P[0, :transition_states] = transitions
+    P[1:, 0] = 1.
+    mc = MarkovChain(P=P)
+
+    simulate_seed = 22220
+    ts_length = 10000
+    seq = mc.simulate(
+        ts_length=ts_length, init=0, num_reps=1, random_state=simulate_seed
+    )
+    max_state_in_seq = np.max(seq)
+
+    assert_array_less(max_state_in_seq, num_states)
 
 
 def test_mc_sample_path():
