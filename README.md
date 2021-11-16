@@ -67,6 +67,29 @@ modification, are permitted provided that the following conditions are met:
 
 For a complete list of changes please refer to the [CHANGELOG.md](CHANGELOG.md)
 
+## Ver 0.5.2 (16-November-2021)
+
+This is a bug fix release
+
+**Maintain:**
+
+1. FIX: [markov: Respect dtype of P in cdfs](https://github.com/QuantEcon/QuantEcon.py/pull/592) ([[oyamad](https://github.com/oyamad)], thanks [@btanner](https://github.com/btanner) for reporting issue)
+2. [LGTM code quality suggestions](https://github.com/QuantEcon/QuantEcon.py/pull/588) ([nshea3](https://github.com/QuantEcon/QuantEcon.py/pull/588))
+
+## Ver 0.5.1 (27-June-2021)
+
+**New:**
+
+1. ENH: [Add Numba-jitted linprog solver](https://github.com/QuantEcon/QuantEcon.py/pull/532) ([[oyamad](https://github.com/oyamad)])
+2. EHN: [Add minmax solver](https://github.com/QuantEcon/QuantEcon.py/pull/579) ([[oyamad](https://github.com/oyamad)])
+3. ENH: [Add LP solution method to DiscreteDP](https://github.com/QuantEcon/QuantEcon.py/pull/585) ([[oyamad](https://github.com/oyamad)])
+
+**Maintain:**
+
+1. MAINT: [Use multivariate_normal via random_state](https://github.com/QuantEcon/QuantEcon.py/pull/581) ([[oyamad](https://github.com/oyamad)])
+2. FIX: [minmax: Fix redundancy](https://github.com/QuantEcon/QuantEcon.py/pull/582) ([[oyamad](https://github.com/oyamad)])
+3. DOCS: [Fix typos in Docs](https://github.com/QuantEcon/QuantEcon.py/pull/584) ([[timgates42](https://github.com/timgates42)])
+
 ### Ver 0.5.0 (19-April-2021)
 
 **Breaking Changes:**
