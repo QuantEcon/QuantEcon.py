@@ -1,5 +1,14 @@
 # Changelog
 
+## Ver 0.5.2 (16-November-2021)
+
+This is a bug fix release
+
+**Maintain:**
+
+1. FIX: [markov: Respect dtype of P in cdfs](https://github.com/QuantEcon/QuantEcon.py/pull/592) ([[oyamad](https://github.com/oyamad)], thanks [@btanner](https://github.com/btanner) for reporting issue)
+2. [LGTM code quality suggestions](https://github.com/QuantEcon/QuantEcon.py/pull/588) ([nshea3](https://github.com/QuantEcon/QuantEcon.py/pull/588))
+
 ## Ver 0.5.1 (27-June-2021)
 
 **New:**
