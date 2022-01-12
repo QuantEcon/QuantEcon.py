@@ -65,7 +65,7 @@ class TestCombJit:
 
         eq_(comb_jit(self.MAX_INTP, 2), 0)
 
-        N = np.int(self.MAX_INTP**0.5 * 2**0.5) + 1
+        N = np.intp(self.MAX_INTP**0.5 * 2**0.5) + 1
         eq_(comb_jit(N, 2), 0)
 
     def test_max_intp(self):
