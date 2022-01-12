@@ -60,8 +60,8 @@ Current Build and Coverage Status
 
 |Build Status| |Coverage Status|
 
-.. |Build Status| image:: https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master
-   :target: https://travis-ci.org/QuantEcon/QuantEcon.py
+.. |Build Status| image:: https://github.com/QuantEcon/QuantEcon.py/workflows/build/badge.svg
+   :target: https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Abuild
 .. |Coverage Status| image:: https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png
    :target: https://coveralls.io/r/QuantEcon/QuantEcon.py
 
