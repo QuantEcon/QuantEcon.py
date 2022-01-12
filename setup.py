@@ -33,7 +33,7 @@ LONG_DESCRIPTION = """
 **QuantEcon** is an organization run by economists for economists with the aim of coordinating
 distributed development of high quality open source code for all forms of quantitative economic modelling.
 
-The project website is located at `http://quantecon.org/ <http://quantecon.org/>`_. This website provides
+The project website is located at `https://quantecon.org/ <https://quantecon.org/>`_. This website provides
 more information with regards to the **quantecon** library, documentation, in addition to some resources
 in regards to how you can use and/or contribute to the package.
 
@@ -42,7 +42,7 @@ The **quantecon** Package
 
 The `repository <https://github.com/QuantEcon/QuantEcon.py>`_ includes the Python package ``quantecon``
 
-Assuming you have `pip <https://pypi.python.org/pypi/pip>`_ on your computer --- as will be the case if you've `installed Anaconda <http://quant-econ.net/getting_started.html#installing-anaconda>`_ --- you can install the latest stable release of ``quantecon`` by typing
+Assuming you have `pip <https://pypi.python.org/pypi/pip>`_ on your computer --- as will be the case if you've `installed Anaconda <https://python-programming.quantecon.org/getting_started.html#anaconda>`_ --- you can install the latest stable release of ``quantecon`` by typing
 
     pip install quantecon
 
@@ -60,15 +60,17 @@ Current Build and Coverage Status
 
 |Build Status| |Coverage Status|
 
-.. |Build Status| image:: https://travis-ci.org/QuantEcon/QuantEcon.py.svg?branch=master
-   :target: https://travis-ci.org/QuantEcon/QuantEcon.py
+.. |Build Status| image:: https://github.com/QuantEcon/QuantEcon.py/workflows/build/badge.svg
+   :target: https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Abuild
 .. |Coverage Status| image:: https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.png
    :target: https://coveralls.io/r/QuantEcon/QuantEcon.py
 
 Additional Links
 ----------------
 
-1. `QuantEcon Course Website <http://quant-econ.net>`_
+1. `Python Programming for Finance and Economics <https://python-programming.quantecon.org/intro.html>`__
+2. `Quantitative Economics with python <https://python.quantecon.org/intro.html>`__
+3. `Advanced Quantitative Economics with Python <https://python-advanced.quantecon.org/intro.html>`__
 
 """
 
