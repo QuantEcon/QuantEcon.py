@@ -1,0 +1,63 @@
+name: conda-build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
+        exclude:
+          - os: windows-latest
+            python-version: 3.7
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        environment-file: environment.yml
+        python-version: ${{ matrix.python-version }}
+        auto-activate-base: false
+
+    - name: Conda info
+      shell: bash -l {0}
+      run: |
+        conda info
+        conda list
+
+    - name: Setup and Install - QuantEcon
+      run: |
+        python setup.py install
+
+    - name: Run Tests
+      run: |
+        flake8 --select F401, F405, E231 quantecon
+        nosetests --with-coverage -a "!slow" --cover-package=quantecon
+
+    - name: Coveralls Parallel
+      uses: AndreMiras/coveralls-python-action@develop
+      if: runner.os == 'Linux'
+      with:
+        flag-name: run-${{ matrix.test_number }}
+        parallel: true
+
+  coveralls_finish:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel-finished: true
