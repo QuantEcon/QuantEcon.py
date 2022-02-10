@@ -13,3 +13,4 @@ dependencies:
   - ipython
   - statsmodels
   - flake8
+  - requests
