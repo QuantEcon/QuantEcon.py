@@ -42,11 +42,12 @@ jobs:
         python setup.py build
 
     - name: Run Tests
+      shell: bash -l {0}
       run: |
         flake8 --select F401, F405, E231 quantecon
         nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
-    - name: Coveralls Parallel
+    - name: Coveralls Parallel (Linux)
       uses: AndreMiras/coveralls-python-action@develop
       if: runner.os == 'Linux'
       with:
