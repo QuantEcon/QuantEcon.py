@@ -37,9 +37,9 @@ jobs:
         conda info
         conda list
 
-    - name: Setup and Install - QuantEcon
+    - name: Setup QuantEcon
       run: |
-        python setup.py install
+        python setup.py build
 
     - name: Run Tests
       run: |
