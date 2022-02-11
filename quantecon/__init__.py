@@ -23,7 +23,7 @@ from . import optimize
 from .compute_fp import compute_fixed_point
 from .discrete_rv import DiscreteRV
 from .dle import DLE
-from .ecdf import ECDF
+from ._ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
 # from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.
 from .graph_tools import DiGraph, random_tournament_graph
@@ -47,6 +47,9 @@ from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, 
 	gth_solve, tauchen, rouwenhorst
 #Imports that Should be Deprecated with markov package
 from .markov import mc_compute_stationary, mc_sample_path
+
+#Imports that are deprecated and will be removed in further versions
+from . import ecdf
 #<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
