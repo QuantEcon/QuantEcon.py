@@ -48,4 +48,6 @@ class ECDF:
             Fraction of the sample less than x
 
         """
-        return np.mean(self.observations <= x)
+        f = lambda a, b: a <= b
+        vf = np.vectorize(f)
+        return np.mean(vf(self.observations, x))
