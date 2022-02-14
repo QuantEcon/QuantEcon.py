@@ -1,0 +1,16 @@
+name: qe
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - nose
+  - coverage
+  - numpy
+  - scipy
+  - pandas
+  - numba
+  - sympy
+  - ipython
+  - statsmodels
+  - flake8
+  - requests
