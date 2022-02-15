@@ -34,6 +34,10 @@ class TestECDF(unittest.TestCase):
     def test_vectorized(self):
         "ecdf: testing vectorized __call__ method"
         t = np.linspace(-1, 1, 100)
-        self.assertEqual(t.shape, self.ecdf(t).shape)
+        e = self.ecdf(t)
+        self.assertEqual(t.shape, e.shape)
+        self.assertEqual(e.dtype, float)
         t = np.linspace(-1, 1, 100).reshape(2, 2, 25)
-        self.assertEqual(t.shape, self.ecdf(t).shape)
+        e = self.ecdf(t)
+        self.assertEqual(t.shape, e.shape)
+        self.assertEqual(e.dtype, float)
