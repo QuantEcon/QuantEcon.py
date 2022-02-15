@@ -51,4 +51,4 @@ class ECDF:
         def f(a):
             return np.mean(self.observations <= a)
         vf = np.frompyfunc(f, 1, 1)
-        return vf(x)
+        return vf(x).astype(np.float)
