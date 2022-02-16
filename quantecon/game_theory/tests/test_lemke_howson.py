@@ -1,15 +1,13 @@
 """
 Tests for lemke_howson.py
-
 """
 import numpy as np
-from numpy.testing import assert_allclose
-from nose.tools import eq_, raises
+from numpy.testing import assert_allclose, assert_, assert_raises
 from quantecon.game_theory import Player, NormalFormGame, lemke_howson
 
 
 class TestLemkeHowson():
-    def setUp(self):
+    def setup(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
@@ -32,7 +30,7 @@ class TestLemkeHowson():
 
 
 class TestLemkeHowsonDegenerate():
-    def setUp(self):
+    def setup(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
@@ -80,7 +78,7 @@ class TestLemkeHowsonDegenerate():
                 for action_computed, action in zip(NE_computed,
                                                    d['NEs_dict'][k]):
                     assert_allclose(action_computed, action)
-                eq_(res.converged, d['converged'])
+                assert_(res.converged == d['converged'])
 
 
 def test_lemke_howson_capping():
@@ -98,47 +96,34 @@ def test_lemke_howson_capping():
                                  capping=max_iter, full_output=True)
         for action0, action1 in zip(NE0, NE1):
             assert_allclose(action0, action1)
-        eq_(res0.init, res1.init)
+        assert_(res0.init == res1.init)
 
     init_pivot = 1
     max_iter = m+n
     NE, res = lemke_howson(g, init_pivot=init_pivot, max_iter=max_iter,
                            capping=1, full_output=True)
-    eq_(res.num_iter, max_iter)
-    eq_(res.init, init_pivot-1)
+    assert_(res.num_iter == max_iter)
+    assert_(res.init == init_pivot-1)
 
 
-@raises(TypeError)
 def test_lemke_howson_invalid_g():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
-    lemke_howson(bimatrix)
+    assert_raises(TypeError, lemke_howson, bimatrix)
 
 
-@raises(ValueError)
 def test_lemke_howson_invalid_init_pivot_integer():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
     g = NormalFormGame(bimatrix)
-    lemke_howson(g, -1)
+    assert_raises(ValueError, lemke_howson, g, -1)
 
 
-@raises(TypeError)
 def test_lemke_howson_invalid_init_pivot_float():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
     g = NormalFormGame(bimatrix)
-    lemke_howson(g, 1.0)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(TypeError, lemke_howson, g, 1.0)
