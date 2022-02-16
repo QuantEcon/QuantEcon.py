@@ -1,10 +1,8 @@
 """
 Tests for mclennan_tourky.py
-
 """
 import numpy as np
-from numpy.testing import assert_array_equal
-from nose.tools import ok_, raises
+from numpy.testing import assert_array_equal, assert_raises, assert_
 from quantecon.game_theory import Player, NormalFormGame, mclennan_tourky
 from quantecon.game_theory.mclennan_tourky import (
      _best_response_selection, _flatten_action_profile, _is_epsilon_nash
@@ -12,7 +10,7 @@ from quantecon.game_theory.mclennan_tourky import (
 
 
 class TestMclennanTourky():
-    def setUp(self):
+    def setup(self):
         def anti_coordination(N, v):
             payoff_array = np.empty((2,)*N)
             payoff_array[0, :] = 1
@@ -48,37 +46,34 @@ class TestMclennanTourky():
     def test_convergence_default(self):
         for d in self.game_dicts:
             NE, res = mclennan_tourky(d['g'], full_output=True)
-            ok_(res.converged)
+            assert_(res.converged)
 
     def test_pure_nash(self):
         for d in self.game_dicts:
             init = (1,) + (0,)*(d['g'].N-1)
             NE, res = mclennan_tourky(d['g'], init=init, full_output=True)
-            ok_(res.num_iter==1)
+            assert_(res.num_iter==1)
 
 
 class TestMclennanTourkyInvalidInputs():
-    def setUp(self):
+    def setup(self):
             self.bimatrix = [[(3, 3), (3, 2)],
                              [(2, 2), (5, 6)],
                              [(0, 3), (6, 1)]]
             self.g = NormalFormGame(self.bimatrix)
 
-    @raises(TypeError)
     def test_mclennan_tourky_invalid_g(self):
-        mclennan_tourky(self.bimatrix)
+        assert_raises(TypeError, mclennan_tourky, self.bimatrix)
 
-    @raises(TypeError)
     def test_mclennan_tourky_invalid_init_type(self):
-        mclennan_tourky(self.g, 1)
+        assert_raises(TypeError, mclennan_tourky, self.g, 1)
 
-    @raises(ValueError)
     def test_mclennan_tourky_invalid_init_length(self):
-        mclennan_tourky(self.g, [1])
+        assert_raises(ValueError, mclennan_tourky, self.g, [1])
 
 
 class TestEpsilonNash():
-    def setUp(self):
+    def setup(self):
         def anti_coordination(N, v):
             payoff_array = np.empty((2,)*N)
             payoff_array[0, :] = 1
@@ -121,17 +116,17 @@ class TestEpsilonNash():
             NE, res = \
                 mclennan_tourky(d['g'], epsilon=d['epsilon'], full_output=True)
             for i in range(d['g'].N):
-                ok_(d['lb'] < NE[i][0] < d['ub'])
+                assert_(d['lb'] < NE[i][0] < d['ub'])
 
     def test_epsilon_nash_without_full_output(self):
         for d in self.game_dicts:
             NE = mclennan_tourky(d['g'], epsilon=d['epsilon'],
                                  full_output=False)
             for i in range(d['g'].N):
-                ok_(d['lb'] < NE[i][0] < d['ub'])
+                assert_(d['lb'] < NE[i][0] < d['ub'])
 
     def test_is_epsilon_nash_no_indptr(self):
-        ok_(_is_epsilon_nash([1., 0., 0., 1., 0.], self.g, 1e-5))
+        assert_(_is_epsilon_nash([1., 0., 0., 1., 0.], self.g, 1e-5))
 
 
 def test_flatten_action_profile():
@@ -151,13 +146,3 @@ def test_best_response_selection_no_indptr():
     expected_output = np.array([0., 1., 0., 0., 1.])
 
     assert_array_equal(test_obj, expected_output)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
