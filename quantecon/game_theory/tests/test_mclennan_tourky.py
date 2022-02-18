@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal, assert_raises, assert_
 from quantecon.game_theory import Player, NormalFormGame, mclennan_tourky
 from quantecon.game_theory.mclennan_tourky import (
-     _best_response_selection, _flatten_action_profile, _is_epsilon_nash
+    _best_response_selection, _flatten_action_profile, _is_epsilon_nash
 )
 
 
@@ -52,7 +52,7 @@ class TestMclennanTourky():
         for d in self.game_dicts:
             init = (1,) + (0,)*(d['g'].N-1)
             NE, res = mclennan_tourky(d['g'], init=init, full_output=True)
-            assert_(res.num_iter==1)
+            assert_(res.num_iter == 1)
 
 
 class TestMclennanTourkyInvalidInputs():

@@ -66,9 +66,9 @@ class TestPlayer_1opponent:
     def test_best_response_with_payoff_perturbation(self):
         """best_response with payoff_perturbation"""
         assert_(self.player.best_response([2/3, 1/3],
-                                      payoff_perturbation=[0, 0.1]) == 1)
+                payoff_perturbation=[0, 0.1]) == 1)
         assert_(self.player.best_response([2, 1],  # int
-                                      payoff_perturbation=[0, 0.1]) == 1)
+                payoff_perturbation=[0, 0.1]) == 1)
 
     def test_is_best_response_against_pure(self):
         assert_(self.player.is_best_response(0, 0))
@@ -79,7 +79,7 @@ class TestPlayer_1opponent:
     def test_is_dominated(self):
         for action in range(self.player.num_actions):
             for method in LP_METHODS:
-                assert_(self.player.is_dominated(action, method=method) == False)
+                assert_(not self.player.is_dominated(action, method=method))
 
     def test_dominated_actions(self):
         for method in LP_METHODS:
@@ -132,7 +132,7 @@ class TestPlayer_2opponents:
     def test_is_dominated(self):
         for action in range(self.player.num_actions):
             for method in LP_METHODS:
-                assert_(self.player.is_dominated(action, method=method) == False)
+                assert_(not self.player.is_dominated(action, method=method))
 
     def test_dominated_actions(self):
         for method in LP_METHODS:
@@ -154,9 +154,9 @@ def test_player_corner_cases():
     n, m = 3, 4
     player = Player(np.zeros((n, m)))
     for action in range(n):
-        assert_(player.is_best_response(action, [1/m]*m) == True)
+        assert_(player.is_best_response(action, [1/m]*m))
         for method in LP_METHODS:
-            assert_(player.is_dominated(action, method=method) == False)
+            assert_(not player.is_dominated(action, method=method))
 
     e = 1e-8 * 2
     player = Player([[-e, -e], [1, -1], [-1, 1]])
@@ -164,10 +164,10 @@ def test_player_corner_cases():
     assert_(player.is_best_response(action, [1/2, 1/2], tol=e))
     assert_(not player.is_best_response(action, [1/2, 1/2], tol=e/2))
     for method in LP_METHODS:
-        assert_(player.is_dominated(action, tol=2*e, method=method) == False)
+        assert_(not player.is_dominated(action, tol=2*e, method=method))
         assert_(player.dominated_actions(tol=2*e, method=method) == [])
 
-        assert_(player.is_dominated(action, tol=e/2, method=method) == True)
+        assert_(player.is_dominated(action, tol=e/2, method=method))
         assert_(player.dominated_actions(tol=e/2, method=method) == [action])
 
 
@@ -452,7 +452,7 @@ class TestPlayer_1action:
     def test_is_dominated(self):
         for action in range(self.player.num_actions):
             for method in LP_METHODS:
-                assert_(self.player.is_dominated(action, method=method) == False)
+                assert_(not self.player.is_dominated(action, method=method))
 
     def test_dominated_actions(self):
         for method in LP_METHODS:
