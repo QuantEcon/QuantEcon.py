@@ -39,11 +39,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -U nose coverage numpy scipy pandas numba sympy ipython statsmodels flake8 pytest
         python setup.py install
-    - name: Run Tests
+    - name: Run Tests (nose)
       run: |
         flake8 --select F401, F405,E231 quantecon
         nosetests --with-coverage -a "!slow" --cover-package=quantecon
-    - name: Run Tests
+    - name: Run Tests (pytest)
       run: |
         pytest quantecon/game_theory
     - name: Coveralls Parallel
