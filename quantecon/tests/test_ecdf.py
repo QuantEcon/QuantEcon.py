@@ -30,3 +30,14 @@ class TestECDF(unittest.TestCase):
         F_1 = self.ecdf(x)
         F_2 = self.ecdf(1.1 * x)
         self.assertGreaterEqual(F_2, F_1)
+
+    def test_vectorized(self):
+        "ecdf: testing vectorized __call__ method"
+        t = np.linspace(-1, 1, 100)
+        e = self.ecdf(t)
+        self.assertEqual(t.shape, e.shape)
+        self.assertEqual(e.dtype, float)
+        t = np.linspace(-1, 1, 100).reshape(2, 2, 25)
+        e = self.ecdf(t)
+        self.assertEqual(t.shape, e.shape)
+        self.assertEqual(e.dtype, float)
