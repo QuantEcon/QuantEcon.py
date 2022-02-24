@@ -38,7 +38,9 @@ jobs:
         conda list
 
     - name: Setup QuantEcon
+      shell: bash -l {0}
       run: |
+        conda activate test
         python setup.py build
 
     - name: Run Tests

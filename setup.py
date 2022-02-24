@@ -1,28 +1,8 @@
 # Use setuptools in preference to distutils
 from setuptools import setup, find_packages
 import os
+from quantecon import __version__ as VERSION
 
-#-Write Versions File-#
-
-VERSION = '0.5.2'
-
-def write_version_py(filename=None):
-    """
-    This constructs a version file for the project
-    """
-    doc = "\"\"\"\nThis is a VERSION file and should NOT be manually altered\n\"\"\""
-    doc += "\nversion = '%s'\n" % VERSION
-
-    if not filename:
-        filename = os.path.join(os.path.dirname(__file__), 'quantecon', 'version.py')
-
-    fl = open(filename, 'w')
-    try:
-        fl.write(doc)
-    finally:
-        fl.close()
-
-write_version_py()  # This is a file used to control the qe.__version__ attribute
 
 #-Meta Information-#
 #~~~~~~~~~~~~~~~~~~#
