@@ -1,14 +1,7 @@
 # Use setuptools in preference to distutils
 from setuptools import setup, find_packages
 import os
-
-
-# To find version from quantecon/version.py
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-version_path = os.path.join(ROOT_DIR, 'quantecon', 'version.py')
-version_dict = {}
-with open(version_path) as version_file:
-    exec(version_file.read(), version_dict)
+from quantecon import __version__ as VERSION
 
 
 #-Meta Information-#
@@ -77,8 +70,6 @@ CLASSIFIERS = [
 
 #-Setup-#
 #~~~~~~~#
-
-VERSION = version_dict['version']
 
 setup(name='quantecon',
       packages=find_packages(),
