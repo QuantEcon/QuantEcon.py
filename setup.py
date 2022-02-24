@@ -105,7 +105,7 @@ setup(name='quantecon',
       keywords=['quantitative', 'economics'],
       install_requires=[
           'numba>=0.38',
-          'numpy',
+          'numpy<1.22,>=1.18 ',
           'requests',
           'scipy>=1.0.0',
           'sympy',

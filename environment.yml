@@ -5,7 +5,7 @@ channels:
 dependencies:
   - nose
   - coverage
-  - numpy
+  - numpy<1.22,>=1.18 
   - scipy
   - pandas
   - numba
