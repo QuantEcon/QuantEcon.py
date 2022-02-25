@@ -14,3 +14,4 @@ dependencies:
   - statsmodels
   - flake8
   - requests
+  - flit
