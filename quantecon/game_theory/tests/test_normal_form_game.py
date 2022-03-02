@@ -1,10 +1,8 @@
 """
 Tests for normal_form_game.py
-
 """
 import numpy as np
-from numpy.testing import assert_array_equal
-from nose.tools import eq_, ok_, raises
+from numpy.testing import assert_array_equal, assert_, assert_raises
 
 from quantecon.game_theory import (
     Player, NormalFormGame, pure2mixed, best_response_2p
@@ -19,7 +17,7 @@ LP_METHODS = [None, 'simplex', 'interior-point', 'revised simplex']
 class TestPlayer_1opponent:
     """Test the methods of Player with one opponent player"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a Player instance"""
         coordination_game_matrix = [[4, 0], [3, 2]]
         self.player = Player(coordination_game_matrix)
@@ -37,10 +35,10 @@ class TestPlayer_1opponent:
             )
 
     def test_best_response_against_pure(self):
-        eq_(self.player.best_response(1), 1)
+        assert_(self.player.best_response(1) == 1)
 
     def test_best_response_against_mixed(self):
-        eq_(self.player.best_response([1/2, 1/2]), 1)
+        assert_(self.player.best_response([1/2, 1/2]) == 1)
 
     def test_best_response_list_when_tie(self):
         """best_response with tie_breaking=False"""
@@ -51,7 +49,7 @@ class TestPlayer_1opponent:
 
     def test_best_response_with_random_tie_breaking(self):
         """best_response with tie_breaking='random'"""
-        ok_(self.player.best_response([2/3, 1/3], tie_breaking='random')
+        assert_(self.player.best_response([2/3, 1/3], tie_breaking='random')
             in [0, 1])
 
         seed = 1234
@@ -59,41 +57,39 @@ class TestPlayer_1opponent:
                                         random_state=seed)
         br1 = self.player.best_response([2/3, 1/3], tie_breaking='random',
                                         random_state=seed)
-        eq_(br0, br1)
+        assert_(br0 == br1)
 
     def test_best_response_with_smallest_tie_breaking(self):
         """best_response with tie_breaking='smallest' (default)"""
-        eq_(self.player.best_response([2/3, 1/3]), 0)
+        assert_(self.player.best_response([2/3, 1/3]) == 0)
 
     def test_best_response_with_payoff_perturbation(self):
         """best_response with payoff_perturbation"""
-        eq_(self.player.best_response([2/3, 1/3],
-                                      payoff_perturbation=[0, 0.1]),
-            1)
-        eq_(self.player.best_response([2, 1],  # int
-                                      payoff_perturbation=[0, 0.1]),
-            1)
+        assert_(self.player.best_response([2/3, 1/3],
+                payoff_perturbation=[0, 0.1]) == 1)
+        assert_(self.player.best_response([2, 1],  # int
+                payoff_perturbation=[0, 0.1]) == 1)
 
     def test_is_best_response_against_pure(self):
-        ok_(self.player.is_best_response(0, 0))
+        assert_(self.player.is_best_response(0, 0))
 
     def test_is_best_response_against_mixed(self):
-        ok_(self.player.is_best_response([1/2, 1/2], [2/3, 1/3]))
+        assert_(self.player.is_best_response([1/2, 1/2], [2/3, 1/3]))
 
     def test_is_dominated(self):
         for action in range(self.player.num_actions):
             for method in LP_METHODS:
-                eq_(self.player.is_dominated(action, method=method), False)
+                assert_(not self.player.is_dominated(action, method=method))
 
     def test_dominated_actions(self):
         for method in LP_METHODS:
-            eq_(self.player.dominated_actions(method=method), [])
+            assert_(self.player.dominated_actions(method=method) == [])
 
 
 class TestPlayer_2opponents:
     """Test the methods of Player with two opponent players"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a Player instance"""
         payoffs_2opponents = [[[3, 6],
                                [4, 2]],
@@ -117,10 +113,10 @@ class TestPlayer_2opponents:
         assert_array_equal(self.player.payoff_vector((0, 1)), [6, 0])
 
     def test_is_best_response_against_pure(self):
-        ok_(not self.player.is_best_response(0, (1, 0)))
+        assert_(not self.player.is_best_response(0, (1, 0)))
 
     def test_best_response_against_pure(self):
-        eq_(self.player.best_response((1, 1)), 1)
+        assert_(self.player.best_response((1, 1)) == 1)
 
     def test_best_response_list_when_tie(self):
         """
@@ -136,11 +132,11 @@ class TestPlayer_2opponents:
     def test_is_dominated(self):
         for action in range(self.player.num_actions):
             for method in LP_METHODS:
-                eq_(self.player.is_dominated(action, method=method), False)
+                assert_(not self.player.is_dominated(action, method=method))
 
     def test_dominated_actions(self):
         for method in LP_METHODS:
-            eq_(self.player.dominated_actions(method=method), [])
+            assert_(self.player.dominated_actions(method=method) == [])
 
 
 def test_random_choice():
@@ -148,31 +144,31 @@ def test_random_choice():
     payoff_matrix = np.zeros((n, m))
     player = Player(payoff_matrix)
 
-    eq_(player.random_choice([0]), 0)
+    assert_(player.random_choice([0]) == 0)
 
     actions = list(range(player.num_actions))
-    ok_(player.random_choice() in actions)
+    assert_(player.random_choice() in actions)
 
 
 def test_player_corner_cases():
     n, m = 3, 4
     player = Player(np.zeros((n, m)))
     for action in range(n):
-        eq_(player.is_best_response(action, [1/m]*m), True)
+        assert_(player.is_best_response(action, [1/m]*m))
         for method in LP_METHODS:
-            eq_(player.is_dominated(action, method=method), False)
+            assert_(not player.is_dominated(action, method=method))
 
     e = 1e-8 * 2
     player = Player([[-e, -e], [1, -1], [-1, 1]])
     action = 0
-    eq_(player.is_best_response(action, [1/2, 1/2], tol=e), True)
-    eq_(player.is_best_response(action, [1/2, 1/2], tol=e/2), False)
+    assert_(player.is_best_response(action, [1/2, 1/2], tol=e))
+    assert_(not player.is_best_response(action, [1/2, 1/2], tol=e/2))
     for method in LP_METHODS:
-        eq_(player.is_dominated(action, tol=2*e, method=method), False)
-        eq_(player.dominated_actions(tol=2*e, method=method), [])
+        assert_(not player.is_dominated(action, tol=2*e, method=method))
+        assert_(player.dominated_actions(tol=2*e, method=method) == [])
 
-        eq_(player.is_dominated(action, tol=e/2, method=method), True)
-        eq_(player.dominated_actions(tol=e/2, method=method), [action])
+        assert_(player.is_dominated(action, tol=e/2, method=method))
+        assert_(player.dominated_actions(tol=e/2, method=method) == [action])
 
 
 # NormalFormGame #
@@ -180,7 +176,7 @@ def test_player_corner_cases():
 class TestNormalFormGame_Sym2p:
     """Test the methods of NormalFormGame with symmetric two players"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a NormalFormGame instance"""
         coordination_game_matrix = [[4, 0], [3, 2]]
         self.g = NormalFormGame(coordination_game_matrix)
@@ -189,16 +185,16 @@ class TestNormalFormGame_Sym2p:
         assert_array_equal(self.g[0, 1], [0, 3])
 
     def test_is_nash_pure(self):
-        ok_(self.g.is_nash((0, 0)))
+        assert_(self.g.is_nash((0, 0)))
 
     def test_is_nash_mixed(self):
-        ok_(self.g.is_nash(([2/3, 1/3], [2/3, 1/3])))
+        assert_(self.g.is_nash(([2/3, 1/3], [2/3, 1/3])))
 
 
 class TestNormalFormGame_Asym2p:
     """Test the methods of NormalFormGame with asymmetric two players"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a NormalFormGame instance"""
         self.BoS_bimatrix = np.array([[(3, 2), (1, 1)],
                                       [(0, 0), (2, 3)]])
@@ -221,10 +217,10 @@ class TestNormalFormGame_Asym2p:
             )
 
     def test_is_nash_pure(self):
-        ok_(not self.g.is_nash((1, 0)))
+        assert_(not self.g.is_nash((1, 0)))
 
     def test_is_nash_mixed(self):
-        ok_(self.g.is_nash(([3/4, 1/4], [1/4, 3/4])))
+        assert_(self.g.is_nash(([3/4, 1/4], [1/4, 3/4])))
 
     def test_payoff_arrays(self):
         assert_array_equal(
@@ -238,7 +234,7 @@ class TestNormalFormGame_Asym2p:
 class TestNormalFormGame_3p:
     """Test the methods of NormalFormGame with three players"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a NormalFormGame instance"""
         payoffs_2opponents = [[[3, 6],
                                [4, 2]],
@@ -262,18 +258,18 @@ class TestNormalFormGame_3p:
             )
 
     def test_is_nash_pure(self):
-        ok_(self.g.is_nash((0, 0, 0)))
-        ok_(not self.g.is_nash((0, 0, 1)))
+        assert_(self.g.is_nash((0, 0, 0)))
+        assert_(not self.g.is_nash((0, 0, 1)))
 
     def test_is_nash_mixed(self):
         p = (1 + np.sqrt(65)) / 16
-        ok_(self.g.is_nash(([1 - p, p], [1 - p, p], [1 - p, p])))
+        assert_(self.g.is_nash(([1 - p, p], [1 - p, p], [1 - p, p])))
 
 
 def test_normalformgame_input_action_sizes():
     g = NormalFormGame((2, 3, 4))
 
-    eq_(g.N, 3)  # Number of players
+    assert_(g.N == 3)  # Number of players
 
     assert_array_equal(
         g.players[0].payoff_array,
@@ -309,10 +305,10 @@ def test_normalformgame_setitem():
 def test_normalformgame_constant_payoffs():
     g = NormalFormGame((2, 2))
 
-    ok_(g.is_nash((0, 0)))
-    ok_(g.is_nash((0, 1)))
-    ok_(g.is_nash((1, 0)))
-    ok_(g.is_nash((1, 1)))
+    assert_(g.is_nash((0, 0)))
+    assert_(g.is_nash((0, 1)))
+    assert_(g.is_nash((1, 0)))
+    assert_(g.is_nash((1, 1)))
 
 
 def test_normalformgame_payoff_profile_array():
@@ -337,7 +333,7 @@ def test_normalformgame_payoff_profile_array_c_contiguous():
         np.arange(np.prod(shape)).reshape(shape)
     g = NormalFormGame(payoff_profile_array)
     for player in g.players:
-        ok_(player.payoff_array.flags['C_CONTIGUOUS'])
+        assert_(player.payoff_array.flags['C_CONTIGUOUS'])
 
 
 # Trivial cases with one player #
@@ -345,7 +341,7 @@ def test_normalformgame_payoff_profile_array_c_contiguous():
 class TestPlayer_0opponents:
     """Test for trivial Player with no opponent player"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a Player instance"""
         self.payoffs = [0, 1, -1]
         self.player = Player(self.payoffs)
@@ -370,39 +366,39 @@ class TestPlayer_0opponents:
 
     def test_is_best_response(self):
         """Trivial player: is_best_response"""
-        ok_(self.player.is_best_response(self.best_response_action, None))
+        assert_(self.player.is_best_response(self.best_response_action, None))
 
     def test_best_response(self):
         """Trivial player: best_response"""
-        eq_(self.player.best_response(None), self.best_response_action)
+        assert_(self.player.best_response(None) == self.best_response_action)
 
     def test_is_dominated(self):
         """Trivial player: is_dominated"""
         for action in range(self.player.num_actions):
-            eq_(self.player.is_dominated(action),
+            assert_(self.player.is_dominated(action) ==
                 (action in self.dominated_actions))
 
     def test_dominated_actions(self):
         """Trivial player: dominated_actions"""
-        eq_(self.player.dominated_actions(), self.dominated_actions)
+        assert_(self.player.dominated_actions() == self.dominated_actions)
 
 
 class TestNormalFormGame_1p:
     """Test for trivial NormalFormGame with a single player"""
 
-    def setUp(self):
+    def setup(self):
         """Setup a NormalFormGame instance"""
         data = [[0], [1], [1]]
         self.g = NormalFormGame(data)
 
     def test_construction(self):
         """Trivial game: construction"""
-        ok_(self.g.N == 1)
+        assert_(self.g.N == 1)
         assert_array_equal(self.g.players[0].payoff_array, [0, 1, 1])
 
     def test_getitem(self):
         """Trivial game: __getitem__"""
-        eq_(self.g[0], 0)
+        assert_(self.g[0] == 0)
 
     def test_delete_action(self):
         actions_to_delete = [1, 2]
@@ -417,18 +413,18 @@ class TestNormalFormGame_1p:
 
     def test_is_nash_pure(self):
         """Trivial game: is_nash with pure action"""
-        ok_(self.g.is_nash((1,)))
-        ok_(not self.g.is_nash((0,)))
+        assert_(self.g.is_nash((1,)))
+        assert_(not self.g.is_nash((0,)))
 
     def test_is_nash_mixed(self):
         """Trivial game: is_nash with mixed action"""
-        ok_(self.g.is_nash(([0, 1/2, 1/2],)))
+        assert_(self.g.is_nash(([0, 1/2, 1/2],)))
 
 
 def test_normalformgame_input_action_sizes_1p():
     g = NormalFormGame(2)
 
-    eq_(g.N, 1)  # Number of players
+    assert_(g.N == 1)  # Number of players
 
     assert_array_equal(
         g.players[0].payoff_array,
@@ -439,16 +435,16 @@ def test_normalformgame_input_action_sizes_1p():
 def test_normalformgame_setitem_1p():
     g = NormalFormGame(2)
 
-    eq_(g.N, 1)  # Number of players
+    assert_(g.N == 1)  # Number of players
 
     g[0] = 10  # Set payoff 10 for action 0
-    eq_(g.players[0].payoff_array[0], 10)
+    assert_(g.players[0].payoff_array[0] == 10)
 
 
 # Trivial cases with one action #
 
 class TestPlayer_1action:
-    def setUp(self):
+    def setup(self):
         """Setup a Player instance"""
         self.payoffs = [[0, 1]]
         self.player = Player(self.payoffs)
@@ -456,11 +452,11 @@ class TestPlayer_1action:
     def test_is_dominated(self):
         for action in range(self.player.num_actions):
             for method in LP_METHODS:
-                eq_(self.player.is_dominated(action, method=method), False)
+                assert_(not self.player.is_dominated(action, method=method))
 
     def test_dominated_actions(self):
         for method in LP_METHODS:
-            eq_(self.player.dominated_actions(method=method), [])
+            assert_(self.player.dominated_actions(method=method) == [])
 
 
 # Test __repr__ #
@@ -480,45 +476,38 @@ def test_player_repr():
 
 # Invalid inputs #
 
-@raises(ValueError)
 def test_player_zero_actions():
-    Player([[]])
+    assert_raises(ValueError, Player, [[]])
 
 
-@raises(ValueError)
 def test_normalformgame_invalid_input_players_shape_inconsistent():
     p0 = Player(np.zeros((2, 3)))
     p1 = Player(np.zeros((2, 3)))
-    NormalFormGame([p0, p1])
+    assert_raises(ValueError, NormalFormGame, [p0, p1])
 
 
-@raises(ValueError)
 def test_normalformgame_invalid_input_players_num_inconsistent():
     p0 = Player(np.zeros((2, 2, 2)))
     p1 = Player(np.zeros((2, 2, 2)))
-    NormalFormGame([p0, p1])
+    assert_raises(ValueError, NormalFormGame, [p0, p1])
 
 
-@raises(ValueError)
 def test_normalformgame_invalid_input_players_dtype_inconsistent():
     p0 = Player(np.zeros((2, 2), dtype=int))
     p1 = Player(np.zeros((2, 2), dtype=float))
-    NormalFormGame([p0, p1])
+    assert_raises(ValueError, NormalFormGame, [p0, p1])
 
 
-@raises(ValueError)
 def test_normalformgame_invalid_input_nosquare_matrix():
-    NormalFormGame(np.zeros((2, 3)))
+    assert_raises(ValueError, NormalFormGame, np.zeros((2, 3)))
 
 
-@raises(ValueError)
 def test_normalformgame_invalid_input_payoff_profiles():
-    NormalFormGame(np.zeros((2, 2, 1)))
+    assert_raises(ValueError, NormalFormGame, np.zeros((2, 2, 1)))
 
 
-@raises(ValueError)
 def test_normalformgame_zero_actions():
-    NormalFormGame((2, 0))
+    assert_raises(ValueError, NormalFormGame, (2, 0))
 
 
 # Utility functions #
@@ -551,14 +540,4 @@ def test_best_response_2p():
                                              test_case['brs_expected']):
             br_computed = \
                 best_response_2p(test_case['payoff_array'], mixed_action)
-            eq_(br_computed, br_expected)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+            assert_(br_computed == br_expected)
