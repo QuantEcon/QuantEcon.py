@@ -3,7 +3,7 @@ Tests for gth_solve.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal, assert_raises
+from numpy.testing import assert_array_equal, assert_raises, assert_
 
 from quantecon.markov import gth_solve
 
