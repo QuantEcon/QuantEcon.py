@@ -2,8 +2,6 @@
 Tests for approximation.py file (i.e. tauchen)
 
 """
-import sys
-import unittest
 import numpy as np
 from quantecon.markov import tauchen, rouwenhorst
 from numpy.testing import assert_
