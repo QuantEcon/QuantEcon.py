@@ -3,7 +3,8 @@ Tests for gth_solve.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal, assert_raises, assert_
+from numpy.testing import (assert_array_equal, assert_raises, assert_,
+                            assert_allclose)
 
 from quantecon.markov import gth_solve
 
@@ -129,7 +130,7 @@ class AddDescription:
 
 class StationaryDistSumOne(AddDescription):
     def __call__(self, x):
-        assert_(np.allclose(sum(x), 1, atol=TOL))
+        assert_allclose(np.sum(x), 1, atol=TOL)
 
 
 class StationaryDistNonnegative(AddDescription):
@@ -139,12 +140,12 @@ class StationaryDistNonnegative(AddDescription):
 
 class StationaryDistLeftEigenVec(AddDescription):
     def __call__(self, A, x):
-        assert_(np.allclose(np.dot(x, A), x, atol=TOL))
+        assert_allclose(np.dot(x, A), x, atol=TOL)
 
 
 class StationaryDistEqualToKnown(AddDescription):
     def __call__(self, y, x):
-        assert_(np.allclose(y, x, atol=TOL))
+        assert_allclose(y, x, atol=TOL)
 
 
 def test_matrices_with_C_F_orders():

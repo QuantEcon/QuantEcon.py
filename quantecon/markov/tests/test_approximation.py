@@ -4,7 +4,7 @@ Tests for approximation.py file (i.e. tauchen)
 """
 import numpy as np
 from quantecon.markov import tauchen, rouwenhorst
-from numpy.testing import assert_
+from numpy.testing import assert_, assert_allclose
 
 #from quantecon.markov.approximation import rouwenhorst
 
@@ -29,8 +29,7 @@ class TestTauchen:
         for b in [0., 1., -1.]:
             mu = b / (1 - self.rho)
             mc = tauchen(self.rho, self.sigma_u, b, self.m, self.n)
-            assert_(np.allclose(mu, np.mean(mc.state_values),
-                                        atol=self.tol))
+            assert_allclose(mu, np.mean(mc.state_values), atol=self.tol)
 
     def testShape(self):
         i, j = self.P.shape
@@ -44,10 +43,10 @@ class TestTauchen:
         assert_(dim_x == 1 and dim_P == 2)
 
     def test_transition_mat_row_sum_1(self):
-        assert_(np.allclose(np.sum(self.P, axis=1), 1, atol=self.tol))
+        assert_allclose(np.sum(self.P, axis=1), 1, atol=self.tol)
 
     def test_positive_probs(self):
-        assert_(np.all(self.P) > -self.tol)
+        assert_(np.all(self.P > -self.tol))
 
     def test_states_sum_0(self):
         assert_(abs(np.sum(self.x)) < self.tol)
@@ -79,10 +78,10 @@ class TestRouwenhorst:
         assert_(dim_x == 1 and dim_P == 2)
 
     def test_transition_mat_row_sum_1(self):
-        assert_(np.allclose(np.sum(self.P, axis=1), 1, atol=self.tol))
+        assert_allclose(np.sum(self.P, axis=1), 1, atol=self.tol)
 
     def test_positive_probs(self):
-        assert_(np.all(self.P) > -self.tol)
+        assert_(np.all(self.P > -self.tol))
 
     def test_states_sum_0(self):
         tol = self.tol + self.n*(self.ybar/(1 - self.rho))
@@ -97,5 +96,5 @@ class TestRouwenhorst:
         known_x = np.array([-psi+5.0, 5., psi+5.0])
         known_P = np.array(
             [[0.81, 0.18, 0.01], [0.09, 0.82, 0.09], [0.01, 0.18, 0.81]])
-        assert_(sum(mc_rouwenhorst.x - known_x) <
-                        self.tol and sum(sum(mc_rouwenhorst.P - known_P)) < self.tol)
+        assert_(np.sum(mc_rouwenhorst.x - known_x) < self.tol and
+                np.sum(mc_rouwenhorst.P - known_P) < self.tol)
