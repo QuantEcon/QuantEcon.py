@@ -4,7 +4,7 @@ Tests for gth_solve.py
 """
 import numpy as np
 from numpy.testing import (assert_array_equal, assert_raises, assert_,
-                            assert_allclose)
+                           assert_allclose)
 
 from quantecon.markov import gth_solve
 
