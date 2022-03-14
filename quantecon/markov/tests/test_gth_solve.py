@@ -3,8 +3,8 @@ Tests for gth_solve.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal
-from nose.tools import eq_, ok_, raises
+from numpy.testing import (assert_array_equal, assert_raises, assert_,
+                           assert_allclose)
 
 from quantecon.markov import gth_solve
 
@@ -130,22 +130,22 @@ class AddDescription:
 
 class StationaryDistSumOne(AddDescription):
     def __call__(self, x):
-        ok_(np.allclose(sum(x), 1, atol=TOL))
+        assert_allclose(np.sum(x), 1, atol=TOL)
 
 
 class StationaryDistNonnegative(AddDescription):
     def __call__(self, x):
-        eq_(np.prod(x >= 0-TOL), 1)
+        assert_(np.prod(x >= 0-TOL) == 1)
 
 
 class StationaryDistLeftEigenVec(AddDescription):
     def __call__(self, A, x):
-        ok_(np.allclose(np.dot(x, A), x, atol=TOL))
+        assert_allclose(np.dot(x, A), x, atol=TOL)
 
 
 class StationaryDistEqualToKnown(AddDescription):
     def __call__(self, y, x):
-        ok_(np.allclose(y, x, atol=TOL))
+        assert_allclose(y, x, atol=TOL)
 
 
 def test_matrices_with_C_F_orders():
@@ -171,23 +171,11 @@ def test_matrices_with_C_F_orders():
     assert_array_equal(computed_F, stationary_dist)
 
 
-@raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
-    gth_solve(np.array([0.4, 0.6]))
+    assert_raises(ValueError, gth_solve, np.array([0.4, 0.6]))
 
 
-@raises(ValueError)
 def test_raises_value_error_non_square():
     """Test with non square input"""
-    gth_solve(np.array([[0.4, 0.6]]))
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(ValueError, gth_solve, np.array([[0.4, 0.6]]))
