@@ -47,6 +47,8 @@ jobs:
       run: |
         pytest quantecon/game_theory
         pytest quantecon/markov
+        pytest quantecon/optimize
+        pytest quantecon/random
     - name: Coveralls Parallel
       uses: AndreMiras/coveralls-python-action@develop
       if: runner.os == 'Linux'
