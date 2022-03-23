@@ -239,13 +239,3 @@ class TestLinprogSimplexScipy:
         desired_fun = -36.0000000000
         res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
         _assert_success(res, c, b_ub=b_ub, desired_fun=desired_fun)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

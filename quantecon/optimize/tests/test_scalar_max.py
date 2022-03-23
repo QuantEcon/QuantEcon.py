@@ -3,8 +3,7 @@ Tests for scalar maximization.
 
 """
 import numpy as np
-from numpy.testing import assert_almost_equal
-from nose.tools import raises
+from numpy.testing import assert_almost_equal, assert_raises
 from numba import njit
 
 from quantecon.optimize import brent_max
@@ -51,26 +50,13 @@ def test_g():
     assert_almost_equal(true_xf, xf, decimal=4)
 
 
-@raises(ValueError)
 def test_invalid_a_brent_max():
-    brent_max(f, -np.inf, 2)
+    assert_raises(ValueError, brent_max, f, -np.inf, 2)
 
 
-@raises(ValueError)
 def test_invalid_b_brent_max():
-    brent_max(f, -2, np.inf)
+    assert_raises(ValueError, brent_max, f, -2, -np.inf)
 
 
-@raises(ValueError)
 def test_invalid_a_b_brent_max():
-    brent_max(f, 1, 0)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(ValueError, brent_max, f, 1, 0)
