@@ -1,4 +1,9 @@
 sphinx
 ipython
 numpydoc
+numba>=0.38
+numpy
+sympy
+scipy>=1.0
+requests
 matplotlib==2.2.3
