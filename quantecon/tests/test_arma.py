@@ -4,14 +4,13 @@ covered by the numpy tests since we rely on much of their code.
 
 """
 import sys
-import unittest
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_
 from quantecon.arma import ARMA
 
 
-class TestARMA(unittest.TestCase):
-    def setUp(self):
+class TestARMA():
+    def setup(self):
         # Initial Values
         phi = np.array([.95, -.4, -.4])
         theta = np.zeros(3)
@@ -28,7 +27,7 @@ class TestARMA(unittest.TestCase):
 
         sim = lp.simulation(ts_length=250)
 
-        self.assertTrue(sim.size==250)
+        assert_(sim.size == 250)
 
     def test_simulate_with_seed(self):
         lp = self.lp
@@ -43,10 +42,4 @@ class TestARMA(unittest.TestCase):
 
         imp_resp = lp.impulse_response(impulse_length=75)
 
-        self.assertTrue(imp_resp.size==75)
-
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestARMA)
-    unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
-
+        assert_(imp_resp.size == 75)
