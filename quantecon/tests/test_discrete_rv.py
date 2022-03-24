@@ -40,7 +40,7 @@ class TestDiscreteRV:
 
     def test_Q_end_1(self):
         "discrete_rv: Q sums to 1"
-        assert_ (self.drv.Q[-1] - 1.0 < 1e-10)
+        assert_(self.drv.Q[-1] - 1.0 < 1e-10)
 
     @pytest.mark.slow
     def test_draw_lln(self):

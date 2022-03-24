@@ -61,7 +61,7 @@ class TestFPLogisticEquation():
         for i in self.unit_inverval:
             # This should not converge  (b/c unique fp is 0.0)
             assert_(not (abs(compute_fixed_point(f, i, **self.kwargs)-fp)
-                        < 1e-4))
+                    < 1e-4))
 
     def test_imitation_game_method(self):
         "compute_fp: Test imitation game method"
