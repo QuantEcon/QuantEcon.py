@@ -22,8 +22,8 @@ def __getattr__(name):
 
     warnings.warn(f"Please use `{name}` from the `quantecon` namespace, "
                   "the `quantecon.discrete_rv` namespace is deprecated. You "
-                  "can use the following instead:\n ",
-                  f"`from quantecon import {name}`."
+                  "can use the following instead:\n "
+                  f"`from quantecon import {name}`.",
                   category=DeprecationWarning, stacklevel=2)
 
     return getattr(_discrete_rv, name)

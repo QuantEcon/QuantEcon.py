@@ -22,8 +22,8 @@ def __getattr__(name):
 
     warnings.warn(f"Please use `{name}` from the `quantecon` namespace, "
                   "the `quantecon.ce_util` namespace is deprecated. You can "
-                  "use the following instead:\n ",
-                  f"`from quantecon import {name}`."
+                  "use the following instead:\n "
+                  f"`from quantecon import {name}`.",
                   category=DeprecationWarning, stacklevel=2)
 
     return getattr(_ce_util, name)
