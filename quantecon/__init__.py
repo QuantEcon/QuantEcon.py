@@ -20,8 +20,8 @@ from . import random
 from . import optimize
 
 #-Objects-#
-from .compute_fp import compute_fixed_point
-from .discrete_rv import DiscreteRV
+from ._compute_fp import compute_fixed_point
+from ._discrete_rv import DiscreteRV
 from .dle import DLE
 from ._ecdf import ECDF
 from .estspec import smooth, periodogram, ar_periodogram
@@ -34,7 +34,7 @@ from .inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
 	rank_size
 from .kalman import Kalman
 from .lae import LAE
-from .arma import ARMA
+from ._arma import ARMA
 from .lqcontrol import LQ, LQMarkov
 from .filter import hamilton_filter
 from .lqnash import nnash
@@ -49,7 +49,7 @@ from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, 
 from .markov import mc_compute_stationary, mc_sample_path
 
 #Imports that are deprecated and will be removed in further versions
-from . import ecdf
+from . import ecdf, arma, compute_fp, discrete_rv
 #<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
