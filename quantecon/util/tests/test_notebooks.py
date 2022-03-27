@@ -8,7 +8,6 @@ fetch_nb_dependencies
 """
 
 from quantecon.util import fetch_nb_dependencies
-import unittest
 import os
 
 FILES = ['test_file.md']
@@ -17,7 +16,7 @@ RAW = "raw"
 BRANCH = "master"
 FOLDER = "quantecon/util/tests/"
 
-class TestNotebookUtils(unittest.TestCase):
+class TestNotebookUtils:
 
     def test_fetch_nb_dependencies(self):
         """
@@ -25,7 +24,7 @@ class TestNotebookUtils(unittest.TestCase):
         """
         status = fetch_nb_dependencies(
             files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)
-        self.assertFalse(False in status)
+        assert(not (False in status))
 
     def test_fetch_nb_dependencies_overwrite(self):
         """
@@ -35,7 +34,7 @@ class TestNotebookUtils(unittest.TestCase):
             files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #First will succeed
         status = fetch_nb_dependencies(
             files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #Second should skip
-        self.assertTrue(False in status)
+        assert(False in status)
 
     def tearDown(self):
         os.remove("test_file.md")

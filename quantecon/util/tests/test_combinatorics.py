@@ -3,8 +3,7 @@ Tests for util/combinatorics.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal
-from nose.tools import eq_
+from numpy.testing import assert_array_equal, assert_
 import scipy.special
 from quantecon.util.combinatorics import (
     next_k_array, k_array_rank, k_array_rank_jit
@@ -12,7 +11,7 @@ from quantecon.util.combinatorics import (
 
 
 class TestKArray:
-    def setUp(self):
+    def setup(self):
         self.k_arrays = np.array(
             [[0, 1, 2],
              [0, 1, 3],
@@ -47,24 +46,15 @@ class TestKArray:
 
     def test_k_array_rank(self):
         for i in range(self.L):
-            eq_(k_array_rank(self.k_arrays[i]), i)
+            assert_(k_array_rank(self.k_arrays[i]) == i)
 
     def test_k_array_rank_jit(self):
         for i in range(self.L):
-            eq_(k_array_rank_jit(self.k_arrays[i]), i)
+            assert_(k_array_rank_jit(self.k_arrays[i]) == i)
 
 
 def test_k_array_rank_arbitrary_precision():
     n, k = 100, 50
     a = np.arange(n-k, n)
-    eq_(k_array_rank(a), scipy.special.comb(n, k, exact=True)-1)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_array_equal(k_array_rank(a),
+                       scipy.special.comb(n, k, exact=True)-1)
