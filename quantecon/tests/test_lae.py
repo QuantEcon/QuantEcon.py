@@ -4,8 +4,8 @@ Tests for lae.py
 TODO: write (economically) meaningful tests for this module
 
 """
-from nose.tools import assert_equal
 import numpy as np
+from numpy.testing import assert_
 from scipy.stats import lognorm
 from quantecon import LAE
 
@@ -35,17 +35,17 @@ lae_b = LAE(p, b)
 def test_x_flattened():
     "lae: is x flattened and reshaped"
     # should have a trailing singleton dimension
-    assert_equal(lae_b.X.shape[-1], 1)
-    assert_equal(lae_a.X.shape[-1], 1)
+    assert_(lae_b.X.shape[-1] == 1)
+    assert_(lae_a.X.shape[-1] == 1)
 
 
 def test_x_2d():
     "lae: is x 2d"
-    assert_equal(lae_a.X.ndim, 2)
-    assert_equal(lae_b.X.ndim, 2)
+    assert_(lae_a.X.ndim == 2)
+    assert_(lae_b.X.ndim == 2)
 
 
 def test_call_shapes():
     "lae: shape of call to lae"
-    assert_equal(lae_a(y).shape, (n_y,))
-    assert_equal(lae_b(y).shape, (n_y,))
+    assert_(lae_a(y).shape == (n_y,))
+    assert_(lae_b(y).shape == (n_y,))

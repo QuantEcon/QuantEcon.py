@@ -3,8 +3,7 @@ Tests for solve_discrete_riccati in matrix_eqn.py file
 
 """
 import numpy as np
-from numpy.testing import assert_allclose
-from nose.tools import raises
+from numpy.testing import assert_allclose, assert_raises
 from quantecon.matrix_eqn import solve_discrete_riccati
 
 
@@ -83,7 +82,6 @@ def test_solve_discrete_riccati():
             yield _test_factory, func, method
 
 
-@raises(ValueError)
 def test_solve_discrete_riccati_invalid_method():
     method = 'invalid_method'
-    _test_funcs[0](method)
+    assert_raises(ValueError, _test_funcs[0], method)
