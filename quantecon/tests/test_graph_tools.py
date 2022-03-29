@@ -176,7 +176,7 @@ class TestDiGraph:
             try:
                 assert_(graph_dict['g'].period == graph_dict['period'])
             except NotImplementedError:
-                assert_(graph_dict['g'].is_strongly_connected == False)
+                assert_(not graph_dict['g'].is_strongly_connected)
 
     def test_is_aperiodic(self):
         for graph_dict in self.graphs.graph_dicts:

@@ -8,6 +8,7 @@ from quantecon.dle import DLE
 
 ATOL = 1e-10
 
+
 class TestDLE:
 
     def setup(self):

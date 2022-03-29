@@ -16,6 +16,7 @@ RAW = "raw"
 BRANCH = "master"
 FOLDER = "quantecon/util/tests/"
 
+
 class TestNotebookUtils:
 
     def test_fetch_nb_dependencies(self):

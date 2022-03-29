@@ -135,7 +135,7 @@ def test_tile():
 
 
 def test_repeat():
-    x = np.linspace(1, 100  , 100)
+    x = np.linspace(1, 100, 100)
     t1 = time.time()
     t_repeat = np.zeros(100*1000)
     _repeat_1d(x, 1000, t_repeat)

@@ -29,7 +29,6 @@ class TestRankNullspace:
         np_A2 = np_rank(A2)
         np_A3 = np_rank(A3)
 
-
         assert(qe_A1 == np_A1 and qe_A2 == np_A2 and qe_A3 == np_A3)
 
 
