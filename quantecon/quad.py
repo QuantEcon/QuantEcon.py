@@ -155,7 +155,8 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     if b.size == 1:
         b = np.repeat(b, d)
 
-    i = np.arange(1, n + 1)
+    # Specify `dtype=np.int64` to avoid overflow on Windows
+    i = np.arange(1, n + 1, dtype=np.int64)
 
     if kind.upper() == "N":  # Neiderreiter
         j = 2.0 ** (np.arange(1, d+1) / (d+1))
