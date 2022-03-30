@@ -2,17 +2,14 @@
 Tests for lss.py
 
 """
-import sys
-import unittest
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_, assert_raises
 from quantecon.lss import LinearStateSpace
-from nose.tools import raises
 
 
-class TestLinearStateSpace(unittest.TestCase):
+class TestLinearStateSpace:
 
-    def setUp(self):
+    def setup(self):
         # Example 1
         A = .95
         C = .05
@@ -41,11 +38,11 @@ class TestLinearStateSpace(unittest.TestCase):
         vals = self.ss1.stationary_distributions()
         ssmux, ssmuy, sssigx, sssigy, sssigyx = vals
 
-        self.assertTrue(abs(ssmux - ssmuy) < 2e-8)
-        self.assertTrue(abs(sssigx - sssigy) < 2e-8)
-        self.assertTrue(abs(ssmux) < 2e-8)
-        self.assertTrue(abs(sssigx - self.ss1.C**2/(1 - self.ss1.A**2)) < 2e-8)
-        self.assertTrue(abs(sssigyx - self.ss1.G @ sssigx) < 2e-8)
+        assert_(abs(ssmux - ssmuy) < 2e-8)
+        assert_(abs(sssigx - sssigy) < 2e-8)
+        assert_(abs(ssmux) < 2e-8)
+        assert_(abs(sssigx - self.ss1.C**2/(1 - self.ss1.A**2)) < 2e-8)
+        assert_(abs(sssigyx - self.ss1.G @ sssigx) < 2e-8)
 
         vals = self.ss2.stationary_distributions()
         ssmux, ssmuy, sssigx, sssigy, sssigyx = vals
@@ -64,7 +61,7 @@ class TestLinearStateSpace(unittest.TestCase):
 
         sim = ss.simulate(ts_length=250)
         for arr in sim:
-            self.assertTrue(len(arr[0]) == 250)
+            assert_(len(arr[0]) == 250)
 
     def test_simulate_with_seed(self):
         ss = self.ss1
@@ -80,8 +77,8 @@ class TestLinearStateSpace(unittest.TestCase):
         xval, yval = self.ss1.replicate(T=100, num_reps=5000)
 
         assert_allclose(xval, yval)
-        self.assertEqual(xval.size, 5000)
-        self.assertLessEqual(abs(np.mean(xval)), .05)
+        assert_(xval.size == 5000)
+        assert_(abs(np.mean(xval)) <= .05)
 
     def test_replicate_with_seed(self):
         xval, yval = self.ss1.replicate(T=100, num_reps=5, random_state=5)
@@ -92,15 +89,9 @@ class TestLinearStateSpace(unittest.TestCase):
         assert_allclose(yval[0], expected_output)
 
 
-@raises(ValueError)
 def test_non_square_A():
     A = np.zeros((1, 2))
     C = np.zeros((1, 1))
     G = np.zeros((1, 1))
 
-    LinearStateSpace(A, C, G)
-
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestLinearStateSpace)
-    unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
+    assert_raises(ValueError, LinearStateSpace, A, C, G)

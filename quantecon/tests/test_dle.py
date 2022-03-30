@@ -2,17 +2,16 @@
 Tests for dle.py file
 """
 
-import sys
-import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 from quantecon.dle import DLE
 
 ATOL = 1e-10
 
-class TestDLE(unittest.TestCase):
 
-    def setUp(self):
+class TestDLE:
+
+    def setup(self):
         """
         Given LQ control is tested we will test the transformation
         to alter the problem into a form suitable to solve using LQ
@@ -38,7 +37,7 @@ class TestDLE(unittest.TestCase):
 
         information = (a22, c2, ub, ud)
         technology = (phic, phig, phii, gamma, deltak, thetak)
-        preferences = (beta, llambda, pih, deltah, thetah)        
+        preferences = (beta, llambda, pih, deltah, thetah)
 
         self.dle = DLE(information, technology, preferences)
 
@@ -110,8 +109,3 @@ class TestDLE(unittest.TestCase):
         for item in solutions.keys():
             assert_allclose(self.dle.__dict__[
                             item], solutions[item], atol=ATOL)
-
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestDLE)
-    unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)

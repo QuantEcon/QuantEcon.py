@@ -2,17 +2,15 @@
 Tests for robustlq.py
 
 """
-import sys
-import unittest
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_
 from quantecon.lqcontrol import LQ
 from quantecon.robustlq import RBLQ
 
 
-class TestRBLQControl(unittest.TestCase):
+class TestRBLQControl:
 
-    def setUp(self):
+    def setup(self):
         # Initial Values
         a_0     = 100
         a_1     = 0.5
@@ -56,7 +54,7 @@ class TestRBLQControl(unittest.TestCase):
         del self.rblq_test_pf
 
     def test_pure_forecasting(self):
-        self.assertTrue(self.rblq_test_pf.pure_forecasting)
+        assert_(self.rblq_test_pf.pure_forecasting)
 
     def test_robust_rule_vs_simple(self):
         rblq = self.rblq_test
@@ -104,7 +102,3 @@ class TestRBLQControl(unittest.TestCase):
             # as well.
             assert_allclose(Pf, Pr)
             assert_allclose(Kf, Kr)
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestRBLQControl)
-    unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)

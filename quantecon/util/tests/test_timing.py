@@ -5,13 +5,12 @@ Tests for timing.py
 
 import time
 from sys import platform
-from numpy.testing import assert_allclose
-from nose.tools import ok_
+from numpy.testing import assert_allclose, assert_
 from quantecon.util import tic, tac, toc, loop_timer
 
 
-class TestTicTacToc():
-    def setUp(self):
+class TestTicTacToc:
+    def setup(self):
         self.h = 0.1
         self.digits = 10
 
@@ -57,14 +56,4 @@ class TestTicTacToc():
             assert(abs(tm - self.h) < 0.01), tm
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
-            ok_(average_time >= average_of_best)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+            assert_(average_time >= average_of_best)

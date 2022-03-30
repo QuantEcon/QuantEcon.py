@@ -2,11 +2,9 @@
 Tests for graph_tools.py
 
 """
-import sys
+
 import numpy as np
-from numpy.testing import assert_array_equal, assert_raises
-import nose
-from nose.tools import eq_, ok_, raises
+from numpy.testing import assert_array_equal, assert_raises, assert_
 
 from quantecon.graph_tools import DiGraph, random_tournament_graph
 
@@ -18,7 +16,7 @@ def list_of_array_equal(s, t):
     s, t: lists of numpy.ndarrays
 
     """
-    eq_(len(s), len(t))
+    assert_(len(s) == len(t))
     all(assert_array_equal(x, y) for x, y in zip(s, t))
 
 
@@ -130,7 +128,7 @@ class Graphs:
 class TestDiGraph:
     """Test the methods in Digraph"""
 
-    def setUp(self):
+    def setup(self):
         """Setup Digraph instances"""
         self.graphs = Graphs()
         for graph_dict in self.graphs.graph_dicts:
@@ -151,8 +149,8 @@ class TestDiGraph:
 
     def test_num_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
-            eq_(graph_dict['g'].num_strongly_connected_components,
-                len(graph_dict['strongly_connected_components']))
+            assert_(graph_dict['g'].num_strongly_connected_components ==
+                    len(graph_dict['strongly_connected_components']))
 
     def test_sink_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
@@ -165,28 +163,28 @@ class TestDiGraph:
 
     def test_num_sink_strongly_connected_components(self):
         for graph_dict in self.graphs.graph_dicts:
-            eq_(graph_dict['g'].num_sink_strongly_connected_components,
-                len(graph_dict['sink_strongly_connected_components']))
+            assert_(graph_dict['g'].num_sink_strongly_connected_components ==
+                    len(graph_dict['sink_strongly_connected_components']))
 
     def test_is_strongly_connected(self):
         for graph_dict in self.graphs.graph_dicts:
-            eq_(graph_dict['g'].is_strongly_connected,
-                graph_dict['is_strongly_connected'])
+            assert_(graph_dict['g'].is_strongly_connected ==
+                    graph_dict['is_strongly_connected'])
 
     def test_period(self):
         for graph_dict in self.graphs.graph_dicts:
             try:
-                eq_(graph_dict['g'].period, graph_dict['period'])
+                assert_(graph_dict['g'].period == graph_dict['period'])
             except NotImplementedError:
-                eq_(graph_dict['g'].is_strongly_connected, False)
+                assert_(not graph_dict['g'].is_strongly_connected)
 
     def test_is_aperiodic(self):
         for graph_dict in self.graphs.graph_dicts:
             try:
-                eq_(graph_dict['g'].is_aperiodic,
-                    graph_dict['is_aperiodic'])
+                assert_(graph_dict['g'].is_aperiodic ==
+                        graph_dict['is_aperiodic'])
             except NotImplementedError:
-                eq_(graph_dict['g'].is_strongly_connected, False)
+                assert_(not graph_dict['g'].is_strongly_connected)
 
     def test_cyclic_components(self):
         for graph_dict in self.graphs.graph_dicts:
@@ -198,7 +196,7 @@ class TestDiGraph:
                            key=lambda x: x[0])
                 )
             except NotImplementedError:
-                eq_(graph_dict['g'].is_strongly_connected, False)
+                assert_(not graph_dict['g'].is_strongly_connected)
 
 
 def test_subgraph():
@@ -285,10 +283,9 @@ def test_node_labels_subgraph():
     )
 
 
-@raises(ValueError)
 def test_raises_value_error_non_sym():
     """Test with non symmetric input"""
-    DiGraph(np.array([[0.4, 0.6]]))
+    assert_raises(ValueError, DiGraph, np.array([[0.4, 0.6]]))
 
 
 def test_raises_non_homogeneous_node_labels():
@@ -298,7 +295,7 @@ def test_raises_non_homogeneous_node_labels():
 
 
 class TestRandomTournamentGraph:
-    def setUp(self):
+    def setup(self):
         n = 5
         g = random_tournament_graph(n)
         self.adj_matrix = g.csgraph.toarray()
@@ -306,11 +303,11 @@ class TestRandomTournamentGraph:
 
     def test_diagonal(self):
         # Test no self loop
-        ok_(not self.adj_matrix[self.eye_bool].any())
+        assert_(not self.adj_matrix[self.eye_bool].any())
 
     def test_off_diagonal(self):
         # Test for each pair of distinct nodes to have exactly one edge
-        ok_((self.adj_matrix ^ self.adj_matrix.T)[~self.eye_bool].all())
+        assert_((self.adj_matrix ^ self.adj_matrix.T)[~self.eye_bool].all())
 
 
 def test_random_tournament_graph_seed():
@@ -318,10 +315,3 @@ def test_random_tournament_graph_seed():
     seed = 1234
     graphs = [random_tournament_graph(n, random_state=seed) for i in range(2)]
     assert_array_equal(*[g.csgraph.toarray() for g in graphs])
-
-
-if __name__ == '__main__':
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
