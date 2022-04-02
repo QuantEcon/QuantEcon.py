@@ -43,12 +43,15 @@ jobs:
         conda activate test
         python setup.py build
 
-    - name: Run Tests
+    - name: flake8 Tests
       shell: bash -l {0}
       run: |
         flake8 --select F401, F405, E231 quantecon
-        coverage run -m nose -a "!slow"
-        coverage lcov
+
+    - name: Run Tests (pytest)
+      shell: bash -l {0}
+      run: |
+        pytest quantecon
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
