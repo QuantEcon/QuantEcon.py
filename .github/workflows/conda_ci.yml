@@ -47,7 +47,7 @@ jobs:
       shell: bash -l {0}
       run: |
         flake8 --select F401, F405, E231 quantecon
-        coverage run -m nosetests -a "!slow"
+        coverage run -m nose -a "!slow"
         coverage lcov
 
     - name: Coveralls
