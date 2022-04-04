@@ -1,56 +1,56 @@
-# name: conda-build
+name: conda-build
 
-# on:
-#   push:
-#     branches:
-#       - master
-#   pull_request:
-#     branches:
-#       - master
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 
-# jobs:
-#   tests:
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       matrix:
-#         os: [windows-latest, ubuntu-latest, macos-latest]
-#         python-version: [3.7, 3.8, 3.9]
-#         exclude:
-#           - os: windows-latest
-#             python-version: 3.7
-#     steps:
-#     - uses: actions/checkout@v2
-#       with:
-#         fetch-depth: 0
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9]
+        exclude:
+          - os: windows-latest
+            python-version: 3.7
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
-#     - uses: conda-incubator/setup-miniconda@v2
-#       with:
-#         auto-update-conda: true
-#         environment-file: environment.yml
-#         python-version: ${{ matrix.python-version }}
-#         auto-activate-base: false
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        environment-file: environment.yml
+        python-version: ${{ matrix.python-version }}
+        auto-activate-base: false
 
-#     - name: Conda info
-#       shell: bash -l {0}
-#       run: |
-#         conda info
-#         conda list
+    - name: Conda info
+      shell: bash -l {0}
+      run: |
+        conda info
+        conda list
 
-#     - name: Setup QuantEcon
-#       shell: bash -l {0}
-#       run: |
-#         conda activate test
-#         python setup.py build
+    - name: Setup QuantEcon
+      shell: bash -l {0}
+      run: |
+        conda activate test
+        python setup.py build
 
-#     - name: Run Tests
-#       shell: bash -l {0}
-#       run: |
-#         flake8 --select F401, F405, E231 quantecon
-#         nosetests --with-coverage -a "!slow" --cover-package=quantecon
+    - name: Run Tests
+      shell: bash -l {0}
+      run: |
+        flake8 --select F401, F405, E231 quantecon
+        nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
-#     - name: Coveralls
-#       uses: coverallsapp/github-action@master
-#       if: runner.os == 'Linux'
-#       with:
-#         github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      if: runner.os == 'Linux'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
