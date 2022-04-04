@@ -47,10 +47,12 @@ jobs:
       shell: bash -l {0}
       run: |
         flake8 --select F401, F405, E231 quantecon
-        nosetests --with-coverage -a "!slow" --cover-package=quantecon
+        coverage run -m nosetests -a "!slow"
+        coverage lcov
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
       if: runner.os == 'Linux'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.lcov
