@@ -47,10 +47,11 @@ jobs:
 
     - name: Run Tests (pytest)
       run: |
-        pytest quantecon
+        python -m pytest --cov=quantecon --cov-report xml
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
       if: runner.os == 'Linux'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.xml
