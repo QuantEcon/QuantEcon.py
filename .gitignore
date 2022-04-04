@@ -9,6 +9,7 @@ quantecon.egg-info/
 *.noseids
 *.coverage
 *.h5
+*.lcov
 
 # Numba cache files
 *.nbc
