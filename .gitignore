@@ -14,3 +14,7 @@ quantecon.egg-info/
 # Numba cache files
 *.nbc
 *.nbi
+
+# Coverage
+
+coverage.xml

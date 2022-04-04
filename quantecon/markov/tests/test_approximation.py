@@ -13,8 +13,8 @@ class TestTauchen:
 
     def setup(self):
         self.rho, self.sigma_u = np.random.rand(2)
-        self.n = np.random.random_integers(3, 25)
-        self.m = np.random.random_integers(4)
+        self.n = np.random.randint(3, 25)
+        self.m = np.random.randint(5)
         self.tol = 1e-12
         self.b = 0.
 
@@ -56,8 +56,8 @@ class TestRouwenhorst:
 
     def setup(self):
         self.rho, self.sigma = np.random.uniform(0, 1, size=2)
-        self.n = np.random.random_integers(3, 25)
-        self.ybar = np.random.random_integers(0, 10)
+        self.n = np.random.randint(3, 26)
+        self.ybar = np.random.randint(0, 11)
         self.tol = 1e-10
 
         mc = rouwenhorst(self.n, self.ybar, self.sigma, self.rho)

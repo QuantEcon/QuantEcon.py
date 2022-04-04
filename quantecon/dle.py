@@ -22,27 +22,27 @@ class DLE(object):
         h_t = \Delta_h h_{t-1} + \Theta_h c_t
         s_t = \Lambda h_{t-1} + \Pi c_t
 
-    and 
+    and
 
         z_{t+1} = A_{22} z_t + C_2 w_{t+1}
         b_t = U_b z_t
-        d_t = U_d z_t 
+        d_t = U_d z_t
 
     where h_{-1}, k_{-1}, and z_0 are given as initial conditions.
 
-    Section 5.5 of HS2013 describes how to map these matrices into those of 
-    a LQ problem. 
+    Section 5.5 of HS2013 describes how to map these matrices into those of
+    a LQ problem.
 
     HS2013 sort the matrices defining the problem into three groups:
 
-    Information: A_{22}, C_2, U_b , and U_d characterize the motion of information 
+    Information: A_{22}, C_2, U_b , and U_d characterize the motion of information
     sets and of taste and technology shocks
 
-    Technology: \Phi_c, \Phi_g, \Phi_i, \Gamma, \Delta_k, and \Theta_k determine the 
+    Technology: \Phi_c, \Phi_g, \Phi_i, \Gamma, \Delta_k, and \Theta_k determine the
     technology for producing consumption goods
 
-    Preferences: \Delta_h, \Theta_h, \Lambda, and \Pi determine the technology for 
-    producing consumption services from consumer goods. A scalar discount factor \beta 
+    Preferences: \Delta_h, \Theta_h, \Lambda, and \Pi determine the technology for
+    producing consumption services from consumer goods. A scalar discount factor \beta
     determines the preference ordering over consumption services.
 
     Parameters
@@ -50,10 +50,10 @@ class DLE(object):
     Information : tuple
         Information is a tuple containing the matrices A_{22}, C_2, U_b, and U_d
     Technology : tuple
-        Technology is a tuple containing the matrices \Phi_c, \Phi_g, \Phi_i, \Gamma, 
+        Technology is a tuple containing the matrices \Phi_c, \Phi_g, \Phi_i, \Gamma,
         \Delta_k, and \Theta_k
     Preferences : tuple
-        Preferences is a tuple containing the matrices \Delta_h, \Theta_h, \Lambda, 
+        Preferences is a tuple containing the matrices \Delta_h, \Theta_h, \Lambda,
         \Pi, and the scalar \beta
 
     """
@@ -145,9 +145,9 @@ class DLE(object):
 
         # === Construct matrices for Lagrange Multipliers === #
 
-        self.Mk = -2 * np.asscalar(self.beta) * (np.hstack((np.zeros((self.nk, self.nh)), np.eye(
+        self.Mk = -2 * self.beta.item() * (np.hstack((np.zeros((self.nk, self.nh)), np.eye(
             self.nk), np.zeros((self.nk, self.nz))))).dot(self.P).dot(self.A0)
-        self.Mh = -2 * np.asscalar(self.beta) * (np.hstack((np.eye(self.nh), np.zeros(
+        self.Mh = -2 * self.beta.item() * (np.hstack((np.eye(self.nh), np.zeros(
             (self.nh, self.nk)), np.zeros((self.nh, self.nz))))).dot(self.P).dot(self.A0)
         self.Ms = -(self.Sb - self.Ss)
         self.Md = -(np.linalg.inv(np.vstack((self.phic.T, self.phig.T))).dot(
@@ -296,7 +296,7 @@ class DLE(object):
         return
 
     def canonical(self):
-        """ 
+        """
         Compute canonical preference representation
         Uses auxiliary problem of 9.4.2, with the preference shock process reintroduced
         Calculates pihat, llambdahat and ubhat for the equivalent canonical household technology

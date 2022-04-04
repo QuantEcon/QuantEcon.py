@@ -7,6 +7,7 @@ from numpy.testing import (assert_array_equal, assert_raises, assert_,
                            assert_allclose)
 
 from quantecon.markov import gth_solve
+import pytest
 
 
 TOL = 1e-15
@@ -90,39 +91,6 @@ class Matrices:
         self.gen_matrix_dicts.append(matrix_dict)
 
 
-def test_stoch_matrix():
-    """Test with stochastic matrices"""
-    print(__name__ + '.' + test_stoch_matrix.__name__)
-    matrices = Matrices()
-    for matrix_dict in matrices.stoch_matrix_dicts:
-        x = gth_solve(matrix_dict['A'])
-        yield StationaryDistSumOne(), x
-        yield StationaryDistNonnegative(), x
-        yield StationaryDistEqualToKnown(), matrix_dict['stationary_dist'], x
-
-
-def test_kmr_matrix():
-    """Test with KMR matrices"""
-    print(__name__ + '.' + test_kmr_matrix.__name__)
-    matrices = Matrices()
-    for matrix_dict in matrices.kmr_matrix_dicts:
-        x = gth_solve(matrix_dict['A'])
-        yield StationaryDistSumOne(), x
-        yield StationaryDistNonnegative(), x
-        yield StationaryDistLeftEigenVec(), matrix_dict['A'], x
-
-
-def test_gen_matrix():
-    """Test with generator matrices"""
-    print(__name__ + '.' + test_gen_matrix.__name__)
-    matrices = Matrices()
-    for matrix_dict in matrices.gen_matrix_dicts:
-        x = gth_solve(matrix_dict['A'])
-        yield StationaryDistSumOne(), x
-        yield StationaryDistNonnegative(), x
-        yield StationaryDistEqualToKnown(), matrix_dict['stationary_dist'], x
-
-
 class AddDescription:
     def __init__(self):
         self.description = self.__class__.__name__
@@ -146,6 +114,63 @@ class StationaryDistLeftEigenVec(AddDescription):
 class StationaryDistEqualToKnown(AddDescription):
     def __call__(self, y, x):
         assert_allclose(y, x, atol=TOL)
+
+
+test_classes = [
+    StationaryDistSumOne,
+    StationaryDistNonnegative,
+]
+
+
+@pytest.mark.parametrize("test_class", test_classes)
+def test_stoch_matrix(test_class):
+    """Test with stochastic matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.stoch_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        test_class()(x)
+
+
+def test_stoch_matrix_1():
+    """Test with stochastic matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.stoch_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        StationaryDistEqualToKnown()(matrix_dict['stationary_dist'], x)
+
+
+@pytest.mark.parametrize("test_class", test_classes)
+def test_kmr_matrix(test_class):
+    """Test with KMR matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.kmr_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        test_class()(x)
+
+
+def test_kmr_matrix_1():
+    """Test with KMR matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.kmr_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        StationaryDistLeftEigenVec()(matrix_dict['A'], x)
+
+
+@pytest.mark.parametrize("test_class", test_classes)
+def test_gen_matrix(test_class):
+    """Test with generator matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.gen_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        test_class()(x)
+
+
+def test_gen_matrix_1():
+    """Test with generator matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.gen_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        StationaryDistEqualToKnown()(matrix_dict['stationary_dist'], x)
 
 
 def test_matrices_with_C_F_orders():

@@ -9,7 +9,7 @@ from quantecon.ivp import IVP
 
 # use the Solow Model with Cobb-Douglas production as test case
 def solow_model(t, k, g, n, s, alpha, delta):
-    """
+    r"""
     Equation of motion for capital stock (per unit effective labor).
 
     Parameters
@@ -41,7 +41,7 @@ def solow_model(t, k, g, n, s, alpha, delta):
 
 
 def solow_jacobian(t, k, g, n, s, alpha, delta):
-    """
+    r"""
     Jacobian matrix for the Solow model.
 
     Parameters
@@ -73,7 +73,7 @@ def solow_jacobian(t, k, g, n, s, alpha, delta):
 
 
 def solow_steady_state(g, n, s, alpha, delta):
-    """
+    r"""
     Steady-state level of capital stock (per unit effective labor).
 
     Parameters
@@ -101,7 +101,7 @@ def solow_steady_state(g, n, s, alpha, delta):
 
 
 def solow_analytic_solution(t, k0, g, n, s, alpha, delta):
-    """
+    r"""
     Analytic solution for the path of capital stock (per unit effective labor).
 
     Parameters
