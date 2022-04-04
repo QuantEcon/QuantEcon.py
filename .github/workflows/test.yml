@@ -47,7 +47,7 @@ jobs:
 
     - name: Run Tests (pytest)
       run: |
-        coverage run -m pytest
+        coverage run -m pytest quantecon
         coverage lcov
 
     - name: Coveralls

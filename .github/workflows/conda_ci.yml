@@ -51,7 +51,8 @@ jobs:
     - name: Run Tests (pytest)
       shell: bash -l {0}
       run: |
-        pytest quantecon
+        coverage run -m pytest quantecon
+        coverage lcov
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
