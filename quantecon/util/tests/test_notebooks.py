@@ -13,7 +13,7 @@ import os
 FILES = ['test_file.md']
 REPO = "https://github.com/QuantEcon/QuantEcon.py"
 RAW = "raw"
-BRANCH = "master"
+BRANCH = "main"
 FOLDER = "quantecon/util/tests/"
 
 
