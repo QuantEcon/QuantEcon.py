@@ -1,9 +1,9 @@
-sphinx>=3.0
+sphinx
 ipython
 numpydoc
 numba>=0.38
-numpy
+numpy>=1.2
 sympy
 scipy>=1.0
 requests
-matplotlib==2.2.3
+matplotlib
