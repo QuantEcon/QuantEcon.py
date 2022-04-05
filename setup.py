@@ -84,7 +84,7 @@ setup(name='quantecon',
       download_url='https://github.com/QuantEcon/QuantEcon.py/tarball/' + VERSION,
       keywords=['quantitative', 'economics'],
       install_requires=[
-          'numba>=0.38',
+          'numba',
           'numpy',
           'requests',
           'scipy>=1.0.0',
