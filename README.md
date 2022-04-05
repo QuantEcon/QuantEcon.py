@@ -12,25 +12,6 @@ A high performance, open source Python code library for economics
 [![Total Alerts](https://img.shields.io/lgtm/alerts/g/QuantEcon/QuantEcon.py.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/QuantEcon/QuantEcon.py/alerts)
 [![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](https://quanteconpy.readthedocs.io/en/latest/?badge=latest)
 
-<ul class="library-links">
-	<li>
-		<p><a href="https://github.com/QuantEcon/QuantEcon.py"><img alt=" " src="/assets/img/library-button-code.png"></a></p>
-		<p><a href="https://github.com/QuantEcon/QuantEcon.py">Code</a></p>
-	</li>
-	<li>
-		<p><a href="http://quanteconpy.readthedocs.org/en/latest/"><img alt=" " src="/assets/img/library-button-documentation.png"></a></p>
-		<p><a href="http://quanteconpy.readthedocs.org/en/latest/">Documentation</a></p>
-	</li>
-	<li>
-		<p><a href="/python-developers"><img alt=" " src="/assets/img/library-button-contribute.png"></a></p>
-		<p><a href="/python-developers">Contribute</a></p>
-	</li>
-	<li>
-		<p><a href="https://github.com/QuantEcon/QuantEcon.py/issues" target="_blank"><img alt=" " src="/assets/img/library-button-issue.png"></a></p>
-		<p><a href="https://github.com/QuantEcon/QuantEcon.py/issues" target="_blank">Report an Issue</a></p>
-	</li>
-</ul>
-
 ## Installation
 
 Before installing `quantecon` we recommend you install the [Anaconda](https://www.anaconda.com/download/) Python distribution, which includes a full suite of scientific python tools. **Note:** quantecon is now only supporting Python version 3.5+. This is mainly to allow code to be written taking full advantage of new features such as using the @ symbol for matrix multiplication. Therefore please install the latest Python 3 Anaconda distribution.
