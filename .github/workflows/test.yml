@@ -1,14 +1,5 @@
 name: build
 
-# We ignore Python 3.7 on windows-latest because 3 tests are failing:
-# - FAIL: test_quadrect_2d_H (quantecon.tests.test_quad.TestQuadrect)
-#   AssertionError:
-#   Not equal to tolerance rtol=1e-07, atol=0
-# - FAIL: test_quadrect_2d_H2 (quantecon.tests.test_quad.TestQuadrect)
-#   AssertionError:
-#   Not equal to tolerance rtol=1e-07, atol=0
-# - The last error can't be found from the log
-#
 # Run this occasionally to test performance:
 # nosetests -a "slow"
 
@@ -24,10 +15,8 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.7, 3.8, 3.9]
-        exclude:
-          - os: windows-latest
-            python-version: 3.7
+        python-version: [3.8, 3.9, '3.10']
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
