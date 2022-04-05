@@ -107,7 +107,8 @@ copyright = u'2014, QuantEcon Developer Team'
 # built documents.
 #
 # The short X.Y version.
-from version import version as quantecon_version
+import quantecon
+quantecon_version = quantecon.__version__
 version = quantecon_version
 # The full version, including alpha/beta/rc tags.
 release = quantecon_version
