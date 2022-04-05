@@ -38,7 +38,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -U numpy scipy pandas numba sympy ipython statsmodels flake8 pytest coverage
+        pip install -U numpy scipy pandas numba sympy ipython flake8 pytest coverage
         python setup.py install
 
     - name: flake8 Tests

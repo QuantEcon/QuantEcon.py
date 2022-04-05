@@ -10,7 +10,6 @@ dependencies:
   - numba
   - sympy
   - ipython
-  - statsmodels
   - flake8
   - requests
   - pytest
