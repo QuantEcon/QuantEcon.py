@@ -52,6 +52,7 @@ An alternative is to download the sourcecode of the `quantecon` package and in
 
 Once you have downloaded the source files then the package can be installed by running
 
-    python setup.py install
+    pip install flit
+    flit install
 
 (To learn the basics about setting up Git see [this link](https://help.github.com/articles/set-up-git/).)
