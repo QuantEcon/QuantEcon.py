@@ -5,12 +5,12 @@ Tests for pure_nash.py
 
 import numpy as np
 import itertools
-from nose.tools import eq_
+from numpy.testing import assert_
 from quantecon.game_theory import NormalFormGame, pure_nash_brute
 
 
 class TestPureNashBruteForce():
-    def setUp(self):
+    def setup(self):
         self.game_dicts = []
 
         # Matching Pennies game with no pure nash equilibrium
@@ -53,7 +53,7 @@ class TestPureNashBruteForce():
 
     def test_brute_force(self):
         for d in self.game_dicts:
-            eq_(sorted(pure_nash_brute(d['g'])), sorted(d['NEs']))
+            assert_(sorted(pure_nash_brute(d['g'])) == sorted(d['NEs']))
 
     def test_tol(self):
         # Prisoners' Dilemma game with one NE and one epsilon NE
@@ -67,14 +67,4 @@ class TestPureNashBruteForce():
 
         g = NormalFormGame(PD_bimatrix)
         for tol, answer in zip([0, epsilon], [NEs, epsilon_NEs]):
-            eq_(sorted(pure_nash_brute(g, tol=tol)), sorted(answer))
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+            assert_(sorted(pure_nash_brute(g, tol=tol)) == sorted(answer))

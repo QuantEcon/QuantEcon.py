@@ -3,7 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - nose
   - coverage
   - numpy
   - scipy
@@ -11,8 +10,8 @@ dependencies:
   - numba
   - sympy
   - ipython
-  - statsmodels
   - flake8
   - requests
   - flit
   - chardet # python>3.9,osx
+  - pytest

@@ -3,9 +3,9 @@ Tests for solve_discrete_riccati in matrix_eqn.py file
 
 """
 import numpy as np
-from numpy.testing import assert_allclose
-from nose.tools import raises
+from numpy.testing import assert_allclose, assert_raises
 from quantecon.matrix_eqn import solve_discrete_riccati
+import pytest
 
 
 def dare_golden_num_float(method):
@@ -74,16 +74,17 @@ _test_funcs = [
 ]
 
 
-def test_solve_discrete_riccati():
-    def _test_factory(func, method):
-        func(method)
-
-    for method in ['doubling', 'qz']:
-        for func in _test_funcs:
-            yield _test_factory, func, method
+_test_methods = [
+    'doubling', 'qz'
+]
 
 
-@raises(ValueError)
+@pytest.mark.parametrize("test_func", _test_funcs)
+@pytest.mark.parametrize("test_method", _test_methods)
+def test_solve_discrete_riccati(test_func, test_method):
+    test_func(test_method)
+
+
 def test_solve_discrete_riccati_invalid_method():
     method = 'invalid_method'
-    _test_funcs[0](method)
+    assert_raises(ValueError, _test_funcs[0], method)

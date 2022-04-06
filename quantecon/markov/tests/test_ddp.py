@@ -4,14 +4,14 @@ Tests for markov/ddp.py
 """
 import numpy as np
 import scipy.sparse as sparse
-from numpy.testing import assert_array_equal, assert_allclose, assert_raises
-from nose.tools import ok_
+from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
+                           assert_)
 
 from quantecon.markov import DiscreteDP, backward_induction
 
 
 class TestDiscreteDP:
-    def setUp(self):
+    def setup(self):
         # From Puterman 2005, Section 3.1
         beta = 0.95
 
@@ -57,8 +57,8 @@ class TestDiscreteDP:
                                  epsilon=self.epsilon)
 
             # Check v is an epsilon/2-approximation of v_star
-            ok_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
-            ok_(np.abs(res_init.v - self.v_star).max() < self.epsilon/2)
+            assert_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
+            assert_(np.abs(res_init.v - self.v_star).max() < self.epsilon/2)
 
             # Check sigma == sigma_star
             assert_array_equal(res.sigma, self.sigma_star)
@@ -90,8 +90,8 @@ class TestDiscreteDP:
                                  epsilon=self.epsilon)
 
             # Check v is an epsilon/2-approximation of v_star
-            ok_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
-            ok_(np.abs(res_init.v - self.v_star).max() < self.epsilon/2)
+            assert_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
+            assert_(np.abs(res_init.v - self.v_star).max() < self.epsilon/2)
 
             # Check sigma == sigma_star
             assert_array_equal(res.sigma, self.sigma_star)
@@ -104,7 +104,7 @@ class TestDiscreteDP:
                             epsilon=self.epsilon, k=k)
 
             # Check v is an epsilon/2-approximation of v_star
-            ok_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
+            assert_(np.abs(res.v - self.v_star).max() < self.epsilon/2)
 
             # Check sigma == sigma_star
             assert_array_equal(res.sigma, self.sigma_star)
@@ -194,7 +194,7 @@ def test_ddp_sorting():
 
 
 class TestFiniteHorizon:
-    def setUp(self):
+    def setup(self):
         # From Puterman 2005, Section 3.2, Section 4.6.1
         # "single-product stochastic inventory control"
         s_indices = [0, 0, 0, 0, 1, 1, 1, 2, 2, 3]
@@ -338,13 +338,3 @@ def test_ddp_to_sa_and_to_product():
 
             for k in ["v", "sigma", "num_iter"]:
                 assert_allclose(sol1[k], sol2[k])
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

@@ -3,10 +3,11 @@ Tests for gth_solve.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal
-from nose.tools import eq_, ok_, raises
+from numpy.testing import (assert_array_equal, assert_raises, assert_,
+                           assert_allclose)
 
 from quantecon.markov import gth_solve
+import pytest
 
 
 TOL = 1e-15
@@ -90,39 +91,6 @@ class Matrices:
         self.gen_matrix_dicts.append(matrix_dict)
 
 
-def test_stoch_matrix():
-    """Test with stochastic matrices"""
-    print(__name__ + '.' + test_stoch_matrix.__name__)
-    matrices = Matrices()
-    for matrix_dict in matrices.stoch_matrix_dicts:
-        x = gth_solve(matrix_dict['A'])
-        yield StationaryDistSumOne(), x
-        yield StationaryDistNonnegative(), x
-        yield StationaryDistEqualToKnown(), matrix_dict['stationary_dist'], x
-
-
-def test_kmr_matrix():
-    """Test with KMR matrices"""
-    print(__name__ + '.' + test_kmr_matrix.__name__)
-    matrices = Matrices()
-    for matrix_dict in matrices.kmr_matrix_dicts:
-        x = gth_solve(matrix_dict['A'])
-        yield StationaryDistSumOne(), x
-        yield StationaryDistNonnegative(), x
-        yield StationaryDistLeftEigenVec(), matrix_dict['A'], x
-
-
-def test_gen_matrix():
-    """Test with generator matrices"""
-    print(__name__ + '.' + test_gen_matrix.__name__)
-    matrices = Matrices()
-    for matrix_dict in matrices.gen_matrix_dicts:
-        x = gth_solve(matrix_dict['A'])
-        yield StationaryDistSumOne(), x
-        yield StationaryDistNonnegative(), x
-        yield StationaryDistEqualToKnown(), matrix_dict['stationary_dist'], x
-
-
 class AddDescription:
     def __init__(self):
         self.description = self.__class__.__name__
@@ -130,22 +98,79 @@ class AddDescription:
 
 class StationaryDistSumOne(AddDescription):
     def __call__(self, x):
-        ok_(np.allclose(sum(x), 1, atol=TOL))
+        assert_allclose(np.sum(x), 1, atol=TOL)
 
 
 class StationaryDistNonnegative(AddDescription):
     def __call__(self, x):
-        eq_(np.prod(x >= 0-TOL), 1)
+        assert_(np.prod(x >= 0-TOL) == 1)
 
 
 class StationaryDistLeftEigenVec(AddDescription):
     def __call__(self, A, x):
-        ok_(np.allclose(np.dot(x, A), x, atol=TOL))
+        assert_allclose(np.dot(x, A), x, atol=TOL)
 
 
 class StationaryDistEqualToKnown(AddDescription):
     def __call__(self, y, x):
-        ok_(np.allclose(y, x, atol=TOL))
+        assert_allclose(y, x, atol=TOL)
+
+
+test_classes = [
+    StationaryDistSumOne,
+    StationaryDistNonnegative,
+]
+
+
+@pytest.mark.parametrize("test_class", test_classes)
+def test_stoch_matrix(test_class):
+    """Test with stochastic matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.stoch_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        test_class()(x)
+
+
+def test_stoch_matrix_1():
+    """Test with stochastic matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.stoch_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        StationaryDistEqualToKnown()(matrix_dict['stationary_dist'], x)
+
+
+@pytest.mark.parametrize("test_class", test_classes)
+def test_kmr_matrix(test_class):
+    """Test with KMR matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.kmr_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        test_class()(x)
+
+
+def test_kmr_matrix_1():
+    """Test with KMR matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.kmr_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        StationaryDistLeftEigenVec()(matrix_dict['A'], x)
+
+
+@pytest.mark.parametrize("test_class", test_classes)
+def test_gen_matrix(test_class):
+    """Test with generator matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.gen_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        test_class()(x)
+
+
+def test_gen_matrix_1():
+    """Test with generator matrices"""
+    matrices = Matrices()
+    for matrix_dict in matrices.gen_matrix_dicts:
+        x = gth_solve(matrix_dict['A'])
+        StationaryDistEqualToKnown()(matrix_dict['stationary_dist'], x)
 
 
 def test_matrices_with_C_F_orders():
@@ -171,23 +196,11 @@ def test_matrices_with_C_F_orders():
     assert_array_equal(computed_F, stationary_dist)
 
 
-@raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
-    gth_solve(np.array([0.4, 0.6]))
+    assert_raises(ValueError, gth_solve, np.array([0.4, 0.6]))
 
 
-@raises(ValueError)
 def test_raises_value_error_non_square():
     """Test with non square input"""
-    gth_solve(np.array([[0.4, 0.6]]))
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(ValueError, gth_solve, np.array([[0.4, 0.6]]))

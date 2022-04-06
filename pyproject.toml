@@ -28,6 +28,20 @@ dependencies = [
     'sympy',
 ]
 
+[project.optional-dependencies]
+testing = [
+    "pytest",
+    "coverage",
+    "flake8",
+    "numpy",
+    "scipy",
+    "pandas",
+    "numba",
+    "sympy",
+    "ipython",
+    "statsmodels",
+]
+
 [project.license]
 file = "LICENSE"
 

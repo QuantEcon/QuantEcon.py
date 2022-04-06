@@ -15,10 +15,11 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.8, 3.9, '3.10']
         exclude:
           - os: windows-latest
-            python-version: 3.7
+            python-version: 3.8
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -43,24 +44,20 @@ jobs:
         pip install -U pip
         pip install -e .
 
-    - name: Run Tests
+    - name: flake8 Tests
       shell: bash -l {0}
       run: |
         flake8 --select F401, F405, E231 quantecon
-        nosetests --with-coverage -a "!slow" --cover-package=quantecon
 
-    - name: Coveralls Parallel (Linux)
-      uses: AndreMiras/coveralls-python-action@develop
+    - name: Run Tests (pytest)
+      shell: bash -l {0}
+      run: |
+        coverage run -m pytest quantecon
+        coverage lcov
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
       if: runner.os == 'Linux'
       with:
-        flag-name: run-${{ matrix.test_number }}
-        parallel: true
-
-  coveralls_finish:
-    needs: tests
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      uses: AndreMiras/coveralls-python-action@develop
-      with:
-        parallel-finished: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.lcov

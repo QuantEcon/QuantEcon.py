@@ -57,17 +57,17 @@ def func_two_prime2(x):
 
 def test_newton_basic():
     """
-    Uses the function f defined above to test the scalar maximization 
+    Uses the function f defined above to test the scalar maximization
     routine.
     """
     true_fval = 1.0
     fval = newton(func, 5, func_prime)
     assert_almost_equal(true_fval, fval.root, decimal=4)
-    
+
 
 def test_newton_basic_two():
     """
-    Uses the function f defined above to test the scalar maximization 
+    Uses the function f defined above to test the scalar maximization
     routine.
     """
     true_fval = 1.0
@@ -83,7 +83,7 @@ def test_newton_hard():
     fval = newton(func_two, 0.4, func_two_prime)
     assert_allclose(true_fval, fval.root, rtol=1e-5, atol=0.01)
 
-    
+
 def test_halley_basic():
     """
     Basic test for halley method
@@ -135,15 +135,3 @@ def test_bisect_basic():
 
 def test_brentq_basic():
     run_check(brentq, 'brentq')
-
-# executing testcases.
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

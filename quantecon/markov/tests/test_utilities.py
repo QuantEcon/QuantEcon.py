@@ -15,13 +15,3 @@ def test_sa_indices():
 
     for indices, indices_expected in zip([s, a], [s_expected, a_expected]):
         assert_array_equal(indices, indices_expected)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
