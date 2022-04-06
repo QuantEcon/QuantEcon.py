@@ -38,9 +38,8 @@ testing = [
     "pandas",
     "numba",
     "sympy",
-    "ipython",
-    "statsmodels",
 ]
+
 
 [project.license]
 file = "LICENSE"
