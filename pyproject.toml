@@ -21,7 +21,7 @@ keywords = [
 dynamic = ["description", "version"]
 requires-python = ">=3.7"
 dependencies = [
-    'numba>=0.38',
+    'numba',
     'numpy',
     'requests',
     'scipy>=1.0.0',
