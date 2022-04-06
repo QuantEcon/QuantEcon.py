@@ -50,6 +50,7 @@ exclude = [
   ".*",  # Any hidden folders or files
   "docs/",
   "quantecon/tests/",
+  "quantecon/util/tests",
   "Makefile",
   "environment.yml",
   "readthedocs.yml",
