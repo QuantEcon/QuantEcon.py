@@ -12,4 +12,6 @@ dependencies:
   - ipython
   - flake8
   - requests
+  - flit
+  - chardet # python>3.9,osx
   - pytest

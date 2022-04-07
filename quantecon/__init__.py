@@ -3,14 +3,14 @@
 Import the main names to top level.
 """
 
+__version__ = '0.5.2'
+
 try:
 	import numba
 except:
 	raise ImportError(
 		"Cannot import numba from current anaconda distribution. \
 			Please run `conda install numba` to install the latest version.")
-
-__version__ = '0.5.2'
 
 #-Modules-#
 from . import distributions
