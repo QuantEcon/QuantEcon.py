@@ -1,5 +1,15 @@
 # Changelog
 
+## Ver 0.5.3 (07-April-2022)
+
+This is primarily a maintenance release to fix a number of deprecation notices, migrating the tests to use `pytest` rather than `nose`,  and python packaging is moving to `flit`
+
+**Enhancement:**
+
+1. [ENH: Vectorize ECDF's __call__ method ](https://github.com/QuantEcon/QuantEcon.py/pull/602) ([Smit-create](https://github.com/Smit-create))
+
+Thanks [Smit-create](https://github.com/Smit-create) as a first time contributor to the project, and [oyamad](https://github.com/oyamad) for your assistance with this release.
+
 ## Ver 0.5.2 (16-November-2021)
 
 This is a bug fix release
