@@ -2,9 +2,11 @@
 
 A high performance, open source Python code library for economics
 
+```python
   from quantecon.markov import DiscreteDP
   aiyagari_ddp = DiscreteDP(R, Q, beta)
   results = aiyagari_ddp.solve(method='policy_iteration')
+```
 
 [![Build Status](https://github.com/QuantEcon/QuantEcon.py/workflows/build/badge.svg)](https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Abuild)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.svg)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
@@ -14,7 +16,7 @@ A high performance, open source Python code library for economics
 
 ## Installation
 
-Before installing `quantecon` we recommend you install the [Anaconda](https://www.anaconda.com/download/) Python distribution, which includes a full suite of scientific python tools. **Note:** quantecon is now only supporting Python version 3.5+. This is mainly to allow code to be written taking full advantage of new features such as using the @ symbol for matrix multiplication. Therefore please install the latest Python 3 Anaconda distribution.
+Before installing `quantecon` we recommend you install the [Anaconda](https://www.anaconda.com/download/) Python distribution, which includes a full suite of scientific python tools. **Note:** `quantecon` is now only supporting Python version 3.5+. This is mainly to allow code to be written taking full advantage of new features such as using the `@` symbol for matrix multiplication. Therefore please install the latest Python 3 Anaconda distribution.
 
 Next you can install quantecon by opening a terminal prompt and typing
 
@@ -24,11 +26,15 @@ Next you can install quantecon by opening a terminal prompt and typing
 
 Once `quantecon` has been installed you should be able to import it as follows:
 
-    import quantecon as qe
+```python
+import quantecon as qe
+```
 
 You can check the version by running
 
-    print(qe.__version__)
+```python
+print(qe.__version__)
+```
 
 If your version is below what’s available on [PyPI](https://pypi.python.org/pypi/quantecon/) then it is time to upgrade. This can be done by running
 
