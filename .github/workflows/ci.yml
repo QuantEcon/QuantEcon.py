@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
@@ -41,8 +43,8 @@ jobs:
     - name: Setup QuantEcon
       shell: bash -l {0}
       run: |
-        conda activate test
-        python setup.py build
+        pip install -U pip
+        pip install .[testing]
 
     - name: flake8 Tests
       shell: bash -l {0}
@@ -61,3 +63,26 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: coverage.lcov
+
+  publish:
+
+    name: Publish to PyPi
+    needs: [tests]
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Install flit
+        run: |
+          pip install flit~=3.6
+      - name: Build and publish
+        run: |
+          flit publish
+        env:
+          FLIT_USERNAME: __token__
+          FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}
