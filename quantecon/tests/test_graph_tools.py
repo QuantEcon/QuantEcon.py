@@ -6,7 +6,7 @@ Tests for graph_tools.py
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises, assert_
 
-from quantecon.graph_tools import DiGraph, random_tournament_graph
+from quantecon import DiGraph, random_tournament_graph
 
 
 def list_of_array_equal(s, t):
