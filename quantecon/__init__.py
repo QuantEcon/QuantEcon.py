@@ -28,15 +28,16 @@ from ._estspec import smooth, periodogram, ar_periodogram
 # from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.
 from ._graph_tools import DiGraph, random_tournament_graph
 from ._gridtools import (cartesian, mlinspace, simplex_grid, simplex_index,
-						 num_compositions, cartesian_nearest_index)
-from .inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
-	rank_size
-from .kalman import Kalman
-from .lae import LAE
+						 num_compositions)
+from ._inequality import (lorenz_curve, gini_coefficient, shorrocks_index,
+						  rank_size)
+from ._kalman import Kalman
+from ._lae import LAE
 from ._arma import ARMA
-from .lqcontrol import LQ, LQMarkov
+from ._lqcontrol import LQ, LQMarkov
 from ._filter import hamilton_filter
-from .lqnash import nnash
+from ._lqnash import nnash
+from ._ivp import IVP
 from .lss import LinearStateSpace
 from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
 from .quadsums import var_quadratic_sum, m_quadratic_sum
@@ -49,7 +50,8 @@ from .markov import mc_compute_stationary, mc_sample_path
 
 #Imports that are deprecated and will be removed in further versions
 from . import (ecdf, arma, compute_fp, discrete_rv, dle, estspec, filter,
-			   graph_tools, gridtools)
+			   graph_tools, gridtools, inequality, ivp, kalman, lae,
+			   lqcontrol, lqnash)
 #<-
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
