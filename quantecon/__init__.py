@@ -38,9 +38,11 @@ from ._lqcontrol import LQ, LQMarkov
 from ._filter import hamilton_filter
 from ._lqnash import nnash
 from ._ivp import IVP
-from .lss import LinearStateSpace
-from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
-from .quadsums import var_quadratic_sum, m_quadratic_sum
+from ._lss import LinearStateSpace
+from ._matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
+from ._quadsums import var_quadratic_sum, m_quadratic_sum
+from ._rank_nullspace import rank_est, nullspace
+from ._robustlq import RBLQ
 #->Propose Delete From Top Level
 #Promote to keep current examples working
 from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, \
@@ -51,8 +53,7 @@ from .markov import mc_compute_stationary, mc_sample_path
 #Imports that are deprecated and will be removed in further versions
 from . import (ecdf, arma, compute_fp, discrete_rv, dle, estspec, filter,
 			   graph_tools, gridtools, inequality, ivp, kalman, lae,
-			   lqcontrol, lqnash)
+			   lqcontrol, lqnash, lss, matrix_eqn, quadsums, rank_nullspace,
+			   robustlq)
 #<-
-from .rank_nullspace import rank_est, nullspace
-from .robustlq import RBLQ
 from .util import searchsorted, fetch_nb_dependencies, tic, tac, toc

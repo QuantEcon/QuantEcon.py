@@ -20,7 +20,7 @@ def __getattr__(name):
                 f"'{name}'."
             )
 
-    warnings.warn(f"Please use `{name}` from the `quantecon` namespace, the"
+    warnings.warn(f"Please use `{name}` from the `quantecon` namespace, the "
                   "`quantecon.lqcontrol` namespace is deprecated. You can use"
                   f" the following instead:\n `from quantecon import {name}`.",
                   category=DeprecationWarning, stacklevel=2)

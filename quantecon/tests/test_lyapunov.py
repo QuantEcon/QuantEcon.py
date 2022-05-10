@@ -4,7 +4,7 @@ Tests for ricatti.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.matrix_eqn import solve_discrete_lyapunov
+from quantecon import solve_discrete_lyapunov
 
 
 def test_dlyap_simple_ones():
