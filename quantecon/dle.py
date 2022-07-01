@@ -53,8 +53,8 @@ class DLE(object):
         Technology is a tuple containing the matrices \Phi_c, \Phi_g, \Phi_i, \Gamma,
         \Delta_k, and \Theta_k
     Preferences : tuple
-        Preferences is a tuple containing the matrices \Delta_h, \Theta_h, \Lambda,
-        \Pi, and the scalar \beta
+        Preferences is a tuple containing the scalar \beta and the
+        matrices \Lambda, \Pi, \Delta_h, and \Theta_h
 
     """
 
