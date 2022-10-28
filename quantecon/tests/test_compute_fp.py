@@ -17,7 +17,7 @@ from quantecon import compute_fixed_point
 class TestFPLogisticEquation():
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.mu_1 = 0.2  # 0 is unique fixed point forall x_0 \in [0, 1]
 
         # (4mu - 1)/(4mu) is a fixed point forall x_0 \in [0, 1]

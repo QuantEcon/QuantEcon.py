@@ -10,7 +10,7 @@ from quantecon import ECDF
 class TestECDF:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.obs = np.random.rand(40)  # observations defining dist
         cls.ecdf = ECDF(cls.obs)
 
