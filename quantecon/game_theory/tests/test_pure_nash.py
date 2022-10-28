@@ -10,7 +10,7 @@ from quantecon.game_theory import NormalFormGame, pure_nash_brute
 
 
 class TestPureNashBruteForce():
-    def setup(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # Matching Pennies game with no pure nash equilibrium

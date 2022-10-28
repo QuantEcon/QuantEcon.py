@@ -17,7 +17,7 @@ from quantecon.random import probvec, sample_without_replacement, draw
 # probvec #
 
 class TestProbvec:
-    def setup(self):
+    def setup_method(self):
         self.m, self.k = 2, 3  # m vectors of dimension k
         seed = 1234
 
@@ -68,7 +68,7 @@ def test_sample_without_replacement_value_error():
 # draw #
 
 class TestDraw:
-    def setup(self):
+    def setup_method(self):
         self.pmf = np.array([0.4, 0.1, 0.5])
         self.cdf = np.cumsum(self.pmf)
         self.n = len(self.pmf)

@@ -10,7 +10,7 @@ from quantecon.util import tic, tac, toc, loop_timer
 
 
 class TestTicTacToc:
-    def setup(self):
+    def setup_method(self):
         self.h = 0.1
         self.digits = 10
 

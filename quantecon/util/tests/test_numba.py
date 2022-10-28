@@ -14,7 +14,7 @@ def numba_linalg_solve_orig(a, b):
 
 
 class TestNumbaLinalgSolve:
-    def setup(self):
+    def setup_method(self):
         self.dtypes = [np.float32, np.float64]
         self.a = np.array([[3, 2, 0], [1, -1, 0], [0, 5, 1]])
         self.b_1dim = np.array([2, 4, -1])
@@ -49,7 +49,7 @@ class TestNumbaLinalgSolve:
 
 
 class TestCombJit:
-    def setup(self):
+    def setup_method(self):
         self.MAX_INTP = np.iinfo(np.intp).max
 
     def test_comb(self):

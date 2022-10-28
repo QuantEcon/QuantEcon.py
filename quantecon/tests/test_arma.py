@@ -9,7 +9,7 @@ from quantecon.arma import ARMA
 
 
 class TestARMA():
-    def setup(self):
+    def setup_method(self):
         # Initial Values
         phi = np.array([.95, -.4, -.4])
         theta = np.zeros(3)

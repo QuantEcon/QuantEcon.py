@@ -87,7 +87,7 @@ class TestFPLogisticEquation():
 
 
 class TestComputeFPContraction():
-    def setup(self):
+    def setup_method(self):
         self.coeff = 0.5
         self.methods = ['iteration', 'imitation_game']
 
