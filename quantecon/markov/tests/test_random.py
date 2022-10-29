@@ -89,7 +89,7 @@ def test_random_stochastic_matrix_k_1():
 
 
 class TestRandomDiscreteDP:
-    def setup(self):
+    def setup_method(self):
         self.num_states, self.num_actions = 5, 4
         self.num_sa = self.num_states * self.num_actions
         self.k = 3

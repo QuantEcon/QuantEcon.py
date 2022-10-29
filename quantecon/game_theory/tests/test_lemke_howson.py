@@ -7,7 +7,7 @@ from quantecon.game_theory import Player, NormalFormGame, lemke_howson
 
 
 class TestLemkeHowson():
-    def setup(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
@@ -30,7 +30,7 @@ class TestLemkeHowson():
 
 
 class TestLemkeHowsonDegenerate():
-    def setup(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory

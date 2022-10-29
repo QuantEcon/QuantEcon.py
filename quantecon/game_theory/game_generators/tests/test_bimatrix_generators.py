@@ -14,7 +14,7 @@ from quantecon.game_theory import (
 
 
 class TestBlottoGame:
-    def setup(self):
+    def setup_method(self):
         self.h, self.t = 4, 3
         rho = 0.5
         self.g = blotto_game(self.h, self.t, rho)
@@ -38,7 +38,7 @@ class TestBlottoGame:
 
 
 class TestRankingGame:
-    def setup(self):
+    def setup_method(self):
         self.n = 100
         self.g = ranking_game(self.n)
 
@@ -85,7 +85,7 @@ def test_sgc_game():
 
 
 class TestTournamentGame:
-    def setup(self):
+    def setup_method(self):
         self.n = 5
         self.k = 3
         self.m = comb(self.n, self.k, exact=True)
@@ -116,7 +116,7 @@ class TestTournamentGame:
 
 
 class TestUnitVectorGame:
-    def setup(self):
+    def setup_method(self):
         self.n = 100
         self.g = unit_vector_game(self.n)
 

@@ -9,7 +9,7 @@ from quantecon.lss import LinearStateSpace
 
 class TestLinearStateSpace:
 
-    def setup(self):
+    def setup_method(self):
         # Example 1
         A = .95
         C = .05

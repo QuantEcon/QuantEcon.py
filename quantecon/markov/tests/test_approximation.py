@@ -11,7 +11,7 @@ from numpy.testing import assert_, assert_allclose
 
 class TestTauchen:
 
-    def setup(self):
+    def setup_method(self):
         self.rho, self.sigma_u = np.random.rand(2)
         self.n = np.random.randint(3, 25)
         self.m = np.random.randint(5)
@@ -54,7 +54,7 @@ class TestTauchen:
 
 class TestRouwenhorst:
 
-    def setup(self):
+    def setup_method(self):
         self.rho, self.sigma = np.random.uniform(0, 1, size=2)
         self.n = np.random.randint(3, 26)
         self.ybar = np.random.randint(0, 11)
