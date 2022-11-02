@@ -31,6 +31,11 @@ class TestTicTacToc:
         tm3 = toc()
 
         rtol = 0.1
+
+        if platform == 'win32':
+            # pytest platform specific issue
+            rtol *= 2
+
         for actual, desired in zip([tm1, tm2, tm3],
                                    [self.h, self.h, self.h*3]):
             assert_allclose(actual, desired, rtol=rtol)
@@ -50,10 +55,15 @@ class TestTicTacToc:
             loop_timer(5, test_function_one_arg, self.h, digits=10)
         test_two_arg = \
             loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
+
+        tol = 0.01
+        if platform == 'win32':
+            # pytest platform specific issue
+            tol *= 2
         for tm in test_one_arg:
-            assert(abs(tm - self.h) < 0.01), tm
+            assert(abs(tm - self.h) < tol), tm
         for tm in test_two_arg:
-            assert(abs(tm - self.h) < 0.01), tm
+            assert(abs(tm - self.h) < tol), tm
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
             assert_(average_time >= average_of_best)
