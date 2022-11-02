@@ -11,7 +11,7 @@ from quantecon.game_theory import (
 
 # Player #
 
-LP_METHODS = [None, 'simplex', 'interior-point', 'revised simplex']
+LP_METHODS = [None, 'highs']
 
 
 class TestPlayer_1opponent:
@@ -50,7 +50,7 @@ class TestPlayer_1opponent:
     def test_best_response_with_random_tie_breaking(self):
         """best_response with tie_breaking='random'"""
         assert_(self.player.best_response([2/3, 1/3], tie_breaking='random')
-            in [0, 1])
+                in [0, 1])
 
         seed = 1234
         br0 = self.player.best_response([2/3, 1/3], tie_breaking='random',
@@ -376,7 +376,7 @@ class TestPlayer_0opponents:
         """Trivial player: is_dominated"""
         for action in range(self.player.num_actions):
             assert_(self.player.is_dominated(action) ==
-                (action in self.dominated_actions))
+                    (action in self.dominated_actions))
 
     def test_dominated_actions(self):
         """Trivial player: dominated_actions"""
@@ -478,6 +478,11 @@ def test_player_repr():
 
 def test_player_zero_actions():
     assert_raises(ValueError, Player, [[]])
+
+
+def test_player_is_dominated_invalid_method():
+    player = Player([[0, 0], [1, 1]])
+    assert_raises(ValueError, player.is_dominated, 0, method='unknown method')
 
 
 def test_normalformgame_invalid_input_players_shape_inconsistent():
