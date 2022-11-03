@@ -56,14 +56,15 @@ class TestTicTacToc:
         test_two_arg = \
             loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
 
-        tol = 0.01
+        rtol = 0.1
+
         if platform == 'win32':
             # pytest platform specific issue
-            tol *= 2
+            rtol *= 2
         for tm in test_one_arg:
-            assert(abs(tm - self.h) < tol), tm
+            assert_allclose(tm, self.h, rtol=rtol)
         for tm in test_two_arg:
-            assert(abs(tm - self.h) < tol), tm
+            assert_allclose(tm, self.h, rtol=rtol)
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
             assert_(average_time >= average_of_best)
