@@ -26,7 +26,7 @@ class TestTicTacToc:
         time.sleep(self.h)
         tm3 = toc()
 
-        rtol = 0.5
+        rtol = 2
         atol = 0.05
 
         for actual, desired in zip([tm1, tm2, tm3],
@@ -46,7 +46,7 @@ class TestTicTacToc:
         test_two_arg = \
             loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
 
-        rtol = 0.5
+        rtol = 2
         atol = 0.05
 
         for tm in test_one_arg:
