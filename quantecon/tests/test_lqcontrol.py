@@ -33,7 +33,7 @@ class TestLQControl:
 
         self.methods = ['doubling', 'qz']
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lq_scalar
         del self.lq_mat
 
@@ -137,7 +137,7 @@ class TestLQMarkov:
         self.lq_markov_mat2 = LQMarkov(Π, Qs, Rs, As, Bs,
                                        Cs=Cs, Ns=Ns, beta=1.05)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lq_markov_scalar
         del self.lq_markov_mat1
         del self.lq_markov_mat2

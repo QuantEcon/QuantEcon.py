@@ -49,7 +49,7 @@ class TestRBLQControl:
         self.lq_test = LQ(Q, R, A, B, C, beta=beta)
         self.methods = ['doubling', 'qz']
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.rblq_test
         del self.rblq_test_pf
 

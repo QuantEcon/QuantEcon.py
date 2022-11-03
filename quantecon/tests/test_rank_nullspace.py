@@ -14,7 +14,7 @@ class TestRankNullspace:
         self.A2 = np.array([[1., 0, 0], [0., 1., 0], [1., 1., 0.]])
         self.A3 = np.zeros((3, 3))
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.A1
         del self.A2
         del self.A3

@@ -41,7 +41,7 @@ class TestDLE:
 
         self.dle = DLE(information, technology, preferences)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.dle
 
     def test_transformation_Q(self):

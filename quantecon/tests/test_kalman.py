@@ -27,7 +27,7 @@ class TestKalman:
         self.methods = ['doubling', 'qz']
 
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.kf
 
 

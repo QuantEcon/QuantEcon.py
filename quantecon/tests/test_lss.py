@@ -30,7 +30,7 @@ class TestLinearStateSpace:
 
         self.ss2 = LinearStateSpace(A, C, G, mu_0=mu_0)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.ss1
         del self.ss2
 

@@ -18,7 +18,7 @@ class TestARMA():
 
         self.lp = ARMA(phi, theta, sigma)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lp
 
     def test_simulate(self):

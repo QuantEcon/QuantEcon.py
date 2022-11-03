@@ -21,7 +21,7 @@ class TestTauchen:
         mc = tauchen(self.rho, self.sigma_u, self.b, self.m, self.n)
         self.x, self.P = mc.state_values, mc.P
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.x
         del self.P
 
@@ -63,7 +63,7 @@ class TestRouwenhorst:
         mc = rouwenhorst(self.n, self.ybar, self.sigma, self.rho)
         self.x, self.P = mc.state_values, mc.P
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.x
         del self.P
 
