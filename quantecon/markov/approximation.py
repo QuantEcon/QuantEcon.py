@@ -275,8 +275,7 @@ def discrete_var(A,
     VAR Processes:  A Simulation Approach* by Stephanie Schmitt-Grohé and
     Martín Uribe, July 11, 2010.
 
-    This code was adapted by Carlos Rondón-Moreno from Schmitt-Grohé and
-    Uribe's code for MATLAB.
+    This code was adapted from Schmitt-Grohé and Uribe's original MATLAB code.
 
     Parameters
     ----------
