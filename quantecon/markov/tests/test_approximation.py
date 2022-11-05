@@ -138,28 +138,28 @@ class TestDiscreteVar:
         del self.A, self.Omega, self.S_out, self.Pi_out
 
     def test_column_major_discretization(self):
-        Pi, S = discrete_var(
+        mc = discrete_var(
                 self.A, self.Omega, grid_sizes=self.sizes,
                 sim_length=self.T, burn_in=self.burn_in,
                 row_major=False)
-        assert_allclose(S, self.S_out)
-        assert_allclose(Pi, self.Pi_out)
+        assert_allclose(mc.state_values, self.S_out)
+        assert_allclose(mc.P, self.Pi_out)
 
     def test_column_row_parity(self):
         """
         Test that column major and row major discretization produces the same
         output, up to a column-major / row-major reordering.
         """
-        Pi, S = discrete_var(
+        mc = discrete_var(
                 self.A, self.Omega, grid_sizes=self.sizes,
                 sim_length=self.T, burn_in=self.burn_in,
                 row_major=False)
-        Pi_r, S_r = discrete_var(
+        mc_r = discrete_var(
                 self.A, self.Omega, grid_sizes=self.sizes,
                 sim_length=self.T, burn_in=self.burn_in,
                 row_major=True)
 
         # State 1 under column major becomes state 3 under row major, given
         # the size of the state space (multigrid state index is (1, 0)).
-        assert_allclose(S[1, :], S_r[3, :])
-        assert_(Pi[1, 1] == Pi_r[3, 3])
+        assert_allclose(mc.state_values[1, :], mc_r.state_values[3, :])
+        assert_(mc.P[1, 1] == mc_r.P[3, 3])
