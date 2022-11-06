@@ -8,7 +8,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 from math import erfc, sqrt
 from .core import MarkovChain
 from quantecon import matrix_eqn as qme
-from quantecon.gridtools import cartesian
+from quantecon.gridtools import mlinspace
 
 import numpy as np
 import scipy as sp
@@ -320,12 +320,7 @@ def discrete_var(A,
     upper_bounds = std_devs * sigma_vector
 
     # Build the individual grids along each dimension
-    V = []
-    for i in range(m):
-        b = np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
-        V.append(b)
-
-    S = cartesian(V)
+    S = mlinspace(-upper_bounds, upper_bounds, grid_sizes)
 
     P = np.zeros((n, n))
     Xvec = np.zeros((m, sim_length))
