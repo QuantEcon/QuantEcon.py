@@ -301,9 +301,16 @@ def discrete_var(A,
 
     Returns
     -------
+
     mc : MarkovChain
         An instance of the MarkovChain class that stores the transition
-        matrix and state values returned by the discretization method
+        matrix and state values returned by the discretization method.
+        The MarkovChain instance contains:
+        Pi : A square matrix containing the transition probability
+            matrix of the discretized state.
+        S : An array where element (i,j) of S is the discretized
+            value of the j-th element of x_t in state i. Reducing S to its
+            unique values yields the grid values.
 
 
     Notes
