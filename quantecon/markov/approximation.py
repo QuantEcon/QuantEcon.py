@@ -270,7 +270,7 @@ def discrete_var(A,
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method.
         The MarkovChain instance contains:
-        Pi : A square matrix containing the transition probability
+        P : A square matrix containing the transition probability
             matrix of the discretized state.
         S : An array where element (i,j) of S is the discretized
             value of the j-th element of x_t in state i. Reducing S to its
@@ -327,31 +327,31 @@ def discrete_var(A,
 
     S = cartesian(V)
 
-    Pi = np.zeros((n, n))
+    P = np.zeros((n, n))
     Xvec = np.zeros((m, sim_length))
     C = sp.linalg.sqrtm(Omega)
 
     # Run simulation to compute transition probabilities
-    _run_sim(A, C, Pi, Xvec, S, sim_length, burn_in, seed)
+    _run_sim(A, C, P, Xvec, S, sim_length, burn_in, seed)
 
-    # Cut states where the column sum of Pi is zero (i.e., inaccesible states
+    # Cut states where the column sum of P is zero (i.e., inaccesible states
     # according to the simulation)
-    indx = np.where(np.sum(Pi, axis=0) > 0)
-    Pi = Pi[indx[0], :]
-    Pi = Pi[:, indx[0]]
+    indx = np.where(np.sum(P, axis=0) > 0)
+    P = P[indx[0], :]
+    P = P[:, indx[0]]
     S  = S[indx[0], :]
 
     # Normalize
-    sum_row = np.sum(Pi, axis=1)
-    for i in range(len(Pi)):
-        Pi[i, :] = Pi[i, :] / sum_row[i]
+    sum_row = np.sum(P, axis=1)
+    for i in range(len(P)):
+        P[i, :] = P[i, :] / sum_row[i]
 
-    mc = MarkovChain(Pi, state_values=S)
+    mc = MarkovChain(P, state_values=S)
     return mc
 
 
 @njit
-def _run_sim(A, C, Pi, Xvec, S, sim_length, burn_in, seed):
+def _run_sim(A, C, P, Xvec, S, sim_length, burn_in, seed):
     m = len(A)
     np.random.seed(seed)
     x0 = np.zeros((m, 1))
@@ -368,6 +368,6 @@ def _run_sim(A, C, Pi, Xvec, S, sim_length, burn_in, seed):
         ind_j = np.argmin(d)
 
         if t > burn_in:
-            Pi[ind_i, ind_j] += 1
+            P[ind_i, ind_j] += 1
         x0 = x
         ind_i = ind_j

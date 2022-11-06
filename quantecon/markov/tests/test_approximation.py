@@ -118,7 +118,7 @@ class TestDiscreteVar:
                      [ 0.38556417,  0.        ],
                      [ 0.38556417,  0.05387746]]
 
-        self.Pi_out = [[8.06451613e-02, 1.93548387e-01, 0.00000000e+00, 3.54838710e-01,
+        self.P_out = [[8.06451613e-02, 1.93548387e-01, 0.00000000e+00, 3.54838710e-01,
               3.70967742e-01, 0.00000000e+00],
              [8.39514352e-05, 8.50806955e-01, 3.79097454e-02, 4.96901738e-04,
               1.10647992e-01, 5.44549850e-05],
@@ -131,15 +131,15 @@ class TestDiscreteVar:
              [0.00000000e+00, 3.63636364e-01, 3.37662338e-01, 0.00000000e+00,
               2.46753247e-01, 5.19480519e-02]]
 
-        self.A, self.Omega, self.S_out, self.Pi_out = map(np.array,
-                                (self.A, self.Omega, self.S_out, self.Pi_out))
+        self.A, self.Omega, self.S_out, self.P_out = map(np.array,
+                                (self.A, self.Omega, self.S_out, self.P_out))
 
-    def tearDown(self):
-        del self.A, self.Omega, self.S_out, self.Pi_out
+    def teardown_method(self):
+        del self.A, self.Omega, self.S_out, self.P_out
 
     def test_discretization(self):
         mc = discrete_var(
                 self.A, self.Omega, grid_sizes=self.sizes,
                 sim_length=self.T, burn_in=self.burn_in)
         assert_allclose(mc.state_values, self.S_out)
-        assert_allclose(mc.P, self.Pi_out)
+        assert_allclose(mc.P, self.P_out)
