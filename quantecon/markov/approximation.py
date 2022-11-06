@@ -8,6 +8,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 from math import erfc, sqrt
 from .core import MarkovChain
 from quantecon import matrix_eqn as qme
+from quantecon.gridtools import cartesian
 
 import numpy as np
 import scipy as sp
@@ -216,47 +217,13 @@ def _fill_tauchen(x, P, n, rho, sigma, half_step):
                        std_norm_cdf((z - half_step) / sigma))
 
 
-def cartesian_product(arrays, row_major=True):
-    """
-    Create a Cartesian product from the list of grids in `arrays` and then
-    flatten it so that S[i, :] is an array of grid points corresponding to
-    state i.
-
-    If row_major is True, then the Cartesian product of the grids is
-    enumerated in row major order. Otherwise it is enumerated in column major.
-
-    Currently the column major operation is copied from MATLAB and could
-    surely be made more efficient.
-    """
-
-    m = len(arrays)
-    if row_major:
-        s = np.stack(np.meshgrid(*arrays, indexing='ij'), axis=-1)
-        S = np.reshape(s, (-1, m))
-    else:
-        V = arrays
-        gs = [len(v) for v in V]
-        n = np.prod(gs)
-        S = np.zeros((n, m))   # Discrete state space
-
-        for i in range(m):
-            if i == 0:
-                S0 = np.ravel(V[i])
-                S[:, i] = np.ravel(np.tile(S0, [np.prod(gs[i+1:]), 1]))
-            else:
-                S0 = np.sort(np.ravel(np.tile(V[i], [np.prod(gs[0:i]), 1])))
-                S[:, i] = np.ravel(np.tile(S0, [np.prod(gs[i+1:]), 1]))
-    return S
-
-
 def discrete_var(A,
                  Omega,
                  grid_sizes=None,
                  std_devs=np.sqrt(10),
                  seed=1234,
                  sim_length=1_000_000,
-                 burn_in=100_000,
-                 row_major=True):
+                 burn_in=100_000):
     r"""
     This code discretizes a VAR(1) process of the form:
 
@@ -295,9 +262,6 @@ def discrete_var(A,
     burn_in : int
         The number of burn-in draws from the simulated series (default,
         100_000).
-    row_major : bool
-        If True then return form the cartesian product state grid using row
-        major ordering.  Otherwise use column major.
 
     Returns
     -------
@@ -310,7 +274,8 @@ def discrete_var(A,
             matrix of the discretized state.
         S : An array where element (i,j) of S is the discretized
             value of the j-th element of x_t in state i. Reducing S to its
-            unique values yields the grid values.
+            unique values yields the grid values. The cartesian product
+            state grid uses a row major ordering.
 
 
     Notes
@@ -360,7 +325,7 @@ def discrete_var(A,
         b = np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
         V.append(b)
 
-    S = cartesian_product(V, row_major=row_major)
+    S = cartesian(V)
 
     Pi = np.zeros((n, n))
     Xvec = np.zeros((m, sim_length))
