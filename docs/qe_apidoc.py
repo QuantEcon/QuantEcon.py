@@ -237,7 +237,6 @@ def model_tool():
     tool_files = glob("../quantecon/[a-z0-9]*.py")
     tools = list(map(lambda x: x.split('/')[-1][:-3], tool_files))
     # Alphabetize
-    tools.remove("version")
     tools.sort()
 
     # list file names of utilities
