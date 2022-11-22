@@ -4,7 +4,6 @@ Filename: test_localint.py
 Tests for localint.py
 
 """
-
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal
 
@@ -14,7 +13,7 @@ from quantecon.game_theory import LocalInteraction
 class TestLocalInteraction:
     '''Test the methods of LocalInteraction'''
 
-    def setUp(self):
+    def setup_method(self):
         '''Setup a LocalInteraction instance'''
         payoff_matrix = np.asarray([[4, 0], [2, 3]])
         adj_matrix = np.asarray([[0, 1, 3],
@@ -56,13 +55,3 @@ class TestLocalInteraction:
                                                actions=init_actions,
                                                player_ind_seq=player_ind_seq),
                            x)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

@@ -4,7 +4,6 @@ Filename: test_logitdyn.py
 Tests for logitdyn.py
 
 """
-
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal_nulp
 
@@ -14,7 +13,7 @@ from quantecon.game_theory import NormalFormGame, LogitDynamics
 class TestLogitDynamics:
     '''Test the methods of LogitDynamics'''
 
-    def setUp(self):
+    def setup_method(self):
         '''Setup a LogitDynamics instance'''
         # symmetric 2x2 coordination game
         payoff_matrix = [[4, 0],
@@ -54,13 +53,3 @@ def test_set_choice_probs_with_asymmetric_payoff_matrix():
     cdfs_computed = cdfs_computed / cdfs_computed[..., [-1]]  # Normalized
 
     assert_array_almost_equal_nulp(cdfs_computed, cdfs)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

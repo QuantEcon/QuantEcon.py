@@ -4,7 +4,6 @@ Filename: test_fictplay.py
 Tests for fictplay.py
 
 """
-
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 from scipy.stats import norm
@@ -14,7 +13,7 @@ from quantecon.game_theory import FictitiousPlay, StochasticFictitiousPlay
 
 class TestFictitiousPlayDecreaingGain:
 
-    def setUp(self):
+    def setup_method(self):
         '''Setup a FictitiousPlay instance'''
         # symmetric 2x2 coordination game
         matching_pennies = [[(1, -1), (-1, 1)],
@@ -37,7 +36,7 @@ class TestFictitiousPlayDecreaingGain:
 
 class TestFictitiousPlayConstantGain:
 
-    def setUp(self):
+    def setup_method(self):
         matching_pennies = [[(1, -1), (-1, 1)],
                             [(-1, 1), (1, -1)]]
         self.fp = FictitiousPlay(matching_pennies, gain=0.1)
@@ -58,7 +57,7 @@ class TestFictitiousPlayConstantGain:
 
 class TestStochasticFictitiosuPlayDecreaingGain:
 
-    def setUp(self):
+    def setup_method(self):
         matching_pennies = [[(1, -1), (-1, 1)],
                             [(-1, 1), (1, -1)]]
         distribution = norm()
@@ -83,7 +82,7 @@ class TestStochasticFictitiosuPlayDecreaingGain:
 
 class TestStochasticFictitiosuPlayConstantGain:
 
-    def setUp(self):
+    def setup_method(self):
         matching_pennies = [[(1, -1), (-1, 1)],
                             [(-1, 1), (1, -1)]]
         distribution = norm()
@@ -104,13 +103,3 @@ class TestStochasticFictitiosuPlayConstantGain:
              for i in range(2)]
         assert_array_almost_equal(x[0][0], x[1][0])
         assert_array_almost_equal(x[0][1], x[1][1])
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

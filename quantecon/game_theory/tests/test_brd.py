@@ -13,7 +13,7 @@ from quantecon.game_theory import BRD, KMR, SamplingBRD
 class TestBRD:
     '''Test the methods of BRD'''
 
-    def setUp(self):
+    def setup_method(self):
         '''Setup a BRD instance'''
         # 2x2 coordination game with action 1 risk-dominant
         payoff_matrix = [[4, 0],
@@ -40,7 +40,7 @@ class TestBRD:
 class TestKMR:
     '''Test the methods of KMR'''
 
-    def setUp(self):
+    def setup_method(self):
         payoff_matrix = [[4, 0],
                          [3, 2]]
         self.N = 4
@@ -57,7 +57,7 @@ class TestKMR:
 class TestSamplingBRD:
     '''Test the methods of SamplingBRD'''
 
-    def setUp(self):
+    def setup_method(self):
         payoff_matrix = [[4, 0],
                          [3, 2]]
         self.N = 4
@@ -69,13 +69,3 @@ class TestSamplingBRD:
                                    random_state=np.random.RandomState(seed))
              for i in range(2)]
         assert_array_equal(x[0], x[1])
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
