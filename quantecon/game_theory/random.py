@@ -7,7 +7,7 @@ import numpy as np
 
 from .normal_form_game import Player, NormalFormGame
 from ..util import check_random_state
-from ..random import probvec
+from ..random.utilities import _probvec_cpu
 
 
 def random_game(nums_actions, random_state=None):
@@ -124,6 +124,33 @@ def random_pure_actions(nums_actions, random_state=None):
     return action_profile
 
 
+def _random_mixed_actions(out, random_state):
+    """
+    Fill the tuple `out` of empty ndarrays with random mixed actions.
+
+    Parameters
+    ----------
+    out : tuple(ndarray(float, ndim=1))
+        Tuple of 1d ndarrays, to be modified in place.
+
+    random_state : np.random.RandomState
+
+    Return
+    ------
+    out : tuple(ndarray(float, ndim=1))
+
+    """
+    N = len(out)
+    for x in out:
+        n = x.shape[0]
+        if n == 1:
+            x[0] = 1
+        else:
+            r = random_state.random_sample(size=n-1)
+            _probvec_cpu(r, x)
+    return out
+
+
 def random_mixed_actions(nums_actions, random_state=None):
     """
     Return a tuple of random mixed actions (vectors of floats).
@@ -146,8 +173,7 @@ def random_mixed_actions(nums_actions, random_state=None):
 
     """
     random_state = check_random_state(random_state)
-    action_profile = tuple(
-        [probvec(1, num_actions, random_state).ravel()
-         for num_actions in nums_actions]
-    )
+    action_profile = \
+        tuple(np.empty(num_actions) for num_actions in nums_actions)
+    _random_mixed_actions(action_profile, random_state)
     return action_profile
