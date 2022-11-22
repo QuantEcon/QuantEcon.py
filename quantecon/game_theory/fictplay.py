@@ -17,8 +17,8 @@ class FictitiousPlay:
 
     gain : scalar(float), optional(default=None)
         The gain of fictitous play model. If gain is None, the model becomes a
-        decreasing gain model. If gain is a scalar, the model becomes a constant
-        gain model.
+        decreasing gain model. If gain is a scalar, the model becomes a
+        constant gain model.
 
     Attributes
     ----------
@@ -84,7 +84,7 @@ class FictitiousPlay:
 
         out : tuple(array_like(float)), optional(default=None)
             Alternative output tuple of arrays in which to place the result.
-            Must be of the same shape as the expected output. 
+            Must be of the same shape as the expected output.
 
         **options : Keyword arguments passed to the best response method and
                     other methods.
@@ -176,8 +176,8 @@ class StochasticFictitiousPlay(FictitiousPlay):
 
     gain : scalar(scalar), optional(default=None)
         The gain of fictitious play model. If gain is None, the model becomes a
-        decreasing gain model. If gain is a scalar, the model becomes a constant
-        gain model.
+        decreasing gain model. If gain is a scalar, the model becomes a
+        constant gain model.
 
     Attributes
     ----------
