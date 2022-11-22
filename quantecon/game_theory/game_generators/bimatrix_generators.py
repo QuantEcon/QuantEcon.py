@@ -197,7 +197,7 @@ def _populate_blotto_payoff_arrays(payoff_arrays, actions, values):
                     for p in range(2):
                         payoffs[p] += values[k, p] / 2
                 else:
-                    winner = np.int(actions[i, k] < actions[j, k])
+                    winner = np.intp(actions[i, k] < actions[j, k])
                     payoffs[winner] += values[k, winner]
             payoff_arrays[0][i, j], payoff_arrays[1][j, i] = payoffs
 

@@ -5,7 +5,6 @@ specified vector of probabilities.
 """
 
 import numpy as np
-from numpy import cumsum
 from .util import check_random_state
 
 
@@ -29,7 +28,7 @@ class DiscreteRV:
 
     def __init__(self, q):
         self._q = np.asarray(q)
-        self.Q = cumsum(q)
+        self.Q = np.cumsum(q)
 
     def __repr__(self):
         return "DiscreteRV with {n} elements".format(n=self._q.size)
@@ -52,7 +51,7 @@ class DiscreteRV:
 
         """
         self._q = np.asarray(val)
-        self.Q = cumsum(val)
+        self.Q = np.cumsum(val)
 
     def draw(self, k=1, random_state=None):
         """

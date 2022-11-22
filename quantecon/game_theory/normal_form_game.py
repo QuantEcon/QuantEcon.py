@@ -434,11 +434,9 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `lemke_howson` from `quantecon.game_theory` is used
-            to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'`, `'interior-point'`,
-            or `'revised simplex'`, then `scipy.optimize.linprog` is
-            used with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used.
+            Otherwise `scipy.optimize.linprog` is used with the method
+            as specified by `method`.
 
         Returns
         -------
@@ -465,11 +463,10 @@ class Player:
             D.shape = (D.shape[0], np.prod(D.shape[1:]))
 
         if method is None:
-            from .lemke_howson import lemke_howson
-            g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
-            NE = lemke_howson(g_zero_sum)
-            return NE[0] @ D @ NE[1] > tol
-        elif method in ['simplex', 'interior-point', 'revised simplex']:
+            from ..optimize.minmax import minmax
+            v, _, _ = minmax(D)
+            return v > tol
+        else:
             from scipy.optimize import linprog
             m, n = D.shape
             A_ub = np.empty((n, m+1))
@@ -482,8 +479,12 @@ class Player:
             b_eq = np.ones(1)
             c = np.zeros(m+1)
             c[-1] = -1
-            res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
-                          method=method)
+            try:
+                res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                              method=method)
+            except ValueError:
+                raise ValueError("Unknown method '{0}'".format(method))
+
             if res.success:
                 return res.x[-1] > tol
             elif res.status == 2:  # infeasible
@@ -491,8 +492,6 @@ class Player:
             else:  # pragma: no cover
                 msg = 'scipy.optimize.linprog returned {0}'.format(res.status)
                 raise RuntimeError(msg)
-        else:
-            raise ValueError('Unknown method {0}'.format(method))
 
     def dominated_actions(self, tol=None, method=None):
         """
@@ -506,11 +505,10 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `lemke_howson` from `quantecon.game_theory` is used
-            to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'`, `'interior-point'`,
-            or `'revised simplex'`, then `scipy.optimize.linprog` is
-            used with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used. If
+            `method` is set to `'simplex'`, `'interior-point'`, or
+            `'revised simplex'`, then `scipy.optimize.linprog` is used
+            with the method as specified by `method`.
 
         Returns
         -------

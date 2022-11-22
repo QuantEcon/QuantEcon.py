@@ -2,16 +2,14 @@
 Tests for ivp.py
 
 """
-import nose
 
 import numpy as np
 
-from .. import ivp
-
+from quantecon.ivp import IVP
 
 # use the Solow Model with Cobb-Douglas production as test case
 def solow_model(t, k, g, n, s, alpha, delta):
-    """
+    r"""
     Equation of motion for capital stock (per unit effective labor).
 
     Parameters
@@ -43,7 +41,7 @@ def solow_model(t, k, g, n, s, alpha, delta):
 
 
 def solow_jacobian(t, k, g, n, s, alpha, delta):
-    """
+    r"""
     Jacobian matrix for the Solow model.
 
     Parameters
@@ -75,7 +73,7 @@ def solow_jacobian(t, k, g, n, s, alpha, delta):
 
 
 def solow_steady_state(g, n, s, alpha, delta):
-    """
+    r"""
     Steady-state level of capital stock (per unit effective labor).
 
     Parameters
@@ -103,7 +101,7 @@ def solow_steady_state(g, n, s, alpha, delta):
 
 
 def solow_analytic_solution(t, k0, g, n, s, alpha, delta):
-    """
+    r"""
     Analytic solution for the path of capital stock (per unit effective labor).
 
     Parameters
@@ -144,7 +142,7 @@ def solow_analytic_solution(t, k0, g, n, s, alpha, delta):
 
 # create an instance of the IVP class
 valid_params = (0.02, 0.02, 0.15, 0.33, 0.05)
-model = ivp.IVP(f=solow_model,
+model = IVP(f=solow_model,
                 jac=solow_jacobian)
 
 model.f_params = valid_params
@@ -200,7 +198,7 @@ def _compute_variable_length_solns(model, t0, k0, g, tol):
 def test_solve_args():
     """Testing arguments passed to the IVP.solve method."""
     # g and tol must be passed together!
-    with nose.tools.assert_raises(ValueError):
+    with np.testing.assert_raises(ValueError):
         t0, k0 = 0, np.array([5.0])
         model.solve(t0, k0, g=_termination_condition)
 
@@ -237,11 +235,11 @@ def test_solve_variable_trajectory():
 
         # test termination condition
         diff = numeric_solution[-1, 1] - solow_steady_state(*valid_params)
-        nose.tools.assert_less_equal(diff, tol)
+        np.testing.assert_(diff <= tol)
 
 
 def test_interpolation():
-    """Testing parameteric B-spline interpolation methods."""
+    """Testing parametric B-spline interpolation methods."""
 
     # compute some fixed length trajectories
     t0, k0 = 0, np.array([5.0])

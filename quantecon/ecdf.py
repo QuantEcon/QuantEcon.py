@@ -48,4 +48,7 @@ class ECDF:
             Fraction of the sample less than x
 
         """
-        return np.mean(self.observations <= x)
+        def f(a):
+            return np.mean(self.observations <= a)
+        vf = np.frompyfunc(f, 1, 1)
+        return vf(x).astype(float)

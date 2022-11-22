@@ -75,9 +75,9 @@ def periodogram(x, window=None, window_len=7):
 
         I(w) = \frac{1}{n} \Big[ \sum_{t=0}^{n-1} x_t e^{itw} \Big] ^2
 
-    at the Fourier frequences :math:`w_j := \frac{2 \pi j}{n}`,
+    at the Fourier frequencies :math:`w_j := \frac{2 \pi j}{n}`,
     :math:`j = 0, \dots, n - 1`, using the fast Fourier transform. Only the
-    frequences :math:`w_j` in :math:`[0, \pi]` and corresponding values
+    frequencies :math:`w_j` in :math:`[0, \pi]` and corresponding values
     :math:`I(w_j)` are returned. If a window type is given then smoothing
     is performed.
 
@@ -94,9 +94,9 @@ def periodogram(x, window=None, window_len=7):
     Returns
     -------
     w : array_like(float)
-        Fourier frequences at which periodogram is evaluated
+        Fourier frequencies at which periodogram is evaluated
     I_w : array_like(float)
-        Values of periodogram at the Fourier frequences
+        Values of periodogram at the Fourier frequencies
 
     """
     n = len(x)
@@ -128,9 +128,9 @@ def ar_periodogram(x, window='hanning', window_len=7):
     Returns
     -------
     w : array_like(float)
-        Fourier frequences at which periodogram is evaluated
+        Fourier frequencies at which periodogram is evaluated
     I_w : array_like(float)
-        Values of periodogram at the Fourier frequences
+        Values of periodogram at the Fourier frequencies
 
     """
     # === run regression === #

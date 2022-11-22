@@ -3,14 +3,14 @@ Tests for vertex_enumeration.py
 
 """
 import numpy as np
-from numpy.testing import assert_allclose, assert_array_equal
-from nose.tools import eq_, raises
+from numpy.testing import (assert_allclose, assert_array_equal, assert_,
+                           assert_raises)
 from quantecon.game_theory import NormalFormGame, vertex_enumeration
 from quantecon.game_theory.vertex_enumeration import _BestResponsePolytope
 
 
 class TestVertexEnumeration:
-    def setUp(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
@@ -36,7 +36,7 @@ class TestVertexEnumeration:
     def test_vertex_enumeration(self):
         for d in self.game_dicts:
             NEs_computed = vertex_enumeration(d['g'])
-            eq_(len(NEs_computed), len(d['NEs']))
+            assert_(len(NEs_computed) == len(d['NEs']))
             for NEs in (NEs_computed, d['NEs']):
                 NEs.sort(key=lambda x: (list(x[0]), list(x[1])))
             for actions_computed, actions in zip(NEs_computed, d['NEs']):
@@ -55,7 +55,7 @@ def test_vertex_enumeration_qhull_options():
                     ([2/3, 1/3, 0], [1/3, 2/3])]
     qhull_options = 'QJ'
     NEs_computed = vertex_enumeration(g, qhull_options=qhull_options)
-    eq_(len(NEs_computed), len(NEs_expected))
+    assert_(len(NEs_computed) == len(NEs_expected))
     for NEs in (NEs_computed, NEs_expected):
         NEs.sort(key=lambda x: (list(x[1]), list(x[0])))
     for actions_computed, actions in zip(NEs_computed, NEs_expected):
@@ -63,23 +63,22 @@ def test_vertex_enumeration_qhull_options():
             assert_allclose(action_computed, action, atol=1e-10)
 
 
-@raises(TypeError)
 def test_vertex_enumeration_invalid_g():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
-    vertex_enumeration(bimatrix)
+    assert_raises(TypeError, vertex_enumeration, bimatrix)
 
 
 class TestBestResponsePolytope:
-    def setUp(self):
+    def setup_method(self):
         # From von Stengel 2007 in Algorithmic Game Theory
         bimatrix = [[(3, 3), (3, 2)],
                     [(2, 2), (5, 6)],
                     [(0, 3), (6, 1)]]
         g = NormalFormGame(bimatrix)
 
-        # Original best reponse polytope for player 0
+        # Original best response polytope for player 0
         vertices_P = np.array([
             [0, 0, 0],       # 0
             [1/3, 0, 0],     # a
@@ -103,7 +102,7 @@ class TestBestResponsePolytope:
         self.labelings_P = labelings_P[ind]
         self.vertices_P = vertices_P[ind]
 
-        # Translated best reponse polytope for player 0
+        # Translated best response polytope for player 0
         self.brp0 = _BestResponsePolytope(g.players[1], idx=0)
 
     def test_best_response_polytope(self):
@@ -123,20 +122,9 @@ class TestBestResponsePolytope:
         assert_allclose(vertices_computed, self.vertices_P, atol=1e-15)
 
 
-@raises(TypeError)
 def test_best_response_polytope_invalid_player_instance():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
     g = NormalFormGame(bimatrix)
-    _BestResponsePolytope(g)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(TypeError, _BestResponsePolytope, g)

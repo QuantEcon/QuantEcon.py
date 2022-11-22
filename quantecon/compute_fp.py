@@ -63,7 +63,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
     routine. It finds an approximate fixed point of `T`, a point
     :math:`v^*` such that :math:`\lVert T(v) - v\rVert \leq
     \mathrm{error\_tol}`, provided `T` is a function that satisfies the
-    assumptions of Brouwer's fixed point theorm, i.e., a continuous
+    assumptions of Brouwer's fixed point theorem, i.e., a continuous
     function that maps a compact and convex set to itself.
 
     Parameters

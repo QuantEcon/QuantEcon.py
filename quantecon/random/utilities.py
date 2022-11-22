@@ -164,7 +164,7 @@ def _sample_without_replacement(n, r, out):
     # Logic taken from random.sample in the standard library
     pool = np.arange(n)
     for j in range(k):
-        idx = int(np.floor(r[j] * (n-j)))  # np.floor returns a float
+        idx = np.intp(np.floor(r[j] * (n-j)))  # np.floor returns a float
         out[j] = pool[idx]
         pool[idx] = pool[n-j-1]
 

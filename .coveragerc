@@ -1,4 +1,7 @@
 [run]
+# relative_files = True is necessary as per documentation of
+# https://github.com/AndreMiras/coveralls-python-action
+relative_files = True
 source = quantecon
 omit =
     */python?.?/*

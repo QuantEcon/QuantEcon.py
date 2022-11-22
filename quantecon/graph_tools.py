@@ -5,7 +5,7 @@ Tools for dealing with a directed graph.
 import numpy as np
 from scipy import sparse
 from scipy.sparse import csgraph
-from fractions import gcd
+from math import gcd
 from numba import jit
 
 from .util import check_random_state

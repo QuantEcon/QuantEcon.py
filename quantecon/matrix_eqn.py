@@ -10,7 +10,6 @@ TODO: 1. See issue 47 on github repository, should add support for
       2. Fix warnings from checking conditioning of matrices
 """
 import numpy as np
-from numpy import dot
 from numpy.linalg import solve
 from scipy.linalg import solve_discrete_lyapunov as sp_solve_discrete_lyapunov
 from scipy.linalg import solve_discrete_are as sp_solve_discrete_are
@@ -172,19 +171,19 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
     # == Choose optimal value of gamma in R_hat = R + gamma B'B == #
     current_min = np.inf
     candidates = (0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5)
-    BB = dot(B.T, B)
-    BTA = dot(B.T, A)
+    BB = np.dot(B.T, B)
+    BTA = np.dot(B.T, A)
     for gamma in candidates:
         Z = R + gamma * BB
         cn = np.linalg.cond(Z)
         if cn * EPS < 1:
-            Q_tilde = - Q + dot(N.T, solve(Z, N + gamma * BTA)) + gamma * I
-            G0 = dot(B, solve(Z, B.T))
-            A0 = dot(I - gamma * G0, A) - dot(B, solve(Z, N))
-            H0 = gamma * dot(A.T, A0) - Q_tilde
+            Q_tilde = - Q + np.dot(N.T, solve(Z, N + gamma * BTA)) + gamma * I
+            G0 = np.dot(B, solve(Z, B.T))
+            A0 = np.dot(I - gamma * G0, A) - np.dot(B, solve(Z, N))
+            H0 = gamma * np.dot(A.T, A0) - Q_tilde
             f1 = np.linalg.cond(Z, np.inf)
             f2 = gamma * f1
-            f3 = np.linalg.cond(I + dot(G0, H0))
+            f3 = np.linalg.cond(I + np.dot(G0, H0))
             f_gamma = max(f1, f2, f3)
             if f_gamma < current_min:
                 best_gamma = gamma
@@ -199,10 +198,10 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
     R_hat = R + gamma * BB
 
     # == Initial conditions == #
-    Q_tilde = - Q + dot(N.T, solve(R_hat, N + gamma * BTA)) + gamma * I
-    G0 = dot(B, solve(R_hat, B.T))
-    A0 = dot(I - gamma * G0, A) - dot(B, solve(R_hat, N))
-    H0 = gamma * dot(A.T, A0) - Q_tilde
+    Q_tilde = - Q + np.dot(N.T, solve(R_hat, N + gamma * BTA)) + gamma * I
+    G0 = np.dot(B, solve(R_hat, B.T))
+    A0 = np.dot(I - gamma * G0, A) - np.dot(B, solve(R_hat, N))
+    H0 = gamma * np.dot(A.T, A0) - Q_tilde
     i = 1
 
     # == Main loop == #
@@ -212,9 +211,9 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
             raise ValueError(fail_msg.format(i))
 
         else:
-            A1 = dot(A0, solve(I + dot(G0, H0), A0))
-            G1 = G0 + dot(dot(A0, G0), solve(I + dot(H0, G0), A0.T))
-            H1 = H0 + dot(A0.T, solve(I + dot(H0, G0), dot(H0, A0)))
+            A1 = np.dot(A0, solve(I + np.dot(G0, H0), A0))
+            G1 = G0 + np.dot(np.dot(A0, G0), solve(I + np.dot(H0, G0), A0.T))
+            H1 = H0 + np.dot(A0.T, solve(I + np.dot(H0, G0), np.dot(H0, A0)))
 
             error = np.max(np.abs(H1 - H0))
             A0 = A1

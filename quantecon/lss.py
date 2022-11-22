@@ -10,8 +10,8 @@ https://lectures.quantecon.org/py/linear_models.html
 
 from textwrap import dedent
 import numpy as np
-from numpy.random import multivariate_normal
 from scipy.linalg import solve
+from .matrix_eqn import solve_discrete_lyapunov
 from numba import jit
 from .util import check_random_state
 
@@ -185,7 +185,8 @@ class LinearStateSpace:
         """
         random_state = check_random_state(random_state)
 
-        x0 = multivariate_normal(self.mu_0.flatten(), self.Sigma_0)
+        x0 = random_state.multivariate_normal(self.mu_0.flatten(),
+                                              self.Sigma_0)
         w = random_state.randn(self.m, ts_length-1)
         v = self.C.dot(w)  # Multiply each w_t by C to get v_t = C w_t
         # == simulate time series == #
@@ -244,7 +245,7 @@ class LinearStateSpace:
     def moment_sequence(self):
         r"""
         Create a generator to calculate the population mean and
-        variance-convariance matrix for both :math:`x_t` and :math:`y_t`
+        variance-covariance matrix for both :math:`x_t` and :math:`y_t`
         starting at the initial condition (self.mu_0, self.Sigma_0).
         Each iteration produces a 4-tuple of items (mu_x, mu_y, Sigma_x,
         Sigma_y) for the next period.
@@ -281,59 +282,61 @@ class LinearStateSpace:
             mu_x = A.dot(mu_x)
             Sigma_x = A.dot(Sigma_x).dot(A.T) + C.dot(C.T)
 
-    def stationary_distributions(self, max_iter=200, tol=1e-5):
+    def stationary_distributions(self):
         r"""
         Compute the moments of the stationary distributions of :math:`x_t` and
-        :math:`y_t` if possible.  Computation is by iteration, starting from
-        the initial conditions self.mu_0 and self.Sigma_0
-
-        Parameters
-        ----------
-        max_iter : scalar(int), optional(default=200)
-            The maximum number of iterations allowed
-        tol : scalar(float), optional(default=1e-5)
-            The tolerance level that one wishes to achieve
+        :math:`y_t` if possible. Computation is by solving the discrete
+        Lyapunov equation.
 
         Returns
         -------
-        mu_x_star : array_like(float)
+        mu_x : array_like(float)
             An n x 1 array representing the stationary mean of :math:`x_t`
-        mu_y_star : array_like(float)
+        mu_y : array_like(float)
             An k x 1 array representing the stationary mean of :math:`y_t`
-        Sigma_x_star : array_like(float)
+        Sigma_x : array_like(float)
             An n x n array representing the stationary var-cov matrix
             of :math:`x_t`
-        Sigma_y_star : array_like(float)
+        Sigma_y : array_like(float)
             An k x k array representing the stationary var-cov matrix
             of :math:`y_t`
+        Sigma_yx : array_like(float)
+            An k x n array representing the stationary cov matrix
+            between :math:`y_t` and :math:`x_t`.
 
         """
-        # == Initialize iteration == #
-        m = self.moment_sequence()
-        mu_x, mu_y, Sigma_x, Sigma_y = next(m)
-        i = 0
-        error = tol + 1
+        self.__partition()
+        num_const, sorted_idx = self.num_const, self.sorted_idx
+        A21, A22 = self.A21, self.A22
+        CC2 = self.C2 @ self.C2.T
+        n = self.n
 
-        # == Loop until convergence or failure == #
-        while error > tol:
+        if num_const > 0:
+            μ = solve(np.eye(n-num_const) - A22, A21)
+        else:
+            μ = solve(np.eye(n-num_const) - A22, np.zeros((n, 1)))
+        Σ = solve_discrete_lyapunov(A22, CC2, method='bartels-stewart')
 
-            if i > max_iter:
-                fail_message = 'Convergence failed after {} iterations'
-                raise ValueError(fail_message.format(max_iter))
+        mu_x = np.empty((n, 1))
+        mu_x[:num_const] = self.mu_0[sorted_idx[:num_const]]
+        mu_x[num_const:] = μ
 
-            else:
-                i += 1
-                mu_x1, mu_y1, Sigma_x1, Sigma_y1 = next(m)
-                error_mu = np.max(np.abs(mu_x1 - mu_x))
-                error_Sigma = np.max(np.abs(Sigma_x1 - Sigma_x))
-                error = max(error_mu, error_Sigma)
-                mu_x, Sigma_x = mu_x1, Sigma_x1
+        Sigma_x = np.zeros((n, n))
+        Sigma_x[num_const:, num_const:] = Σ
 
-        # == Prepare return values == #
-        mu_x_star, Sigma_x_star = mu_x, Sigma_x
-        mu_y_star, Sigma_y_star = mu_y1, Sigma_y1
+        mu_x = self.P.T @ mu_x
+        Sigma_x = self.P.T @ Sigma_x @ self.P
 
-        return mu_x_star, mu_y_star, Sigma_x_star, Sigma_y_star
+        mu_y = self.G @ mu_x
+        Sigma_y = self.G @ Sigma_x @ self.G.T
+        if self.H is not None:
+            Sigma_y += self.H @ self.H.T
+        Sigma_yx = self.G @ Sigma_x
+
+        self.mu_x, self.mu_y = mu_x, mu_y
+        self.Sigma_x, self.Sigma_y, self.Sigma_yx = Sigma_x, Sigma_y, Sigma_yx
+
+        return mu_x, mu_y, Sigma_x, Sigma_y, Sigma_yx
 
     def geometric_sums(self, beta, x_t):
         r"""
@@ -406,3 +409,62 @@ class LinearStateSpace:
             Apower = np.dot(Apower, A)
 
         return xcoef, ycoef
+
+    def __partition(self):
+        r"""
+        Reorder the states by shifting the constant terms to the
+        top of the state vector. Then partition the linear state
+        space model following Appendix C in RMT Ch2 such that the
+        A22 matrix associated with non-constant states have eigenvalues
+        all strictly smaller than 1.
+
+        .. math::
+            \left[\begin{array}{c}
+            const\\
+            x_{2,t+1}
+            \end{array}\right]=\left[\begin{array}{cc}
+            I & 0\\
+            A_{21} & A_{22}
+            \end{array}\right]\left[\begin{array}{c}
+            1\\
+            x_{2,t}
+            \end{array}\right]+\left[\begin{array}{c}
+            0\\
+            C_{2}
+            \end{array}\right]w_{t+1}
+
+        Returns
+        -------
+        A22 : array_like(float)
+            Lower right part of the reordered matrix A.
+        A21 : array_like(float)
+            Lower left part of the reordered matrix A.
+        """
+        A, C = self.A, self.C
+        n = self.n
+
+        sorted_idx = []
+        A_diag = np.diag(A)
+        num_const = 0
+        for idx in range(n):
+            if (A_diag[idx] == 1) and (C[idx, :] == 0).all() and \
+                    np.linalg.norm(A[idx, :]) == 1:
+                sorted_idx.insert(0, idx)
+                num_const += 1
+            else:
+                sorted_idx.append(idx)
+        self.num_const = num_const
+        self.sorted_idx = sorted_idx
+
+        P = np.zeros((n, n))
+        P[range(n), sorted_idx] = 1
+
+        sorted_A = P @ A @ P.T
+        sorted_C = P @ C
+        A21 = sorted_A[num_const:, :num_const]
+        A22 = sorted_A[num_const:, num_const:]
+        C2 = sorted_C[num_const:, :]
+
+        self.P, self.A21, self.A22, self.C2 = P, A21, A22, C2
+
+        return A21, A22

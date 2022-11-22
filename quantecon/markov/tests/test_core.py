@@ -10,8 +10,10 @@ Functions
 import numpy as np
 from scipy import sparse
 import itertools
-from numpy.testing import assert_allclose, assert_array_equal, assert_raises
-from nose.tools import eq_, ok_, raises
+from numpy.testing import (
+    assert_allclose, assert_array_equal, assert_array_less, assert_raises,
+    assert_
+)
 
 from quantecon.markov import (
     MarkovChain, mc_compute_stationary, mc_sample_path
@@ -25,7 +27,7 @@ def list_of_array_equal(s, t):
     s, t: lists of numpy.ndarrays
 
     """
-    eq_(len(s), len(t))
+    assert_(len(s) == len(t))
     all(assert_array_equal(x, y) for x, y in zip(s, t))
 
 
@@ -189,7 +191,7 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
     p = 1/3
     TOL = 1e-2
 
-    def setUp(self):
+    def setup_method(self):
         """ Setup a KMRMarkovMatrix and Compute Stationary Values """
         self.P = KMR_Markov_matrix_sequential(self.N, self.p, self.epsilon)
         self.mc = MarkovChain(self.P)
@@ -313,7 +315,7 @@ def test_simulate_ergodicity():
 
     x = mc.simulate(ts_length, init=init, num_reps=num_reps, random_state=seed)
     frequency_1 = x[:, -1].mean()
-    ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
+    assert_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
 def test_simulate_for_matrices_with_C_F_orders():
@@ -337,6 +339,33 @@ def test_simulate_for_matrices_with_C_F_orders():
     computed_F = MarkovChain(P_F).simulate(ts_length, init=init)
     assert_array_equal(computed_C, sample_path)
     assert_array_equal(computed_F, sample_path)
+
+
+def test_simulate_issue591():
+    """
+    Test MarkovChasin.simulate for P with dtype=np.float32
+    https://github.com/QuantEcon/QuantEcon.py/issues/591
+    """
+    num_states = 5
+    transition_states = 4
+
+    transition_seed = 2
+    random_state = np.random.RandomState(transition_seed)
+    transitions = random_state.uniform(0., 1., transition_states)
+    transitions /= np.sum(transitions)
+    P = np.zeros((num_states, num_states), dtype=np.float32)
+    P[0, :transition_states] = transitions
+    P[1:, 0] = 1.
+    mc = MarkovChain(P=P)
+
+    simulate_seed = 22220
+    ts_length = 10000
+    seq = mc.simulate(
+        ts_length=ts_length, init=0, num_reps=1, random_state=simulate_seed
+    )
+    max_state_in_seq = np.max(seq)
+
+    assert_array_less(max_state_in_seq, num_states)
 
 
 def test_mc_sample_path():
@@ -376,11 +405,11 @@ def test_mc_sample_path_lln():
 
     frequency_1 = mc_sample_path(P, init=init, sample_size=sample_size,
                                  random_state=seed).mean()
-    ok_(np.abs(frequency_1 - stationary_dist[1]) < tol)
+    assert_(np.abs(frequency_1 - stationary_dist[1]) < tol)
 
 
 class TestMCStateValues:
-    def setUp(self):
+    def setup_method(self):
         state_values = [[0, 1], [2, 3], [4, 5]]  # Pass python list
         self.state_values = np.array(state_values)
 
@@ -490,29 +519,28 @@ def test_get_index():
     P = [[0.4, 0.6], [0.2, 0.8]]
     mc = MarkovChain(P)
 
-    eq_(mc.get_index(0), 0)
-    eq_(mc.get_index(1), 1)
+    assert_(mc.get_index(0) == 0)
+    assert_(mc.get_index(1) == 1)
     assert_raises(ValueError, mc.get_index, 2)
     assert_array_equal(mc.get_index([1, 0]), [1, 0])
     assert_raises(ValueError, mc.get_index, [[1]])
 
     mc.state_values = [1, 2]
-    eq_(mc.get_index(1), 0)
-    eq_(mc.get_index(2), 1)
+    assert_(mc.get_index(1) == 0)
+    assert_(mc.get_index(2) == 1)
     assert_raises(ValueError, mc.get_index, 0)
     assert_array_equal(mc.get_index([2, 1]), [1, 0])
     assert_raises(ValueError, mc.get_index, [[1]])
 
     mc.state_values = [[1, 2], [3, 4]]
-    eq_(mc.get_index([1, 2]), 0)
+    assert_(mc.get_index([1, 2]) == 0)
     assert_raises(ValueError, mc.get_index, 1)
     assert_array_equal(mc.get_index([[3, 4], [1, 2]]), [1, 0])
 
 
-@raises(ValueError)
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
-    MarkovChain(np.array([0.4, 0.6]))
+    assert_raises(ValueError, MarkovChain, np.array([0.4, 0.6]))
 
 
 def test_raises_value_error_non_sym():
@@ -552,13 +580,3 @@ def test_raises_non_homogeneous_state_values():
     P = [[0.4, 0.6], [0.2, 0.8]]
     state_values = [(0, 1), 2]
     assert_raises(ValueError, MarkovChain, P, state_values=state_values)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)

@@ -6,7 +6,6 @@ linear quadratic control problems.
 """
 from textwrap import dedent
 import numpy as np
-from numpy import dot
 from scipy.linalg import solve
 from .matrix_eqn import solve_discrete_riccati, solve_discrete_riccati_system
 from .util import check_random_state
@@ -71,7 +70,7 @@ class LQ:
         non-negative definite
     R : array_like(float)
         R is the payoff (or cost) matrix that corresponds with the
-        state variable x and is n x n. Should be symetric and
+        state variable x and is n x n. Should be symmetric and
         non-negative definite
     A : array_like(float)
         A is part of the state transition as described above. It should
@@ -93,7 +92,7 @@ class LQ:
     Rf : array_like(float), optional(default=None)
         Rf is the final (in a finite horizon model) payoff(or cost)
         matrix that corresponds with the control variable u and is n x
-        n.  Should be symetric and non-negative definite
+        n.  Should be symmetric and non-negative definite
 
     Attributes
     ----------
@@ -186,15 +185,15 @@ class LQ:
         Q, R, A, B, N, C = self.Q, self.R, self.A, self.B, self.N, self.C
         P, d = self.P, self.d
         # == Some useful matrices == #
-        S1 = Q + self.beta * dot(B.T, dot(P, B))
-        S2 = self.beta * dot(B.T, dot(P, A)) + N
-        S3 = self.beta * dot(A.T, dot(P, A))
+        S1 = Q + self.beta * np.dot(B.T, np.dot(P, B))
+        S2 = self.beta * np.dot(B.T, np.dot(P, A)) + N
+        S3 = self.beta * np.dot(A.T, np.dot(P, A))
         # == Compute F as (Q + B'PB)^{-1} (beta B'PA + N) == #
         self.F = solve(S1, S2)
         # === Shift P back in time one step == #
-        new_P = R - dot(S2.T, self.F) + S3
+        new_P = R - np.dot(S2.T, self.F) + S3
         # == Recalling that trace(AB) = trace(BA) == #
-        new_d = self.beta * (d + np.trace(dot(P, dot(C, C.T))))
+        new_d = self.beta * (d + np.trace(np.dot(P, np.dot(C, C.T))))
         # == Set new state == #
         self.P, self.d = new_P, new_d
 
@@ -240,15 +239,15 @@ class LQ:
         P = solve_discrete_riccati(A0, B0, R, Q, N, method=method)
 
         # == Compute F == #
-        S1 = Q + self.beta * dot(B.T, dot(P, B))
-        S2 = self.beta * dot(B.T, dot(P, A)) + N
+        S1 = Q + self.beta * np.dot(B.T, np.dot(P, B))
+        S2 = self.beta * np.dot(B.T, np.dot(P, A)) + N
         F = solve(S1, S2)
 
         # == Compute d == #
         if self.beta == 1:
             d = 0
         else:
-            d = self.beta * np.trace(dot(P, dot(C, C.T))) / (1 - self.beta)
+            d = self.beta * np.trace(np.dot(P, np.dot(C, C.T))) / (1 - self.beta)
 
         # == Bind states and return values == #
         self.P, self.F, self.d = P, F, d
@@ -315,7 +314,7 @@ class LQ:
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
         w_path = random_state.randn(self.j, T+1)
-        Cw_path = dot(C, w_path)
+        Cw_path = np.dot(C, w_path)
 
         # == Compute and record the sequence of policies == #
         policies = []
@@ -327,13 +326,13 @@ class LQ:
         # == Use policy sequence to generate states and controls == #
         F = policies.pop()
         x_path[:, 0] = x0.flatten()
-        u_path[:, 0] = - dot(F, x0).flatten()
+        u_path[:, 0] = - np.dot(F, x0).flatten()
         for t in range(1, T):
             F = policies.pop()
-            Ax, Bu = dot(A, x_path[:, t-1]), dot(B, u_path[:, t-1])
+            Ax, Bu = np.dot(A, x_path[:, t-1]), np.dot(B, u_path[:, t-1])
             x_path[:, t] = Ax + Bu + Cw_path[:, t]
-            u_path[:, t] = - dot(F, x_path[:, t])
-        Ax, Bu = dot(A, x_path[:, T-1]), dot(B, u_path[:, T-1])
+            u_path[:, t] = - np.dot(F, x_path[:, t])
+        Ax, Bu = np.dot(A, x_path[:, T-1]), np.dot(B, u_path[:, T-1])
         x_path[:, T] = Ax + Bu + Cw_path[:, T]
 
         return x_path, u_path, w_path
@@ -479,7 +478,7 @@ class LQMarkov:
         return dedent(m.format(b=self.beta, m=self.m, n=self.n, k=self.k,
                                j=self.j, t=t))
 
-    def stationary_values(self):
+    def stationary_values(self, max_iter=1000):
         """
         Computes the matrix :math:`P(s)` and scalar :math:`d(s)` that
         represent the value function
@@ -490,6 +489,11 @@ class LQMarkov:
 
         in the infinite horizon case.  Also computes the control matrix
         :math:`F` from :math:`u = - F(s) x`.
+
+        Parameters
+        ----------
+        max_iter : scalar(int), optional(default=1000)
+            The maximum number of iterations allowed
 
         Returns
         -------
@@ -512,7 +516,8 @@ class LQMarkov:
         Qs, Rs, Ns = self.Qs, self.Rs, self.Ns
 
         # == Solve for P(s) by iterating discrete riccati system== #
-        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta)
+        Ps = solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
+                                           max_iter=max_iter)
 
         # == calculate F and d == #
         Fs = np.array([np.empty((k, n)) for i in range(m)])

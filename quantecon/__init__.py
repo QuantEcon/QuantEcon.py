@@ -3,6 +3,8 @@
 Import the main names to top level.
 """
 
+__version__ = '0.5.3'
+
 try:
 	import numba
 except:
@@ -27,7 +29,7 @@ from .estspec import smooth, periodogram, ar_periodogram
 from .graph_tools import DiGraph, random_tournament_graph
 from .gridtools import cartesian, mlinspace, simplex_grid, simplex_index
 from .inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
-	rank_size_plot
+	rank_size
 from .kalman import Kalman
 from .lae import LAE
 from .arma import ARMA
@@ -47,6 +49,3 @@ from .markov import mc_compute_stationary, mc_sample_path
 from .rank_nullspace import rank_est, nullspace
 from .robustlq import RBLQ
 from .util import searchsorted, fetch_nb_dependencies, tic, tac, toc
-
-#-Add Version Attribute-#
-from .version import version as __version__

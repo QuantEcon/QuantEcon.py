@@ -2,17 +2,15 @@
 Tests for lqcontrol.py file
 
 """
-import sys
-import unittest
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_raises
 from numpy import dot
 from quantecon.lqcontrol import LQ, LQMarkov
 
 
-class TestLQControl(unittest.TestCase):
+class TestLQControl:
 
-    def setUp(self):
+    def setup_method(self):
         # Initial Values
         q = 1.
         r = 1.
@@ -35,7 +33,7 @@ class TestLQControl(unittest.TestCase):
 
         self.methods = ['doubling', 'qz']
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lq_scalar
         del self.lq_mat
 
@@ -91,9 +89,9 @@ class TestLQControl(unittest.TestCase):
             assert_allclose(val_func_lq, val_func_answer, atol=1e-3)
 
 
-class TestLQMarkov(unittest.TestCase):
+class TestLQMarkov:
 
-    def setUp(self):
+    def setup_method(self):
 
         # Markov chain transition matrix
         Π = np.array([[0.8, 0.2],
@@ -139,7 +137,7 @@ class TestLQMarkov(unittest.TestCase):
         self.lq_markov_mat2 = LQMarkov(Π, Qs, Rs, As, Bs,
                                        Cs=Cs, Ns=Ns, beta=1.05)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lq_markov_scalar
         del self.lq_markov_mat1
         del self.lq_markov_mat2
@@ -226,9 +224,4 @@ class TestLQMarkov(unittest.TestCase):
         # test raising error for not converging
         lq_markov_mat = self.lq_markov_mat2
 
-        self.assertRaises(ValueError, lq_markov_mat.stationary_values)
-
-if __name__ == '__main__':
-    for Test in [TestLQControl, TestLQMarkov]:
-        suite = unittest.TestLoader().loadTestsFromTestCase(Test)
-        unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)
+        assert_raises(ValueError, lq_markov_mat.stationary_values)

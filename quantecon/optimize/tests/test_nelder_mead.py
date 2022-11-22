@@ -5,8 +5,7 @@ Tests for `multivar_maximization.py`
 
 import numpy as np
 from numba import njit
-from numpy.testing import assert_allclose
-from nose.tools import raises
+from numpy.testing import assert_allclose, assert_raises
 
 from quantecon.optimize import nelder_mead
 from ..nelder_mead import _nelder_mead_algorithm
@@ -330,71 +329,59 @@ class TestMaximization():
         assert_allclose(results.fun, fun)
 
 
-@raises(ValueError)
 def test_invalid_bounds_1():
     x0 = np.array([-2., 1.])
     bounds = np.array([[10., -10.], [10., -10.]])
-    nelder_mead(rosenbrock, x0, bounds=bounds)
+    assert_raises(ValueError, nelder_mead, rosenbrock, x0, bounds=bounds)
 
 
-@raises(ValueError)
 def test_invalid_bounds_2():
     x0 = np.array([-2., 1.])
     bounds = np.array([[10., -10., 10., -10.]])
-    nelder_mead(rosenbrock, x0, bounds=bounds)
+    assert_raises(ValueError, nelder_mead, rosenbrock, x0, bounds=bounds)
 
 
-@raises(ValueError)
 def test_invalid_ρ():
     vertices = np.array([[-2., 1.],
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_ρ = -1.
-    _nelder_mead_algorithm(rosenbrock, vertices, ρ=invalid_ρ)
+    assert_raises(ValueError, _nelder_mead_algorithm, rosenbrock,
+                  vertices, ρ=invalid_ρ)
 
 
-@raises(ValueError)
 def test_invalid_χ():
     vertices = np.array([[-2., 1.],
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_χ = 0.5
-    _nelder_mead_algorithm(rosenbrock, vertices, χ=invalid_χ)
+    assert_raises(ValueError, _nelder_mead_algorithm, rosenbrock,
+                  vertices, χ=invalid_χ)
 
 
-@raises(ValueError)
 def test_invalid_ρχ():
     vertices = np.array([[-2., 1.],
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     ρ = 2
     χ = 1.5
-    _nelder_mead_algorithm(rosenbrock, vertices, ρ=ρ, χ=χ)
+    assert_raises(ValueError, _nelder_mead_algorithm, rosenbrock,
+                  vertices, ρ=ρ, χ=χ)
 
 
-@raises(ValueError)
 def test_invalid_γ():
     vertices = np.array([[-2., 1.],
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_γ = -1e-7
-    _nelder_mead_algorithm(rosenbrock, vertices, γ=invalid_γ)
+    assert_raises(ValueError, _nelder_mead_algorithm, rosenbrock,
+                  vertices, γ=invalid_γ)
 
 
-@raises(ValueError)
 def test_invalid_σ():
     vertices = np.array([[-2., 1.],
                          [1.05 * -2., 1.],
                          [-2., 1.05 * 1.]])
     invalid_σ = 1. + 1e-7
-    _nelder_mead_algorithm(rosenbrock, vertices, σ=invalid_σ)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(ValueError, _nelder_mead_algorithm, rosenbrock,
+                  vertices, σ=invalid_σ)

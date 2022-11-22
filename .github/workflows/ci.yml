@@ -1,0 +1,98 @@
+name: conda-build
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: [3.8, 3.9, '3.10']
+        exclude:
+          - os: windows-latest
+            python-version: 3.8
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Cache conda
+      uses: actions/cache@v2
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key:
+          ${{ runner.os }}-${{ matrix.python-version }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        environment-file: environment.yml
+        python-version: ${{ matrix.python-version }}
+        auto-activate-base: false
+        use-only-tar-bz2: true
+
+    - name: Conda info
+      shell: bash -l {0}
+      run: |
+        conda info
+        conda list
+
+    - name: Setup QuantEcon
+      shell: bash -l {0}
+      run: |
+        pip install -U pip
+        pip install .[testing]
+
+    - name: flake8 Tests
+      shell: bash -l {0}
+      run: |
+        flake8 --select F401, F405, E231 quantecon
+
+    - name: Run Tests (pytest)
+      shell: bash -l {0}
+      run: |
+        coverage run -m pytest quantecon
+        coverage lcov
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      if: runner.os == 'Linux'
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.lcov
+
+  publish:
+
+    name: Publish to PyPi
+    needs: [tests]
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Install flit
+        run: |
+          pip install flit~=3.6
+      - name: Build and publish
+        run: |
+          flit publish
+        env:
+          FLIT_USERNAME: __token__
+          FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}

@@ -2,17 +2,17 @@
 Tests for discrete_rv.py
 
 """
-import unittest
+
 import numpy as np
-from numpy.testing import assert_allclose
-from nose.plugins.attrib import attr
+from numpy.testing import assert_allclose, assert_
+import pytest
 from quantecon import DiscreteRV
 
 
-class TestDiscreteRV(unittest.TestCase):
+class TestDiscreteRV:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         x = np.random.rand(10)
         x /= x.sum()
         # make sure it sums to 1
@@ -30,7 +30,7 @@ class TestDiscreteRV(unittest.TestCase):
         Q_after = self.drv.Q
 
         # should be different
-        self.assertFalse(np.allclose(Q_init, Q_after))
+        assert_(not np.allclose(Q_init, Q_after))
 
         # clean up: reset values
         self.drv.q = self.x
@@ -40,9 +40,9 @@ class TestDiscreteRV(unittest.TestCase):
 
     def test_Q_end_1(self):
         "discrete_rv: Q sums to 1"
-        assert (self.drv.Q[-1] - 1.0 < 1e-10)
+        assert_(self.drv.Q[-1] - 1.0 < 1e-10)
 
-    @attr("slow")
+    @pytest.mark.slow
     def test_draw_lln(self):
         "discrete_rv: lln satisfied?"
         draws = self.drv.draw(1000000)

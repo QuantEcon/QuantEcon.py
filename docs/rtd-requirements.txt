@@ -1,0 +1,9 @@
+sphinx
+ipython
+numpydoc
+numba>=0.38
+numpy>=1.2
+sympy
+scipy>=1.0
+requests
+matplotlib

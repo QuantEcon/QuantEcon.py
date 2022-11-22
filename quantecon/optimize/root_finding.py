@@ -247,7 +247,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50,
         p1 = x0 * (1 + 1e-4) + 1e-4
     else:
         p1 = x0 * (1 + 1e-4) - 1e-4
-        q0 = func(p0, *args)
+    q0 = func(p0, *args)
     funcalls += 1
     q1 = func(p1, *args)
     funcalls += 1

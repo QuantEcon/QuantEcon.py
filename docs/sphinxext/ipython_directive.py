@@ -46,7 +46,7 @@ ToDo
 Authors
 -------
 
-- John D Hunter: orignal author.
+- John D Hunter: original author.
 - Fernando Perez: refactoring, documentation, cleanups, port to 0.11.
 - VĂĄclavĹ milauer <eudoxos-AT-arcig.cz>: Prompt generalizations.
 - Skipper Seabold, refactoring, cleanups, pure python addition
