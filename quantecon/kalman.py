@@ -34,7 +34,7 @@ class Kalman:
 
 
     Parameters
-    -----------
+    ----------
     ss : instance of LinearStateSpace
         An instance of the quantecon.lss.LinearStateSpace class
     x_hat : scalar(float) or array_like(float), optional(default=None)
@@ -241,7 +241,7 @@ class Kalman:
         self.filtered_to_forecast()
 
     def stationary_values(self, method='doubling'):
-        """
+        r"""
         Computes the limit of :math:`\Sigma_t` as t goes to infinity by
         solving the associated Riccati equation. The outputs are stored in the
         attributes `K_infinity` and `Sigma_infinity`. Computation is via the
