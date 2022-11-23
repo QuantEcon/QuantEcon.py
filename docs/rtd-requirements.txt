@@ -2,7 +2,7 @@ sphinx
 ipython
 numpydoc
 numba>=0.38
-numpy>=1.2
+numpy>=1.17
 sympy
 scipy>=1.0
 requests
