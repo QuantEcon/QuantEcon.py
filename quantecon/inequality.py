@@ -60,7 +60,7 @@ def gini_coefficient(y):
     Implements the Gini inequality index
 
     Parameters
-    -----------
+    ----------
     y : array_like(float)
         Array of income/wealth for each individual.
         Ordered or unordered is fine
@@ -88,13 +88,13 @@ def shorrocks_index(A):
     Implements Shorrocks mobility index
 
     Parameters
-    -----------
+    ----------
     A : array_like(float)
         Square matrix with transition probabilities (mobility matrix) of
         dimension m
 
     Returns
-    --------
+    -------
     Shorrocks index: float
         The Shorrocks mobility index calculated as
 
@@ -105,7 +105,7 @@ def shorrocks_index(A):
         An index equal to 0 indicates complete immobility.
 
     References
-    -----------
+    ----------
     .. [1] Wealth distribution and social mobility in the US:
        A quantitative approach (Benhabib, Bisin, Luo, 2017).
        https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf

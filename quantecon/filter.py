@@ -24,14 +24,16 @@ def hamilton_filter(data, h, p=None):
         Must be greater than h.
         If not supplied, random walk process is assumed.
 
-    Note: For seasonal data, it's desirable for p and h to be integer multiples
-          of the number of obsevations in a year.
-          e.g. For quarterly data, h = 8 and p = 4 are recommended.
-
     Returns
     -------
     cycle : array of cyclical component
     trend : trend component
+
+    Notes
+    -----
+    For seasonal data, it's desirable for p and h to be integer multiples of
+    the number of obsevations in a year. E.g. for quarterly data, h = 8 and p =
+    4 are recommended.
 
     """
     # transform data to array

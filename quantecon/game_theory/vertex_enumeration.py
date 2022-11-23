@@ -59,7 +59,7 @@ def vertex_enumeration_gen(g, qhull_options=None):
         manual <http://www.qhull.org>`_  for details.
 
     Yields
-    -------
+    ------
     tuple(ndarray(float, ndim=1))
         Tuple of Nash equilibrium mixed actions.
 
@@ -124,7 +124,7 @@ def _vertex_enumeration_gen(labelings_bits_tup, equations_tup, trans_recips):
 
 
 class _BestResponsePolytope:
-    """
+    r"""
     Class that represents a best response polytope for a player in a
     two-player normal form game.
 

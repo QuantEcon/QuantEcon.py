@@ -17,9 +17,9 @@ def check_random_state(seed):
 
     Otherwise raise ValueError.
 
-    .. Note
-       ----
-        1. This code was sourced from scikit-learn
+    Notes
+    -----
+    This code was sourced from scikit-learn.
 
     """
     if seed is None or seed is np.random:

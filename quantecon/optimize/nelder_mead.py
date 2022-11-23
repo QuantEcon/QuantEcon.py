@@ -52,7 +52,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
         The maximum number of allowed iterations.
 
     Returns
-    ----------
+    -------
     results : namedtuple
         A namedtuple containing the following items:
         ::
@@ -78,7 +78,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
                                  [0.99999814, 0.99999756]]))
 
     Notes
-    --------
+    -----
     This algorithm has a long history of successful use in applications, but it
     will usually be slower than an algorithm that uses first or second
     derivative information. In practice, it can have poor performance in
@@ -170,7 +170,7 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
         The maximum number of allowed iterations.
 
     Returns
-    ----------
+    -------
     results : namedtuple
         A namedtuple containing the following items:
         ::
@@ -312,7 +312,7 @@ def _initialize_simplex(x0, bounds):
         Sequence of (min, max) pairs for each element in x0.
 
     Returns
-    ----------
+    -------
     vertices : ndarray(float, ndim=2)
         Initial simplex with shape (n+1, n).
 
@@ -396,7 +396,7 @@ def _check_bounds(x, bounds):
         Sequence of (min, max) pairs for each element in x.
 
     Returns
-    ----------
+    -------
     bool
         `True` if `x` is within `bounds`, `False` otherwise.
 
@@ -434,7 +434,7 @@ def _neg_bounded_fun(fun, bounds, x, args=()):
         Extra arguments passed to the objective function.
 
     Returns
-    ----------
+    -------
     scalar
         `-fun(x, *args)` if x is within `bounds`, `np.inf` otherwise.
 

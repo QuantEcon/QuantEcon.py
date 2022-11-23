@@ -95,8 +95,8 @@ class LogitDynamics:
         random_state : np.random.RandomState, optional(default=None)
             Random number generator used.
 
-        Return
-        ------
+        Returns
+        -------
         tuple(int)
             The action profile after iterations.
 
@@ -137,8 +137,8 @@ class LogitDynamics:
         random_state : np.random.RandomState, optional(default=None)
             Random number generator used.
 
-        Return
-        ------
+        Returns
+        -------
         ndarray(int)
             The array representing the time series of action profiles.
 

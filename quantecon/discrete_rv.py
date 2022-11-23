@@ -61,7 +61,7 @@ class DiscreteRV:
         q[i].
 
         Parameters
-        -----------
+        ----------
         k : scalar(int), optional
             Number of draws to be returned
 

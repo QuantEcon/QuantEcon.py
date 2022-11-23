@@ -49,7 +49,7 @@ def support_enumeration_gen(g):
         NormalFormGame instance with 2 players.
 
     Yields
-    -------
+    ------
     tuple(ndarray(float, ndim=1))
         Tuple of Nash equilibrium mixed actions.
 

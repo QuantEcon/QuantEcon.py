@@ -47,7 +47,7 @@ def simulate_linear_model(A, x0, v, ts_length):
         The length of the time series
 
     Returns
-    --------
+    -------
     x : np.ndarray
         Time series with ts_length columns, the t-th column being :math:`x_t`
     """
