@@ -70,7 +70,7 @@ class LogitDynamics:
             tuple(actions[i+1:]) + tuple(actions[:i])
 
         cdf = self.players[i].logit_choice_cdfs[opponent_actions]
-        random_value = random_state.rand()
+        random_value = random_state.random()
         next_action = cdf.searchsorted(random_value*cdf[-1], side='right')
 
         return next_action

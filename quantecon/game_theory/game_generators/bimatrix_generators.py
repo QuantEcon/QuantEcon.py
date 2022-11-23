@@ -590,7 +590,7 @@ def unit_vector_game(n, avoid_pure_nash=False, random_state=None):
 
     """
     random_state = check_random_state(random_state)
-    payoff_arrays = (np.zeros((n, n)), random_state.random_sample((n, n)))
+    payoff_arrays = (np.zeros((n, n)), random_state.random((n, n)))
 
     if not avoid_pure_nash:
         ones_ind = random_state.randint(n, size=n)
@@ -603,7 +603,7 @@ def unit_vector_game(n, avoid_pure_nash=False, random_state=None):
         nums_suboptimal = is_suboptimal.sum(axis=1)
 
         while (nums_suboptimal==0).any():
-            payoff_arrays[1][:] = random_state.random_sample((n, n))
+            payoff_arrays[1][:] = random_state.random((n, n))
             payoff_arrays[1].max(axis=0, out=maxes)
             np.less(payoff_arrays[1], maxes, out=is_suboptimal)
             is_suboptimal.sum(axis=1, out=nums_suboptimal)
