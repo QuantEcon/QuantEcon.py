@@ -5,6 +5,9 @@ Utilities to Support Random State Infrastructure
 import numpy as np
 import numbers
 
+# To be called as util.rng_integers
+from scipy._lib._util import rng_integers  # noqa: F401
+
 
 # Random States
 

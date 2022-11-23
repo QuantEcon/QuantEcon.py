@@ -4,6 +4,6 @@ numpydoc
 numba>=0.38
 numpy>=1.17
 sympy
-scipy>=1.0
+scipy>=1.5
 requests
 matplotlib
