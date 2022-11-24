@@ -313,7 +313,7 @@ class LQ:
         x0 = x0.reshape(self.n, 1)  # Make sure x0 is a column vector
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
-        w_path = random_state.randn(self.j, T+1)
+        w_path = random_state.standard_normal(self.j, T+1)
         Cw_path = np.dot(C, w_path)
 
         # == Compute and record the sequence of policies == #
@@ -604,7 +604,7 @@ class LQMarkov:
         # == Prepare storage arrays == #
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
-        w_path = random_state.randn(self.j, T+1)
+        w_path = random_state.standard_normal(self.j, T+1)
         Cw_path = np.empty((self.n, T+1))
         for i in range(T+1):
             Cw_path[:, i] = Cs[state[i]] @ w_path[:, i]

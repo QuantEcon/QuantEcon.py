@@ -187,13 +187,13 @@ class LinearStateSpace:
 
         x0 = random_state.multivariate_normal(self.mu_0.flatten(),
                                               self.Sigma_0)
-        w = random_state.randn(self.m, ts_length-1)
+        w = random_state.standard_normal(self.m, ts_length-1)
         v = self.C.dot(w)  # Multiply each w_t by C to get v_t = C w_t
         # == simulate time series == #
         x = simulate_linear_model(self.A, x0, v, ts_length)
 
         if self.H is not None:
-            v = random_state.randn(self.l, ts_length)
+            v = random_state.standard_normal(self.l, ts_length)
             y = self.G.dot(x) + self.H.dot(v)
         else:
             y = self.G.dot(x)
@@ -235,7 +235,7 @@ class LinearStateSpace:
             x_T, _ = self.simulate(ts_length=T+1, random_state=random_state)
             x[:, j] = x_T[:, -1]
         if self.H is not None:
-            v = random_state.randn(self.l, num_reps)
+            v = random_state.standard_normal(self.l, num_reps)
             y = self.G.dot(x) + self.H.dot(v)
         else:
             y = self.G.dot(x)
