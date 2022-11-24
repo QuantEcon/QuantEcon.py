@@ -195,12 +195,12 @@ def random_discrete_dp(num_states, num_actions, beta=None,
     L = num_states * num_actions
 
     random_state = check_random_state(random_state)
-    R = scale * random_state.randn(L)
+    R = scale * random_state.standard_normal(L)
     Q = _random_stochastic_matrix(L, num_states, k=k,
                                   sparse=sparse, format='csr',
                                   random_state=random_state)
     if beta is None:
-        beta = random_state.random_sample()
+        beta = random_state.random()
 
     if sa_pair:
         s_indices, a_indices = sa_indices(num_states, num_actions)

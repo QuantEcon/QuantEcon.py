@@ -87,7 +87,7 @@ from numba import jit
 
 from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
-from ..util import searchsorted, check_random_state
+from ..util import searchsorted, check_random_state, rng_integers
 
 
 class MarkovChain:
@@ -492,7 +492,7 @@ class MarkovChain:
                 dim = 2
                 k = num_reps
             if init is None:
-                init_states = random_state.randint(self.n, size=k)
+                init_states = rng_integers(self.n, size=k)
             elif isinstance(init, numbers.Integral):
                 # Check init is in the state space
                 if init >= self.n or init < -self.n:
@@ -507,7 +507,7 @@ class MarkovChain:
         X = np.empty((k, ts_length), dtype=int)
 
         # Random values, uniformly sampled from [0, 1)
-        random_values = random_state.random_sample(size=(k, ts_length-1))
+        random_values = random_state.random(size=(k, ts_length-1))
 
         # Generate sample paths and store in X
         if not self.is_sparse:  # Dense
@@ -705,7 +705,7 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
         X_0 = init
     else:
         cdf0 = np.cumsum(init)
-        u_0 = random_state.random_sample()
+        u_0 = random_state.random()
         X_0 = searchsorted(cdf0, u_0)
 
     mc = MarkovChain(P)
