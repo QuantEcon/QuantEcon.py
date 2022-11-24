@@ -37,7 +37,7 @@ def random_game(nums_actions, random_state=None):
 
     random_state = check_random_state(random_state)
     players = [
-        Player(random_state.random_sample(nums_actions[i:]+nums_actions[:i]))
+        Player(random_state.random(nums_actions[i:]+nums_actions[:i]))
         for i in range(N)
     ]
     g = NormalFormGame(players)
@@ -146,7 +146,7 @@ def _random_mixed_actions(out, random_state):
         if n == 1:
             x[0] = 1
         else:
-            r = random_state.random_sample(size=n-1)
+            r = random_state.random(size=n-1)
             _probvec_cpu(r, x)
     return out
 

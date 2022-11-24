@@ -171,7 +171,7 @@ class KMR(BRD):
         tol = options.get('tol', None)
         random_state = check_random_state(options.get('random_state', None))
 
-        if random_state.rand() < self.epsilon:  # Mutation
+        if random_state.random() < self.epsilon:  # Mutation
             action_dist[action] -= 1
             random_state = check_random_state(random_state)
             next_action = self.player.random_choice(random_state=random_state)
