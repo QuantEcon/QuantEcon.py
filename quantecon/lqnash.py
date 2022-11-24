@@ -110,8 +110,8 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
     v2 = np.eye(k_2)
     P1 = np.zeros((n, n))
     P2 = np.zeros((n, n))
-    F1 = random_state.standard_normal(k_1, n)
-    F2 = random_state.standard_normal(k_2, n)
+    F1 = random_state.standard_normal((k_1, n))
+    F2 = random_state.standard_normal((k_2, n))
 
     for it in range(max_iter):
         # update

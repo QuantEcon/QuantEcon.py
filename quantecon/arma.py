@@ -252,7 +252,7 @@ class ARMA:
         random_state = check_random_state(random_state)
 
         sys = self.ma_poly, self.ar_poly, 1
-        u = random_state.standard_normal(ts_length, 1) * self.sigma
+        u = random_state.standard_normal((ts_length, 1)) * self.sigma
         vals = dlsim(sys, u)[1]
 
         return vals.flatten()
