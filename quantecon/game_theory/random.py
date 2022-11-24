@@ -6,7 +6,7 @@ Generate random NormalFormGame instances.
 import numpy as np
 
 from .normal_form_game import Player, NormalFormGame
-from ..util import check_random_state
+from ..util import check_random_state, rng_integers
 from ..random.utilities import _probvec_cpu
 
 
@@ -119,7 +119,7 @@ def random_pure_actions(nums_actions, random_state=None):
     """
     random_state = check_random_state(random_state)
     action_profile = tuple(
-        [random_state.randint(num_actions) for num_actions in nums_actions]
+        [rng_integers(random_state, num_actions) for num_actions in nums_actions]
     )
     return action_profile
 

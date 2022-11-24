@@ -1,7 +1,7 @@
 import numpy as np
 import numbers
 from scipy import sparse
-from ..util import check_random_state
+from ..util import check_random_state, rng_integers
 from .random import random_pure_actions
 from .normal_form_game import Player
 
@@ -112,7 +112,8 @@ class LocalInteraction:
         elif revision == 'asynchronous':
             if player_ind_seq is None:
                 random_state = check_random_state(random_state)
-                player_ind_seq = random_state.randint(self.N, size=num_reps)
+                player_ind_seq = rng_integers(random_state, self.N,
+                                              size=num_reps)
             elif isinstance(player_ind_seq, numbers.Integral):
                 player_ind_seq = [player_ind_seq]
         else:
@@ -176,7 +177,8 @@ class LocalInteraction:
         elif revision == 'asynchronous':
             if player_ind_seq is None:
                 random_state = check_random_state(random_state)
-                player_ind_seq = random_state.randint(self.N, size=ts_length)
+                player_ind_seq = rng_integers(random_state, self.N,
+                                              size=ts_length)
         else:
             raise ValueError(
                             "revision must be `simultaneous` or `asynchronous`"

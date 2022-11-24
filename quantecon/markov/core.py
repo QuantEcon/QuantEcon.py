@@ -87,7 +87,7 @@ from numba import jit
 
 from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
-from ..util import searchsorted, check_random_state
+from ..util import searchsorted, check_random_state, rng_integers
 
 
 class MarkovChain:
@@ -492,7 +492,7 @@ class MarkovChain:
                 dim = 2
                 k = num_reps
             if init is None:
-                init_states = random_state.randint(self.n, size=k)
+                init_states = rng_integers(random_state, self.n, size=k)
             elif isinstance(init, numbers.Integral):
                 # Check init is in the state space
                 if init >= self.n or init < -self.n:

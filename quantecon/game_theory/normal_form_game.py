@@ -130,7 +130,7 @@ import numbers
 import numpy as np
 from numba import jit
 
-from ..util import check_random_state
+from ..util import check_random_state, rng_integers
 
 
 class Player:
@@ -412,7 +412,7 @@ class Player:
         if n == 1:
             idx = 0
         else:
-            idx = random_state.randint(n)
+            idx = rng_integers(random_state, n)
 
         if actions is not None:
             return actions[idx]

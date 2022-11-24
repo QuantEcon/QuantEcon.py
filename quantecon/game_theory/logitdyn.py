@@ -1,7 +1,7 @@
 import numpy as np
 import numbers
 from .normal_form_game import NormalFormGame
-from ..util import check_random_state
+from ..util import check_random_state, rng_integers
 from .random import random_pure_actions
 
 
@@ -109,7 +109,7 @@ class LogitDynamics:
 
         if player_ind_seq is None:
             random_state = check_random_state(random_state)
-            player_ind_seq = random_state.randint(self.N, size=num_reps)
+            player_ind_seq = rng_integers(random_state, self.N, size=num_reps)
 
         if isinstance(player_ind_seq, numbers.Integral):
             player_ind_seq = [player_ind_seq]
@@ -150,7 +150,7 @@ class LogitDynamics:
 
         out = np.empty((ts_length, self.N), dtype=int)
         random_state = check_random_state(random_state)
-        player_ind_seq = random_state.randint(self.N, size=ts_length)
+        player_ind_seq = rng_integers(random_state, self.N, size=ts_length)
 
         for t, player_ind in enumerate(player_ind_seq):
             out[t, :] = actions[:]
