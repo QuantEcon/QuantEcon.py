@@ -140,7 +140,6 @@ def _random_mixed_actions(out, random_state):
     out : tuple(ndarray(float, ndim=1))
 
     """
-    N = len(out)
     for x in out:
         n = x.shape[0]
         if n == 1:

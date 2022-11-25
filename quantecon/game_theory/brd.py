@@ -74,7 +74,7 @@ class BRD:
         action_dist[action] -= 1
         next_action = self.player.best_response(action_dist,
                                                 tol=tol,
-                                                tie_breaking=self.tie_breaking,
+                                                tie_breaking=tie_breaking,
                                                 random_state=random_state)
         action_dist[next_action] += 1
         return action_dist
