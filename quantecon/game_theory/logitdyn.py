@@ -92,7 +92,7 @@ class LogitDynamics:
         num_reps : scalar(int), optional(default=1)
             The number of iterations.
 
-        random_state : np.random.RandomState, optional(default=None)
+        random_state : int or np.random.RandomState/Generator, optional
             Random number generator used.
 
         Returns
@@ -134,7 +134,7 @@ class LogitDynamics:
             The action profile in the initial period. If None, selected
             randomly.
 
-        random_state : np.random.RandomState, optional(default=None)
+        random_state : int or np.random.RandomState/Generator, optional
             Random number generator used.
 
         Returns

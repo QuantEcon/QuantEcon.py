@@ -339,11 +339,12 @@ class Player:
             Tolerance level used in determining best responses. If None,
             default to the value of the `tol` attribute.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used. Relevant only when tie_breaking='random'.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used. Relevant only when
+            tie_breaking='random'.
 
         Returns
         -------
@@ -388,11 +389,11 @@ class Player:
         actions : array_like(int), optional(default=None)
             An array of integers representing pure actions.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------

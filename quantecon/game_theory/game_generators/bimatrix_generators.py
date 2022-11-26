@@ -129,11 +129,11 @@ def blotto_game(h, t, rho, mu=0, random_state=None):
         [-1, 1].
     mu : scalar(float), optional(default=0)
         Mean of the players' values of each hill.
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -225,11 +225,11 @@ def ranking_game(n, steps=10, random_state=None):
         the costs are multiples of `1/(n*steps)`, where the cost of
         effort level `0` is 0, and the maximum possible cost of effort
         level `n-1` is less than or equal to 1.
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -415,11 +415,11 @@ def tournament_game(n, k, random_state=None):
         Number of nodes in the tournament graph.
     k : scalar(int)
         Size of subsets of nodes in the tournament graph.
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -548,11 +548,11 @@ def unit_vector_game(n, avoid_pure_nash=False, random_state=None):
         If True, player 0's payoffs will be placed in order to avoid
         pure Nash equilibria. (If necessary, the payoffs for player 1
         are redrawn so as not to have a dominant action.)
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
