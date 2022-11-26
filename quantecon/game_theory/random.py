@@ -30,6 +30,16 @@ def random_game(nums_actions, random_state=None):
     -------
     g : NormalFormGame
 
+    Examples
+    --------
+    >>> rng = np.random.default_rng(12345)
+    >>> g = random_game((3, 2), random_state=rng)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[0.22733602, 0.59830875],  [0.31675834, 0.94180287]],
+     [[0.79736546, 0.18673419],  [0.67625467, 0.24824571]],
+     [[0.39110955, 0.67275604],  [0.33281393, 0.94888115]]]
+
     """
     N = len(nums_actions)
     if N == 0:
@@ -69,6 +79,16 @@ def covariance_game(nums_actions, rho, random_state=None):
     Returns
     -------
     g : NormalFormGame
+
+    Examples
+    --------
+    >>> rng = np.random.default_rng(12345)
+    >>> g = covariance_game((3, 2), rho=-0.7, random_state=rng)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[ 1.80214175, -0.8232619 ],  [ 0.7023331 , -0.90308782]],
+     [[-0.2174803 , -0.35640649],  [ 1.51235766, -1.00972746]],
+     [[-1.08921974, -0.42346148],  [-1.78910753,  2.53930201]]]
 
     References
     ----------
