@@ -53,11 +53,21 @@ class TestPlayer_1opponent:
                 in [0, 1])
 
         seed = 1234
-        br0 = self.player.best_response([2/3, 1/3], tie_breaking='random',
-                                        random_state=seed)
-        br1 = self.player.best_response([2/3, 1/3], tie_breaking='random',
-                                        random_state=seed)
-        assert_(br0 == br1)
+        brs = [
+            self.player.best_response([2/3, 1/3], tie_breaking='random',
+                                      random_state=seed)
+            for i in range(2)
+        ]
+        assert_(brs[0] == brs[1])
+
+        # Generate seed by np.random.SeedSequence().entropy
+        seed = 189001345436880673361166627406341705095
+        brs = [
+            self.player.best_response([2/3, 1/3], tie_breaking='random',
+                                      random_state=np.random.default_rng(seed))
+            for i in range(2)
+        ]
+        assert_(brs[0] == brs[1])
 
     def test_best_response_with_smallest_tie_breaking(self):
         """best_response with tie_breaking='smallest' (default)"""
