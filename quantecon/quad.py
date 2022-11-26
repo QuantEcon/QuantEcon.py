@@ -171,7 +171,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
         nodes = np.outer(i * (i+1) / 2, j)
         nodes = (nodes - fix(nodes)).squeeze()
     elif kind.upper() == "R":  # pseudo-random
-        nodes = random_state.rand(n, d).squeeze()
+        nodes = random_state.random((n, d)).squeeze()
     else:
         raise ValueError("Unknown sequence requested")
 

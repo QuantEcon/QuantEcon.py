@@ -51,7 +51,7 @@ def probvec(m, k, random_state=None, parallel=True):
 
     # if k >= 2
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=(m, k-1))
+    r = random_state.random(size=(m, k-1))
     x = np.empty((m, k))
 
     # Parse Parallel Option #
@@ -146,7 +146,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     size = k if num_trials is None else (num_trials, k)
 
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=size)
+    r = random_state.random(size=size)
     result = _sample_without_replacement(n, r)
 
     return result
