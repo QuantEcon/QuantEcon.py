@@ -33,4 +33,4 @@ def test_est_non_integer_state():
 
     mc = estimate_mc_discrete(test_series, input_state_values)
     assert_allclose(mc.P, P)
-    assert_array_equal(mc.state_values == final_state_values)
+    assert_array_equal(mc.state_values, final_state_values)
