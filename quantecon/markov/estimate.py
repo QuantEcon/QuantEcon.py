@@ -2,15 +2,15 @@ import numpy as np
 from numba import jit
 from .core import MarkovChain
 
-def estimate_P(index_series, state_values=None):
+def estimate_mc_discrete(index_series, state_values=None):
     """
     Estimates the Markov chain associated with discrete-valued
     time series data :math:`(X_0, ..., X_{k-1})` that is assumed to be
-    Markovian.  The estimation is by maximum likelihood.  In particular, the
-    estimated transition probabilities are returned as a matrix :math:`P`
-    where :math:`P[i, j] = N_{ij} / N_i`.  Here :math:`N_{ij}` is 
-    :math:`\sum_{t=0}^{k-1} 1\{X_t=i,\; X_{t+1}=j\}`, the number of
-    transitions from i to j, while :math:`N_i` is total number of visits to i.
+    Markovian.  The estimation is by maximum likelihood. Transition
+    probabilities are returned as a matrix :math:`P` where :math:`P[i, j] =
+    N_{ij} / N_i`.  Here :math:`N_{ij}` is :math:`\sum_{t=0}^{k-1} 1\{X_t=i,\;
+    X_{t+1}=j\}`, the number of transitions from i to j, while :math:`N_i` is
+    total number of visits to i.
 
 
     Parameters

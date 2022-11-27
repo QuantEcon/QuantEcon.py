@@ -15,7 +15,7 @@ def test_est_integer_state():
     P = np.asarray(P)
     final_state_values = np.array([0, 1, 2])
 
-    mc = estimate_P(test_series, input_state_values)
+    mc = estimate_mc_discrete(test_series, input_state_values)
     assert_allclose(mc.P, P)
     assert_array_equal(mc.state_values, final_state_values)
 
@@ -29,6 +29,6 @@ def test_est_non_integer_state():
     P = np.asarray(P)
     final_state_values = np.array(('a', 'b', 'c'))
 
-    mc = estimate_P(test_series, input_state_values)
+    mc = estimate_mc_discrete(test_series, input_state_values)
     assert_allclose(mc.P, P)
     assert_array_equal(mc.state_values == final_state_values)
