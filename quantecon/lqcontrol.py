@@ -274,11 +274,11 @@ class LQ:
             equation, str in {'doubling', 'qz'}. Only relevant when the
             `T` attribute is `None` (i.e., the horizon is infinite).
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to set
-            the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState is
-            used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -560,11 +560,11 @@ class LQMarkov:
         ts_length : scalar(int), optional(default=None)
             Length of the simulation. If None, T is set to be 100
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to set
-            the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState is
-            used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
