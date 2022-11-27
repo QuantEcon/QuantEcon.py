@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit
+from numba import njit
 from .core import MarkovChain
 
 def estimate_mc_discrete(index_series, state_values=None):
