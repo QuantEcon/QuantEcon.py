@@ -100,7 +100,7 @@ class TestQuadrect:
 
         # Integration parameters
         n = np.array([5, 11, 21, 51, 101, 401])  # number of nodes
-        np.random.seed(42)  # same seed as ML code.
+        random_state = np.random.RandomState(42) # same seed as ML code.
         a, b = -1, 1  # endpoints
 
         # Set up pandas DataFrame to hold results
@@ -114,10 +114,9 @@ class TestQuadrect:
             for kind in kinds:
                 for num in n:
                     num_in = num ** 2 if len(kind) == 1 else num
-                    quad_rect_res1d.loc[func_name, num][kind] = quadrect(func,
-                                                                        num_in,
-                                                                        a, b,
-                                                                        kind)
+                    quad_rect_res1d.loc[func_name, num][kind] = \
+                        quadrect(func, num_in, a, b, kind,
+                                 random_state=random_state)
 
         cls.data1d = quad_rect_res1d
 
