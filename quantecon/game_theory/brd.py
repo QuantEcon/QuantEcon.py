@@ -1,6 +1,6 @@
 import numpy as np
 from .normal_form_game import Player
-from ..util import check_random_state
+from ..util import check_random_state, rng_integers
 from .random import random_pure_actions
 
 
@@ -112,7 +112,7 @@ class BRD:
 
         out = np.empty((ts_length, self.num_actions), dtype=int)
         random_state = check_random_state(random_state)
-        player_ind_seq = random_state.randint(self.N, size=ts_length)
+        player_ind_seq = rng_integers(random_state, self.N, size=ts_length)
         action_dist = np.asarray(init_action_dist)
         for t in range(ts_length):
             out[t, :] = action_dist[:]

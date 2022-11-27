@@ -35,12 +35,12 @@ class TestLocalInteraction:
                                                actions=init_actions), x)
 
     def test_time_series_asynchronous_revision(self):
-        seed = 1234
+        seed = 21388225457580135037104913043871211454
         init_actions = (0, 0, 1)
         x = [self.li.time_series(ts_length=3,
                                  revision='asynchronous',
                                  actions=init_actions,
-                                 random_state=np.random.RandomState(seed))
+                                 random_state=np.random.default_rng(seed))
              for i in range(2)]
         assert_array_equal(x[0], x[1])
 

@@ -23,16 +23,16 @@ class TestLogitDynamics:
         self.ld = LogitDynamics(data, beta=beta)
 
     def test_play(self):
-        seed = 1234
+        seed = 76240103339929371127372784081282227092
         x = [self.ld.play(init_actions=(0, 0),
-                          random_state=np.random.RandomState(seed))
+                          random_state=np.random.default_rng(seed))
              for i in range(2)]
         assert_array_equal(x[0], x[1])
 
     def test_time_series(self):
-        seed = 1234
+        seed = 165570719993771384215214311194249493239
         series = [self.ld.time_series(ts_length=10, init_actions=(0, 0),
-                                      random_state=np.random.RandomState(seed))
+                                      random_state=np.random.default_rng(seed))
                   for i in range(2)]
         assert_array_equal(series[0], series[1])
 

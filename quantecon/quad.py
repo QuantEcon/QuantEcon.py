@@ -113,11 +113,12 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     equidist_pp : array_like, optional(default=None)
         TODO: I don't know what this does
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number
+        generator for reproducibility. If None, a randomly
+        initialized RandomState is used. Relevant only when setting
+        `kind='R'`.
 
     Returns
     -------
@@ -469,7 +470,7 @@ def qnwunif(n, a, b):
     return nodes, weights
 
 
-def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
+def quadrect(f, n, a, b, kind='lege', random_state=None, *args, **kwargs):
     """
     Integrate the d-dimensional function f on a rectangle with lower and
     upper bound for dimension i defined by a[i] and b[i], respectively;
@@ -510,6 +511,12 @@ def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
         H    - Haber  equidistributed sequence
         R    - Monte Carlo
 
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used. Relevant only when setting `kind='R'`.
+
     *args, **kwargs :
         Other arguments passed to the function f
 
@@ -538,7 +545,7 @@ def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
     elif kind.lower() == "simp":
         nodes, weights = qnwsimp(n, a, b)
     else:
-        nodes, weights = qnwequi(n, a, b, kind)
+        nodes, weights = qnwequi(n, a, b, kind, random_state=random_state)
 
     out = weights.dot(f(nodes, *args, **kwargs))
     return out

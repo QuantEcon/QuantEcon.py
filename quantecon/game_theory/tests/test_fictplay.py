@@ -65,16 +65,16 @@ class TestStochasticFictitiosuPlayDecreaingGain:
                                            distribution=distribution)
 
     def test_play(self):
-        seed = 1234
+        seed = 272733541340907175684079858751241831341
         x = [self.fp.play(actions=(0, 0),
-                          random_state=np.random.RandomState(seed))
+                          random_state=np.random.default_rng(seed))
              for i in range(2)]
         assert_array_almost_equal(x[0], x[1])
 
     def test_time_series(self):
-        seed = 1234
+        seed = 226177486389088886197048956835604946950
         x = [self.fp.time_series(ts_length=3, init_actions=(0, 0),
-                                 random_state=np.random.RandomState(seed))
+                                 random_state=np.random.default_rng(seed))
              for i in range(2)]
         assert_array_almost_equal(x[0][0], x[1][0])
         assert_array_almost_equal(x[0][1], x[1][1])
@@ -90,16 +90,16 @@ class TestStochasticFictitiosuPlayConstantGain:
                                            distribution=distribution)
 
     def test_play(self):
-        seed = 1234
+        seed = 271001177347704493622442691590340912076
         x = [self.fp.play(actions=(0, 0),
-                          random_state=np.random.RandomState(seed))
+                          random_state=np.random.default_rng(seed))
              for i in range(2)]
         assert_array_almost_equal(x[0], x[1])
 
     def test_time_series(self):
-        seed = 1234
+        seed = 143773081180220547556482766921740826832
         x = [self.fp.time_series(ts_length=3, init_actions=(0, 0),
-                                 random_state=np.random.RandomState(seed))
+                                 random_state=np.random.default_rng(seed))
              for i in range(2)]
         assert_array_almost_equal(x[0][0], x[1][0])
         assert_array_almost_equal(x[0][1], x[1][1])

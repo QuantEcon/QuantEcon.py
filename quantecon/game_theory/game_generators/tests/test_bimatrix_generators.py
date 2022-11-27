@@ -32,9 +32,12 @@ class TestBlottoGame:
         seed = 0
         h, t = 3, 4
         rho = -0.5
-        g0 = blotto_game(h, t, rho, random_state=seed)
-        g1 = blotto_game(h, t, rho, random_state=seed)
-        assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
+        for gen in [lambda x: x, np.random.default_rng]:
+            gs = [
+                blotto_game(h, t, rho, random_state=gen(seed))
+                for i in range(2)
+            ]
+            assert_array_equal(*[g.payoff_profile_array for g in gs])
 
 
 class TestRankingGame:
@@ -59,9 +62,9 @@ class TestRankingGame:
     def test_seed(self):
         seed = 0
         n = 100
-        g0 = ranking_game(n, random_state=seed)
-        g1 = ranking_game(n, random_state=seed)
-        assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
+        for gen in [lambda x: x, np.random.default_rng]:
+            gs = [ranking_game(n, random_state=gen(seed)) for i in range(2)]
+            assert_array_equal(*[g.payoff_profile_array for g in gs])
 
 
 def test_sgc_game():
@@ -106,9 +109,12 @@ class TestTournamentGame:
 
     def test_seed(self):
         seed = 0
-        g0 = tournament_game(self.n, self.k, random_state=seed)
-        g1 = tournament_game(self.n, self.k, random_state=seed)
-        assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
+        for gen in [lambda x: x, np.random.default_rng]:
+            gs = [
+                tournament_game(self.n, self.k, random_state=gen(seed))
+                for i in range(2)
+            ]
+            assert_array_equal(*[g.payoff_profile_array for g in gs])
 
     def test_raises_value_error_too_large_inputs(self):
         n, k = 100, 50
@@ -135,9 +141,11 @@ class TestUnitVectorGame:
     def test_seed(self):
         seed = 0
         n = 100
-        g0 = unit_vector_game(n, random_state=seed)
-        g1 = unit_vector_game(n, random_state=seed)
-        assert_array_equal(g1.payoff_profile_array, g0.payoff_profile_array)
+        for gen in [lambda x: x, np.random.default_rng]:
+            gs = [
+                unit_vector_game(n, random_state=gen(seed)) for i in range(2)
+            ]
+            assert_array_equal(*[g.payoff_profile_array for g in gs])
 
     def test_redraw(self):
         seed = 1

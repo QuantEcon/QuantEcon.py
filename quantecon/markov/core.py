@@ -87,7 +87,7 @@ from numba import jit
 
 from .gth_solve import gth_solve
 from ..graph_tools import DiGraph
-from ..util import searchsorted, check_random_state
+from ..util import searchsorted, check_random_state, rng_integers
 
 
 class MarkovChain:
@@ -455,11 +455,11 @@ class MarkovChain:
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -492,7 +492,7 @@ class MarkovChain:
                 dim = 2
                 k = num_reps
             if init is None:
-                init_states = random_state.randint(self.n, size=k)
+                init_states = rng_integers(random_state, self.n, size=k)
             elif isinstance(init, numbers.Integral):
                 # Check init is in the state space
                 if init >= self.n or init < -self.n:
@@ -542,11 +542,11 @@ class MarkovChain:
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -687,11 +687,11 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     sample_size : scalar(int), optional(default=1000)
         The length of the sample path.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
