@@ -4,9 +4,9 @@ Tests for markov/estimate.py
 """
 import numpy as np
 
-from numpy.testing import assert_array_equal
-from numpy.testing import assert_allclose
+from numpy.testing import assert_array_equal, assert_allclose
 
+from ..estimate import estimate_P
 
 def test_est_integer_state():
     test_series = (0, 1, 1, 1, 1, 0, 2, 1)
