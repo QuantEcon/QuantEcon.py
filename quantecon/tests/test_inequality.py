@@ -103,12 +103,12 @@ def test_rank_size():
     of the size of the distribution.
     """
 
-    np.random.seed(15)
+    rng = np.random.default_rng(15)
     sample_size = 10000
     c = 0.74
 
     # Tests Pareto; r_squared ~ 1
-    pareto_draw = np.exp(np.random.exponential(scale=1.0, size=sample_size))
+    pareto_draw = np.exp(rng.exponential(scale=1.0, size=sample_size))
     rank_data, size_data = rank_size(pareto_draw, c=c)
 
     assert len(rank_data) == len(size_data)
@@ -120,7 +120,7 @@ def test_rank_size():
     assert_allclose(r_sqval, 1, rtol=1e-3)
 
     # Tests Exponential; r_squared < 1
-    z = np.random.randn(sample_size)
+    z = rng.standard_normal(sample_size)
 
     exp_draw = np.exp(z)
     rank_data_exp, size_data_exp = rank_size(exp_draw, c=c)
