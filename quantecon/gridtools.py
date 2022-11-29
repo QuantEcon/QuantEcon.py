@@ -30,7 +30,7 @@ def cartesian(nodes, order='C'):
     nodes = [np.array(e) for e in nodes]
     shapes = [e.shape[0] for e in nodes]
 
-    dtype = nodes[0].dtype
+    dtype = np.result_type(*nodes)
 
     n = len(nodes)
     l = np.prod(shapes)

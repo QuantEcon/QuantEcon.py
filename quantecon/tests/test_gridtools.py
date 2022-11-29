@@ -36,6 +36,19 @@ def test_cartesian_C_order_int_float():
     assert_(abs(prod_int-prod_float).max() == 0)
 
 
+def test_cartesian_C_order_int_float_mixed():
+    x_int = [0, 1]
+    x_float = [2.3, 4.5]
+    prod_expected = np.array(
+        [[0., 2.3],
+         [0., 4.5],
+         [1., 2.3],
+         [1., 4.5]]
+    )
+    prod_computed = cartesian([x_int, x_float])
+    assert_array_equal(prod_computed, prod_expected)
+
+
 def test_cartesian_F_order():
     x = np.linspace(0, 9, 10)
 
