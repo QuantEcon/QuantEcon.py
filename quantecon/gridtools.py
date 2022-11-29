@@ -27,7 +27,7 @@ def cartesian(nodes, order='C'):
         each line corresponds to one point of the product space
     '''
 
-    nodes = [np.array(e) for e in nodes]
+    nodes = [np.asarray(e) for e in nodes]
     shapes = [e.shape[0] for e in nodes]
 
     dtype = np.result_type(*nodes)
@@ -75,9 +75,9 @@ def mlinspace(a, b, nums, order='C'):
         each line corresponds to one point of the product space
     '''
 
-    a = np.array(a, dtype='float64')
-    b = np.array(b, dtype='float64')
-    nums = np.array(nums, dtype='int64')
+    a = np.asarray(a, dtype='float64')
+    b = np.asarray(b, dtype='float64')
+    nums = np.asarray(nums, dtype='int64')
     nodes = [np.linspace(a[i], b[i], nums[i]) for i in range(len(nums))]
 
     return cartesian(nodes, order=order)
