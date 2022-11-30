@@ -510,9 +510,6 @@ class DiscreteDP:
         The product form uses the version of the init method taking
         `R`, `Q` and `beta`.
 
-        Parameters
-        ----------
-
         Returns
         -------
         ddp_sa : DiscreteDP
