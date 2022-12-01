@@ -5,7 +5,9 @@ Tests for gridtools.py file
 import numpy as np
 import time
 import pytest
-from numpy.testing import assert_array_equal, assert_, assert_raises
+from numpy.testing import (
+    assert_array_equal, assert_equal, assert_, assert_raises
+)
 
 from quantecon.gridtools import (
     cartesian, mlinspace, _repeat_1d, simplex_grid, simplex_index,
@@ -168,7 +170,7 @@ def test_repeat():
 class TestCartesianNearestIndex:
     def setup_method(self):
         nums = (5, 6)
-        self.nodes = [np.arange(nums[0]), np.linspace(0, 1, nums[1])]
+        self.nodes = [list(range(nums[0])), np.linspace(0, 1, nums[1])]
         self.orders = ['C', 'F']
         self.prod_dict = \
             {order:cartesian(self.nodes, order=order) for order in self.orders}
@@ -182,7 +184,11 @@ class TestCartesianNearestIndex:
         for order in self.orders:
             ind_expected = self.linear_search(x, order)
             ind_computed = cartesian_nearest_index(x, self.nodes, order)
-            assert_(ind_computed, ind_expected)
+            assert_equal(ind_computed, ind_expected)
+
+        assert_raises(
+            ValueError, cartesian_nearest_index, x, self.prod_dict['C']
+        )
 
     def test_2d(self):
         T = 10
@@ -198,6 +204,10 @@ class TestCartesianNearestIndex:
                 ind_expected[t] = self.linear_search(X[t], order)
             ind_computed = cartesian_nearest_index(X, self.nodes, order)
             assert_array_equal(ind_computed, ind_expected)
+
+        assert_raises(
+            ValueError, cartesian_nearest_index, X, self.prod_dict['C']
+        )
 
 
 class TestSimplexGrid:

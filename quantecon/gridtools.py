@@ -159,7 +159,7 @@ def cartesian_nearest_index(x, nodes, order='C'):
     the point (0.6, 0.4) is `prod[2]`:
 
     >>> x = (0.6, 0.4)
-    >>> qe.cartesian_nearest_index(x, nodes)
+    >>> qe.cartesian_nearest_index(x, nodes)  # Pass `nodes`, not `prod`
     2
 
     The closest to (-0.1, 1.2) and (2, 0) are `prod[1]` and `prod[4]`,
@@ -167,7 +167,7 @@ def cartesian_nearest_index(x, nodes, order='C'):
 
     >>> x = [(-0.1, 1.2), (2, 0)]
     >>> qe.cartesian_nearest_index(x, nodes)
-    array([1, 4]
+    array([1, 4])
 
     Internally, the index in each dimension is searched by binary search
     and then the index in the cartesian product is calculated (*not* by
@@ -177,11 +177,20 @@ def cartesian_nearest_index(x, nodes, order='C'):
     """
     x = np.asarray(x)
     is_1d = False
-    if x.ndim == 1:
+    shape = x.shape
+    if len(shape) == 1:
         is_1d = True
         x = x[np.newaxis]
-    dtype = np.result_type(*nodes)
+    types = [type(e[0]) for e in nodes]
+    dtype = np.result_type(*types)
     nodes = tuple(np.asarray(e, dtype=dtype) for e in nodes)
+
+    n = shape[1-is_1d]
+    if len(nodes) != n:
+        msg = 'point `x`' if is_1d else 'points in `x`'
+        msg += ' must have same length as `nodes`'
+        raise ValueError(msg)
+
     out = _cartesian_nearest_indices(x, nodes, order=order)
     if is_1d:
         return out[0]
@@ -201,7 +210,7 @@ def _cartesian_nearest_indices(X, nodes, order='C'):
         Points to search the closest points for.
 
     nodes : tuple(ndarray(ndim=1))
-        Tuple of sorted ndarrays.
+        Tuple of sorted ndarrays of same dtype.
 
     order : str, optional(default='C')
         ('C' or 'F') order in which the product is enumerated.
