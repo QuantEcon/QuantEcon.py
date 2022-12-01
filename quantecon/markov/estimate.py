@@ -3,7 +3,7 @@ from numba import njit
 from .core import MarkovChain
 
 def estimate_mc_discrete(index_series, state_values=None):
-    """
+    r"""
     Estimates the Markov chain associated with discrete-valued
     time series data :math:`(X_0, ..., X_{k-1})` that is assumed to be
     Markovian.  The estimation is by maximum likelihood. Transition
@@ -18,7 +18,7 @@ def estimate_mc_discrete(index_series, state_values=None):
 
     index_series : array_like (int, ndim=1)
         A time series in index form, from which the transition matrix
-        will be estimated.  A sequence (i_0, i_1, ..., i_{k-1}) where  
+        will be estimated.  A sequence (i_0, i_1, ..., i_{k-1}) where
         element i_t indicates that the Markov chain is in state
         state_values[i_t] at time t.
 
@@ -30,10 +30,10 @@ def estimate_mc_discrete(index_series, state_values=None):
     Returns
     -------
 
-    mc : MarkovChain 
+    mc : MarkovChain
         A MarkovChain object where mc.P is a stochastic matrix estimated from
         the index_series data and mc.state_values is the states of the Markov
-        chain.  
+        chain.
 
     """
 
@@ -46,7 +46,7 @@ def estimate_mc_discrete(index_series, state_values=None):
     state_values = np.asarray(state_values)
 
     # Compute the number of visits to each state and the frequency of
-    # transiting from state i to state 
+    # transiting from state i to state
     state_counter = np.zeros(n, dtype=int)
     trans_counter = np.zeros((n, n), dtype=int)
     _fill_counters(state_counter, trans_counter, index_series)
@@ -58,13 +58,7 @@ def estimate_mc_discrete(index_series, state_values=None):
     trans_counter = np.delete(trans_counter, zero_index, axis=1)
     state_values = np.delete(state_values, zero_index)
 
-    new_n = len(state_values)
-    P = np.empty((new_n, new_n))
-
-    # Normalize
-    row_sum = np.sum(trans_counter, axis=1)
-    for i in range(new_n):
-        P[i, :] = trans_counter[i, :] / row_sum[i]
+    P = trans_counter / trans_counter.sum(1)[:, np.newaxis]
 
     mc = MarkovChain(P, state_values=state_values)
     return mc
