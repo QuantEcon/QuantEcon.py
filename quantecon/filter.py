@@ -21,7 +21,6 @@ def hamilton_filter(data, h, p=None):
         24 for monthly data.
     p : integer (optional)
         If supplied, it is p in the paper. Number of lags in regression.
-        Must be greater than h.
         If not supplied, random walk process is assumed.
 
     Returns
