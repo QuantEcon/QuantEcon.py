@@ -20,7 +20,7 @@ def estimate_mc_discrete(X):
     ----------
     X : array_like
         A time series of state values, from which the transition matrix
-        will be estimated.
+        will be estimated, where `X[t]` contains the t-th observation.
 
     Returns
     -------
