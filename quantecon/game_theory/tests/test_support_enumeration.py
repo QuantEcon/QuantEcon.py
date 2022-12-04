@@ -19,7 +19,7 @@ def random_skew_sym(n, m=None, random_state=None):
     if m is None:
         m = n
     random_state = check_random_state(random_state)
-    B = random_state.random_sample((n, m))
+    B = random_state.random((n, m))
     A = np.empty((n+m, n+m))
     A[:n, :n] = 0
     A[n:, n:] = 0
@@ -29,7 +29,7 @@ def random_skew_sym(n, m=None, random_state=None):
 
 
 class TestSupportEnumeration():
-    def setup(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory

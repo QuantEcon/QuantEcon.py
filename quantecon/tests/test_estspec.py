@@ -19,7 +19,7 @@ x_21 = np.random.rand(21)
 class PeriodogramBase:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         if cls is PeriodogramBase:
             raise pytest.skip("Skip PeriodogramBase tests" +
                                     " it's a base class")
@@ -47,10 +47,10 @@ class PeriodogramBase:
 class TestPeriodogram(PeriodogramBase):
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         if cls is PeriodogramBase:
             raise pytest.skip("Skip BaseTest tests, it's a base class")
-        super(TestPeriodogram, cls).setup()
+        super(TestPeriodogram, cls).setup_method()
         cls.window_length = 7
         cls.w_20, cls.Iw_20 = periodogram(x_20)
         cls.w_21, cls.Iw_21 = periodogram(x_21)
@@ -60,10 +60,10 @@ class TestPeriodogram(PeriodogramBase):
 class TestArPeriodogram(PeriodogramBase):
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         if cls is PeriodogramBase:
             raise pytest.skip("Skip BaseTest tests, it's a base class")
-        super(TestArPeriodogram, cls).setup()
+        super(TestArPeriodogram, cls).setup_method()
         cls.window_length = 7
         cls.w_20, cls.Iw_20 = ar_periodogram(x_20)
         cls.w_21, cls.Iw_21 = ar_periodogram(x_21)
@@ -81,7 +81,7 @@ class TestArPeriodogram(PeriodogramBase):
 class TestSmooth:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_20 = np.random.rand(20)
         cls.x_21 = np.random.rand(21)
         cls.window_length = 7

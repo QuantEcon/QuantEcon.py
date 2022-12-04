@@ -63,11 +63,11 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         This is the tolerance level for convergence
     max_iter : scalar(int), optional(default=1000)
         This is the maximum number of iteratiosn allowed
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -110,8 +110,8 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
     v2 = np.eye(k_2)
     P1 = np.zeros((n, n))
     P2 = np.zeros((n, n))
-    F1 = random_state.randn(k_1, n)
-    F2 = random_state.randn(k_2, n)
+    F1 = random_state.standard_normal((k_1, n))
+    F2 = random_state.standard_normal((k_2, n))
 
     for it in range(max_iter):
         # update

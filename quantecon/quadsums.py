@@ -87,7 +87,7 @@ def m_quadratic_sum(A, B, max_it=50):
         The maximum number of iterations
 
     Returns
-    ========
+    -------
     gamma1: array_like(float, ndim=2)
         Represents the value :math:`V`
 

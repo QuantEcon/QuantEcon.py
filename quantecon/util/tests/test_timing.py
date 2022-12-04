@@ -4,20 +4,16 @@ Tests for timing.py
 """
 
 import time
-from sys import platform
 from numpy.testing import assert_allclose, assert_
 from quantecon.util import tic, tac, toc, loop_timer
 
 
 class TestTicTacToc:
-    def setup(self):
+    def setup_method(self):
         self.h = 0.1
         self.digits = 10
 
     def test_timer(self):
-        if platform == 'darwin':
-            # skip for darwin
-            return
 
         tic()
 
@@ -30,15 +26,14 @@ class TestTicTacToc:
         time.sleep(self.h)
         tm3 = toc()
 
-        rtol = 0.1
+        rtol = 2
+        atol = 0.05
+
         for actual, desired in zip([tm1, tm2, tm3],
                                    [self.h, self.h, self.h*3]):
-            assert_allclose(actual, desired, rtol=rtol)
+            assert_allclose(actual, desired, atol=atol, rtol=rtol)
 
     def test_loop(self):
-        if platform == 'darwin':
-            # skip for darwin
-            return
 
         def test_function_one_arg(n):
             return time.sleep(n)
@@ -50,10 +45,14 @@ class TestTicTacToc:
             loop_timer(5, test_function_one_arg, self.h, digits=10)
         test_two_arg = \
             loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
+
+        rtol = 2
+        atol = 0.05
+
         for tm in test_one_arg:
-            assert(abs(tm - self.h) < 0.01), tm
+            assert_allclose(tm, self.h, atol=atol, rtol=rtol)
         for tm in test_two_arg:
-            assert(abs(tm - self.h) < 0.01), tm
+            assert_allclose(tm, self.h, atol=atol, rtol=rtol)
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
             assert_(average_time >= average_of_best)

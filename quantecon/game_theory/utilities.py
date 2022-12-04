@@ -2,6 +2,10 @@
 Utility routines for the game_theory submodule
 
 """
+import numbers
+import numpy as np
+
+
 class NashResult(dict):
     """
     Contain the information about the result of Nash equilibrium
@@ -51,3 +55,41 @@ class NashResult(dict):
 
     def __dir__(self):
         return self.keys()
+
+
+# _copy_action_to, _copy_action_profile_to
+
+def _copy_action_to(dst, src):
+    """
+    Copy the pure action (int) or mixed action (array_like) in `src` to
+    the empty ndarray `dst`.
+
+    Parameters
+    ----------
+    dst : ndarray(float, ndim=1)
+
+    src : scalar(int) or array_like(float, ndim=1)
+
+    """
+    if isinstance(src, numbers.Integral):  # pure action
+        dst[:] = 0
+        dst[src] = 1
+    else:  # mixed action
+        np.copyto(dst, src)
+
+
+def _copy_action_profile_to(dst, src):
+    """
+    Copy the pure actions (int) or mixed actions (array_like) in the
+    N-array_like `src` to the empty ndarrays in the N-array_like `dst`.
+
+    Parameters
+    ----------
+    dst : array_like(ndarray(float, ndim=1))
+
+    src : array_like(int or array_like(float, ndim=1))
+
+    """
+    N = len(dst)
+    for i in range(N):
+        _copy_action_to(dst[i], src[i])

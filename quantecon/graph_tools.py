@@ -381,11 +381,11 @@ def random_tournament_graph(n, random_state=None):
     n : scalar(int)
         Number of nodes.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -401,7 +401,7 @@ def random_tournament_graph(n, random_state=None):
     """
     random_state = check_random_state(random_state)
     num_edges = n * (n-1) // 2
-    r = random_state.random_sample(num_edges)
+    r = random_state.random(num_edges)
     row = np.empty(num_edges, dtype=int)
     col = np.empty(num_edges, dtype=int)
     _populate_random_tournament_row_col(n, r, row, col)

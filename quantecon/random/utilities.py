@@ -23,11 +23,11 @@ def probvec(m, k, random_state=None, parallel=True):
     k : scalar(int)
         Dimension of each probability vectors.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     parallel : bool(default=True)
         Whether to use multi-core CPU (parallel=True) or single-threaded
@@ -51,7 +51,7 @@ def probvec(m, k, random_state=None, parallel=True):
 
     # if k >= 2
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=(m, k-1))
+    r = random_state.random(size=(m, k-1))
     x = np.empty((m, k))
 
     # Parse Parallel Option #
@@ -113,11 +113,11 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     num_trials : scalar(int), optional(default=None)
         Number of trials.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -146,7 +146,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     size = k if num_trials is None else (num_trials, k)
 
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=size)
+    r = random_state.random(size=size)
     result = _sample_without_replacement(n, r)
 
     return result

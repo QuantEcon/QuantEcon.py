@@ -11,7 +11,7 @@ from numpy.testing import assert_, assert_allclose
 
 class TestTauchen:
 
-    def setup(self):
+    def setup_method(self):
         self.rho, self.sigma_u = np.random.rand(2)
         self.n = np.random.randint(3, 25)
         self.m = np.random.randint(5)
@@ -21,7 +21,7 @@ class TestTauchen:
         mc = tauchen(self.rho, self.sigma_u, self.b, self.m, self.n)
         self.x, self.P = mc.state_values, mc.P
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.x
         del self.P
 
@@ -54,7 +54,7 @@ class TestTauchen:
 
 class TestRouwenhorst:
 
-    def setup(self):
+    def setup_method(self):
         self.rho, self.sigma = np.random.uniform(0, 1, size=2)
         self.n = np.random.randint(3, 26)
         self.ybar = np.random.randint(0, 11)
@@ -63,7 +63,7 @@ class TestRouwenhorst:
         mc = rouwenhorst(self.n, self.ybar, self.sigma, self.rho)
         self.x, self.P = mc.state_values, mc.P
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.x
         del self.P
 

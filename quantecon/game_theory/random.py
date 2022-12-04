@@ -6,8 +6,8 @@ Generate random NormalFormGame instances.
 import numpy as np
 
 from .normal_form_game import Player, NormalFormGame
-from ..util import check_random_state
-from ..random import probvec
+from ..util import check_random_state, rng_integers
+from ..random.utilities import _probvec_cpu
 
 
 def random_game(nums_actions, random_state=None):
@@ -20,15 +20,25 @@ def random_game(nums_actions, random_state=None):
     nums_actions : tuple(int)
         Tuple of the numbers of actions, one for each player.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
     g : NormalFormGame
+
+    Examples
+    --------
+    >>> rng = np.random.default_rng(12345)
+    >>> g = random_game((3, 2), random_state=rng)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[0.22733602, 0.59830875],  [0.31675834, 0.94180287]],
+     [[0.79736546, 0.18673419],  [0.67625467, 0.24824571]],
+     [[0.39110955, 0.67275604],  [0.33281393, 0.94888115]]]
 
     """
     N = len(nums_actions)
@@ -37,7 +47,7 @@ def random_game(nums_actions, random_state=None):
 
     random_state = check_random_state(random_state)
     players = [
-        Player(random_state.random_sample(nums_actions[i:]+nums_actions[:i]))
+        Player(random_state.random(nums_actions[i:]+nums_actions[:i]))
         for i in range(N)
     ]
     g = NormalFormGame(players)
@@ -60,15 +70,25 @@ def covariance_game(nums_actions, rho, random_state=None):
         Covariance of a pair of payoff values. Must be in [-1/(N-1), 1],
         where N is the number of players.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
     g : NormalFormGame
+
+    Examples
+    --------
+    >>> rng = np.random.default_rng(12345)
+    >>> g = covariance_game((3, 2), rho=-0.7, random_state=rng)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[ 1.80214175, -0.8232619 ],  [ 0.7023331 , -0.90308782]],
+     [[-0.2174803 , -0.35640649],  [ 1.51235766, -1.00972746]],
+     [[-1.08921974, -0.42346148],  [-1.78910753,  2.53930201]]]
 
     References
     ----------
@@ -105,11 +125,11 @@ def random_pure_actions(nums_actions, random_state=None):
     nums_actions : tuple(int)
         Tuple of the numbers of actions, one for each player.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -119,9 +139,35 @@ def random_pure_actions(nums_actions, random_state=None):
     """
     random_state = check_random_state(random_state)
     action_profile = tuple(
-        [random_state.randint(num_actions) for num_actions in nums_actions]
+        [rng_integers(random_state, num_actions) for num_actions in nums_actions]
     )
     return action_profile
+
+
+def _random_mixed_actions(out, random_state):
+    """
+    Fill the tuple `out` of empty ndarrays with random mixed actions.
+
+    Parameters
+    ----------
+    out : tuple(ndarray(float, ndim=1))
+        Tuple of 1d ndarrays, to be modified in place.
+
+    random_state : np.random.RandomState or np.random.Generator
+
+    Return
+    ------
+    out : tuple(ndarray(float, ndim=1))
+
+    """
+    for x in out:
+        n = x.shape[0]
+        if n == 1:
+            x[0] = 1
+        else:
+            r = random_state.random(size=n-1)
+            _probvec_cpu(r, x)
+    return out
 
 
 def random_mixed_actions(nums_actions, random_state=None):
@@ -133,11 +179,11 @@ def random_mixed_actions(nums_actions, random_state=None):
     nums_actions : tuple(int)
         Tuple of the numbers of actions, one for each player.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -146,8 +192,7 @@ def random_mixed_actions(nums_actions, random_state=None):
 
     """
     random_state = check_random_state(random_state)
-    action_profile = tuple(
-        [probvec(1, num_actions, random_state).ravel()
-         for num_actions in nums_actions]
-    )
+    action_profile = \
+        tuple(np.empty(num_actions) for num_actions in nums_actions)
+    _random_mixed_actions(action_profile, random_state)
     return action_profile
