@@ -3,7 +3,7 @@ from numba import njit
 from .core import MarkovChain
 
 
-def estimate_mc_discrete(X):
+def estimate_mc(X):
     r"""
     Estimate the Markov chain associated with a time series :math:`X =
     (X_0, \ldots, X_{T-1})` assuming that the state space is the finite

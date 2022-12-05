@@ -4,7 +4,7 @@ Tests for markov/estimate.py
 """
 import numpy as np
 from numpy.testing import assert_array_equal, assert_allclose
-from ..estimate import estimate_mc_discrete
+from ..estimate import estimate_mc
 
 
 class TestEstimateMCDiscrete:
@@ -23,16 +23,16 @@ class TestEstimateMCDiscrete:
             self.initial_state_values[self.final_state_indices]
 
     def test_integer_state(self):
-        mc = estimate_mc_discrete(self.test_index_series)
+        mc = estimate_mc(self.test_index_series)
         assert_allclose(mc.P, self.P)
         assert_array_equal(mc.state_values, self.final_state_indices)
 
     def test_non_integer_state(self):
-        mc = estimate_mc_discrete(self.test_value_series)
+        mc = estimate_mc(self.test_value_series)
         assert_allclose(mc.P, self.P)
         assert_array_equal(mc.state_values, self.final_state_values)
 
-        mc = estimate_mc_discrete(self.test_index_series)
+        mc = estimate_mc(self.test_index_series)
         mc.state_values = self.initial_state_values[mc.state_values]
         assert_allclose(mc.P, self.P)
         assert_array_equal(mc.state_values, self.final_state_values)
@@ -48,6 +48,6 @@ class TestEstimateMCDiscrete:
         )
         final_state_values = initial_state_values[ind]
 
-        mc = estimate_mc_discrete(X)
+        mc = estimate_mc(X)
         assert_allclose(mc.P, self.P[np.ix_(ind, ind)])
         assert_array_equal(mc.state_values, final_state_values)
