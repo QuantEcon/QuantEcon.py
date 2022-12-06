@@ -54,6 +54,7 @@ def rouwenhorst(n, rho, sigma, mu=0.):
         0  & \theta_n  \\
         \end{bmatrix}
 
+    where :math:`{p = q = \frac{(1 + \rho)}{2}}`
 
     Parameters
     ----------
