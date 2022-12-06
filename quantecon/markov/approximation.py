@@ -12,11 +12,11 @@ import numpy as np
 from numba import njit
 
 
-def rouwenhorst(n, ybar, sigma, rho):
+def rouwenhorst(n, rho, sigma, mu=0.):
     r"""
-    Takes as inputs n, p, q, psi. It will then construct a markov chain
+    Takes as inputs n, mu, sigma, rho. It will then construct a markov chain
     that estimates an AR(1) process of:
-    :math:`y_t = \bar{y} + \rho y_{t-1} + \varepsilon_t`
+    :math:`y_t = \mu + \rho y_{t-1} + \varepsilon_t`
     where :math:`\varepsilon_t` is i.i.d. normal of mean 0, std dev of sigma
 
     The Rouwenhorst approximation uses the following recursive defintion
@@ -60,16 +60,16 @@ def rouwenhorst(n, ybar, sigma, rho):
     n : int
         The number of points to approximate the distribution
 
-    ybar : float
-        The value :math:`\bar{y}` in the process.  Note that the mean of this
-        AR(1) process, :math:`y`, is simply :math:`\bar{y}/(1 - \rho)`
+    rho : float
+        Persistence parameter in AR(1) process, if you are approximating
+        an AR(1) process then this is the autocorrelation across periods.
 
     sigma : float
         The value of the standard deviation of the :math:`\varepsilon` process
 
-    rho : float
-        By default this will be 0, but if you are approximating an AR(1)
-        process then this is the autocorrelation across periods
+    mu : float, optional(default=0.0)
+        The value :math:`\mu` in the process.  Note that the mean of this
+        AR(1) process, :math:`y`, is simply :math:`\mu/(1 - \rho)`
 
     Returns
     -------
@@ -130,7 +130,7 @@ def rouwenhorst(n, ybar, sigma, rho):
 
     theta = row_build_mat(n, p, q)
 
-    bar += ybar / (1 - rho)
+    bar += mu / (1 - rho)
 
     return MarkovChain(theta, bar)
 
@@ -157,7 +157,8 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
     sigma : scalar(float)
         The standard deviation of the random process
     mu : scalar(float), optional(default=0.0)
-        Mean of AR(1) process
+        The value :math:`\mu` in the process.  Note that the mean of this
+        AR(1) process, :math:`y`, is simply :math:`\mu/(1 - \rho)`
     n_std : scalar(int), optional(default=3)
         The number of standard deviations to approximate out to
 
