@@ -150,13 +150,13 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
     Parameters
     ----------
 
-    n : scalar(int), optional(default=7)
+    n : scalar(int)
         The number of states to use in the approximation
     rho : scalar(float)
         The autocorrelation coefficient, Persistence parameter in AR(1) process
     sigma : scalar(float)
         The standard deviation of the random process
-    mu : scalar(float)
+    mu : scalar(float), optional(default=0.0)
         Mean of AR(1) process
     n_std : scalar(int), optional(default=3)
         The number of standard deviations to approximate out to
