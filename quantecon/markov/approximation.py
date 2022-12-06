@@ -135,30 +135,31 @@ def rouwenhorst(n, ybar, sigma, rho):
     return MarkovChain(theta, bar)
 
 
-def tauchen(rho, sigma_u, b=0., m=3, n=7):
+def tauchen(n, rho, sigma, mu=0., n_std=3):
     r"""
     Computes a Markov chain associated with a discretized version of
     the linear Gaussian AR(1) process
 
     .. math::
 
-        y_{t+1} = b + \rho y_t + u_{t+1}
+        y_t = \mu + \rho y_{t-1} + \epsilon_t
 
-    using Tauchen's method. Here :math:`{u_t}` is an i.i.d. Gaussian process
+    using Tauchen's method. Here :math:`{\epsilon_t}` is an i.i.d. Gaussian process
     with zero mean.
 
     Parameters
     ----------
-    b : scalar(float)
-        The constant term of {y_t}
-    rho : scalar(float)
-        The autocorrelation coefficient
-    sigma_u : scalar(float)
-        The standard deviation of the random process
-    m : scalar(int), optional(default=3)
-        The number of standard deviations to approximate out to
+
     n : scalar(int), optional(default=7)
         The number of states to use in the approximation
+    rho : scalar(float)
+        The autocorrelation coefficient, Persistence parameter in AR(1) process
+    sigma : scalar(float)
+        The standard deviation of the random process
+    mu : scalar(float)
+        Mean of AR(1) process
+    n_std : scalar(int), optional(default=3)
+        The number of standard deviations to approximate out to
 
     Returns
     -------
@@ -170,10 +171,10 @@ def tauchen(rho, sigma_u, b=0., m=3, n=7):
     """
 
     # standard deviation of demeaned y_t
-    std_y = np.sqrt(sigma_u**2 / (1 - rho**2))
+    std_y = np.sqrt(sigma**2 / (1 - rho**2))
 
     # top of discrete state space for demeaned y_t
-    x_max = m * std_y
+    x_max = n_std * std_y
 
     # bottom of discrete state space for demeaned y_t
     x_min = -x_max
@@ -187,10 +188,10 @@ def tauchen(rho, sigma_u, b=0., m=3, n=7):
 
     # approximate Markov transition matrix for
     # demeaned y_t
-    _fill_tauchen(x, P, n, rho, sigma_u, half_step)
+    _fill_tauchen(x, P, n, rho, sigma, half_step)
 
     # shifts the state values by the long run mean of y_t
-    mu = b / (1 - rho)
+    mu = mu / (1 - rho)
 
     mc = MarkovChain(P, state_values=x+mu)
 
