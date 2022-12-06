@@ -12,13 +12,13 @@ from numpy.testing import assert_, assert_allclose
 class TestTauchen:
 
     def setup_method(self):
-        self.rho, self.sigma_u = np.random.rand(2)
+        self.rho, self.sigma = np.random.rand(2)
         self.n = np.random.randint(3, 25)
-        self.m = np.random.randint(5)
+        self.n_std = np.random.randint(5)
         self.tol = 1e-12
-        self.b = 0.
+        self.mu = 0.
 
-        mc = tauchen(self.rho, self.sigma_u, self.b, self.m, self.n)
+        mc = tauchen(self.n, self.rho, self.sigma, self.mu, self.n_std)
         self.x, self.P = mc.state_values, mc.P
 
     def teardown_method(self):
@@ -26,10 +26,10 @@ class TestTauchen:
         del self.P
 
     def testStateCenter(self):
-        for b in [0., 1., -1.]:
-            mu = b / (1 - self.rho)
-            mc = tauchen(self.rho, self.sigma_u, b, self.m, self.n)
-            assert_allclose(mu, np.mean(mc.state_values), atol=self.tol)
+        for mu in [0., 1., -1.]:
+            mu_expect = mu / (1 - self.rho)
+            mc = tauchen(self.n, self.rho, self.sigma, mu, self.n_std)
+            assert_allclose(mu_expect, np.mean(mc.state_values), atol=self.tol)
 
     def testShape(self):
         i, j = self.P.shape
