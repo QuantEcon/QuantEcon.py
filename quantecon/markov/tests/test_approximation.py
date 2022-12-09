@@ -3,6 +3,7 @@ Tests for approximation.py file (i.e. tauchen)
 
 """
 import numpy as np
+import pytest
 from quantecon.markov import tauchen, rouwenhorst
 from numpy.testing import assert_, assert_allclose
 
@@ -18,7 +19,8 @@ class TestTauchen:
         self.tol = 1e-12
         self.mu = 0.
 
-        mc = tauchen(self.n, self.rho, self.sigma, self.mu, self.n_std)
+        with pytest.warns(UserWarning):
+            mc = tauchen(self.n, self.rho, self.sigma, self.mu, self.n_std)
         self.x, self.P = mc.state_values, mc.P
 
     def teardown_method(self):
@@ -28,7 +30,8 @@ class TestTauchen:
     def testStateCenter(self):
         for mu in [0., 1., -1.]:
             mu_expect = mu / (1 - self.rho)
-            mc = tauchen(self.n, self.rho, self.sigma, mu, self.n_std)
+            with pytest.warns(UserWarning):
+                mc = tauchen(self.n, self.rho, self.sigma, mu, self.n_std)
             assert_allclose(mu_expect, np.mean(mc.state_values), atol=self.tol)
 
     def testShape(self):
@@ -60,7 +63,8 @@ class TestRouwenhorst:
         self.mu = np.random.randint(0, 11)
         self.tol = 1e-10
 
-        mc = rouwenhorst(self.n, self.rho, self.sigma, self.mu)
+        with pytest.warns(UserWarning):
+            mc = rouwenhorst(self.n, self.rho, self.sigma, self.mu)
         self.x, self.P = mc.state_values, mc.P
 
     def teardown_method(self):
@@ -89,7 +93,8 @@ class TestRouwenhorst:
 
     def test_control_case(self):
         n = 3; mu = 1; sigma = 0.5; rho = 0.8;
-        mc_rouwenhorst = rouwenhorst(n, rho, sigma, mu)
+        with pytest.warns(UserWarning):
+            mc_rouwenhorst = rouwenhorst(n, rho, sigma, mu)
         mc_rouwenhorst.x, mc_rouwenhorst.P = mc_rouwenhorst.state_values, mc_rouwenhorst.P
         sigma_y = np.sqrt(sigma**2 / (1-rho**2))
         psi = sigma_y * np.sqrt(n-1)
