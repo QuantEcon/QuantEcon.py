@@ -8,6 +8,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 from math import erfc, sqrt
 from .core import MarkovChain
 
+import warnings
 import numpy as np
 from numba import njit
 
@@ -79,8 +80,19 @@ def rouwenhorst(n, rho, sigma, mu=0.):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
+    Note
+    ----
+
+    UserWarning: The API of `rouwenhorst` was changed from
+    `rouwenhorst(n, ybar, sigma, rho)` to
+    `rouwenhorst(n, rho, sigma, mu=0.)` in version 0.6.0.
+
     """
 
+    warnings.warn("The API of rouwenhorst has changed from `rouwenhorst(n, ybar, sigma, rho)`"
+                  " to `rouwenhorst(n, rho, sigma, mu=0.)`. To find more details please visit:"
+                  " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
+                  UserWarning, stacklevel=2)
     # Get the standard deviation of y
     y_sd = sqrt(sigma**2 / (1 - rho**2))
 
@@ -170,7 +182,18 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
+    Note
+    ----
+
+    UserWarning: The API of `tauchen` was changed from
+    `tauchen(rho, sigma_u, b=0., m=3, n=7)` to
+    `tauchen(n, rho, sigma, mu=0., n_std=3)` in version 0.6.0.
+
     """
+    warnings.warn("The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
+                  " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
+                  " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
+                  UserWarning, stacklevel=2)
 
     # standard deviation of demeaned y_t
     std_y = np.sqrt(sigma**2 / (1 - rho**2))
