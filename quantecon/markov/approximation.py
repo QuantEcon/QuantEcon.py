@@ -8,15 +8,16 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 from math import erfc, sqrt
 from .core import MarkovChain
 
+import warnings
 import numpy as np
 from numba import njit
 
 
-def rouwenhorst(n, ybar, sigma, rho):
+def rouwenhorst(n, rho, sigma, mu=0.):
     r"""
-    Takes as inputs n, p, q, psi. It will then construct a markov chain
+    Takes as inputs n, mu, sigma, rho. It will then construct a markov chain
     that estimates an AR(1) process of:
-    :math:`y_t = \bar{y} + \rho y_{t-1} + \varepsilon_t`
+    :math:`y_t = \mu + \rho y_{t-1} + \varepsilon_t`
     where :math:`\varepsilon_t` is i.i.d. normal of mean 0, std dev of sigma
 
     The Rouwenhorst approximation uses the following recursive defintion
@@ -54,22 +55,23 @@ def rouwenhorst(n, ybar, sigma, rho):
         0  & \theta_n  \\
         \end{bmatrix}
 
+    where :math:`{p = q = \frac{(1 + \rho)}{2}}`
 
     Parameters
     ----------
     n : int
         The number of points to approximate the distribution
 
-    ybar : float
-        The value :math:`\bar{y}` in the process.  Note that the mean of this
-        AR(1) process, :math:`y`, is simply :math:`\bar{y}/(1 - \rho)`
+    rho : float
+        Persistence parameter in AR(1) process, if you are approximating
+        an AR(1) process then this is the autocorrelation across periods.
 
     sigma : float
         The value of the standard deviation of the :math:`\varepsilon` process
 
-    rho : float
-        By default this will be 0, but if you are approximating an AR(1)
-        process then this is the autocorrelation across periods
+    mu : float, optional(default=0.0)
+        The value :math:`\mu` in the process.  Note that the mean of this
+        AR(1) process, :math:`y`, is simply :math:`\mu/(1 - \rho)`
 
     Returns
     -------
@@ -78,8 +80,19 @@ def rouwenhorst(n, ybar, sigma, rho):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
+    Note
+    ----
+
+    UserWarning: The API of `rouwenhorst` was changed from
+    `rouwenhorst(n, ybar, sigma, rho)` to
+    `rouwenhorst(n, rho, sigma, mu=0.)` in version 0.6.0.
+
     """
 
+    warnings.warn("The API of rouwenhorst has changed from `rouwenhorst(n, ybar, sigma, rho)`"
+                  " to `rouwenhorst(n, rho, sigma, mu=0.)`. To find more details please visit:"
+                  " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
+                  UserWarning, stacklevel=2)
     # Get the standard deviation of y
     y_sd = sqrt(sigma**2 / (1 - rho**2))
 
@@ -130,35 +143,37 @@ def rouwenhorst(n, ybar, sigma, rho):
 
     theta = row_build_mat(n, p, q)
 
-    bar += ybar / (1 - rho)
+    bar += mu / (1 - rho)
 
     return MarkovChain(theta, bar)
 
 
-def tauchen(rho, sigma_u, b=0., m=3, n=7):
+def tauchen(n, rho, sigma, mu=0., n_std=3):
     r"""
     Computes a Markov chain associated with a discretized version of
     the linear Gaussian AR(1) process
 
     .. math::
 
-        y_{t+1} = b + \rho y_t + u_{t+1}
+        y_t = \mu + \rho y_{t-1} + \epsilon_t
 
-    using Tauchen's method. Here :math:`{u_t}` is an i.i.d. Gaussian process
+    using Tauchen's method. Here :math:`{\epsilon_t}` is an i.i.d. Gaussian process
     with zero mean.
 
     Parameters
     ----------
-    b : scalar(float)
-        The constant term of {y_t}
-    rho : scalar(float)
-        The autocorrelation coefficient
-    sigma_u : scalar(float)
-        The standard deviation of the random process
-    m : scalar(int), optional(default=3)
-        The number of standard deviations to approximate out to
-    n : scalar(int), optional(default=7)
+
+    n : scalar(int)
         The number of states to use in the approximation
+    rho : scalar(float)
+        The autocorrelation coefficient, Persistence parameter in AR(1) process
+    sigma : scalar(float)
+        The standard deviation of the random process
+    mu : scalar(float), optional(default=0.0)
+        The value :math:`\mu` in the process.  Note that the mean of this
+        AR(1) process, :math:`y`, is simply :math:`\mu/(1 - \rho)`
+    n_std : scalar(int), optional(default=3)
+        The number of standard deviations to approximate out to
 
     Returns
     -------
@@ -167,13 +182,24 @@ def tauchen(rho, sigma_u, b=0., m=3, n=7):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
+    Note
+    ----
+
+    UserWarning: The API of `tauchen` was changed from
+    `tauchen(rho, sigma_u, b=0., m=3, n=7)` to
+    `tauchen(n, rho, sigma, mu=0., n_std=3)` in version 0.6.0.
+
     """
+    warnings.warn("The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
+                  " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
+                  " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
+                  UserWarning, stacklevel=2)
 
     # standard deviation of demeaned y_t
-    std_y = np.sqrt(sigma_u**2 / (1 - rho**2))
+    std_y = np.sqrt(sigma**2 / (1 - rho**2))
 
     # top of discrete state space for demeaned y_t
-    x_max = m * std_y
+    x_max = n_std * std_y
 
     # bottom of discrete state space for demeaned y_t
     x_min = -x_max
@@ -187,10 +213,10 @@ def tauchen(rho, sigma_u, b=0., m=3, n=7):
 
     # approximate Markov transition matrix for
     # demeaned y_t
-    _fill_tauchen(x, P, n, rho, sigma_u, half_step)
+    _fill_tauchen(x, P, n, rho, sigma, half_step)
 
     # shifts the state values by the long run mean of y_t
-    mu = b / (1 - rho)
+    mu = mu / (1 - rho)
 
     mc = MarkovChain(P, state_values=x+mu)
 
