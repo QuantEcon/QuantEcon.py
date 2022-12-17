@@ -80,8 +80,8 @@ def rouwenhorst(n, rho, sigma, mu=0.):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
-    Note
-    ----
+    Notes
+    -----
 
     UserWarning: The API of `rouwenhorst` was changed from
     `rouwenhorst(n, ybar, sigma, rho)` to
@@ -182,8 +182,8 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
-    Note
-    ----
+    Notes
+    -----
 
     UserWarning: The API of `tauchen` was changed from
     `tauchen(rho, sigma_u, b=0., m=3, n=7)` to

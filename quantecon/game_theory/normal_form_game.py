@@ -130,7 +130,7 @@ import numbers
 import numpy as np
 from numba import jit
 
-from ..util import check_random_state, rng_integers
+from quantecon.util import check_random_state, rng_integers
 
 
 class Player:

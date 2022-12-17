@@ -9,7 +9,7 @@ from numpy.testing import (
     assert_array_equal, assert_equal, assert_, assert_raises
 )
 
-from quantecon.gridtools import (
+from quantecon._gridtools import (
     cartesian, mlinspace, _repeat_1d, simplex_grid, simplex_index,
     num_compositions, num_compositions_jit, cartesian_nearest_index
 )
