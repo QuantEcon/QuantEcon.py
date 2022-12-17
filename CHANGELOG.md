@@ -1,5 +1,37 @@
 # Changelog
 
+## Ver 0.6.0 (18-December-2022)
+
+This is the next major release of the `quantecon` package as it includes some **breaking changes** as listed below. It also
+includes a number of new features and enhancements including learning algorithms in the game theory module, MLE estimation
+for Markov Chains, in addition to some useful helper functions. 
+
+[PR #601: Updates to public and private API](https://github.com/QuantEcon/QuantEcon.py/pull/601) 
+**includes some deprecations** which will issue warnings and a helpful suggestion on how to
+update any effected imports from the `quantecon` package.
+
+### Breaking
+
+1. [MAINT: Unify tauchen and rouwenhorst API](https://github.com/QuantEcon/QuantEcon.py/pull/664) ([Smit-create](https://github.com/Smit-create))
+
+### New
+
+1. [ENH: Add MLE Estimation for Markov Chains](https://github.com/QuantEcon/QuantEcon.py/pull/658) ([jstac](https://github.com/jstac))
+2. [ENH: Implement cartesian_nearest_index](https://github.com/QuantEcon/QuantEcon.py/pull/660) ([oyamad](https://github.com/oyamad))
+3. [ENH: check_random_state: Accept np.random.Generator](https://github.com/QuantEcon/QuantEcon.py/pull/654) ([oyamad](https://github.com/oyamad))
+4. [ENH: Add learning algorithms to Game Theory module](https://github.com/QuantEcon/QuantEcon.py/pull/487) ([Yuya-Furusawa](https://github.com/oyamad)
+
+### Fixes
+
+1. [FIX: Fix dtype in cartesian](https://github.com/QuantEcon/QuantEcon.py/pull/659) ([oyamad](https://github.com/oyamad))
+2. [FIX: Bugfix in brd.py](https://github.com/QuantEcon/QuantEcon.py/pull/657) ([oyamad](https://github.com/oyamad))
+3. [MAINT: player.is_dominated: Allow recent methods for scipy.optimize.linprog](https://github.com/QuantEcon/QuantEcon.py/pull/648) ([oyamad](https://github.com/oyamad))
+4. [MAINT: Distinguish between private and public namespaces](https://github.com/QuantEcon/QuantEcon.py/pull/601) ([Smit-create](https://github.com/Smit-create)).
+5. [MAINT: Clairfy hamilton_filter API](https://github.com/QuantEcon/QuantEcon.py/pull/634) ([rht](https://github.com/rht))
+
+Thank you to ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), ([Smit-create](https://github.com/Smit-create)), 
+and ([rht](https://github.com/rht)) for all your contributions, PR reviews, and comments. 
+
 ## Ver 0.5.3 (07-April-2022)
 
 This is primarily a maintenance release to fix a number of deprecation notices, migrating the tests to use `pytest` rather than `nose`,  and python packaging is moving to `flit`
