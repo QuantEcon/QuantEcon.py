@@ -1,83 +1,28 @@
-r"""
-Computes a sequence of marginal densities for a continuous state space
-Markov chain :math:`X_t` where the transition probabilities can be represented
-as densities. The estimate of the marginal density of :math:`X_t` is
+# This file is not meant for public use and will be removed v0.8.0.
+# Use the `quantecon` namespace for importing the objects
+# included below.
 
-.. math::
-
-    \frac{1}{n} \sum_{i=0}^n p(X_{t-1}^i, y)
-
-This is a density in :math:`y`.
-
-References
-----------
-
-https://lectures.quantecon.org/py/stationary_densities.html
-
-"""
-from textwrap import dedent
-import numpy as np
+import warnings
+from . import _lae
 
 
-class LAE:
-    """
-    An instance is a representation of a look ahead estimator associated
-    with a given stochastic kernel p and a vector of observations X.
+__all__ = ['LAE']
 
-    Parameters
-    ----------
-    p : function
-        The stochastic kernel.  A function p(x, y) that is vectorized in
-        both x and y
-    X : array_like(float)
-        A vector containing observations
 
-    Attributes
-    ----------
-    p, X : see Parameters
+def __dir__():
+    return __all__
 
-    Examples
-    --------
-    >>> psi = LAE(p, X)
-    >>> y = np.linspace(0, 1, 100)
-    >>> psi(y)  # Evaluate look ahead estimate at grid of points y
 
-    """
+def __getattr__(name):
+    if name not in __all__:
+        raise AttributeError(
+                "`quantecon.lae` is deprecated and has no attribute "
+                f"'{name}'."
+            )
 
-    def __init__(self, p, X):
-        X = X.flatten()  # So we know what we're dealing with
-        n = len(X)
-        self.p, self.X = p, X.reshape((n, 1))
+    warnings.warn(f"Please use `{name}` from the `quantecon` namespace, the"
+                  "`quantecon.lae` namespace is deprecated. You can use"
+                  f" the following instead:\n `from quantecon import {name}`.",
+                  category=DeprecationWarning, stacklevel=2)
 
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        m = """\
-        Look ahead estimator
-          - number of observations : {n}
-        """
-        return dedent(m.format(n=self.X.size))
-
-    def __call__(self, y):
-        """
-        A vectorized function that returns the value of the look ahead
-        estimate at the values in the array y.
-
-        Parameters
-        ----------
-        y : array_like(float)
-            A vector of points at which we wish to evaluate the look-
-            ahead estimator
-
-        Returns
-        -------
-        psi_vals : array_like(float)
-            The values of the density estimate at the points in y
-
-        """
-        k = len(y)
-        v = self.p(self.X, y.reshape((1, k)))
-        psi_vals = np.mean(v, axis=0)    # Take mean along each row
-
-        return psi_vals.flatten()
+    return getattr(_lae, name)

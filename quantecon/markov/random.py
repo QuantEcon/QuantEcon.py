@@ -30,11 +30,11 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
         Whether to store the transition probability matrix in sparse
         matrix form.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -82,11 +82,11 @@ def random_stochastic_matrix(n, k=None, sparse=False, format='csr',
         Sparse matrix format, str in {'bsr', 'csr', 'csc', 'coo', 'lil',
         'dia', 'dok'}. Relevant only when sparse=True.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -176,11 +176,11 @@ def random_discrete_dp(num_states, num_actions, beta=None,
         Whether to represent the data in the state-action pairs
         formulation. (If `sparse=True`, automatically set `True`.)
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -195,12 +195,12 @@ def random_discrete_dp(num_states, num_actions, beta=None,
     L = num_states * num_actions
 
     random_state = check_random_state(random_state)
-    R = scale * random_state.randn(L)
+    R = scale * random_state.standard_normal(L)
     Q = _random_stochastic_matrix(L, num_states, k=k,
                                   sparse=sparse, format='csr',
                                   random_state=random_state)
     if beta is None:
-        beta = random_state.random_sample()
+        beta = random_state.random()
 
     if sa_pair:
         s_indices, a_indices = sa_indices(num_states, num_actions)

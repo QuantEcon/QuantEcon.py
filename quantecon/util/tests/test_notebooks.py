@@ -37,5 +37,5 @@ class TestNotebookUtils:
             files=FILES, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER)  #Second should skip
         assert(False in status)
 
-    def tearDown(self):
+    def teardown_method(self):
         os.remove("test_file.md")

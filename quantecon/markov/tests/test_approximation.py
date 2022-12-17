@@ -3,6 +3,7 @@ Tests for approximation.py file (i.e. tauchen)
 
 """
 import numpy as np
+import pytest
 from quantecon.markov import tauchen, rouwenhorst
 from numpy.testing import assert_, assert_allclose
 
@@ -11,25 +12,27 @@ from numpy.testing import assert_, assert_allclose
 
 class TestTauchen:
 
-    def setup(self):
-        self.rho, self.sigma_u = np.random.rand(2)
+    def setup_method(self):
+        self.rho, self.sigma = np.random.rand(2)
         self.n = np.random.randint(3, 25)
-        self.m = np.random.randint(5)
+        self.n_std = np.random.randint(5)
         self.tol = 1e-12
-        self.b = 0.
+        self.mu = 0.
 
-        mc = tauchen(self.rho, self.sigma_u, self.b, self.m, self.n)
+        with pytest.warns(UserWarning):
+            mc = tauchen(self.n, self.rho, self.sigma, self.mu, self.n_std)
         self.x, self.P = mc.state_values, mc.P
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.x
         del self.P
 
     def testStateCenter(self):
-        for b in [0., 1., -1.]:
-            mu = b / (1 - self.rho)
-            mc = tauchen(self.rho, self.sigma_u, b, self.m, self.n)
-            assert_allclose(mu, np.mean(mc.state_values), atol=self.tol)
+        for mu in [0., 1., -1.]:
+            mu_expect = mu / (1 - self.rho)
+            with pytest.warns(UserWarning):
+                mc = tauchen(self.n, self.rho, self.sigma, mu, self.n_std)
+            assert_allclose(mu_expect, np.mean(mc.state_values), atol=self.tol)
 
     def testShape(self):
         i, j = self.P.shape
@@ -54,16 +57,17 @@ class TestTauchen:
 
 class TestRouwenhorst:
 
-    def setup(self):
+    def setup_method(self):
         self.rho, self.sigma = np.random.uniform(0, 1, size=2)
         self.n = np.random.randint(3, 26)
-        self.ybar = np.random.randint(0, 11)
+        self.mu = np.random.randint(0, 11)
         self.tol = 1e-10
 
-        mc = rouwenhorst(self.n, self.ybar, self.sigma, self.rho)
+        with pytest.warns(UserWarning):
+            mc = rouwenhorst(self.n, self.rho, self.sigma, self.mu)
         self.x, self.P = mc.state_values, mc.P
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.x
         del self.P
 
@@ -84,12 +88,13 @@ class TestRouwenhorst:
         assert_(np.all(self.P > -self.tol))
 
     def test_states_sum_0(self):
-        tol = self.tol + self.n*(self.ybar/(1 - self.rho))
+        tol = self.tol + self.n*(self.mu/(1 - self.rho))
         assert_(abs(np.sum(self.x)) < tol)
 
     def test_control_case(self):
-        n = 3; ybar = 1; sigma = 0.5; rho = 0.8;
-        mc_rouwenhorst = rouwenhorst(n, ybar, sigma, rho)
+        n = 3; mu = 1; sigma = 0.5; rho = 0.8;
+        with pytest.warns(UserWarning):
+            mc_rouwenhorst = rouwenhorst(n, rho, sigma, mu)
         mc_rouwenhorst.x, mc_rouwenhorst.P = mc_rouwenhorst.state_values, mc_rouwenhorst.P
         sigma_y = np.sqrt(sigma**2 / (1-rho**2))
         psi = sigma_y * np.sqrt(n-1)

@@ -130,7 +130,7 @@ import numbers
 import numpy as np
 from numba import jit
 
-from ..util import check_random_state
+from quantecon.util import check_random_state, rng_integers
 
 
 class Player:
@@ -339,11 +339,12 @@ class Player:
             Tolerance level used in determining best responses. If None,
             default to the value of the `tol` attribute.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used. Relevant only when tie_breaking='random'.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used. Relevant only when
+            tie_breaking='random'.
 
         Returns
         -------
@@ -388,11 +389,11 @@ class Player:
         actions : array_like(int), optional(default=None)
             An array of integers representing pure actions.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -412,7 +413,7 @@ class Player:
         if n == 1:
             idx = 0
         else:
-            idx = random_state.randint(n)
+            idx = rng_integers(random_state, n)
 
         if actions is not None:
             return actions[idx]
@@ -434,10 +435,9 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `minmax` from `quantecon.optimize` is used. If
-            `method` is set to `'simplex'`, `'interior-point'`, or
-            `'revised simplex'`, then `scipy.optimize.linprog` is used
-            with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used.
+            Otherwise `scipy.optimize.linprog` is used with the method
+            as specified by `method`.
 
         Returns
         -------
@@ -467,7 +467,7 @@ class Player:
             from ..optimize.minmax import minmax
             v, _, _ = minmax(D)
             return v > tol
-        elif method in ['simplex', 'interior-point', 'revised simplex']:
+        else:
             from scipy.optimize import linprog
             m, n = D.shape
             A_ub = np.empty((n, m+1))
@@ -480,8 +480,12 @@ class Player:
             b_eq = np.ones(1)
             c = np.zeros(m+1)
             c[-1] = -1
-            res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
-                          method=method)
+            try:
+                res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                              method=method)
+            except ValueError:
+                raise ValueError("Unknown method '{0}'".format(method))
+
             if res.success:
                 return res.x[-1] > tol
             elif res.status == 2:  # infeasible
@@ -489,8 +493,6 @@ class Player:
             else:  # pragma: no cover
                 msg = 'scipy.optimize.linprog returned {0}'.format(res.status)
                 raise RuntimeError(msg)
-        else:
-            raise ValueError('Unknown method {0}'.format(method))
 
     def dominated_actions(self, tol=None, method=None):
         """

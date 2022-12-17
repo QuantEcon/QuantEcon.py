@@ -17,3 +17,7 @@ from .game_generators import (
     blotto_game, ranking_game, sgc_game, tournament_game, unit_vector_game
 )
 from .repeated_game import RepeatedGame
+from .fictplay import FictitiousPlay, StochasticFictitiousPlay
+from .localint import LocalInteraction
+from .brd import BRD, KMR, SamplingBRD
+from .logitdyn import LogitDynamics

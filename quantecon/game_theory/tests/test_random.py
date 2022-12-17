@@ -3,9 +3,11 @@ Tests for game_theory/random.py
 
 """
 import numpy as np
-from numpy.testing import assert_allclose, assert_raises, assert_
+from numpy.testing import (
+    assert_allclose, assert_raises, assert_, assert_array_equal
+)
 from quantecon.game_theory import (
-    random_game, covariance_game, random_pure_actions, random_mixed_actions
+    random_game, covariance_game, random_pure_actions, random_mixed_actions,
 )
 
 
@@ -13,6 +15,14 @@ def test_random_game():
     nums_actions = (2, 3, 4)
     g = random_game(nums_actions)
     assert_(g.nums_actions == nums_actions)
+
+    # Generate seed by np.random.SeedSequence().entropy
+    seed = 227108210370342174739429861866005407311
+    gs = [
+        random_game(nums_actions, random_state=np.random.default_rng(seed))
+        for i in range(2)
+    ]
+    assert_array_equal(*[g.payoff_profile_array for g in gs])
 
 
 def test_covariance_game():
@@ -22,6 +32,14 @@ def test_covariance_game():
     rho = 0.5
     g = covariance_game(nums_actions, rho=rho)
     assert_(g.nums_actions == nums_actions)
+
+    seed = 289722416785475140936980467255496855908
+    gs = [
+        covariance_game(nums_actions, rho=rho,
+                        random_state=np.random.default_rng(seed))
+        for i in range(2)
+    ]
+    assert_array_equal(*[g.payoff_profile_array for g in gs])
 
     rho = 1
     g = covariance_game(nums_actions, rho=rho)
@@ -63,12 +81,13 @@ def test_random_pure_actions():
     nums_actions = (2, 3, 4)
     N = len(nums_actions)
     seed = 1234
-    action_profiles = [
-        random_pure_actions(nums_actions, seed) for i in range(2)
-    ]
-    for i in range(N):
-        assert_(action_profiles[0][i] < nums_actions[i])
-    assert_(action_profiles[0] == action_profiles[1])
+    for gen in [lambda x: x, np.random.default_rng]:
+        action_profiles = [
+            random_pure_actions(nums_actions, gen(seed)) for i in range(2)
+        ]
+        for i in range(N):
+            assert_(action_profiles[0][i] < nums_actions[i])
+        assert_(action_profiles[0] == action_profiles[1])
 
 
 def test_random_mixed_actions():

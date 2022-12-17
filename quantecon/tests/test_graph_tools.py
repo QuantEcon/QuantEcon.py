@@ -6,7 +6,7 @@ Tests for graph_tools.py
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises, assert_
 
-from quantecon.graph_tools import DiGraph, random_tournament_graph
+from quantecon import DiGraph, random_tournament_graph
 
 
 def list_of_array_equal(s, t):
@@ -128,7 +128,7 @@ class Graphs:
 class TestDiGraph:
     """Test the methods in Digraph"""
 
-    def setup(self):
+    def setup_method(self):
         """Setup Digraph instances"""
         self.graphs = Graphs()
         for graph_dict in self.graphs.graph_dicts:
@@ -295,7 +295,7 @@ def test_raises_non_homogeneous_node_labels():
 
 
 class TestRandomTournamentGraph:
-    def setup(self):
+    def setup_method(self):
         n = 5
         g = random_tournament_graph(n)
         self.adj_matrix = g.csgraph.toarray()

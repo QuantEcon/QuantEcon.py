@@ -4,17 +4,17 @@ Tests for rank_nullspace.py
 """
 import numpy as np
 from numpy.linalg import matrix_rank as np_rank
-from quantecon.rank_nullspace import rank_est, nullspace
+from quantecon import rank_est, nullspace
 
 
 class TestRankNullspace:
 
-    def setup(self):
+    def setup_method(self):
         self.A1 = np.eye(6)
         self.A2 = np.array([[1., 0, 0], [0., 1., 0], [1., 1., 0.]])
         self.A3 = np.zeros((3, 3))
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.A1
         del self.A2
         del self.A3

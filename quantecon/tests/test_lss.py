@@ -4,12 +4,12 @@ Tests for lss.py
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_, assert_raises
-from quantecon.lss import LinearStateSpace
+from quantecon import LinearStateSpace
 
 
 class TestLinearStateSpace:
 
-    def setup(self):
+    def setup_method(self):
         # Example 1
         A = .95
         C = .05
@@ -30,7 +30,7 @@ class TestLinearStateSpace:
 
         self.ss2 = LinearStateSpace(A, C, G, mu_0=mu_0)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.ss1
         del self.ss2
 

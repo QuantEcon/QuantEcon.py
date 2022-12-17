@@ -87,7 +87,7 @@ sigma2_3d = data['sigma2_3d']
 class TestQuadrect:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         ## Create Python Data for quadrect
         # Create the python data -- similar to notebook code
         kinds = ["trap", "simp", "lege", "N", "W", "H", "R"]
@@ -100,7 +100,7 @@ class TestQuadrect:
 
         # Integration parameters
         n = np.array([5, 11, 21, 51, 101, 401])  # number of nodes
-        np.random.seed(42)  # same seed as ML code.
+        random_state = np.random.RandomState(42) # same seed as ML code.
         a, b = -1, 1  # endpoints
 
         # Set up pandas DataFrame to hold results
@@ -114,10 +114,9 @@ class TestQuadrect:
             for kind in kinds:
                 for num in n:
                     num_in = num ** 2 if len(kind) == 1 else num
-                    quad_rect_res1d.loc[func_name, num][kind] = quadrect(func,
-                                                                        num_in,
-                                                                        a, b,
-                                                                        kind)
+                    quad_rect_res1d.loc[func_name, num][kind] = \
+                        quadrect(func, num_in, a, b, kind,
+                                 random_state=random_state)
 
         cls.data1d = quad_rect_res1d
 
@@ -229,7 +228,7 @@ class TestQuadrect:
 class TestQnwcheb:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_cheb_1, cls.w_cheb_1 = qnwcheb(n, a, b)
         cls.x_cheb_3, cls.w_cheb_3 = qnwcheb(n_3, a_3, b_3)
 
@@ -249,7 +248,7 @@ class TestQnwcheb:
 class TestQnwequiN:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_equiN_1, cls.w_equiN_1 = qnwequi(n, a, b, "N")
         cls.x_equiN_3, cls.w_equiN_3 = qnwequi(n_3, a_3, b_3, "N")
 
@@ -269,7 +268,7 @@ class TestQnwequiN:
 class TestQnwequiW:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_equiW_1, cls.w_equiW_1 = qnwequi(n, a, b, "W")
         cls.x_equiW_3, cls.w_equiW_3 = qnwequi(n_3, a_3, b_3, "W")
 
@@ -289,7 +288,7 @@ class TestQnwequiW:
 class TestQnwequiH:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_equiH_1, cls.w_equiH_1 = qnwequi(n, a, b, "H")
         cls.x_equiH_3, cls.w_equiH_3 = qnwequi(n_3, a_3, b_3, "H")
 
@@ -309,7 +308,7 @@ class TestQnwequiH:
 class TestQnwequiR:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_equiR_1, cls.w_equiR_1 = qnwequi(n, a, b, "R", random_state=41)
         temp, cls.w_equiR_3 = qnwequi(n_3, a_3, b_3, "R", random_state=42)
 
@@ -346,7 +345,7 @@ class TestQnwequiR:
 class TestQnwlege:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_lege_1, cls.w_lege_1 = qnwlege(n, a, b)
         cls.x_lege_3, cls.w_lege_3 = qnwlege(n_3, a_3, b_3)
 
@@ -366,7 +365,7 @@ class TestQnwlege:
 class TestQnwnorm:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_norm_1, cls.w_norm_1 = qnwnorm(n, a, b)
         cls.x_norm_3, cls.w_norm_3 = qnwnorm(n_3, mu_3d, sigma2_3d)
 
@@ -386,7 +385,7 @@ class TestQnwnorm:
 class TestQnwlogn:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_logn_1, cls.w_logn_1 = qnwlogn(n, a, b)
         cls.x_logn_3, cls.w_logn_3 = qnwlogn(n_3, mu_3d, sigma2_3d)
 
@@ -406,7 +405,7 @@ class TestQnwlogn:
 class TestQnwsimp:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_simp_1, cls.w_simp_1 = qnwsimp(n, a, b)
         cls.x_simp_3, cls.w_simp_3 = qnwsimp(n_3, a_3, b_3)
 
@@ -426,7 +425,7 @@ class TestQnwsimp:
 class TestQnwtrap:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_trap_1, cls.w_trap_1 = qnwtrap(n, a, b)
         cls.x_trap_3, cls.w_trap_3 = qnwtrap(n_3, a_3, b_3)
 
@@ -446,7 +445,7 @@ class TestQnwtrap:
 class TestQnwunif:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_unif_1, cls.w_unif_1 = qnwunif(n, a, b)
         cls.x_unif_3, cls.w_unif_3 = qnwunif(n_3, a_3, b_3)
 
@@ -466,7 +465,7 @@ class TestQnwunif:
 class TestQnwbeta:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_beta_1, cls.w_beta_1 = qnwbeta(n, b, b + 1.0)
         cls.x_beta_3, cls.w_beta_3 = qnwbeta(n_3, b_3, b_3 + 1.0)
 
@@ -486,7 +485,7 @@ class TestQnwbeta:
 class TestQnwgamm:
 
     @classmethod
-    def setup(cls):
+    def setup_method(cls):
         cls.x_gamm_1, cls.w_gamm_1 = qnwgamma(n, b)
         cls.x_gamm_3, cls.w_gamm_3 = qnwgamma(n_3, b_3)
 

@@ -11,3 +11,4 @@ from .random import random_markov_chain, random_stochastic_matrix, \
 from .approximation import tauchen, rouwenhorst
 from .ddp import DiscreteDP, backward_induction
 from .utilities import sa_indices
+from .estimate import estimate_mc

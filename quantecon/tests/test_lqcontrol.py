@@ -5,12 +5,12 @@ Tests for lqcontrol.py file
 import numpy as np
 from numpy.testing import assert_allclose, assert_raises
 from numpy import dot
-from quantecon.lqcontrol import LQ, LQMarkov
+from quantecon import LQ, LQMarkov
 
 
 class TestLQControl:
 
-    def setup(self):
+    def setup_method(self):
         # Initial Values
         q = 1.
         r = 1.
@@ -33,7 +33,7 @@ class TestLQControl:
 
         self.methods = ['doubling', 'qz']
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lq_scalar
         del self.lq_mat
 
@@ -91,7 +91,7 @@ class TestLQControl:
 
 class TestLQMarkov:
 
-    def setup(self):
+    def setup_method(self):
 
         # Markov chain transition matrix
         Π = np.array([[0.8, 0.2],
@@ -137,7 +137,7 @@ class TestLQMarkov:
         self.lq_markov_mat2 = LQMarkov(Π, Qs, Rs, As, Bs,
                                        Cs=Cs, Ns=Ns, beta=1.05)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.lq_markov_scalar
         del self.lq_markov_mat1
         del self.lq_markov_mat2

@@ -4,8 +4,7 @@ Tests for lqnash.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.lqnash import nnash
-from quantecon.lqcontrol import LQ
+from quantecon import nnash, LQ
 
 
 class TestLQNash:
@@ -93,13 +92,15 @@ class TestLQNash:
         xbar = tfi.dot(aaa[:2, 2])
 
         # Define answers from matlab. TODO: this is ghetto
-        f1_ml = np.asarray(np.matrix("""\
-           0.243666582208565,   0.027236062661951, -6.827882928738190;
-           0.392370733875639,   0.139696450885998, -37.734107291009138"""))
+        f1_ml = np.array([
+               [0.243666582208565,   0.027236062661951, -6.827882928738190],
+               [0.392370733875639,   0.139696450885998, -37.734107291009138]
+           ])
 
-        f2_ml = np.asarray(np.matrix("""\
-           0.027236062661951,   0.243666582208565,  -6.827882928738186;
-           0.139696450885998,   0.392370733875639, -37.734107291009131"""))
+        f2_ml = np.array([
+               [0.027236062661951,   0.243666582208565,  -6.827882928738186],
+               [0.139696450885998,   0.392370733875639, -37.734107291009131]
+           ])
 
         xbar_ml = np.array([1.246871007582702, 1.246871007582685])
 

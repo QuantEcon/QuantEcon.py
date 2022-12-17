@@ -4,14 +4,14 @@ Tests for dle.py file
 
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.dle import DLE
+from quantecon import DLE
 
 ATOL = 1e-10
 
 
 class TestDLE:
 
-    def setup(self):
+    def setup_method(self):
         """
         Given LQ control is tested we will test the transformation
         to alter the problem into a form suitable to solve using LQ
@@ -41,7 +41,7 @@ class TestDLE:
 
         self.dle = DLE(information, technology, preferences)
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.dle
 
     def test_transformation_Q(self):
