@@ -27,9 +27,10 @@ update any effected imports from the `quantecon` package.
 2. [FIX: Bugfix in brd.py](https://github.com/QuantEcon/QuantEcon.py/pull/657) ([oyamad](https://github.com/oyamad))
 3. [MAINT: player.is_dominated: Allow recent methods for scipy.optimize.linprog](https://github.com/QuantEcon/QuantEcon.py/pull/648) ([oyamad](https://github.com/oyamad))
 4. [MAINT: Distinguish between private and public namespaces](https://github.com/QuantEcon/QuantEcon.py/pull/601) ([Smit-create](https://github.com/Smit-create)).
+5. [MAINT: Clairfy hamilton_filter API](https://github.com/QuantEcon/QuantEcon.py/pull/634) ([rht](https://github.com/rht))
 
-Thank you to ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), and ([Smit-create](https://github.com/Smit-create))
-for all your PR reviews and comments. 
+Thank you to ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), ([Smit-create](https://github.com/Smit-create)), 
+and ([rht](https://github.com/rht)) for all your contributions, PR reviews, and comments. 
 
 ## Ver 0.5.3 (07-April-2022)
 
