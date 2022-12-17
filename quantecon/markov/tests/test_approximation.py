@@ -4,10 +4,8 @@ Tests for approximation.py file (i.e. tauchen)
 """
 import numpy as np
 import pytest
-from quantecon.markov import tauchen, rouwenhorst
+from quantecon.markov import tauchen, rouwenhorst, discrete_var
 from numpy.testing import assert_, assert_allclose
-
-#from quantecon.markov.approximation import rouwenhorst
 
 
 class TestTauchen:
@@ -103,3 +101,50 @@ class TestRouwenhorst:
             [[0.81, 0.18, 0.01], [0.09, 0.82, 0.09], [0.01, 0.18, 0.81]])
         assert_(np.sum(mc_rouwenhorst.x - known_x) < self.tol and
                 np.sum(mc_rouwenhorst.P - known_P) < self.tol)
+
+
+class TestDiscreteVar:
+
+    def setup_method(self):
+        self.T, self.burn_in  = 1_000_000, 100_000
+
+        self.A = [[0.7901, -1.3570],
+             [-0.0104, 0.8638]]
+        self.Omega = [[0.0012346, -0.0000776],
+                 [-0.0000776, 0.0000401]]
+
+        self.sizes = np.array((2, 3))
+
+        # Expected outputs
+        self.S_out = [[-0.38556417, -0.05387746],
+                     [-0.38556417,  0.        ],
+                     [-0.38556417,  0.05387746],
+                     [ 0.38556417, -0.05387746],
+                     [ 0.38556417,  0.        ],
+                     [ 0.38556417,  0.05387746]]
+
+        self.P_out = [[8.06451613e-02, 1.93548387e-01, 0.00000000e+00, 3.54838710e-01,
+              3.70967742e-01, 0.00000000e+00],
+             [8.39514352e-05, 8.50806955e-01, 3.79097454e-02, 4.96901738e-04,
+              1.10647992e-01, 5.44549850e-05],
+             [0.00000000e+00, 3.01394785e-01, 6.97927443e-01, 0.00000000e+00,
+              5.70755895e-04, 1.07016730e-04],
+             [1.03646634e-04, 5.52782048e-04, 0.00000000e+00, 6.99407487e-01,
+              2.99936085e-01, 0.00000000e+00],
+             [3.14483775e-05, 1.09581871e-01, 4.53755161e-04, 3.85467256e-02,
+              8.51289608e-01, 9.65914451e-05],
+             [0.00000000e+00, 3.63636364e-01, 3.37662338e-01, 0.00000000e+00,
+              2.46753247e-01, 5.19480519e-02]]
+
+        self.A, self.Omega, self.S_out, self.P_out = map(np.array,
+                                (self.A, self.Omega, self.S_out, self.P_out))
+
+    def teardown_method(self):
+        del self.A, self.Omega, self.S_out, self.P_out
+
+    def test_discretization(self):
+        mc = discrete_var(
+                self.A, self.Omega, grid_sizes=self.sizes,
+                sim_length=self.T, burn_in=self.burn_in)
+        assert_allclose(mc.state_values, self.S_out)
+        assert_allclose(mc.P, self.P_out)

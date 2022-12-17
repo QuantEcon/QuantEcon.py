@@ -7,9 +7,12 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 
 from math import erfc, sqrt
 from .core import MarkovChain
+from quantecon import matrix_eqn as qme
+from quantecon.gridtools import mlinspace
 
 import warnings
 import numpy as np
+import scipy as sp
 from numba import njit
 
 
@@ -238,3 +241,154 @@ def _fill_tauchen(x, P, n, rho, sigma, half_step):
             z = x[j] - rho * x[i]
             P[i, j] = (std_norm_cdf((z + half_step) / sigma) -
                        std_norm_cdf((z - half_step) / sigma))
+
+
+def discrete_var(A,
+                 Omega,
+                 grid_sizes=None,
+                 std_devs=np.sqrt(10),
+                 seed=1234,
+                 sim_length=1_000_000,
+                 burn_in=100_000):
+    r"""
+    This code discretizes a VAR(1) process of the form:
+
+    .. math::
+
+        x_t = A x_{t-1} + u_t
+
+    where :math:`{u_t}` is zero-mean Gaussian with variance-covariance
+    matrix Omega.
+
+    By default, the code removes the states that are never visited under the
+    simulation that computes the transition probabilities.
+
+    For a mathematical derivation check *Finite-State Approximation Of
+    VAR Processes:  A Simulation Approach* by Stephanie Schmitt-Grohé and
+    Martín Uribe, July 11, 2010.
+
+    This code was adapted from Schmitt-Grohé and Uribe's original MATLAB code.
+
+    Parameters
+    ----------
+    A : array_like(float)
+        An m x m matrix containing the process' autocorrelation parameters
+    Omega : array_like(float)
+        An m x m variance-covariance matrix
+    grid_sizes : array_like(int) or None
+        An m-vector containing the number of grid points in the discretization
+        of each dimension of x_t. If grid_sizes is None, then grid_sizes is
+        set to (10, ..., 10).
+    std_devs : float
+        The number of standard deviations the grid should stretch in each
+        dimension, where standard deviations are measured under the stationary
+        distribution.
+    sim_length : int
+        The the length of the simulated time series (default,  1_000_000).
+    burn_in : int
+        The number of burn-in draws from the simulated series (default,
+        100_000).
+
+    Returns
+    -------
+
+    mc : MarkovChain
+        An instance of the MarkovChain class that stores the transition
+        matrix and state values returned by the discretization method.
+        The MarkovChain instance contains:
+        P : A square matrix containing the transition probability
+            matrix of the discretized state.
+        S : An array where element (i,j) of S is the discretized
+            value of the j-th element of x_t in state i. Reducing S to its
+            unique values yields the grid values. The cartesian product
+            state grid uses a row major ordering.
+
+
+    Notes
+    -----
+        The code presently assumes normal shocks but normality is not required
+        for the algorithm to work. The draws from the multivariate standard
+        normal generator can be replaced by any other random number generator
+        with mean 0 and unit standard deviation.
+
+
+    Example
+    -------
+
+        This example discretizes the stochastic process used to calibrate
+        the economic model included in ``Downward Nominal Wage Rigidity,
+        Currency Pegs, and Involuntary Unemployment'' by Stephanie
+        Schmitt-Grohé and Martín Uribe, Journal of Political Economy 124,
+        October 2016, 1466-1514.
+
+            A     = np.array([[0.7901, -1.3570],
+                              [-0.0104, 0.8638]])
+            Omega = np.array([[0.0012346, -0.0000776],
+                              [-0.0000776, 0.0000401]])
+            grid_sizes = np.array([21, 11])
+            mc = discrete_var(A, Omega, grid_sizes,
+                              sim_length=1_000_000, burn_in = 100_000)
+    """
+
+    m = len(A)   # The number of dimensions of the original state x_t
+    default_grid_size = 10
+
+    if grid_sizes is None:
+        # Set the size of every grid to default_grid_size
+        grid_sizes = np.full(m, default_grid_size)
+
+    n = grid_sizes.prod()  # Size of the discretized state
+
+    # Compute stationary variance-covariance matrix of AR process and use
+    # it to obtain grid bounds.
+    Sigma = qme.solve_discrete_lyapunov(A, Omega)
+    sigma_vector = np.sqrt(np.diagonal(Sigma))    # Stationary std dev
+    upper_bounds = std_devs * sigma_vector
+
+    # Build the individual grids along each dimension
+    S = mlinspace(-upper_bounds, upper_bounds, grid_sizes)
+
+    P = np.zeros((n, n))
+    Xvec = np.zeros((m, sim_length))
+    C = sp.linalg.sqrtm(Omega)
+
+    # Run simulation to compute transition probabilities
+    _run_sim(A, C, P, Xvec, S, sim_length, burn_in, seed)
+
+    # Cut states where the column sum of P is zero (i.e., inaccesible states
+    # according to the simulation)
+    indx = np.where(np.sum(P, axis=0) > 0)
+    P = P[indx[0], :]
+    P = P[:, indx[0]]
+    S  = S[indx[0], :]
+
+    # Normalize
+    sum_row = np.sum(P, axis=1)
+    for i in range(len(P)):
+        P[i, :] = P[i, :] / sum_row[i]
+
+    mc = MarkovChain(P, state_values=S)
+    return mc
+
+
+@njit
+def _run_sim(A, C, P, Xvec, S, sim_length, burn_in, seed):
+    m = len(A)
+    np.random.seed(seed)
+    x0 = np.zeros((m, 1))
+    d = np.sum(S**2, axis=1)
+    ind_i = np.argmin(d)
+
+    for t in range(sim_length + burn_in):
+        # Update state
+        drw = C @ np.random.randn(m, 1)
+        x = A @ x0 + drw
+        # Find the index of the state closest to x
+        xx = np.reshape(x, (1, m))
+        d = np.sum((S - xx)**2, axis=1)
+        ind_j = np.argmin(d)
+
+        if t > burn_in:
+            P[ind_i, ind_j] += 1
+        x0 = x
+        ind_i = ind_j
