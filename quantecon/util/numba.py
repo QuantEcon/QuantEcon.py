@@ -44,7 +44,7 @@ def _numba_linalg_solve(a, b):
 
     Notes
     -----
-    From github.com/numba/numba/blob/master/numba/targets/linalg.py
+    From github.com/numba/numba/blob/main/numba/targets/linalg.py
 
     """
     numba_xgesv = _LAPACK().numba_xgesv(a.dtype)
