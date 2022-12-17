@@ -7,8 +7,11 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 
 from math import erfc, sqrt
 from .core import MarkovChain
-from quantecon import matrix_eqn as qme
-from quantecon.gridtools import mlinspace
+from .estimate import estimate_mc
+from ..gridtools import cartesian, cartesian_nearest_index
+from ..lss import simulate_linear_model
+from ..matrix_eqn import solve_discrete_lyapunov
+from ..util import check_random_state
 
 import warnings
 import numpy as np
@@ -244,12 +247,13 @@ def _fill_tauchen(x, P, n, rho, sigma, half_step):
 
 
 def discrete_var(A,
-                 Omega,
+                 C,
                  grid_sizes=None,
                  std_devs=np.sqrt(10),
-                 seed=1234,
                  sim_length=1_000_000,
-                 burn_in=100_000):
+                 rv=None,
+                 order='C',
+                 random_state=None):
     r"""
     This code discretizes a VAR(1) process of the form:
 
@@ -329,66 +333,43 @@ def discrete_var(A,
             mc = discrete_var(A, Omega, grid_sizes,
                               sim_length=1_000_000, burn_in = 100_000)
     """
+    A = np.asarray(A)
+    C = np.asarray(C)
+    m, r = C.shape
 
-    m = len(A)   # The number of dimensions of the original state x_t
-    default_grid_size = 10
+    # Run simulation to compute transition probabilities
+    random_state = check_random_state(random_state)
 
-    if grid_sizes is None:
-        # Set the size of every grid to default_grid_size
-        grid_sizes = np.full(m, default_grid_size)
+    if rv is None:
+        u = random_state.standard_normal(size=(sim_length-1, r))
+    else:
+        u = rv.rvs(size=sim_length-1, random_state=random_state)
 
-    n = grid_sizes.prod()  # Size of the discretized state
+    v = C @ u.T
+    x0 = np.zeros(m)
+    X = simulate_linear_model(A, x0, v, ts_length=sim_length)
 
     # Compute stationary variance-covariance matrix of AR process and use
     # it to obtain grid bounds.
-    Sigma = qme.solve_discrete_lyapunov(A, Omega)
+    Sigma = solve_discrete_lyapunov(A, C @ C.T)
     sigma_vector = np.sqrt(np.diagonal(Sigma))    # Stationary std dev
     upper_bounds = std_devs * sigma_vector
 
     # Build the individual grids along each dimension
-    S = mlinspace(-upper_bounds, upper_bounds, grid_sizes)
+    if grid_sizes is None:
+        # Set the size of every grid to default_grid_size
+        default_grid_size = 10
+        grid_sizes = np.full(m, default_grid_size)
 
-    P = np.zeros((n, n))
-    Xvec = np.zeros((m, sim_length))
-    C = sp.linalg.sqrtm(Omega)
+    V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
+         for i in range(m)]
 
-    # Run simulation to compute transition probabilities
-    _run_sim(A, C, P, Xvec, S, sim_length, burn_in, seed)
+    # Estimate the Markov chain
+    X_indices = cartesian_nearest_index(X.T, V, order=order)
+    mc = estimate_mc(X_indices)
 
-    # Cut states where the column sum of P is zero (i.e., inaccesible states
-    # according to the simulation)
-    indx = np.where(np.sum(P, axis=0) > 0)
-    P = P[indx[0], :]
-    P = P[:, indx[0]]
-    S  = S[indx[0], :]
+    # Assign the visited states in the cartesian product as the state values
+    prod = cartesian(V, order=order)
+    mc.state_values = prod[mc.state_values]
 
-    # Normalize
-    sum_row = np.sum(P, axis=1)
-    for i in range(len(P)):
-        P[i, :] = P[i, :] / sum_row[i]
-
-    mc = MarkovChain(P, state_values=S)
     return mc
-
-
-@njit
-def _run_sim(A, C, P, Xvec, S, sim_length, burn_in, seed):
-    m = len(A)
-    np.random.seed(seed)
-    x0 = np.zeros((m, 1))
-    d = np.sum(S**2, axis=1)
-    ind_i = np.argmin(d)
-
-    for t in range(sim_length + burn_in):
-        # Update state
-        drw = C @ np.random.randn(m, 1)
-        x = A @ x0 + drw
-        # Find the index of the state closest to x
-        xx = np.reshape(x, (1, m))
-        d = np.sum((S - xx)**2, axis=1)
-        ind_j = np.argmin(d)
-
-        if t > burn_in:
-            P[ind_i, ind_j] += 1
-        x0 = x
-        ind_i = ind_j
