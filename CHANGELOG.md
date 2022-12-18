@@ -19,7 +19,7 @@ update any effected imports from the `quantecon` package.
 1. [ENH: Add MLE Estimation for Markov Chains](https://github.com/QuantEcon/QuantEcon.py/pull/658) ([jstac](https://github.com/jstac))
 2. [ENH: Implement cartesian_nearest_index](https://github.com/QuantEcon/QuantEcon.py/pull/660) ([oyamad](https://github.com/oyamad))
 3. [ENH: check_random_state: Accept np.random.Generator](https://github.com/QuantEcon/QuantEcon.py/pull/654) ([oyamad](https://github.com/oyamad))
-4. [ENH: Add learning algorithms to Game Theory module](https://github.com/QuantEcon/QuantEcon.py/pull/487) ([Yuya-Furusawa](https://github.com/oyamad)
+4. [ENH: Add learning algorithms to Game Theory module](https://github.com/QuantEcon/QuantEcon.py/pull/487) ([Yuya-Furusawa](https://github.com/Yuya-Furusawa))
 
 ### Fixes
 
@@ -29,8 +29,8 @@ update any effected imports from the `quantecon` package.
 4. [MAINT: Distinguish between private and public namespaces](https://github.com/QuantEcon/QuantEcon.py/pull/601) ([Smit-create](https://github.com/Smit-create)).
 5. [MAINT: Clairfy hamilton_filter API](https://github.com/QuantEcon/QuantEcon.py/pull/634) ([rht](https://github.com/rht))
 
-Thank you to ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), ([Smit-create](https://github.com/Smit-create)), 
-and ([rht](https://github.com/rht)) for all your contributions, PR reviews, and comments. 
+Thank you to ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), ([Smit-create](https://github.com/Smit-create)),
+([rht](https://github.com/rht)), and ([Yuya-Furusawa](https://github.com/Yuya-Furusawa)) for all your contributions, PR reviews, and comments. 
 
 ## Ver 0.5.3 (07-April-2022)
 
