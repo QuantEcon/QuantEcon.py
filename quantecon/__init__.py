@@ -6,11 +6,11 @@ Import the main names to top level.
 __version__ = '0.6.0'
 
 try:
-	import numba
+    import numba
 except:
-	raise ImportError(
-		"Cannot import numba from current anaconda distribution. \
-			Please run `conda install numba` to install the latest version.")
+    raise ImportError(
+        "Cannot import numba from current anaconda distribution. \
+            Please run `conda install numba` to install the latest version.")
 
 # Modules
 from . import distributions
@@ -26,10 +26,10 @@ from ._dle import DLE
 from ._ecdf import ECDF
 from ._estspec import smooth, periodogram, ar_periodogram
 from ._graph_tools import DiGraph, random_tournament_graph
-from ._gridtools import (cartesian, mlinspace, simplex_grid, simplex_index,
-						 num_compositions)
+from ._gridtools import (cartesian, mlinspace, cartesian_nearest_index,
+                         simplex_grid, simplex_index, num_compositions)
 from ._inequality import (lorenz_curve, gini_coefficient, shorrocks_index,
-						  rank_size)
+                          rank_size)
 from ._kalman import Kalman
 from ._lae import LAE
 from ._arma import ARMA
@@ -46,7 +46,7 @@ from ._robustlq import RBLQ
 #-> Propose Delete From Top Level
 # Promote to keep current examples working
 from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, \
-	gth_solve, tauchen, rouwenhorst
+    gth_solve, tauchen, rouwenhorst
 
 
 from .util import searchsorted, fetch_nb_dependencies, tic, tac, toc
@@ -57,6 +57,6 @@ from .markov import mc_compute_stationary, mc_sample_path
 
 # Imports that are deprecated and will be removed in further versions
 from . import (ecdf, arma, compute_fp, discrete_rv, dle, estspec, filter,
-			   graph_tools, gridtools, inequality, ivp, kalman, lae,
-			   lqcontrol, lqnash, lss, matrix_eqn, quadsums, rank_nullspace,
-			   robustlq)
+               graph_tools, gridtools, inequality, ivp, kalman, lae,
+               lqcontrol, lqnash, lss, matrix_eqn, quadsums, rank_nullspace,
+               robustlq)
