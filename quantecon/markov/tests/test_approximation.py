@@ -19,8 +19,7 @@ class TestTauchen:
         self.tol = 1e-12
         self.mu = 0.
 
-        with pytest.warns(UserWarning):
-            mc = tauchen(self.n, self.rho, self.sigma, self.mu, self.n_std)
+        mc = tauchen(self.n, self.rho, self.sigma, self.mu, self.n_std)
         self.x, self.P = mc.state_values, mc.P
 
     def teardown_method(self):
@@ -30,8 +29,7 @@ class TestTauchen:
     def testStateCenter(self):
         for mu in [0., 1., -1.]:
             mu_expect = mu / (1 - self.rho)
-            with pytest.warns(UserWarning):
-                mc = tauchen(self.n, self.rho, self.sigma, mu, self.n_std)
+            mc = tauchen(self.n, self.rho, self.sigma, mu, self.n_std)
             assert_allclose(mu_expect, np.mean(mc.state_values), atol=self.tol)
 
     def testShape(self):

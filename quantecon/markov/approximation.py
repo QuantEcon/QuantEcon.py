@@ -190,10 +190,13 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
     `tauchen(n, rho, sigma, mu=0., n_std=3)` in version 0.6.0.
 
     """
-    warnings.warn("The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
-                  " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
-                  " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
-                  UserWarning, stacklevel=2)
+
+    if not isinstance(n, int):
+        warnings.warn(
+            "The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
+            " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
+            " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
+            UserWarning, stacklevel=2)
 
     # standard deviation of demeaned y_t
     std_y = np.sqrt(sigma**2 / (1 - rho**2))
