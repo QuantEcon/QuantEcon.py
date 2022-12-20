@@ -4,9 +4,9 @@ Provides a class called DLE to convert and solve dynamic linear economies
 """
 
 import numpy as np
-from .lqcontrol import LQ
-from .matrix_eqn import solve_discrete_lyapunov
-from .rank_nullspace import nullspace
+from ._lqcontrol import LQ
+from ._matrix_eqn import solve_discrete_lyapunov
+from ._rank_nullspace import nullspace
 
 class DLE(object):
     r"""

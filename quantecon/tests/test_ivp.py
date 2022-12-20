@@ -5,7 +5,7 @@ Tests for ivp.py
 
 import numpy as np
 
-from quantecon.ivp import IVP
+from quantecon import IVP
 
 # use the Solow Model with Cobb-Douglas production as test case
 def solow_model(t, k, g, n, s, alpha, delta):

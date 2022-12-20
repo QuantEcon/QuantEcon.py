@@ -20,28 +20,29 @@ from . import random
 from . import optimize
 
 #-Objects-#
-from .compute_fp import compute_fixed_point
-from .discrete_rv import DiscreteRV
-from .dle import DLE
-from .ecdf import ECDF
-from .estspec import smooth, periodogram, ar_periodogram
+from ._compute_fp import compute_fixed_point
+from ._discrete_rv import DiscreteRV
+from ._dle import DLE
+from ._ecdf import ECDF
+from ._estspec import smooth, periodogram, ar_periodogram
 # from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.
-from .graph_tools import DiGraph, random_tournament_graph
-from .gridtools import (
+from ._graph_tools import DiGraph, random_tournament_graph
+from ._gridtools import (
 	cartesian, mlinspace, cartesian_nearest_index, simplex_grid, simplex_index,
     num_compositions
 )
-from .inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
+from ._inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
 	rank_size
-from .kalman import Kalman
-from .lae import LAE
-from .arma import ARMA
-from .lqcontrol import LQ, LQMarkov
-from .filter import hamilton_filter
-from .lqnash import nnash
-from .lss import LinearStateSpace
-from .matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
-from .quadsums import var_quadratic_sum, m_quadratic_sum
+from ._kalman import Kalman
+from ._lae import LAE
+from ._arma import ARMA
+from ._lqcontrol import LQ, LQMarkov
+from ._filter import hamilton_filter
+from ._lqnash import nnash
+from ._ivp import IVP
+from ._lss import LinearStateSpace
+from ._matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
+from ._quadsums import var_quadratic_sum, m_quadratic_sum
 #->Propose Delete From Top Level
 #Promote to keep current examples working
 from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, \
@@ -49,6 +50,6 @@ from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, 
 #Imports that Should be Deprecated with markov package
 from .markov import mc_compute_stationary, mc_sample_path
 #<-
-from .rank_nullspace import rank_est, nullspace
-from .robustlq import RBLQ
+from ._rank_nullspace import rank_est, nullspace
+from ._robustlq import RBLQ
 from .util import searchsorted, fetch_nb_dependencies, tic, tac, toc
