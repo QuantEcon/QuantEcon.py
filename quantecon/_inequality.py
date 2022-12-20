@@ -150,4 +150,3 @@ def rank_size(data, c=1.0):
     rank_data = np.arange(len(w)) + 1
     size_data = w
     return rank_data, size_data
-
