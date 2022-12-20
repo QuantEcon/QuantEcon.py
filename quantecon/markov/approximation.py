@@ -10,6 +10,7 @@ from .core import MarkovChain
 
 import warnings
 import numpy as np
+import numbers
 from numba import njit
 
 
@@ -191,7 +192,7 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
 
     """
 
-    if not isinstance(n, int):
+    if not isinstance(n, numbers.Integral):
         warnings.warn(
             "The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
             " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
