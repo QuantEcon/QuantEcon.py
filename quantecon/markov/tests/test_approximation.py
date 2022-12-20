@@ -5,7 +5,7 @@ Tests for approximation.py file (i.e. tauchen)
 import numpy as np
 import pytest
 from quantecon.markov import tauchen, rouwenhorst
-from numpy.testing import assert_, assert_allclose
+from numpy.testing import assert_, assert_allclose, assert_raises
 
 #from quantecon.markov.approximation import rouwenhorst
 
@@ -52,6 +52,12 @@ class TestTauchen:
     def test_states_sum_0(self):
         assert_(abs(np.sum(self.x)) < self.tol)
 
+    def test_old_tauchen_api_warning(self):
+        # Test the warning
+        with pytest.warns(UserWarning):
+            # This will raise an error because `n` must be an int
+            assert_raises(TypeError, tauchen, 4.0, self.rho, self.sigma,
+                                self.mu, self.n_std)
 
 class TestRouwenhorst:
 
