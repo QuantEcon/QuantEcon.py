@@ -7,7 +7,7 @@ in the docstrings.
 
 import numpy as np
 import scipy.linalg
-from .matrix_eqn import solve_discrete_lyapunov
+from ._matrix_eqn import solve_discrete_lyapunov
 
 
 def var_quadratic_sum(A, C, H, beta, x0):

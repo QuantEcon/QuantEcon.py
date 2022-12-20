@@ -4,7 +4,7 @@ Tests for dle.py file
 
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.dle import DLE
+from quantecon import DLE
 
 ATOL = 1e-10
 
