@@ -6,7 +6,7 @@ response correspondence.
 """
 import numbers
 import numpy as np
-from quantecon._compute_fp import _compute_fixed_point_ig
+from ..compute_fp import _compute_fixed_point_ig
 from .normal_form_game import pure2mixed
 from .utilities import NashResult
 

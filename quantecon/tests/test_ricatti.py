@@ -4,7 +4,7 @@ Tests for solve_discrete_riccati in matrix_eqn.py file
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_raises
-from quantecon import solve_discrete_riccati
+from quantecon.matrix_eqn import solve_discrete_riccati
 import pytest
 
 

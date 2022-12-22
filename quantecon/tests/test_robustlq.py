@@ -4,8 +4,8 @@ Tests for robustlq.py
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_
-from quantecon import LQ
-from quantecon import RBLQ
+from quantecon.lqcontrol import LQ
+from quantecon.robustlq import RBLQ
 
 
 class TestRBLQControl:

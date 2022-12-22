@@ -4,7 +4,8 @@ Tests for lqnash.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon import nnash, LQ
+from quantecon.lqnash import nnash
+from quantecon.lqcontrol import LQ
 
 
 class TestLQNash:

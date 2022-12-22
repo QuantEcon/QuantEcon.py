@@ -95,8 +95,8 @@ import scipy.special
 from numba import jit
 from ..normal_form_game import Player, NormalFormGame
 from ...util import check_random_state, rng_integers
-from ..._gridtools import simplex_grid
-from ..._graph_tools import random_tournament_graph
+from ...gridtools import simplex_grid
+from ...graph_tools import random_tournament_graph
 from ...util.combinatorics import next_k_array, k_array_rank_jit
 
 __all__ = [

@@ -4,7 +4,7 @@ Tests for lss.py
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_, assert_raises
-from quantecon import LinearStateSpace
+from quantecon.lss import LinearStateSpace
 
 
 class TestLinearStateSpace:

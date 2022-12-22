@@ -4,7 +4,7 @@ Tests for quadsums.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon import var_quadratic_sum, m_quadratic_sum
+from quantecon.quadsums import var_quadratic_sum, m_quadratic_sum
 
 
 def test_var_simplesum():

@@ -5,7 +5,7 @@ covered by the numpy tests since we rely on much of their code.
 """
 import numpy as np
 from numpy.testing import assert_array_equal, assert_
-from quantecon import ARMA
+from quantecon.arma import ARMA
 
 
 class TestARMA():

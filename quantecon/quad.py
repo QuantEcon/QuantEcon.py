@@ -14,7 +14,7 @@ import math
 import numpy as np
 import scipy.linalg as la
 from numba import jit, vectorize
-from ._ce_util import ckron, gridmake
+from .ce_util import ckron, gridmake
 from .util import check_random_state
 
 __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
