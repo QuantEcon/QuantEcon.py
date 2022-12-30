@@ -45,7 +45,7 @@ Many examples of QuantEcon.py in action can be found at [Quantitative Economics
 *   [Documentation](https://quanteconpy.readthedocs.org/en/latest/)
 *   [Notebook gallery](https://notes.quantecon.org)
 
-QuantEcon.py is supported financially by the [Alfred P. Sloan Foundation](http://www.sloan.org/) and is part of the [QuantEcon organization](/).
+QuantEcon.py is supported financially by the [Alfred P. Sloan Foundation](http://www.sloan.org/) and is part of the [QuantEcon organization](https://quantecon.org).
 
 ## Downloading the `quantecon` Repository
 
