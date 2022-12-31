@@ -5,7 +5,7 @@ Tests for bimatrix_generators.py
 import numpy as np
 from scipy.special import comb
 from numpy.testing import assert_array_equal, assert_, assert_raises
-from quantecon import num_compositions
+from quantecon.gridtools import num_compositions
 from quantecon.game_theory import pure_nash_brute
 
 from quantecon.game_theory import (

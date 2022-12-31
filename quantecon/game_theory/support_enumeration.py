@@ -11,8 +11,8 @@ Tardos, and V. Vazirani eds., Algorithmic Game Theory, 2007.
 """
 import numpy as np
 from numba import jit
-from quantecon.util.numba import _numba_linalg_solve
-from quantecon.util.combinatorics import next_k_array
+from ..util.numba import _numba_linalg_solve
+from ..util.combinatorics import next_k_array
 
 
 def support_enumeration(g):

@@ -86,7 +86,7 @@ from scipy import sparse
 from numba import jit
 
 from .gth_solve import gth_solve
-from .._graph_tools import DiGraph
+from ..graph_tools import DiGraph
 from ..util import searchsorted, check_random_state, rng_integers
 
 

@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon import hamilton_filter
+from quantecon.filter import hamilton_filter
 from quantecon.tests.util import get_data_dir
 
 def test_hamilton_filter():
