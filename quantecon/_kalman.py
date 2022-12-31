@@ -10,8 +10,8 @@ https://lectures.quantecon.org/py/kalman.html
 from textwrap import dedent
 import numpy as np
 from scipy.linalg import inv
-from quantecon.lss import LinearStateSpace
-from quantecon.matrix_eqn import solve_discrete_riccati
+from ._lss import LinearStateSpace
+from ._matrix_eqn import solve_discrete_riccati
 
 
 class Kalman:

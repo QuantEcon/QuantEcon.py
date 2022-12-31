@@ -11,7 +11,7 @@ https://lectures.quantecon.org/py/linear_models.html
 from textwrap import dedent
 import numpy as np
 from scipy.linalg import solve
-from .matrix_eqn import solve_discrete_lyapunov
+from ._matrix_eqn import solve_discrete_lyapunov
 from numba import jit
 from .util import check_random_state
 

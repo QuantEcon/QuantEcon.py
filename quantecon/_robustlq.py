@@ -4,10 +4,10 @@ Solves robust LQ control problems.
 """
 from textwrap import dedent
 import numpy as np
-from .lqcontrol import LQ
-from .quadsums import var_quadratic_sum
+from ._lqcontrol import LQ
+from ._quadsums import var_quadratic_sum
 from scipy.linalg import solve, inv, det
-from .matrix_eqn import solve_discrete_lyapunov
+from ._matrix_eqn import solve_discrete_lyapunov
 
 
 class RBLQ:
@@ -169,7 +169,7 @@ class RBLQ:
         method : str, optional(default='doubling')
             Solution method used in solving the associated Riccati
             equation, str in {'doubling', 'qz'}.
-            
+
         Returns
         -------
         F : array_like(float, ndim=2)

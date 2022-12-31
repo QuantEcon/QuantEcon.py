@@ -7,7 +7,7 @@ linear quadratic control problems.
 from textwrap import dedent
 import numpy as np
 from scipy.linalg import solve
-from .matrix_eqn import solve_discrete_riccati, solve_discrete_riccati_system
+from ._matrix_eqn import solve_discrete_riccati, solve_discrete_riccati_system
 from .util import check_random_state
 from .markov import MarkovChain
 
