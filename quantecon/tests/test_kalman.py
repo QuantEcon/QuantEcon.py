@@ -4,8 +4,8 @@ Tests for the kalman.py
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.lss import LinearStateSpace
-from quantecon.kalman import Kalman
+from quantecon import LinearStateSpace
+from quantecon import Kalman
 
 
 class TestKalman:

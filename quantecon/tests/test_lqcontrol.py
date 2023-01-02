@@ -5,7 +5,7 @@ Tests for lqcontrol.py file
 import numpy as np
 from numpy.testing import assert_allclose, assert_raises
 from numpy import dot
-from quantecon.lqcontrol import LQ, LQMarkov
+from quantecon import LQ, LQMarkov
 
 
 class TestLQControl:

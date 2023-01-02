@@ -1,54 +1,28 @@
-"""
-Implements the empirical cumulative distribution function given an array
-of observations.
+# This file is not meant for public use and will be removed v0.8.0.
+# Use the `quantecon` namespace for importing the objects
+# included below.
 
-"""
+import warnings
+from . import _ecdf
 
-import numpy as np
+
+__all__ = ['ECDF']
 
 
-class ECDF:
-    """
-    One-dimensional empirical distribution function given a vector of
-    observations.
+def __dir__():
+    return __all__
 
-    Parameters
-    ----------
-    observations : array_like
-        An array of observations
 
-    Attributes
-    ----------
-    observations : see Parameters
+def __getattr__(name):
+    if name not in __all__:
+        raise AttributeError(
+                "`quantecon.ecdf` is deprecated and has no attribute "
+                f"'{name}'."
+            )
 
-    """
+    warnings.warn(f"Please use `{name}` from the `quantecon` namespace, "
+                  "the `quantecon.ecdf` namespace is deprecated. You can use "
+                  f"the following instead:\n `from quantecon import {name}`.",
+                  category=DeprecationWarning, stacklevel=2)
 
-    def __init__(self, observations):
-        self.observations = np.asarray(observations)
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        m = "Empirical CDF:\n  - number of observations: {n}"
-        return m.format(n=self.observations.size)
-
-    def __call__(self, x):
-        """
-        Evaluates the ecdf at x
-
-        Parameters
-        ----------
-        x : scalar(float)
-            The x at which the ecdf is evaluated
-
-        Returns
-        -------
-        scalar(float)
-            Fraction of the sample less than x
-
-        """
-        def f(a):
-            return np.mean(self.observations <= a)
-        vf = np.frompyfunc(f, 1, 1)
-        return vf(x).astype(float)
+    return getattr(_ecdf, name)
