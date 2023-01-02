@@ -6,8 +6,8 @@ import warnings
 from . import _gridtools
 
 
-__all__ = ['cartesian', 'mlinspace', 'simplex_grid', 'simplex_index',
-           'num_compositions', 'num_compositions_jit']
+__all__ = ['cartesian', 'mlinspace', 'cartesian_nearest_index', 'simplex_grid',
+           'simplex_index', 'num_compositions', 'num_compositions_jit']
 
 
 def __dir__():
