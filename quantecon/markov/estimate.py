@@ -72,6 +72,21 @@ def fit_discrete_mc(X, grids, order='C'):
     grids: array_like(array_like(ndim=1))
         Array of sorted arrays. Set of grid points in each dimension
 
+    Examples
+    --------
+
+    >>> grids = (np.arange(3), np.arange(2))
+    >>> X = [(-0.1, 1.2), (2, 0), (0.6, 0.4), (1.0, 0.1)]
+    >>> mc = fit_discrete_mc(X, grids)
+    >>> mc.state_values
+    array([[0, 1],
+        [1, 0],
+        [2, 0]])
+    >>> mc.P
+    array([[0., 0., 1.],
+        [0., 1., 0.],
+        [0., 1., 0.]])
+
     Returns
     -------
 
