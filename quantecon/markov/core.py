@@ -357,11 +357,9 @@ class MarkovChain:
         if self.is_irreducible:
             return self.digraph.period
         else:
-            rec_classes = self.recurrent_classes
-
             # Determine the period, the LCM of the periods of rec_classes
             d = 1
-            for rec_class in rec_classes:
+            for rec_class in self.recurrent_classes_indices:
                 period = self.digraph.subgraph(rec_class).period
                 d = (d * period) // gcd(d, period)
 
