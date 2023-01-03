@@ -25,14 +25,14 @@ from ._discrete_rv import DiscreteRV
 from ._dle import DLE
 from ._ecdf import ECDF
 from ._estspec import smooth, periodogram, ar_periodogram
-# from .game_theory import <objects-here> 							#Place Holder if we wish to promote any general objects to the qe namespace.
-from .graph_tools import DiGraph, random_tournament_graph
-from .gridtools import (
-	cartesian, mlinspace, cartesian_nearest_index, simplex_grid, simplex_index,
+# from .game_theory import <objects-here>                           #Place Holder if we wish to promote any general objects to the qe namespace.
+from ._graph_tools import DiGraph, random_tournament_graph
+from ._gridtools import (
+    cartesian, mlinspace, cartesian_nearest_index, simplex_grid, simplex_index,
     num_compositions
 )
 from ._inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
-	rank_size
+    rank_size
 from ._kalman import Kalman
 from ._lae import LAE
 from ._arma import ARMA
@@ -46,7 +46,7 @@ from ._quadsums import var_quadratic_sum, m_quadratic_sum
 #->Propose Delete From Top Level
 #Promote to keep current examples working
 from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, \
-	gth_solve, tauchen, rouwenhorst
+    gth_solve, tauchen, rouwenhorst
 #Imports that Should be Deprecated with markov package
 from .markov import mc_compute_stationary, mc_sample_path
 #<-
