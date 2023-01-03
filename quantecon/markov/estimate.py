@@ -55,7 +55,7 @@ def _count_transition_frequencies(index_series, trans_counter):
     return trans_counter
 
 
-def fit_discrete_mc(X, grid, order='C'):
+def fit_discrete_mc(X, grids, order='C'):
     """
     Function that takes an arbitrary time series :math: `(X_t)_{t=0}^{T-1}` in
     :math: `\mathbb R^n` plus a set of grid points in each dimension and converts
@@ -66,10 +66,10 @@ def fit_discrete_mc(X, grid, order='C'):
     ----------
 
     X: array_like(ndim=2)
-        Time-series such that the t-th column being :math:`x_t`.
-        It should be of the shape n x t.
+        Time-series such that the t-th row being :math:`x_t`.
+        It should be of the shape T x n, where n is the number of dimensions.
 
-    grid: array_like(array_like(ndim=1))
+    grids: array_like(array_like(ndim=1))
         Array of sorted arrays. Set of grid points in each dimension
 
     Returns
@@ -79,9 +79,9 @@ def fit_discrete_mc(X, grid, order='C'):
         An instance of the MarkovChain class constructed after discretization
         onto the grid.
     """
-    X_indices = cartesian_nearest_index(X.T, grid, order=order)
+    X_indices = cartesian_nearest_index(X, grids, order=order)
     mc = estimate_mc(X_indices)
     # Assign the visited states in the cartesian product as the state values
-    prod = cartesian(grid, order=order)
+    prod = cartesian(grids, order=order)
     mc.state_values = prod[mc.state_values]
     return mc
