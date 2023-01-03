@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit
 from .core import MarkovChain
-from ..gridtools import cartesian_nearest_index, cartesian
+from .._gridtools import cartesian_nearest_index, cartesian
 
 
 def estimate_mc(X):
@@ -56,7 +56,7 @@ def _count_transition_frequencies(index_series, trans_counter):
 
 
 def fit_discrete_mc(X, grids, order='C'):
-    """
+    r"""
     Function that takes an arbitrary time series :math: `(X_t)_{t=0}^{T-1}` in
     :math: `\mathbb R^n` plus a set of grid points in each dimension and converts
     it to a MarkovChain by first applying discretization onto the grid
