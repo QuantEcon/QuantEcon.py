@@ -115,7 +115,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     """
     try:
         N = g.N
-    except:
+    except AttributeError:
         raise TypeError('g must be a 2-player NormalFormGame')
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')

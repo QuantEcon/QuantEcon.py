@@ -106,7 +106,7 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     """
     try:
         N = g.N
-    except:
+    except AttributeError:
         raise TypeError('g must be a NormalFormGame')
     if N < 2:
         raise NotImplementedError('Not implemented for 1-player games')

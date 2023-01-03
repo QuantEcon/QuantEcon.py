@@ -56,7 +56,7 @@ def support_enumeration_gen(g):
     """
     try:
         N = g.N
-    except:
+    except AttributeError:
         raise TypeError('input must be a 2-player NormalFormGame')
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')
