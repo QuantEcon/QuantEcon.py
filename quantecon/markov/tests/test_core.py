@@ -12,7 +12,7 @@ from scipy import sparse
 import itertools
 from numpy.testing import (
     assert_allclose, assert_array_equal, assert_array_less, assert_raises,
-    assert_
+    assert_, assert_equal
 )
 
 from quantecon.markov import (
@@ -417,7 +417,8 @@ class TestMCStateValues:
             'mc': MarkovChain([[1, 0, 0], [1, 0, 0], [0, 0, 1]],
                               state_values=state_values),
             'coms': [[0], [1], [2]],
-            'recs': [[0], [2]]
+            'recs': [[0], [2]],
+            'period': 1
         }
 
         self.mc_periodic_dict = {
@@ -425,7 +426,8 @@ class TestMCStateValues:
                               state_values=state_values),
             'coms': [[0, 1, 2]],
             'recs': [[0, 1, 2]],
-            'cycs': [[0], [1], [2]]
+            'cycs': [[0], [1], [2]],
+            'period': 3
         }
 
     def test_com_rec_classes(self):
@@ -470,6 +472,12 @@ class TestMCStateValues:
                     sorted(getattr(mc, prop), key=key),
                     sorted(classes, key=key)
                 )
+
+    def test_period(self):
+        for mc_dict in [self.mc_reducible_dict, self.mc_periodic_dict]:
+            mc = mc_dict['mc']
+            period = mc_dict['period']
+            assert_equal(mc.period, period)
 
     def test_simulate(self):
         # Deterministic mc
