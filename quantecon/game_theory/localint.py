@@ -13,11 +13,11 @@ class LocalInteraction:
     Parameters
     ----------
     payoff_matrix : array_like(float, ndim=2)
-        The payoff matrix of the symmetric two-player game played in　each
+        The payoff matrix of the symmetric two-player game played in each
         interaction.
 
     adj_matrix : array_like(float, ndim=2)
-        The adjacency matrix of the network. Non constant weights and　asymmetry
+        The adjacency matrix of the network. Non constant weights and asymmetry
         in interactions are allowed.
 
     Attributes
