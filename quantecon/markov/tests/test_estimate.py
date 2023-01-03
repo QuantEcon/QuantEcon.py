@@ -4,7 +4,7 @@ Tests for markov/estimate.py
 """
 import numpy as np
 from numpy.testing import assert_array_equal, assert_allclose
-from quantecon.markov.estimate import estimate_mc
+from quantecon.markov.estimate import estimate_mc, fit_discrete_mc
 
 
 class TestEstimateMCDiscrete:
@@ -51,3 +51,34 @@ class TestEstimateMCDiscrete:
         mc = estimate_mc(X)
         assert_allclose(mc.P, self.P[np.ix_(ind, ind)])
         assert_array_equal(mc.state_values, final_state_values)
+
+
+class TestFitDiscreteMC:
+    def setup_method(self):
+        self.grids = ((np.arange(4), np.arange(5)))
+        self.X = [(-0.1, 1.2), (2, 0), (2, 3),
+                  (4.4, 4.0), (0.6, 0.4), (1.0, 0.1)]
+
+    def test_order_f(self):
+        mc = fit_discrete_mc(self.X, self.grids, order='F')
+        S_expected = np.array([[1, 0], [2, 0], [0, 1], [2, 3], [3, 4]])
+        P_expected = np.array([[1., 0., 0., 0., 0.],
+                            [0., 0., 0., 1., 0.],
+                            [0., 1., 0., 0., 0.],
+                            [0., 0., 0., 0., 1.],
+                            [1., 0., 0., 0., 0.]])
+
+        assert_array_equal(mc.state_values, S_expected)
+        assert_allclose(mc.P, P_expected)
+
+    def test_order_c(self):
+        mc = fit_discrete_mc(self.X, self.grids, order='C')
+        S_expected = np.array([[0, 1], [1, 0], [2, 0], [2, 3], [3, 4]])
+        P_expected = np.array([[0., 0., 1., 0., 0.],
+                            [0., 1., 0., 0., 0.],
+                            [0., 0., 0., 1., 0.],
+                            [0., 0., 0., 0., 1.],
+                            [0., 1., 0., 0., 0.]])
+
+        assert_array_equal(mc.state_values, S_expected)
+        assert_allclose(mc.P, P_expected)
