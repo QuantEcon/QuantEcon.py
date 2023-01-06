@@ -66,11 +66,11 @@ def fit_discrete_mc(X, grids, order='C'):
     ----------
 
     X: array_like(ndim=2)
-        Time-series such that the t-th row being :math:`x_t`.
+        Time-series such that the t-th row is :math:`x_t`.
         It should be of the shape T x n, where n is the number of dimensions.
 
     grids: array_like(array_like(ndim=1))
-        Array of sorted arrays. Set of grid points in each dimension
+        Array of `n` sorted arrays. Set of grid points in each dimension
 
     Examples
     --------
@@ -80,12 +80,12 @@ def fit_discrete_mc(X, grids, order='C'):
     >>> mc = fit_discrete_mc(X, grids)
     >>> mc.state_values
     array([[0, 1],
-        [1, 0],
-        [2, 0]])
+           [1, 0],
+           [2, 0]])
     >>> mc.P
     array([[0., 0., 1.],
-        [0., 1., 0.],
-        [0., 1., 0.]])
+           [0., 1., 0.],
+           [0., 1., 0.]])
 
     Returns
     -------

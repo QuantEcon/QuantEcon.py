@@ -63,10 +63,10 @@ class TestFitDiscreteMC:
         mc = fit_discrete_mc(self.X, self.grids, order='F')
         S_expected = np.array([[1, 0], [2, 0], [0, 1], [2, 3], [3, 4]])
         P_expected = np.array([[1., 0., 0., 0., 0.],
-                            [0., 0., 0., 1., 0.],
-                            [0., 1., 0., 0., 0.],
-                            [0., 0., 0., 0., 1.],
-                            [1., 0., 0., 0., 0.]])
+                               [0., 0., 0., 1., 0.],
+                               [0., 1., 0., 0., 0.],
+                               [0., 0., 0., 0., 1.],
+                               [1., 0., 0., 0., 0.]])
 
         assert_array_equal(mc.state_values, S_expected)
         assert_allclose(mc.P, P_expected)
@@ -75,10 +75,10 @@ class TestFitDiscreteMC:
         mc = fit_discrete_mc(self.X, self.grids, order='C')
         S_expected = np.array([[0, 1], [1, 0], [2, 0], [2, 3], [3, 4]])
         P_expected = np.array([[0., 0., 1., 0., 0.],
-                            [0., 1., 0., 0., 0.],
-                            [0., 0., 0., 1., 0.],
-                            [0., 0., 0., 0., 1.],
-                            [0., 1., 0., 0., 0.]])
+                               [0., 1., 0., 0., 0.],
+                               [0., 0., 0., 1., 0.],
+                               [0., 0., 0., 0., 1.],
+                               [0., 1., 0., 0., 0.]])
 
         assert_array_equal(mc.state_values, S_expected)
         assert_allclose(mc.P, P_expected)
