@@ -4,7 +4,7 @@ Tests for quantecon.util
 """
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon import matrix_eqn as qme
+from quantecon import _matrix_eqn as qme
 
 
 def test_solve_discrete_lyapunov_zero():
@@ -36,4 +36,3 @@ def test_solve_discrete_lyapunov_complex():
 
     assert_allclose(np.dot(np.dot(A, X), A.conj().transpose()) - X, -B,
                     atol=1e-15)
-

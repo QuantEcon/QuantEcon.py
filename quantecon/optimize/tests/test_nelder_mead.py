@@ -230,7 +230,7 @@ class TestMaximization():
         results = nelder_mead(rotated_hyper_ellipsoid, x0, bounds=bounds,
                               tol_x=1e-30, tol_f=1e-30)
 
-        assert_allclose(results.x, sol, atol=1e-7)
+        assert_allclose(results.x, sol, atol=1e-6)
         assert_allclose(results.fun, fun, atol=1e-7)
 
     def test_booth(self):

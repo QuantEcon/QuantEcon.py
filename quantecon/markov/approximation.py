@@ -15,7 +15,7 @@ from ..util import check_random_state
 
 import warnings
 import numpy as np
-import scipy as sp
+import numbers
 from numba import njit
 
 
@@ -86,8 +86,8 @@ def rouwenhorst(n, rho, sigma, mu=0.):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
-    Note
-    ----
+    Notes
+    -----
 
     UserWarning: The API of `rouwenhorst` was changed from
     `rouwenhorst(n, ybar, sigma, rho)` to
@@ -188,18 +188,21 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method
 
-    Note
-    ----
+    Notes
+    -----
 
     UserWarning: The API of `tauchen` was changed from
     `tauchen(rho, sigma_u, b=0., m=3, n=7)` to
     `tauchen(n, rho, sigma, mu=0., n_std=3)` in version 0.6.0.
 
     """
-    warnings.warn("The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
-                  " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
-                  " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
-                  UserWarning, stacklevel=2)
+
+    if not isinstance(n, numbers.Integral):
+        warnings.warn(
+            "The API of tauchen has changed from `tauchen(rho, sigma_u, b=0., m=3, n=7)`"
+            " to `tauchen(n, rho, sigma, mu=0., n_std=3)`. To find more details please visit:"
+            " https://github.com/QuantEcon/QuantEcon.py/issues/663.",
+            UserWarning, stacklevel=2)
 
     # standard deviation of demeaned y_t
     std_y = np.sqrt(sigma**2 / (1 - rho**2))
