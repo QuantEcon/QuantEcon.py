@@ -1,6 +1,7 @@
 import numpy as np
 from numba import njit
 from .core import MarkovChain
+from .._gridtools import cartesian_nearest_index, cartesian
 
 
 def estimate_mc(X):
@@ -52,3 +53,50 @@ def _count_transition_frequencies(index_series, trans_counter):
         trans_counter[i, j] += 1
         i = j
     return trans_counter
+
+
+def fit_discrete_mc(X, grids, order='C'):
+    r"""
+    Function that takes an arbitrary time series :math: `(X_t)_{t=0}^{T-1}` in
+    :math: `\mathbb R^n` plus a set of grid points in each dimension and converts
+    it to a MarkovChain by first applying discretization onto the grid
+    and then estimation of the Markov chain.
+
+    Parameters
+    ----------
+
+    X: array_like(ndim=2)
+        Time-series such that the t-th row is :math:`x_t`.
+        It should be of the shape T x n, where n is the number of dimensions.
+
+    grids: array_like(array_like(ndim=1))
+        Array of `n` sorted arrays. Set of grid points in each dimension
+
+    Examples
+    --------
+
+    >>> grids = (np.arange(3), np.arange(2))
+    >>> X = [(-0.1, 1.2), (2, 0), (0.6, 0.4), (1.0, 0.1)]
+    >>> mc = fit_discrete_mc(X, grids)
+    >>> mc.state_values
+    array([[0, 1],
+           [1, 0],
+           [2, 0]])
+    >>> mc.P
+    array([[0., 0., 1.],
+           [0., 1., 0.],
+           [0., 1., 0.]])
+
+    Returns
+    -------
+
+    mc: MarkovChain
+        An instance of the MarkovChain class constructed after discretization
+        onto the grid.
+    """
+    X_indices = cartesian_nearest_index(X, grids, order=order)
+    mc = estimate_mc(X_indices)
+    # Assign the visited states in the cartesian product as the state values
+    prod = cartesian(grids, order=order)
+    mc.state_values = prod[mc.state_values]
+    return mc
