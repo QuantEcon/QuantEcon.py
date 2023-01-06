@@ -162,9 +162,9 @@ class Kalman:
         A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
 
         Atil = np.vstack([np.hstack([A, np.zeros((n, n)), np.zeros((n, l))]),
-                          np.hstack([np.dot(K, G),
-                                     A-np.dot(K, G),
-                                     np.dot(K, H)]),
+                          np.hstack([K @ G,
+                                     A- K @ G,
+                                     K @ H]),
                           np.zeros((l, 2*n + l))])
 
         Ctil = np.vstack([np.hstack([C, np.zeros((n, l))]),
@@ -200,16 +200,16 @@ class Kalman:
         """
         # === simplify notation === #
         G, H = self.ss.G, self.ss.H
-        R = np.dot(H, H.T)
+        R = H @ H.T
 
         # === and then update === #
         y = np.atleast_2d(y)
         y.shape = self.ss.k, 1
-        E = np.dot(self.Sigma, G.T)
-        F = np.dot(np.dot(G, self.Sigma), G.T) + R
-        M = np.dot(E, inv(F))
-        self.x_hat = self.x_hat + np.dot(M, (y - np.dot(G, self.x_hat)))
-        self.Sigma = self.Sigma - np.dot(M, np.dot(G,  self.Sigma))
+        E = self.Sigma @ G.T
+        F = G @ self.Sigma @ G.T + R
+        M = E @ inv(F)
+        self.x_hat = self.x_hat + M @ (y - G @ self.x_hat)
+        self.Sigma = self.Sigma - M @ G @ self.Sigma
 
     def filtered_to_forecast(self):
         """
@@ -220,11 +220,11 @@ class Kalman:
         """
         # === simplify notation === #
         A, C = self.ss.A, self.ss.C
-        Q = np.dot(C, C.T)
+        Q = C @ C.T
 
         # === and then update === #
-        self.x_hat = np.dot(A, self.x_hat)
-        self.Sigma = np.dot(A, np.dot(self.Sigma, A.T)) + Q
+        self.x_hat = A @ self.x_hat
+        self.Sigma = A @ self.Sigma @ A.T + Q
 
     def update(self, y):
         """
@@ -265,13 +265,13 @@ class Kalman:
 
         # === simplify notation === #
         A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
-        Q, R = np.dot(C, C.T), np.dot(H, H.T)
+        Q, R = C @ C.T, H @ H.T
 
         # === solve Riccati equation, obtain Kalman gain === #
         Sigma_infinity = solve_discrete_riccati(A.T, G.T, Q, R, method=method)
-        temp1 = np.dot(np.dot(A, Sigma_infinity), G.T)
-        temp2 = inv(np.dot(G, np.dot(Sigma_infinity, G.T)) + R)
-        K_infinity = np.dot(temp1, temp2)
+        temp1 = A @ Sigma_infinity @ G.T
+        temp2 = inv(G @ Sigma_infinity @ G.T + R)
+        K_infinity = temp1 @ temp2
 
         # == record as attributes and return == #
         self._Sigma_infinity, self._K_infinity = Sigma_infinity, K_infinity
@@ -301,21 +301,21 @@ class Kalman:
             P_mat = A
             P = np.identity(self.ss.n)  # Create a copy
         elif coeff_type == 'var':
-            coeffs.append(np.dot(G, K_infinity))
-            P_mat = A - np.dot(K_infinity, G)
+            coeffs.append(G @ K_infinity)
+            P_mat = A - K_infinity @ G
             P = np.copy(P_mat)  # Create a copy
         else:
             raise ValueError("Unknown coefficient type")
         while i <= j:
-            coeffs.append(np.dot(np.dot(G, P), K_infinity))
-            P = np.dot(P, P_mat)
+            coeffs.append(G @ P @ K_infinity)
+            P = P @ P_mat
             i += 1
         return coeffs
 
     def stationary_innovation_covar(self):
         # == simplify notation == #
         H, G = self.ss.H, self.ss.G
-        R = np.dot(H, H.T)
+        R = H @ H.T
         Sigma_infinity = self.Sigma_infinity
 
-        return np.dot(G, np.dot(Sigma_infinity, G.T)) + R
+        return G @ Sigma_infinity @ G.T + R
