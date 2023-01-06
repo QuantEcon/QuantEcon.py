@@ -74,7 +74,7 @@ def nullspace(A, atol=1e-13, rtol=0):
         If `A` is an array with shape (m, k), then `ns` will be an array
         with shape (k, n), where n is the estimated dimension of the
         nullspace of `A`.  The columns of `ns` are a basis for the
-        nullspace; each element in numpy.dot(A, ns) will be
+        nullspace; each element in A @ ns will be
         approximately zero.
 
     Note: If both `atol` and `rtol` are positive, the combined tolerance

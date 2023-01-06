@@ -590,7 +590,7 @@ class DiscreteDP:
             Updated value function vector, of length n.
 
         """
-        vals = self.R + self.beta * self.Q.dot(v)  # Shape: (L,) or (n, m)
+        vals = self.R + self.beta * self.Q @ v # Shape: (L,) or (n, m)
 
         if Tv is None:
             Tv = np.empty(self.num_states)
@@ -613,7 +613,7 @@ class DiscreteDP:
 
         """
         R_sigma, Q_sigma = self.RQ_sigma(sigma)
-        return lambda v: R_sigma + self.beta * Q_sigma.dot(v)
+        return lambda v: R_sigma + self.beta * Q_sigma @ v
 
     def compute_greedy(self, v, sigma=None):
         """
