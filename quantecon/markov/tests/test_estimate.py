@@ -4,7 +4,8 @@ Tests for markov/estimate.py
 """
 import numpy as np
 from numpy.testing import assert_array_equal, assert_allclose
-from quantecon.markov.estimate import estimate_mc, fit_discrete_mc
+from quantecon import estimate_mc
+from quantecon.markov import fit_discrete_mc
 
 
 class TestEstimateMCDiscrete:
