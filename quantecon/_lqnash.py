@@ -125,7 +125,7 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
 
         # break up the computation of F1, F2
         F1_left = v1 - (H1 @ B2 + G1.dot(M1.T)) @ (H2 @ B1 + G2.dot(M2.T))
-        F1_right = H1 @ A +G1.dot(W1.T) - (H1 @ B2 + G1.dot(M1.T)) @ \
+        F1_right = H1 @ A + G1.dot(W1.T) - (H1 @ B2 + G1.dot(M1.T)) @ \
             (H2 @ A + G2.dot(W2.T))
         F1 = solve(F1_left, F1_right)
         F2 = H2 @ A + G2.dot(W2.T) - (H2 @ B1 + G2.dot(M2.T)) @ F1
