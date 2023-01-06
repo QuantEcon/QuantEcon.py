@@ -7,7 +7,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 
 from math import erfc, sqrt
 from .core import MarkovChain
-from .estimate import estimate_mc
+from .estimate import fit_discrete_mc
 from ..gridtools import cartesian, cartesian_nearest_index
 from ..lss import simulate_linear_model
 from ..matrix_eqn import solve_discrete_lyapunov
@@ -367,12 +367,7 @@ def discrete_var(A,
     V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
          for i in range(m)]
 
-    # Estimate the Markov chain
-    X_indices = cartesian_nearest_index(X.T, V, order=order)
-    mc = estimate_mc(X_indices)
-
-    # Assign the visited states in the cartesian product as the state values
-    prod = cartesian(V, order=order)
-    mc.state_values = prod[mc.state_values]
+    # Fit the Markov chain
+    mc = fit_discrete_mc(X.T, V, order='C')
 
     return mc
