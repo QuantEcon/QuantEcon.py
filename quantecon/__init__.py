@@ -46,7 +46,7 @@ from ._quadsums import var_quadratic_sum, m_quadratic_sum
 #->Propose Delete From Top Level
 #Promote to keep current examples working
 from .markov import MarkovChain, random_markov_chain, random_stochastic_matrix, \
-    gth_solve, tauchen, rouwenhorst
+    gth_solve, tauchen, rouwenhorst, estimate_mc
 #Imports that Should be Deprecated with markov package
 from .markov import mc_compute_stationary, mc_sample_path
 #<-
