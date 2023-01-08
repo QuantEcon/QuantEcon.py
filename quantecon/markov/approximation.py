@@ -8,7 +8,7 @@ Discretizes Gaussian linear AR(1) processes via Tauchen's method
 from math import erfc, sqrt
 from .core import MarkovChain
 from .estimate import fit_discrete_mc
-from ..gridtools import cartesian, cartesian_nearest_index
+from ..gridtools import cartesian
 from ..lss import simulate_linear_model
 from ..matrix_eqn import solve_discrete_lyapunov
 from ..util import check_random_state
