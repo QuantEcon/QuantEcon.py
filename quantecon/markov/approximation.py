@@ -258,46 +258,44 @@ def discrete_var(A,
                  random_state=None):
     r"""
     This code discretizes a VAR(1) process of the form:
-
     .. math::
-
-        x_t = A x_{t-1} + u_t
-
-    where :math:`{u_t}` is zero-mean Gaussian with variance-covariance
-    matrix Omega.
-
+        x_t = A x_{t-1} + C u_t
+    where 
+    :math:`{u_t}` is drawn iid from a distribution with mean 0 
+    and unit standard deviaiton;
+    :math:`{C}` is a volatility matrix in linear state space model.
     By default, the code removes the states that are never visited under the
     simulation that computes the transition probabilities.
-
     For a mathematical derivation check *Finite-State Approximation Of
     VAR Processes:  A Simulation Approach* by Stephanie Schmitt-Grohé and
     Martín Uribe, July 11, 2010.
-
     This code was adapted from Schmitt-Grohé and Uribe's original MATLAB code.
-
+    
     Parameters
     ----------
     A : array_like(float)
         An m x m matrix containing the process' autocorrelation parameters
-    Omega : array_like(float)
-        An m x m variance-covariance matrix
-    grid_sizes : array_like(int) or None
+    C : array_like(float)
+        An m x m volatility matrix
+    grid_sizes : array_like(int) or None, optional(default=None)
         An m-vector containing the number of grid points in the discretization
-        of each dimension of x_t. If grid_sizes is None, then grid_sizes is
+        of each dimension of x_t. If None, then grid_sizes is
         set to (10, ..., 10).
-    std_devs : float
+    std_devs : float, optional(default=np.sqrt(10))
         The number of standard deviations the grid should stretch in each
         dimension, where standard deviations are measured under the stationary
         distribution.
-    sim_length : int
-        The the length of the simulated time series (default,  1_000_000).
-    burn_in : int
-        The number of burn-in draws from the simulated series (default,
-        100_000).
-
+    sim_length : int, optional(default=1_000_000)
+        The length of the simulated time series.
+    rv: a `scipy.stats` instance or None, optional(default=None)
+        An instance of `scipy.stats` for a distribution that :math:`{u_t}`
+        is drawn. It must have a zero mean and unit standard deviation. 
+        If None, then standard normal distribution is used.
+    random_state: a `np.random.RandomState` or `np.random.Generator` instance, or None, optional(default=None)
+        If None, the `np.random.RandomState` singleton is returned.
+    
     Returns
     -------
-
     mc : MarkovChain
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method.
@@ -308,32 +306,21 @@ def discrete_var(A,
             value of the j-th element of x_t in state i. Reducing S to its
             unique values yields the grid values. The cartesian product
             state grid uses a row major ordering.
-
-
-    Notes
-    -----
-        The code presently assumes normal shocks but normality is not required
-        for the algorithm to work. The draws from the multivariate standard
-        normal generator can be replaced by any other random number generator
-        with mean 0 and unit standard deviation.
-
-
+        
     Example
     -------
-
         This example discretizes the stochastic process used to calibrate
         the economic model included in ``Downward Nominal Wage Rigidity,
         Currency Pegs, and Involuntary Unemployment'' by Stephanie
         Schmitt-Grohé and Martín Uribe, Journal of Political Economy 124,
         October 2016, 1466-1514.
-
             A     = np.array([[0.7901, -1.3570],
                               [-0.0104, 0.8638]])
             Omega = np.array([[0.0012346, -0.0000776],
                               [-0.0000776, 0.0000401]])
+            C = sp.linalg.sqrtm(Omega)
             grid_sizes = np.array([21, 11])
-            mc = discrete_var(A, Omega, grid_sizes,
-                              sim_length=1_000_000, burn_in = 100_000)
+            mc = discrete_var(A, C, grid_sizes, sim_length=1_000_000)
     """
     A = np.asarray(A)
     C = np.asarray(C)
@@ -367,6 +354,6 @@ def discrete_var(A,
          for i in range(m)]
 
     # Fit the Markov chain
-    mc = fit_discrete_mc(X.T, V, order='C')
+    mc = fit_discrete_mc(X.T, V, order=order)
 
     return mc
