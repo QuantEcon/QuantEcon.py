@@ -9,6 +9,10 @@ from . import _lss
 __all__ = ['LinearStateSpace', 'simulate_linear_model']
 
 
+def __dir__():
+    return __all__
+
+
 def __getattr__(name):
     if name not in __all__:
         raise AttributeError(
