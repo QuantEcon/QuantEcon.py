@@ -183,17 +183,18 @@ class LQ:
         """
         # === Simplify notation === #
         Q, R, A, B, N, C = self.Q, self.R, self.A, self.B, self.N, self.C
-        P, d = self.P, self.d
+        P, d = map(np.atleast_2d, (self.P, self.d))
+        
         # == Some useful matrices == #
-        S1 = Q + self.beta * B.T @ np.dot(P, B)
-        S2 = self.beta * B.T @ np.dot(P, A) + N
-        S3 = self.beta * A.T @ np.dot(P, A)
+        S1 = Q + self.beta * B.T @ P @ B
+        S2 = self.beta * B.T @ P @ A + N
+        S3 = self.beta * A.T @ P @ A
         # == Compute F as (Q + B'PB)^{-1} (beta B'PA + N) == #
         self.F = solve(S1, S2)
         # === Shift P back in time one step == #
         new_P = R - S2.T @ self.F + S3
         # == Recalling that trace(AB) = trace(BA) == #
-        new_d = self.beta * (d + np.trace(np.dot(P, C @ C.T)))
+        new_d = self.beta * (d + np.trace(P @ C @ C.T))
         # == Set new state == #
         self.P, self.d = new_P, new_d
 
