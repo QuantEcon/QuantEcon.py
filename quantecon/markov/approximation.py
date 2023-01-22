@@ -1,7 +1,6 @@
 """
-tauchen
--------
-Discretizes Gaussian linear AR(1) processes via Tauchen's method
+Collection of functions to approximate a continuous random process by a
+discrete Markov chain.
 
 """
 
@@ -257,42 +256,59 @@ def discrete_var(A,
                  order='C',
                  random_state=None):
     r"""
-    This code discretizes a VAR(1) process of the form:
+    Generate an `MarkovChain` instance that discretizes a multivariate
+    autorregressive process by a simulation of the process.
+
+    This function discretizes a VAR(1) process of the form:
+
     .. math::
+
         x_t = A x_{t-1} + C u_t
-    where 
-    :math:`{u_t}` is drawn iid from a distribution with mean 0 
-    and unit standard deviaiton;
-    :math:`{C}` is a volatility matrix in linear state space model.
-    By default, the code removes the states that are never visited under the
-    simulation that computes the transition probabilities.
+
+    where :math:`{u_t}` is drawn iid from a distribution with mean 0 and
+    unit standard deviaiton; and :math:`{C}` is a volatility matrix.
+    Internally, from this process a sample time series of length
+    `sim_length` is produced, and with a cartesian grid as specified by
+    `grid_sizes` and `std_devs` a Markov chain is estimated that fits
+    the time series, where the states that are never visited under the
+    simulation are removed.
+
     For a mathematical derivation check *Finite-State Approximation Of
-    VAR Processes:  A Simulation Approach* by Stephanie Schmitt-Grohé and
-    Martín Uribe, July 11, 2010.
-    This code was adapted from Schmitt-Grohé and Uribe's original MATLAB code.
+    VAR Processes: A Simulation Approach* by Stephanie Schmitt-Grohé and
+    Martín Uribe, July 11, 2010. In particular, we follow Schmitt-Grohé
+    and Uribe's method in contructing the grid for approximation.
     
     Parameters
     ----------
-    A : array_like(float)
-        An m x m matrix containing the process' autocorrelation parameters
-    C : array_like(float)
-        An m x m volatility matrix
-    grid_sizes : array_like(int) or None, optional(default=None)
-        An m-vector containing the number of grid points in the discretization
-        of each dimension of x_t. If None, then grid_sizes is
-        set to (10, ..., 10).
+    A : array_like(float, ndim=2)
+        An m x m matrix containing the process' autocorrelation
+        parameters. Its eigenvalues must have moduli bounded by unity.
+    C : array_like(float, ndim=2)
+        An m x r volatility matrix
+    grid_sizes : array_like(int, ndim=1), optional(default=None)
+        An m-vector containing the number of grid points in the
+        discretization of each dimension of x_t. If None, then set to
+        (10, ..., 10).
     std_devs : float, optional(default=np.sqrt(10))
-        The number of standard deviations the grid should stretch in each
-        dimension, where standard deviations are measured under the stationary
-        distribution.
+        The number of standard deviations the grid should stretch in
+        each dimension, where standard deviations are measured under the
+        stationary distribution.
     sim_length : int, optional(default=1_000_000)
         The length of the simulated time series.
-    rv: a `scipy.stats` instance or None, optional(default=None)
-        An instance of `scipy.stats` for a distribution that :math:`{u_t}`
-        is drawn. It must have a zero mean and unit standard deviation. 
-        If None, then standard normal distribution is used.
-    random_state: a `np.random.RandomState` or `np.random.Generator` instance, or None, optional(default=None)
-        If None, the `np.random.RandomState` singleton is returned.
+    rv : optional(default=None)
+        Object that represents the disturbance term u_t. If None, then
+        standard normal distribution from numpy.random is used.
+        Alternatively, one can pass a "frozen" object of a multivariate
+        distribution from `scipy.stats`. It must have a zero mean and
+        unit standard deviation (of dimension m).
+    order : str, optional(default='C')
+        ('C' or 'F') order in which the states in the cartesian grid are
+        enumerated.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
     
     Returns
     -------
@@ -300,27 +316,56 @@ def discrete_var(A,
         An instance of the MarkovChain class that stores the transition
         matrix and state values returned by the discretization method.
         The MarkovChain instance contains:
-        P : A square matrix containing the transition probability
-            matrix of the discretized state.
-        S : An array where element (i,j) of S is the discretized
-            value of the j-th element of x_t in state i. Reducing S to its
-            unique values yields the grid values. The cartesian product
-            state grid uses a row major ordering.
+
+        * `mc.P`: A 2-dim array containing the transition probability
+          matrix over the discretized states.
+        * `mc.state_values`: A 2-dim array containing the state vectors
+          (of dimension m) as rows, which are ordered according to the
+          `order` option.
         
-    Example
-    -------
-        This example discretizes the stochastic process used to calibrate
-        the economic model included in ``Downward Nominal Wage Rigidity,
-        Currency Pegs, and Involuntary Unemployment'' by Stephanie
-        Schmitt-Grohé and Martín Uribe, Journal of Political Economy 124,
-        October 2016, 1466-1514.
-            A     = np.array([[0.7901, -1.3570],
-                              [-0.0104, 0.8638]])
-            Omega = np.array([[0.0012346, -0.0000776],
-                              [-0.0000776, 0.0000401]])
-            C = sp.linalg.sqrtm(Omega)
-            grid_sizes = np.array([21, 11])
-            mc = discrete_var(A, C, grid_sizes, sim_length=1_000_000)
+    Examples
+    --------
+    This example discretizes the stochastic process used to calibrate
+    the economic model included in "Downward Nominal Wage Rigidity,
+    Currency Pegs, and Involuntary Unemployment" by Stephanie
+    Schmitt-Grohé and Martín Uribe, Journal of Political Economy 124,
+    October 2016, 1466-1514.
+
+    >>> rng = np.random.default_rng(12345)
+    >>> A = [[0.7901, -1.3570],
+    ...      [-0.0104, 0.8638]]
+    >>> Omega = [[0.0012346, -0.0000776],
+    ...          [-0.0000776, 0.0000401]]
+    >>> C = scipy.linalg.sqrtm(Omega)
+    >>> grid_sizes = [21, 11]
+    >>> mc = discrete_var(A, C, grid_sizes, random_state=rng)
+    >>> mc.P.shape
+    (145, 145)
+    >>> mc.state_values.shape
+    (145, 2)
+    >>> mc.state_values[:10]  # First 10 states
+    array([[-0.38556417,  0.02155098],
+           [-0.38556417,  0.03232648],
+           [-0.38556417,  0.04310197],
+           [-0.38556417,  0.05387746],
+           [-0.34700776,  0.01077549],
+           [-0.34700776,  0.02155098],
+           [-0.34700776,  0.03232648],
+           [-0.34700776,  0.04310197],
+           [-0.34700776,  0.05387746],
+           [-0.30845134,  0.        ]])
+    >>> mc.simulate(10, random_state=rng)
+    array([[ 0.11566925, -0.01077549],
+           [ 0.11566925, -0.01077549],
+           [ 0.15422567,  0.        ],
+           [ 0.15422567,  0.        ],
+           [ 0.15422567, -0.01077549],
+           [ 0.11566925, -0.02155098],
+           [ 0.11566925, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.19278209, -0.03232648]])
+
     """
     A = np.asarray(A)
     C = np.asarray(C)
