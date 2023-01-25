@@ -7,8 +7,8 @@ discrete Markov chain.
 from math import erfc, sqrt
 from .core import MarkovChain
 from .estimate import fit_discrete_mc
-from ..lss import simulate_linear_model
-from ..matrix_eqn import solve_discrete_lyapunov
+from .._lss import simulate_linear_model
+from .._matrix_eqn import solve_discrete_lyapunov
 from ..util import check_random_state
 
 import warnings
@@ -277,7 +277,7 @@ def discrete_var(A,
     VAR Processes: A Simulation Approach* by Stephanie Schmitt-Grohé and
     Martín Uribe, July 11, 2010. In particular, we follow Schmitt-Grohé
     and Uribe's method in contructing the grid for approximation.
-    
+
     Parameters
     ----------
     A : array_like(float, ndim=2)
@@ -309,7 +309,7 @@ def discrete_var(A,
         instance to set the initial state of the random number generator
         for reproducibility. If None, a randomly initialized RandomState
         is used.
-    
+
     Returns
     -------
     mc : MarkovChain
@@ -322,7 +322,7 @@ def discrete_var(A,
         * `mc.state_values`: A 2-dim array containing the state vectors
           (of dimension m) as rows, which are ordered according to the
           `order` option.
-        
+
     Examples
     --------
     This example discretizes the stochastic process used to calibrate
