@@ -23,7 +23,7 @@ PivOptions = namedtuple(
     'PivOptions', ['fea_tol', 'tol_piv', 'tol_ratio_diff']
 )
 PivOptions.__new__.__defaults__ = (FEA_TOL, TOL_PIV, TOL_RATIO_DIFF)
-PivOptions.__doc__ = 'namedtuple to hold tolerance values for pivoting'
+PivOptions.__doc__ = 'namedtuple to hold tolerance values for pivoting.'
 
 
 # Delete useless docstring for fields of namedtuple
@@ -32,8 +32,8 @@ def _del_field_docstring(nt):
         getattr(nt, field).__doc__ = ''
 
 
-for nt in [SimplexResult, PivOptions]:
-    _del_field_docstring(nt)
+for _nt in [SimplexResult, PivOptions]:
+    _del_field_docstring(_nt)
 
 
 @jit(nopython=True, cache=True)
