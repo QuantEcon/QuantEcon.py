@@ -291,6 +291,8 @@ def discrete_var(A,
         An instance of `scipy.stats` for a distribution that :math:`{u_t}`
         is drawn. It must have a zero mean and unit standard deviation. 
         If None, then standard normal distribution is used.
+    order : str, optional(default='C')
+            ('C' or 'F') order in which the cartesian product is enumerated 
     random_state: a `np.random.RandomState` or `np.random.Generator` instance, or None, optional(default=None)
         If None, the `np.random.RandomState` singleton is returned.
     
@@ -332,7 +334,7 @@ def discrete_var(A,
     if rv is None:
         u = random_state.standard_normal(size=(sim_length-1, r))
     else:
-        u = rv.rvs(size=sim_length-1, random_state=random_state)
+        u = rv.rvs(size=(sim_length-1, r), random_state=random_state)
 
     v = C @ u.T
     x0 = np.zeros(m)
@@ -352,8 +354,7 @@ def discrete_var(A,
 
     V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
          for i in range(m)]
-
     # Fit the Markov chain
     mc = fit_discrete_mc(X.T, V, order=order)
-
+    print(mc)
     return mc
