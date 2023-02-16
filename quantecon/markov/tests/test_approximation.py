@@ -129,7 +129,7 @@ class TestDiscreteVar:
                      [ 0.38556417,  0.        ],
                      [ 0.38556417,  0.05387746]]
 
-        self.S_out_orderF =[
+        self.S_out_orderF = [
                      [-0.38556417, -0.05387746],
                      [ 0.38556417, -0.05387746],
                      [-0.38556417,  0.        ],
@@ -200,7 +200,7 @@ class TestDiscreteVar:
                 self.A, self.C, 
                 grid_sizes=self.sizes,
                 sim_length=self.T, 
-                rv=sp.stats.multivariate_normal,
+                rv=sp.stats.multivariate_normal(cov=np.identity(2)),
                 random_state=self.random_state)
         assert_allclose(mc.state_values, self.S_out)
         assert_allclose(mc.P, self.P_out)

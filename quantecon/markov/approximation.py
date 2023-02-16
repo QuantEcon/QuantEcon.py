@@ -339,7 +339,9 @@ def discrete_var(A,
     ...          [-0.0000776, 0.0000401]]
     >>> C = scipy.linalg.sqrtm(Omega)
     >>> grid_sizes = [21, 11]
-    >>> mc = discrete_var(A, C, grid_sizes, random_state=rng)
+    >>> mc = discrete_var(A, C, grid_sizes, 
+    ...         rv=scipy.stats.multivariate_normal(cov=np.identity(2)),
+    ...         random_state=rng)
     >>> mc.P.shape
     (145, 145)
     >>> mc.state_values.shape
@@ -366,7 +368,6 @@ def discrete_var(A,
            [ 0.15422567, -0.03232648],
            [ 0.15422567, -0.03232648],
            [ 0.19278209, -0.03232648]])
-
     """
     A = np.asarray(A)
     C = np.asarray(C)
@@ -378,8 +379,8 @@ def discrete_var(A,
     if rv is None:
         u = random_state.standard_normal(size=(sim_length-1, r))
     else:
-        u = rv.rvs(size=(sim_length-1, r), random_state=random_state)
-
+        u = rv.rvs(size=sim_length-1, random_state=random_state)
+        
     v = C @ u.T
     x0 = np.zeros(m)
     X = simulate_linear_model(A, x0, v, ts_length=sim_length)
