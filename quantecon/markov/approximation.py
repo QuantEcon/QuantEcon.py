@@ -339,9 +339,7 @@ def discrete_var(A,
     ...          [-0.0000776, 0.0000401]]
     >>> C = scipy.linalg.sqrtm(Omega)
     >>> grid_sizes = [21, 11]
-    >>> mc = discrete_var(A, C, grid_sizes, 
-    ...         rv=scipy.stats.multivariate_normal(cov=np.identity(2)),
-    ...         random_state=rng)
+    >>> mc = discrete_var(A, C, grid_sizes, random_state=rng)
     >>> mc.P.shape
     (145, 145)
     >>> mc.state_values.shape
@@ -368,6 +366,39 @@ def discrete_var(A,
            [ 0.15422567, -0.03232648],
            [ 0.15422567, -0.03232648],
            [ 0.19278209, -0.03232648]])
+
+    The simulation below uses the same parameters with :math:`{u_t}`
+    drawn from a multivariate t-distribution
+
+    >>> mc = discrete_var(A, C, grid_sizes, 
+    ...               rv=scipy.stats.multivariate_t(shape=np.identity(2)), 
+    ...               random_state=rng)
+    >>> mc.P.shape
+    (231, 231)
+    >>> mc.state_values.shape
+    (231, 2)
+    >>> mc.state_values[:10]
+    array([[-0.38556417, -0.05387746],
+           [-0.38556417, -0.04310197],
+           [-0.38556417, -0.03232648],
+           [-0.38556417, -0.02155098],
+           [-0.38556417, -0.01077549],
+           [-0.38556417,  0.        ],
+           [-0.38556417,  0.01077549],
+           [-0.38556417,  0.02155098],
+           [-0.38556417,  0.03232648],
+           [-0.38556417,  0.04310197]])
+    >>> mc.simulate(10, random_state=rng)
+    array([[ 0.2313385 , -0.02155098],
+           [ 0.2313385 , -0.02155098],
+           [ 0.11566925, -0.02155098],
+           [ 0.15422567, -0.02155098],
+           [ 0.11566925,  0.        ],
+           [ 0.        ,  0.        ],
+           [ 0.03855642,  0.01077549],
+           [ 0.        ,  0.02155098],
+           [ 0.03855642,  0.03232648],
+           [-0.03855642,  0.02155098]])
     """
     A = np.asarray(A)
     C = np.asarray(C)
@@ -380,7 +411,7 @@ def discrete_var(A,
         u = random_state.standard_normal(size=(sim_length-1, r))
     else:
         u = rv.rvs(size=sim_length-1, random_state=random_state)
-        
+    
     v = C @ u.T
     x0 = np.zeros(m)
     X = simulate_linear_model(A, x0, v, ts_length=sim_length)
@@ -399,6 +430,7 @@ def discrete_var(A,
 
     V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
          for i in range(m)]
+
     # Fit the Markov chain
     mc = fit_discrete_mc(X.T, V, order=order)
 
