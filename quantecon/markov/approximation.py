@@ -315,14 +315,17 @@ def discrete_var(A,
     -------
     mc : MarkovChain
         An instance of the MarkovChain class that stores the transition
-        matrix and state values returned by the discretization method.
-        The MarkovChain instance contains:
+        matrix and state values returned by the discretization method,
+        in the following attributes:
 
-        * `mc.P`: A 2-dim array containing the transition probability
-          matrix over the discretized states.
-        * `mc.state_values`: A 2-dim array containing the state vectors
-          (of dimension m) as rows, which are ordered according to the
-          `order` option.
+            `P` : ndarray(float, ndim=2)
+                A 2-dim array containing the transition probability
+                matrix over the discretized states.
+
+            `state_values` : ndarray(float, ndim=2)
+                A 2-dim array containing the state vectors (of dimension
+                m) as rows, which are ordered according to the `order`
+                option.
 
     Examples
     --------
