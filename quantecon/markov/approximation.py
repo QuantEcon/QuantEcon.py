@@ -282,7 +282,8 @@ def discrete_var(A,
     ----------
     A : array_like(float, ndim=2)
         An m x m matrix containing the process' autocorrelation
-        parameters. Its eigenvalues must have moduli bounded by unity.
+        parameters. Its eigenvalues are assumed to have moduli 
+        bounded by unity.
     C : array_like(float, ndim=2)
         An m x r volatility matrix
     grid_sizes : array_like(int, ndim=1), optional(default=None)
