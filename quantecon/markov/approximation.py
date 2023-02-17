@@ -370,6 +370,40 @@ def discrete_var(A,
            [ 0.15422567, -0.03232648],
            [ 0.19278209, -0.03232648]])
 
+    The simulation below uses the same parameters with :math:`{u_t}`
+    drawn from a multivariate t-distribution
+
+    >>> df = 100
+    >>> Sigma = np.diag(np.tile((df-2)/df, 2))
+    >>> mc = discrete_var(A, C, grid_sizes, 
+    ...              rv=scipy.stats.multivariate_t(shape=Sigma, df=df), 
+    ...              random_state=rng)
+    >>> mc.P.shape
+    (146, 146)
+    >>> mc.state_values.shape
+    (146, 2)
+    >>> mc.state_values[:10]
+    array([[-0.38556417,  0.02155098],
+           [-0.38556417,  0.03232648],
+           [-0.38556417,  0.04310197],
+           [-0.38556417,  0.05387746],
+           [-0.34700776,  0.01077549],
+           [-0.34700776,  0.02155098],
+           [-0.34700776,  0.03232648],
+           [-0.34700776,  0.04310197],
+           [-0.34700776,  0.05387746],
+           [-0.30845134,  0.        ]])
+    >>> mc.simulate(10, random_state=rng)
+    array([[-0.03855642, -0.02155098],
+           [ 0.03855642, -0.03232648],
+           [ 0.07711283, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.15422567, -0.04310197],
+           [ 0.15422567, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.2313385 , -0.04310197],
+           [ 0.2313385 , -0.03232648],
+           [ 0.26989492, -0.03232648]])
     """
     A = np.asarray(A)
     C = np.asarray(C)
@@ -381,8 +415,8 @@ def discrete_var(A,
     if rv is None:
         u = random_state.standard_normal(size=(sim_length-1, r))
     else:
-        u = rv.rvs(size=(sim_length-1, r), random_state=random_state)
-
+        u = rv.rvs(size=sim_length-1, random_state=random_state)
+    
     v = C @ u.T
     x0 = np.zeros(m)
     X = simulate_linear_model(A, x0, v, ts_length=sim_length)
@@ -401,6 +435,7 @@ def discrete_var(A,
 
     V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
          for i in range(m)]
+
     # Fit the Markov chain
     mc = fit_discrete_mc(X.T, V, order=order)
 
