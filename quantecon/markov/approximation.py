@@ -1,12 +1,15 @@
 """
-tauchen
--------
-Discretizes Gaussian linear AR(1) processes via Tauchen's method
+Collection of functions to approximate a continuous random process by a
+discrete Markov chain.
 
 """
 
 from math import erfc, sqrt
 from .core import MarkovChain
+from .estimate import fit_discrete_mc
+from .._lss import simulate_linear_model
+from .._matrix_eqn import solve_discrete_lyapunov
+from ..util import check_random_state
 
 import warnings
 import numpy as np
@@ -242,3 +245,198 @@ def _fill_tauchen(x, P, n, rho, sigma, half_step):
             z = x[j] - rho * x[i]
             P[i, j] = (std_norm_cdf((z + half_step) / sigma) -
                        std_norm_cdf((z - half_step) / sigma))
+
+
+def discrete_var(A,
+                 C,
+                 grid_sizes=None,
+                 std_devs=np.sqrt(10),
+                 sim_length=1_000_000,
+                 rv=None,
+                 order='C',
+                 random_state=None):
+    r"""
+    Generate an `MarkovChain` instance that discretizes a multivariate
+    autorregressive process by a simulation of the process.
+
+    This function discretizes a VAR(1) process of the form:
+
+    .. math::
+
+        x_t = A x_{t-1} + C u_t
+
+    where :math:`{u_t}` is drawn iid from a distribution with mean 0 and
+    unit standard deviaiton; and :math:`{C}` is a volatility matrix.
+    Internally, from this process a sample time series of length
+    `sim_length` is produced, and with a cartesian grid as specified by
+    `grid_sizes` and `std_devs` a Markov chain is estimated that fits
+    the time series, where the states that are never visited under the
+    simulation are removed.
+
+    For a mathematical derivation check *Finite-State Approximation Of
+    VAR Processes: A Simulation Approach* by Stephanie Schmitt-Grohé and
+    Martín Uribe, July 11, 2010. In particular, we follow Schmitt-Grohé
+    and Uribe's method in contructing the grid for approximation.
+
+    Parameters
+    ----------
+    A : array_like(float, ndim=2)
+        An m x m matrix containing the process' autocorrelation
+        parameters. Its eigenvalues are assumed to have moduli 
+        bounded by unity.
+    C : array_like(float, ndim=2)
+        An m x r volatility matrix
+    grid_sizes : array_like(int, ndim=1), optional(default=None)
+        An m-vector containing the number of grid points in the
+        discretization of each dimension of x_t. If None, then set to
+        (10, ..., 10).
+    std_devs : float, optional(default=np.sqrt(10))
+        The number of standard deviations the grid should stretch in
+        each dimension, where standard deviations are measured under the
+        stationary distribution.
+    sim_length : int, optional(default=1_000_000)
+        The length of the simulated time series.
+    rv : optional(default=None)
+        Object that represents the disturbance term u_t. If None, then
+        standard normal distribution from numpy.random is used.
+        Alternatively, one can pass a "frozen" object of a multivariate
+        distribution from `scipy.stats`. It must have a zero mean and
+        unit standard deviation (of dimension m).
+    order : str, optional(default='C')
+        ('C' or 'F') order in which the states in the cartesian grid are
+        enumerated.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
+
+    Returns
+    -------
+    mc : MarkovChain
+        An instance of the MarkovChain class that stores the transition
+        matrix and state values returned by the discretization method,
+        in the following attributes:
+
+            `P` : ndarray(float, ndim=2)
+                A 2-dim array containing the transition probability
+                matrix over the discretized states.
+
+            `state_values` : ndarray(float, ndim=2)
+                A 2-dim array containing the state vectors (of dimension
+                m) as rows, which are ordered according to the `order`
+                option.
+
+    Examples
+    --------
+    This example discretizes the stochastic process used to calibrate
+    the economic model included in "Downward Nominal Wage Rigidity,
+    Currency Pegs, and Involuntary Unemployment" by Stephanie
+    Schmitt-Grohé and Martín Uribe, Journal of Political Economy 124,
+    October 2016, 1466-1514.
+
+    >>> rng = np.random.default_rng(12345)
+    >>> A = [[0.7901, -1.3570],
+    ...      [-0.0104, 0.8638]]
+    >>> Omega = [[0.0012346, -0.0000776],
+    ...          [-0.0000776, 0.0000401]]
+    >>> C = scipy.linalg.sqrtm(Omega)
+    >>> grid_sizes = [21, 11]
+    >>> mc = discrete_var(A, C, grid_sizes, random_state=rng)
+    >>> mc.P.shape
+    (145, 145)
+    >>> mc.state_values.shape
+    (145, 2)
+    >>> mc.state_values[:10]  # First 10 states
+    array([[-0.38556417,  0.02155098],
+           [-0.38556417,  0.03232648],
+           [-0.38556417,  0.04310197],
+           [-0.38556417,  0.05387746],
+           [-0.34700776,  0.01077549],
+           [-0.34700776,  0.02155098],
+           [-0.34700776,  0.03232648],
+           [-0.34700776,  0.04310197],
+           [-0.34700776,  0.05387746],
+           [-0.30845134,  0.        ]])
+    >>> mc.simulate(10, random_state=rng)
+    array([[ 0.11566925, -0.01077549],
+           [ 0.11566925, -0.01077549],
+           [ 0.15422567,  0.        ],
+           [ 0.15422567,  0.        ],
+           [ 0.15422567, -0.01077549],
+           [ 0.11566925, -0.02155098],
+           [ 0.11566925, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.19278209, -0.03232648]])
+
+    The simulation below uses the same parameters with :math:`{u_t}`
+    drawn from a multivariate t-distribution
+
+    >>> df = 100
+    >>> Sigma = np.diag(np.tile((df-2)/df, 2))
+    >>> mc = discrete_var(A, C, grid_sizes, 
+    ...              rv=scipy.stats.multivariate_t(shape=Sigma, df=df), 
+    ...              random_state=rng)
+    >>> mc.P.shape
+    (146, 146)
+    >>> mc.state_values.shape
+    (146, 2)
+    >>> mc.state_values[:10]
+    array([[-0.38556417,  0.02155098],
+           [-0.38556417,  0.03232648],
+           [-0.38556417,  0.04310197],
+           [-0.38556417,  0.05387746],
+           [-0.34700776,  0.01077549],
+           [-0.34700776,  0.02155098],
+           [-0.34700776,  0.03232648],
+           [-0.34700776,  0.04310197],
+           [-0.34700776,  0.05387746],
+           [-0.30845134,  0.        ]])
+    >>> mc.simulate(10, random_state=rng)
+    array([[-0.03855642, -0.02155098],
+           [ 0.03855642, -0.03232648],
+           [ 0.07711283, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.15422567, -0.04310197],
+           [ 0.15422567, -0.03232648],
+           [ 0.15422567, -0.03232648],
+           [ 0.2313385 , -0.04310197],
+           [ 0.2313385 , -0.03232648],
+           [ 0.26989492, -0.03232648]])
+    """
+    A = np.asarray(A)
+    C = np.asarray(C)
+    m, r = C.shape
+
+    # Run simulation to compute transition probabilities
+    random_state = check_random_state(random_state)
+
+    if rv is None:
+        u = random_state.standard_normal(size=(sim_length-1, r))
+    else:
+        u = rv.rvs(size=sim_length-1, random_state=random_state)
+    
+    v = C @ u.T
+    x0 = np.zeros(m)
+    X = simulate_linear_model(A, x0, v, ts_length=sim_length)
+
+    # Compute stationary variance-covariance matrix of AR process and use
+    # it to obtain grid bounds.
+    Sigma = solve_discrete_lyapunov(A, C @ C.T)
+    sigma_vector = np.sqrt(np.diagonal(Sigma))    # Stationary std dev
+    upper_bounds = std_devs * sigma_vector
+
+    # Build the individual grids along each dimension
+    if grid_sizes is None:
+        # Set the size of every grid to default_grid_size
+        default_grid_size = 10
+        grid_sizes = np.full(m, default_grid_size)
+
+    V = [np.linspace(-upper_bounds[i], upper_bounds[i], grid_sizes[i])
+         for i in range(m)]
+
+    # Fit the Markov chain
+    mc = fit_discrete_mc(X.T, V, order=order)
+
+    return mc
