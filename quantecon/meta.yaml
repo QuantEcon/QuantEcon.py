@@ -60,7 +60,3 @@ about:
   home: https://github.com/jstac/quant-econ
   license: BSD
   summary: 'Code for quant-econ.net'
-
-# See
-# http://docs.continuum.io/conda/build.html for
-# more information about meta.yaml
