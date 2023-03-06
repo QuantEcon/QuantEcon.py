@@ -9,11 +9,6 @@ as densities. The estimate of the marginal density of :math:`X_t` is
 
 This is a density in :math:`y`.
 
-References
-----------
-
-https://lectures.quantecon.org/py/stationary_densities.html
-
 """
 from textwrap import dedent
 import numpy as np

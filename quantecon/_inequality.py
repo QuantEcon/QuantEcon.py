@@ -108,7 +108,6 @@ def shorrocks_index(A):
     ----------
     .. [1] Wealth distribution and social mobility in the US:
        A quantitative approach (Benhabib, Bisin, Luo, 2017).
-       https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
     """
 
     A = np.asarray(A)  # Convert to array if not already

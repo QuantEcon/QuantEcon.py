@@ -1,10 +1,6 @@
 """
 Implements the Kalman filter for a linear Gaussian state space model.
 
-References
-----------
-
-https://lectures.quantecon.org/py/kalman.html
 
 """
 from textwrap import dedent
@@ -52,12 +48,6 @@ class Kalman:
         The infinite limit of Sigma_t
     K_infinity : array_like or scalar(float)
         The stationary Kalman gain.
-
-
-    References
-    ----------
-
-    https://lectures.quantecon.org/py/kalman.html
 
     """
 
