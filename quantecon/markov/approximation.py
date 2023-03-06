@@ -301,7 +301,7 @@ def discrete_var(A,
         standard normal distribution from numpy.random is used.
         Alternatively, one can pass a "frozen" object of a multivariate
         distribution from `scipy.stats`. It must have a zero mean and
-        unit standard deviation (of dimension m).
+        unit standard deviation (of dimension r).
     order : str, optional(default='C')
         ('C' or 'F') order in which the states in the cartesian grid are
         enumerated.
