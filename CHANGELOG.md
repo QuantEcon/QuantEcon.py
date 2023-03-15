@@ -14,7 +14,7 @@
 
 There were a range of additional maitenance and fixes including [Update __Iss.py - Remove broken link](https://github.com/QuantEcon/QuantEcon.py/pull/692), [693](https://github.com/QuantEcon/QuantEcon.py/pull/693), [689](https://github.com/QuantEcon/QuantEcon.py/pull/689), [Bring estimate_mc into top level namespace](https://github.com/QuantEcon/QuantEcon.py/pull/688), [Warn only when n in not int in tauchen](https://github.com/QuantEcon/QuantEcon.py/pull/673), [FIX: Avoid bare 'except'](https://github.com/QuantEcon/QuantEcon.py/pull/686), [FIX: DOC: Remove 2-byte spaces](https://github.com/QuantEcon/QuantEcon.py/pull/685)
 
-Thank you to ([bensonarafat](https://github.com/bensonarafat)), ([crondonm])(https://github.com/crondonm)), ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), and ([Smit-create](https://github.com/Smit-create)) for all your contributions, PR reviews, and comments. 
+Thank you to ([bensonarafat](https://github.com/bensonarafat)), ([crondonm](https://github.com/crondonm)), ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), and ([Smit-create](https://github.com/Smit-create)) for all your contributions, PR reviews, and comments. 
 
 ## Ver 0.6.0 (18-December-2022)
 
