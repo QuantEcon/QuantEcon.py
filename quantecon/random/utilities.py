@@ -63,7 +63,7 @@ def probvec(m, k, random_state=None, parallel=True):
     return x
 
 
-def _probvec(r, out):
+def _probvec(r, out):  # pragma: no cover
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
