@@ -6,7 +6,8 @@ specified initial condition v.
 import time
 import warnings
 import numpy as np
-from numba import jit, generated_jit, types
+from numba import jit, types
+from numba.extending import overload
 from .game_theory.lemke_howson import _lemke_howson_tbl, _get_mixed_actions
 
 
@@ -352,8 +353,12 @@ def _initialize_tableaux_ig(X, Y, tableaux, bases):
     return tableaux, bases
 
 
-@generated_jit(nopython=True, cache=True)
-def _square_sum(a):
+def _square_sum(a):  # pragma: no cover
+    pass
+
+
+@overload(_square_sum, jit_options={'cache':True})
+def _square_sum_ol(a):
     if isinstance(a, types.Number):
         return lambda a: a**2
     elif isinstance(a, types.Array):
