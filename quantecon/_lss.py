@@ -11,7 +11,7 @@ from numba import jit
 from .util import check_random_state
 
 
-@jit
+@jit(nopython=True)
 def simulate_linear_model(A, x0, v, ts_length):
     r"""
     This is a separate function for simulating a vector linear system of
