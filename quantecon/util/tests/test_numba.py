@@ -9,6 +9,11 @@ from quantecon.util.numba import _numba_linalg_solve, comb_jit
 
 
 @jit(nopython=True)
+def _numba_linalg_solve_jitted(a, b):
+    return _numba_linalg_solve(a, b)
+
+
+@jit(nopython=True)
 def numba_linalg_solve_orig(a, b):
     return np.linalg.solve(a, b)
 
@@ -26,7 +31,7 @@ class TestNumbaLinalgSolve:
             a = np.asfortranarray(self.a, dtype=dtype)
             b = np.asfortranarray(self.b_1dim, dtype=dtype)
             sol_orig = numba_linalg_solve_orig(a, b)
-            r = _numba_linalg_solve(a, b)
+            r = _numba_linalg_solve_jitted(a, b)
             assert_(r == 0)
             assert_array_equal(b, sol_orig)
 
@@ -35,7 +40,7 @@ class TestNumbaLinalgSolve:
             a = np.asfortranarray(self.a, dtype=dtype)
             b = np.asfortranarray(self.b_2dim, dtype=dtype)
             sol_orig = numba_linalg_solve_orig(a, b)
-            r = _numba_linalg_solve(a, b)
+            r = _numba_linalg_solve_jitted(a, b)
             assert_(r == 0)
             assert_array_equal(b, sol_orig)
 
@@ -44,7 +49,7 @@ class TestNumbaLinalgSolve:
             for dtype in self.dtypes:
                 a = np.asfortranarray(self.a_singular, dtype=dtype)
                 b = np.asfortranarray(b, dtype=dtype)
-                r = _numba_linalg_solve(a, b)
+                r = _numba_linalg_solve_jitted(a, b)
                 assert_(r != 0)
 
 
