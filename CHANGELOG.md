@@ -12,7 +12,15 @@
 
 1. [FIX: Fix period of reducible MarkovChain with custom state_values](https://github.com/QuantEcon/QuantEcon.py/pull/684) ([oyamad](https://github.com/oyamad))
 
-There were a range of additional maitenance and fixes including [Update __Iss.py - Remove broken link](https://github.com/QuantEcon/QuantEcon.py/pull/692), [693](https://github.com/QuantEcon/QuantEcon.py/pull/693), [689](https://github.com/QuantEcon/QuantEcon.py/pull/689), [Bring estimate_mc into top level namespace](https://github.com/QuantEcon/QuantEcon.py/pull/688), [Warn only when n in not int in tauchen](https://github.com/QuantEcon/QuantEcon.py/pull/673), [FIX: Avoid bare 'except'](https://github.com/QuantEcon/QuantEcon.py/pull/686), [FIX: DOC: Remove 2-byte spaces](https://github.com/QuantEcon/QuantEcon.py/pull/685)
+There were a range of additional maitenance and fixes including
+[RFC: Replace `@generated_jit` with `@overload`](https://github.com/QuantEcon/QuantEcon.py/pull/701),
+[Update __Iss.py - Remove broken link](https://github.com/QuantEcon/QuantEcon.py/pull/692),
+[FIX: Add `__dir__` to lss.py](https://github.com/QuantEcon/QuantEcon.py/pull/693),
+[MAINT: Rename ivy.py to ivp.py](https://github.com/QuantEcon/QuantEcon.py/pull/689),
+[Bring estimate_mc into top level namespace](https://github.com/QuantEcon/QuantEcon.py/pull/688),
+[Warn only when n in not int in tauchen](https://github.com/QuantEcon/QuantEcon.py/pull/673),
+[FIX: Avoid bare 'except'](https://github.com/QuantEcon/QuantEcon.py/pull/686),
+[FIX: DOC: Remove 2-byte spaces](https://github.com/QuantEcon/QuantEcon.py/pull/685)
 
 Thank you to ([bensonarafat](https://github.com/bensonarafat)), ([crondonm](https://github.com/crondonm)), ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), and ([Smit-create](https://github.com/Smit-create)) for all your contributions, PR reviews, and comments. 
 
