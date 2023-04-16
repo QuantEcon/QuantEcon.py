@@ -11,6 +11,7 @@ import numbers
 import numpy as np
 from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
                            assert_)
+from numba import njit
 from quantecon.random import probvec, sample_without_replacement, draw
 
 
@@ -67,32 +68,43 @@ def test_sample_without_replacement_value_error():
 
 # draw #
 
+@njit
+def draw_jitted(cdf, size=None):
+    return draw(cdf, size)
+
+
 class TestDraw:
     def setup_method(self):
         self.pmf = np.array([0.4, 0.1, 0.5])
         self.cdf = np.cumsum(self.pmf)
         self.n = len(self.pmf)
+        self.draw_funcs = [draw, draw_jitted]
 
     def test_return_types(self):
-        out = draw(self.cdf)
-        assert_(isinstance(out, numbers.Integral))
+        for func in self.draw_funcs:
+            out = func(self.cdf)
+            assert_(isinstance(out, numbers.Integral))
 
         size = 10
-        out = draw(self.cdf, size)
-        assert_(out.shape == (size,))
+        for func in self.draw_funcs:
+            out = func(self.cdf, size)
+            assert_(out.shape == (size,))
 
     def test_return_values(self):
-        out = draw(self.cdf)
-        assert_(out in range(self.n))
+        for func in self.draw_funcs:
+            out = func(self.cdf)
+            assert_(out in range(self.n))
 
         size = 10
-        out = draw(self.cdf, size)
-        assert_(np.isin(out, range(self.n)).all())
+        for func in self.draw_funcs:
+            out = func(self.cdf, size)
+            assert_(np.isin(out, range(self.n)).all())
 
     def test_lln(self):
         size = 1000000
-        out = draw(self.cdf, size)
-        hist, bin_edges = np.histogram(out, bins=self.n, density=True)
-        pmf_computed = hist * np.diff(bin_edges)
-        atol = 1e-2
-        assert_allclose(pmf_computed, self.pmf, atol=atol)
+        for func in self.draw_funcs:
+            out = func(self.cdf, size)
+            hist, bin_edges = np.histogram(out, bins=self.n, density=True)
+            pmf_computed = hist * np.diff(bin_edges)
+            atol = 1e-2
+            assert_allclose(pmf_computed, self.pmf, atol=atol)
