@@ -60,3 +60,7 @@ about:
   home: https://github.com/jstac/quant-econ
   license: BSD
   summary: 'Code for quant-econ.net'
+  
+# See
+# https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html for 
+# more information about meta.yaml 

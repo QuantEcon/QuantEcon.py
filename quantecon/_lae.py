@@ -9,6 +9,11 @@ as densities. The estimate of the marginal density of :math:`X_t` is
 
 This is a density in :math:`y`.
 
+References 
+---------- 
+
+https://python.quantecon.org/ar1_processes.html
+
 """
 from textwrap import dedent
 import numpy as np
@@ -51,6 +56,7 @@ class LAE:
         m = """\
         Look ahead estimator
           - number of observations : {n}
+          
         """
         return dedent(m.format(n=self.X.size))
 

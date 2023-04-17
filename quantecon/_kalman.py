@@ -1,6 +1,10 @@
 """
 Implements the Kalman filter for a linear Gaussian state space model.
 
+References 
+---------- 
+
+https://python.quantecon.org/kalman.html
 
 """
 from textwrap import dedent
@@ -48,6 +52,11 @@ class Kalman:
         The infinite limit of Sigma_t
     K_infinity : array_like or scalar(float)
         The stationary Kalman gain.
+
+    References 
+    ---------- 
+
+    https://python.quantecon.org/kalman.html
 
     """
 
@@ -144,6 +153,7 @@ class Kalman:
         whitened_lss : LinearStateSpace
             This is the linear state space system that represents
             the whitened system
+
         """
         K = self.K_infinity
 
@@ -279,6 +289,7 @@ class Kalman:
         coeff_type : string, either 'ma' or 'var' (default='ma')
             The type of coefficent sequence to compute.  Either 'ma' for
             moving average or 'var' for VAR.
+            
         """
         # == simplify notation == #
         A, G = self.ss.A, self.ss.G
