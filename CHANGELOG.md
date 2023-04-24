@@ -1,5 +1,29 @@
 # Changelog
 
+## Ver 0.7.0 (24-February-2023)
+
+### New
+
+1. [END: Add function fit_discrete_mc](https://github.com/QuantEcon/QuantEcon.py/pull/681) ([jstac](https://github.com/jstac)), ([Smit-create](https://github.com/Smit-create)) and ([oyamad](https://github.com/oyamad)) which takes a time series and fits a finite markov chain
+2. [ENH: Adding Discrete Approximation of VAR Methods](https://github.com/QuantEcon/QuantEcon.py/pull/640) ([crondonm](https://github.com/crondonm)) 
+3. [ENH: Implement LCP solver](https://github.com/QuantEcon/QuantEcon.py/pull/690) ([oyamad](https://github.com/oyamad))
+
+### Fixes and Maintenance
+
+1. [FIX: Fix period of reducible MarkovChain with custom state_values](https://github.com/QuantEcon/QuantEcon.py/pull/684) ([oyamad](https://github.com/oyamad))
+
+There were a range of additional maitenance and fixes including
+[RFC: Replace `@generated_jit` with `@overload`](https://github.com/QuantEcon/QuantEcon.py/pull/701),
+[Update __Iss.py - Remove broken link](https://github.com/QuantEcon/QuantEcon.py/pull/692),
+[FIX: Add `__dir__` to lss.py](https://github.com/QuantEcon/QuantEcon.py/pull/693),
+[MAINT: Rename ivy.py to ivp.py](https://github.com/QuantEcon/QuantEcon.py/pull/689),
+[Bring estimate_mc into top level namespace](https://github.com/QuantEcon/QuantEcon.py/pull/688),
+[Warn only when n in not int in tauchen](https://github.com/QuantEcon/QuantEcon.py/pull/673),
+[FIX: Avoid bare 'except'](https://github.com/QuantEcon/QuantEcon.py/pull/686),
+[FIX: DOC: Remove 2-byte spaces](https://github.com/QuantEcon/QuantEcon.py/pull/685)
+
+Thank you to ([bensonarafat](https://github.com/bensonarafat)), ([crondonm](https://github.com/crondonm)), ([oyamad](https://github.com/oyamad)), ([jstac](https://github.com/jstac)), and ([Smit-create](https://github.com/Smit-create)) for all your contributions, PR reviews, and comments. 
+
 ## Ver 0.6.0 (18-December-2022)
 
 This is the next major release of the `quantecon` package as it includes some **breaking changes** as listed below. It also
