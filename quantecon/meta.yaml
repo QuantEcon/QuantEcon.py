@@ -59,7 +59,7 @@ test:
 about:
   home: https://github.com/jstac/quant-econ
   license: BSD
-  summary: 'Code for quant-econ.net'
+  summary: 'Code for quantecon.org'
   
 # See
 # https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html for 
