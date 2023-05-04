@@ -4,8 +4,8 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import numpy as np
-from numba import guvectorize, generated_jit, types
-
+from numba import guvectorize, types
+from numba.extending import overload
 from ..util import check_random_state, searchsorted
 
 
@@ -63,7 +63,7 @@ def probvec(m, k, random_state=None, parallel=True):
     return x
 
 
-def _probvec(r, out):
+def _probvec(r, out):  # pragma: no cover
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
@@ -169,7 +169,7 @@ def _sample_without_replacement(n, r, out):
         pool[idx] = pool[n-j-1]
 
 
-@generated_jit(nopython=True)
+# Pure python implementation that will run if the JIT compiler is disabled
 def draw(cdf, size=None):
     """
     Generate a random sample according to the cumulative distribution
@@ -198,6 +198,20 @@ def draw(cdf, size=None):
     array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
 
     """
+    if isinstance(size, int):
+        rs = np.random.random(size)
+        out = np.empty(size, dtype=np.int_)
+        for i in range(size):
+            out[i] = searchsorted(cdf, rs[i])
+        return out
+    else:
+        r = np.random.random()
+        return searchsorted(cdf, r)
+
+
+# Overload for the `draw` function
+@overload(draw)
+def ol_draw(cdf, size):
     if isinstance(size, types.Integer):
         def draw_impl(cdf, size):
             rs = np.random.random(size)

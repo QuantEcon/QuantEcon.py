@@ -3,11 +3,9 @@ Utilities to support Numba jitted functions
 
 """
 import numpy as np
-from numba import jit, generated_jit, types
-try:
-    from numba.np.linalg import _LAPACK  # for Numba >= 0.49.0
-except ModuleNotFoundError:
-    from numba.targets.linalg import _LAPACK  # for Numba < 0.49.0
+from numba import jit, types
+from numba.extending import overload
+from numba.np.linalg import _LAPACK
 
 
 # BLAS kinds as letters
@@ -19,14 +17,19 @@ _blas_kinds = {
 }
 
 
-@generated_jit(nopython=True, cache=True)
-def _numba_linalg_solve(a, b):
+def _numba_linalg_solve(a, b):  # pragma: no cover
+    pass
+
+
+@overload(_numba_linalg_solve, jit_options={'cache':True})
+def _numba_linalg_solve_ol(a, b):
     """
     Solve the linear equation ax = b directly calling a Numba internal
     function. The data in `a` and `b` are interpreted in Fortran order,
     and dtype of `a` and `b` must be the same, one of {float32, float64,
     complex64, complex128}. `a` and `b` are modified in place, and the
     solution is stored in `b`. *No error check is made for the inputs.*
+    Only work in a Numba-jitted function.
 
     Parameters
     ----------

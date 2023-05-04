@@ -34,5 +34,5 @@ exclude_lines =
     @jit
     @jit\(.*nopython=True
     @njit
-    @generated_jit\(.*nopython=True
+    @overload
     @guvectorize\(.*nopython=True
