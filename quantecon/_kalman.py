@@ -1,8 +1,8 @@
 """
 Implements the Kalman filter for a linear Gaussian state space model.
 
-References 
----------- 
+References
+----------
 
 https://python.quantecon.org/kalman.html
 
@@ -53,8 +53,8 @@ class Kalman:
     K_infinity : array_like or scalar(float)
         The stationary Kalman gain.
 
-    References 
-    ---------- 
+    References
+    ----------
 
     https://python.quantecon.org/kalman.html
 

@@ -9,8 +9,8 @@ as densities. The estimate of the marginal density of :math:`X_t` is
 
 This is a density in :math:`y`.
 
-References 
----------- 
+References
+----------
 
 https://python.quantecon.org/ar1_processes.html
 
