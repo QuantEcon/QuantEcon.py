@@ -211,16 +211,16 @@ def draw(cdf, size=None):
 
 # Overload for the `draw` function
 @overload(draw)
-def ol_draw(cdf, size):
+def ol_draw(cdf, size=None):
     if isinstance(size, types.Integer):
-        def draw_impl(cdf, size):
+        def draw_impl(cdf, size=None):
             rs = np.random.random(size)
             out = np.empty(size, dtype=np.int_)
             for i in range(size):
                 out[i] = searchsorted(cdf, rs[i])
             return out
     else:
-        def draw_impl(cdf, size):
+        def draw_impl(cdf, size=None):
             r = np.random.random()
             return searchsorted(cdf, r)
     return draw_impl

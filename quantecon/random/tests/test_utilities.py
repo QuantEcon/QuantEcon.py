@@ -108,3 +108,14 @@ class TestDraw:
             pmf_computed = hist * np.diff(bin_edges)
             atol = 1e-2
             assert_allclose(pmf_computed, self.pmf, atol=atol)
+
+
+@njit
+def draw_jitted_w_o_size(n):
+    cdf = np.linspace(1/n, 1, n)
+    return draw(cdf)
+
+
+def test_draw_jitted_w_o_size():
+    n = 3
+    assert_(draw_jitted_w_o_size(n) in range(n))
