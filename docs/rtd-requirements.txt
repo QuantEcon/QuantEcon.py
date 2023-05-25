@@ -1,4 +1,4 @@
-sphinx
+sphinx<=6.2.1
 ipython
 numpydoc
 numba>=0.49
