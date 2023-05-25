@@ -12,7 +12,7 @@ This is a density in :math:`y`.
 References
 ----------
 
-https://lectures.quantecon.org/py/stationary_densities.html
+https://python.quantecon.org/ar1_processes.html
 
 """
 from textwrap import dedent
@@ -56,6 +56,7 @@ class LAE:
         m = """\
         Look ahead estimator
           - number of observations : {n}
+          
         """
         return dedent(m.format(n=self.X.size))
 

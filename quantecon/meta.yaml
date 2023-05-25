@@ -59,8 +59,8 @@ test:
 about:
   home: https://github.com/jstac/quant-econ
   license: BSD
-  summary: 'Code for quant-econ.net'
-
+  summary: 'Code for quantecon.org'
+  
 # See
-# http://docs.continuum.io/conda/build.html for
-# more information about meta.yaml
+# https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html for 
+# more information about meta.yaml 

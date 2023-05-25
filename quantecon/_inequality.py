@@ -108,7 +108,8 @@ def shorrocks_index(A):
     ----------
     .. [1] Wealth distribution and social mobility in the US:
        A quantitative approach (Benhabib, Bisin, Luo, 2017).
-       https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
+       https://www.aeaweb.org/articles?id=10.1257/aer.20151684
+
     """
 
     A = np.asarray(A)  # Convert to array if not already
@@ -144,6 +145,7 @@ def rank_size(data, c=1.0):
         Location in the population when sorted from smallest to largest
     size_data : array_like(float, ndim=1)
         Size data for top (c x 100)% of the observations
+        
     """
     w = - np.sort(- data)                  # Reverse sort
     w = w[:int(len(w) * c)]                # extract top (c * 100)%
