@@ -1,6 +1,14 @@
 # Changelog
 
-## Ver 0.7.0 (24-February-2023)
+## Ver 0.7.1 (29-May-2023)
+
+This is a minor release with bug fixes and improvements to documentation. 
+
+### Fix
+
+1. [Fix for #704](https://github.com/QuantEcon/QuantEcon.py/commit/beec748020bace3834bff9afa83067f668357a24)
+
+## Ver 0.7.0 (24-April-2023)
 
 ### New
 
