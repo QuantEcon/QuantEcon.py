@@ -9,6 +9,38 @@ from quantecon import LQ
 
 
 class TestLQNash:
+  def test_randomseed(self):
+        "Test case to guarantee randomseed is working"
+        # Copied these values from test_lqcontrol, added rng1 and rng2
+        a = np.array([[.95, 0.], [0, .95]])
+        b1 = np.array([.95, 0.])
+        b2 = np.array([0., .95])
+        r1 = np.array([[-.25, 0.], [0., 0.]])   
+        r2 = np.array([[0., 0.], [0., -.25]])
+        q1 = np.array([[-.15]])
+        q2 = np.array([[-.15]])
+        rng = np.random.RandomState(seed=1)
+        rng2 = np.random.RandomState(seed=2)
+
+        f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, 0, 0, 0, 0, 0, 0,
+                               tol=1e-8, max_iter=10000, random_state=rng)
+        f1_2, f2_2, p1_2, p2_2 = nnash(a, b1, b2, r1, r2, q1, q2, 0, 0, 0, 0, 0, 0,
+                               tol=1e-8, max_iter=10000, random_state=rng2)
+        f1_3, f2_3, p1_3, p2_3 = nnash(a, b1, b2, r1, r2, q1, q2, 0, 0, 0, 0, 0, 0,
+                               tol=1e-8, max_iter=10000, random_state=rng)
+
+        #Parameters from different random seeds should be different
+        assert not np.array_equal(f1, f1_2), 
+        assert not np.array_equal(f2, f2_2),
+        assert not np.array_equal(p1, p1_2),
+        assert not np.array_equal(p2, p2_2), 
+
+        #Parameters from the same random seed should be equal
+        assert np.array_equal(f1, f1_3), 
+        assert np.array_equal(f2, f2_3), 
+        assert np.array_equal(p1, p1_3), 
+        assert np.array_equal(p2, p2_3), 
+
     def test_noninteractive(self):
         "Test case for when agents don't interact with each other"
         # Copied these values from test_lqcontrol
