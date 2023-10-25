@@ -48,7 +48,7 @@ class TestLQControl:
             (2*lq_scalar.Q+lq_scalar.beta*lq_scalar.Rf*2*lq_scalar.B**2) \
             * x0
         x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + \
-            np.dot(lq_scalar.C, w_seq[0, -1])
+            lq_scalar.C * w_seq[0, -1]
 
         assert_allclose(u_0, u_seq, rtol=1e-4)
         assert_allclose(x_1, x_seq[0, -1], rtol=1e-4)

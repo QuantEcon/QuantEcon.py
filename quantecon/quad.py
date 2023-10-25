@@ -296,7 +296,7 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
 
     if d > 1:
         nodes = nodes @ new_sig2 + mu  # Broadcast ok
-    else:  # nodes.dot(sig) will not be aligned in scalar case.
+    else:  # nodes @ sig will not be aligned in scalar case.
         nodes = nodes * new_sig2 + mu
 
     return nodes.squeeze(), weights
