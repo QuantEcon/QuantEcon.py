@@ -72,7 +72,7 @@ has been under continuous development for around
 including numerical methods, data visualization, estimation, and dynamic
 programming, implementing a number of fundamental algorithms used in
 high performance computational economics. In this article we review the key
-features of the the library.
+features of the library.
 
 # Statement of Need
 
@@ -532,7 +532,7 @@ Directed Graph:
 QuantEcon developers are considering future projects such as adding more
 equilibrium computation algorithms for N-player games and supporting extensive
 form games. In addition, QuantEcon aims to extend its current implementation to
-other backend libraries like JAX or other GPU providing libraries to utilize the
+other backend libraries like JAX or other GPU providing libraries to utilize
 modern computing systems and provide faster execution speeds.
 
 
