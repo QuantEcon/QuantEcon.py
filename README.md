@@ -70,6 +70,11 @@ A BibTeX entry for LaTeX users is
 @article{10.21105/joss.05585,
 author = {Batista, Quentin and Coleman, Chase and Furusawa, Yuya and Hu, Shu and Lunagariya, Smit and Lyon, Spencer and McKay, Matthew and Oyama, Daisuke and Sargent, Thomas J. and Shi, Zejin and Stachurski, John and Winant, Pablo and Watkins, Natasha and Yang, Ziyue and Zhang, Hengcheng},
 doi = {10.5281/zenodo.10345102},
-title = {QuantEcon.py: A community based Python library for quantitative economics}
+title = {QuantEcon.py: A community based Python library for quantitative economics},
+year = {2024},
+journal = {Journal of Open Source Software},
+volume = {9},
+number = {93},
+pages = {5585}
 }
 ```
