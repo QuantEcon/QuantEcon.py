@@ -1,0 +1,82 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Batista
+  given-names: Quentin
+- family-names: Coleman
+  given-names: Chase
+- family-names: Furusawa
+  given-names: Yuya
+- family-names: Hu
+  given-names: Shu
+- family-names: Lunagariya
+  given-names: Smit
+- family-names: Lyon
+  given-names: Spencer
+- family-names: McKay
+  given-names: Matthew
+- family-names: Oyama
+  given-names: Daisuke
+- family-names: Sargent
+  given-names: Thomas J.
+- family-names: Shi
+  given-names: Zejin
+- family-names: Stachurski
+  given-names: John
+- family-names: Winant
+  given-names: Pablo
+- family-names: Watkins
+  given-names: Natasha
+- family-names: Yang
+  given-names: Ziyue
+- family-names: Zhang
+  given-names: Hengcheng
+doi: 10.5281/zenodo.10345102
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Batista
+    given-names: Quentin
+  - family-names: Coleman
+    given-names: Chase
+  - family-names: Furusawa
+    given-names: Yuya
+  - family-names: Hu
+    given-names: Shu
+  - family-names: Lunagariya
+    given-names: Smit
+  - family-names: Lyon
+    given-names: Spencer
+  - family-names: McKay
+    given-names: Matthew
+  - family-names: Oyama
+    given-names: Daisuke
+  - family-names: Sargent
+    given-names: Thomas J.
+  - family-names: Shi
+    given-names: Zejin
+  - family-names: Stachurski
+    given-names: John
+  - family-names: Winant
+    given-names: Pablo
+  - family-names: Watkins
+    given-names: Natasha
+  - family-names: Yang
+    given-names: Ziyue
+  - family-names: Zhang
+    given-names: Hengcheng
+  date-published: 2024-01-06
+  doi: 10.21105/joss.05585
+  issn: 2475-9066
+  issue: 93
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 5585
+  title: "QuantEcon.py: A community based Python library for
+    quantitative economics"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.05585"
+  volume: 9
+title: "QuantEcon.py: A community based Python library for quantitative
+  economics"
