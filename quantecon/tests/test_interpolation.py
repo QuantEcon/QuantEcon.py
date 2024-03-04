@@ -1,7 +1,6 @@
 import numpy as np
 from quantecon._interpolation import interp, _interpf, _interpa
 
-import pytest
 from numpy.testing import assert_allclose
 
 def test_interp_float():
