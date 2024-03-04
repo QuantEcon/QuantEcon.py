@@ -33,6 +33,7 @@ from ._gridtools import (
 )
 from ._inequality import lorenz_curve, gini_coefficient, shorrocks_index, \
     rank_size
+from ._interpolation import interp, interpf, interpa
 from ._kalman import Kalman
 from ._lae import LAE
 from ._arma import ARMA
