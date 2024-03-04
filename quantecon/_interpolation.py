@@ -28,18 +28,18 @@ def interp(x, xp, fp):
     ValueError
         if xp and fp have different lengths
     """
-    
+
     if len(xp) != len(fp):
         raise ValueError("xp and fp must be the same length")
 
     if isinstance(x, float):
-        return interpf(x, xp, fp)
+        return _interpf(x, xp, fp)
     else:
-        return interpa(x, xp, fp)
+        return _interpa(x, xp, fp)
 
 
 @njit
-def interpf(x, xp, fp):
+def _interpf(x, xp, fp):
     """
     Linearly interpolate (xp, fp) to evaluate at x.
     
@@ -78,7 +78,7 @@ def interpf(x, xp, fp):
 
 
 @njit
-def interpa(x, xp, fp):
+def _interpa(x, xp, fp):
     """
     Linearly interpolate (xp, fp) to evaluate an array of x.
     
