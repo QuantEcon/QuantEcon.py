@@ -452,13 +452,31 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
     See `solve_tableau`.
 
     """
+    L = tableau.shape[0] - 1
+    nm = tableau.shape[1] - (L+1)  # n + m
+
     success, status, num_iter_1 = \
         solve_tableau(tableau, basis, max_iter, skip_aux=False,
                       piv_options=piv_options)
 
-    if success and tableau[-1, -1] > piv_options.fea_tol:  # Infeasible
+    if not success:  # max_iter exceeded
+        return success, status, num_iter_1
+    if tableau[-1, -1] > piv_options.fea_tol:  # Infeasible
         success = False
         status = 2
+        return success, status, num_iter_1
+
+    # Check artifial variables have been eliminated
+    tol_piv = piv_options.tol_piv
+    for i in range(L):
+        if basis[i] >= nm:  # Artifial variable not eliminated
+            for j in range(nm):
+                if tableau[i, j] < -tol_piv or \
+                   tableau[i, j] > tol_piv:  # Treated nonzero
+                    _pivoting(tableau, j, i)
+                    basis[i] = j
+                    num_iter_1 += 1
+                    break
 
     return success, status, num_iter_1
 
