@@ -6,7 +6,7 @@
 
 * FIX: linprog_simplex: Fix bug in Phase 1 by @oyamad in https://github.com/QuantEcon/QuantEcon.py/pull/727
 
-## Maintenance 
+### Maintenance 
 
 * FIX: Update license file from BSD-3 to MIT by @mmcky in https://github.com/QuantEcon/QuantEcon.py/pull/712
 * MAINT: Update end year in License by @mmcky in https://github.com/QuantEcon/QuantEcon.py/pull/713
