@@ -239,3 +239,15 @@ class TestLinprogSimplexScipy:
         desired_fun = -36.0000000000
         res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
         _assert_success(res, c, b_ub=b_ub, desired_fun=desired_fun)
+
+
+class TestLinprogSimplex:
+    def test_phase_1_bug_725(self):
+        # Identified a bug in Phase 1
+        # https://github.com/QuantEcon/QuantEcon.py/issues/725
+        c = np.array([-4.09555556, 4.59044444])
+        A_ub = np.array([[1, 0.1], [-1, -0.1], [1, 1]])
+        b_ub = np.array([9.1, -0.1, 0.1])
+        desired_x = [0.1, 0]
+        res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
+        _assert_success(res, c, b_ub=b_ub, desired_x=desired_x)
