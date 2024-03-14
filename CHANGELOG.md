@@ -2,7 +2,7 @@
 
 ## Ver 0.7.2 (14th-March-2024)
 
-## What's Changed
+### Fix
 
 * FIX: linprog_simplex: Fix bug in Phase 1 by @oyamad in https://github.com/QuantEcon/QuantEcon.py/pull/727
 
