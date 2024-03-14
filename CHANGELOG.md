@@ -1,5 +1,20 @@
 # Changelog
 
+## Ver 0.7.2 (14th-March-2024)
+
+## What's Changed
+
+* FIX: linprog_simplex: Fix bug in Phase 1 by @oyamad in https://github.com/QuantEcon/QuantEcon.py/pull/727
+
+## Maintenance 
+
+* FIX: Update license file from BSD-3 to MIT by @mmcky in https://github.com/QuantEcon/QuantEcon.py/pull/712
+* MAINT: Update end year in License by @mmcky in https://github.com/QuantEcon/QuantEcon.py/pull/713
+* Add citation by @Smit-create in https://github.com/QuantEcon/QuantEcon.py/pull/719
+* Update ci.yml to latest version by @kp992 in https://github.com/QuantEcon/QuantEcon.py/pull/718
+
+**Full Changelog**: https://github.com/QuantEcon/QuantEcon.py/compare/v0.7.1...v0.7.2
+
 ## Ver 0.7.1 (29-May-2023)
 
 This is a minor release with bug fixes and improvements to documentation. 
