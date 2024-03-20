@@ -137,7 +137,7 @@ class DiGraph:
         if values is None:
             self._node_labels = None
         else:
-            values = np.asarray(values)
+            values = np.asanyarray(values)
             if (values.ndim < 1) or (values.shape[0] != self.n):
                 raise ValueError(
                     'node_labels must be an array_like of length n'
