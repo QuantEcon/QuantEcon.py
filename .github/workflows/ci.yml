@@ -33,13 +33,15 @@ jobs:
         key:
           ${{ runner.os }}-${{ matrix.python-version }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
 
-    - uses: conda-incubator/setup-miniconda@v2
+    - uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
+        miniforge-version: latest
         environment-file: environment.yml
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
         use-only-tar-bz2: true
+        activate-environment: qe
 
     - name: Conda info
       shell: bash -l {0}
