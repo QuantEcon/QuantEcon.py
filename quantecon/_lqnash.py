@@ -4,7 +4,7 @@ from .util import check_random_state
 
 
 def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
-          beta=1.0, tol=1e-8, max_iter=1000, random_state=None):
+          beta=1.0, tol=1e-8, max_iter=1000):
     r"""
     Compute the limit of a Nash linear quadratic dynamic game. In this
     problem, player i minimizes
@@ -67,7 +67,8 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         Random seed (integer) or np.random.RandomState or Generator
         instance to set the initial state of the random number generator
         for reproducibility. If None, a randomly initialized RandomState
-        is used.
+        is used. 
+        Randomness is almost irrelevant because parameters are deterministically redefined
 
     Returns
     -------
