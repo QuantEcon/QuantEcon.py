@@ -6,6 +6,9 @@ chain by the Grassmann-Taksar-Heyman (GTH) algorithm.
 import numpy as np
 from numba import jit
 
+from ..util.compat import copy_if_needed
+
+
 def gth_solve(A, overwrite=False, use_jit=True):
     r"""
     This routine computes the stationary distribution of an irreducible
@@ -52,7 +55,9 @@ def gth_solve(A, overwrite=False, use_jit=True):
        Simulation, Princeton University Press, 2009.
 
     """
-    A1 = np.array(A, dtype=float, copy=not overwrite, order='C')
+    copy = copy_if_needed if overwrite else True
+
+    A1 = np.array(A, dtype=float, copy=copy, order='C')
     # `order='C'` is for use with Numba <= 0.18.2
     # See issue github.com/numba/numba/issues/1103
 
