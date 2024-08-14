@@ -12,6 +12,7 @@ dependencies:
   - ipython
   - flake8
   - requests
+  - urllib3>=2
   - flit
   - chardet # python>3.9,osx
   - pytest
