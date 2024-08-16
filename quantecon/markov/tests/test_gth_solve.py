@@ -196,6 +196,13 @@ def test_matrices_with_C_F_orders():
     assert_array_equal(computed_F, stationary_dist)
 
 
+def test_unable_to_avoid_copy():
+    A = np.array([[0, 1], [0, 1]])  # dtype=int
+    stationary_dist = [0., 1.]
+    x = gth_solve(A, overwrite=True)
+    assert_array_equal(x, stationary_dist)
+
+
 def test_raises_value_error_non_2dim():
     """Test with non 2dim input"""
     assert_raises(ValueError, gth_solve, np.array([0.4, 0.6]))
