@@ -1,11 +1,10 @@
 """
 Tests for lqnash.py
-
 """
+
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon import nnash
-from quantecon import LQ
+from quantecon import nnash, LQ
 
 
 class TestLQNash:
