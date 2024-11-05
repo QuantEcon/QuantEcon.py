@@ -3,31 +3,35 @@ from .polymatrix_game import PolymatrixGame
 from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
 
+
 def polym_lcp_solver(polym: PolymatrixGame):
     """
     Finds the Nash Equilbrium of a polymatrix game
     using Howson's algorithm described in
     https://www.jstor.org/stable/2634798
     which utilises linear complimentarity.
-    
+
     Args:
         polym (PolymatrixGame): Polymatrix game to solve.
 
     Returns:
         Probability distribution across actions for each player
         at Nash Equilibrium.
-    """    
+    """
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
     positive_cost_maker = polym.range_of_payoffs()[1] + LOW_AVOIDER
     # Construct the LCP like Howson:
     M = np.vstack([
         np.hstack([
-            np.zeros((polym.nums_actions[player], polym.nums_actions[player])) if p2 == player
+            np.zeros(
+                (polym.nums_actions[player], polym.nums_actions[player])
+                ) if p2 == player
             else (positive_cost_maker - polym.polymatrix[(player, p2)])
             for p2 in range(polym.N)
         ] + [
-            -np.outer(np.ones(polym.nums_actions[player]), np.eye(polym.N)[player])
+            -np.outer(np.ones(
+                polym.nums_actions[player]), np.eye(polym.N)[player])
         ])
         for player in range(polym.N)
     ] + [
@@ -77,7 +81,11 @@ def polym_lcp_solver(polym: PolymatrixGame):
             sum(polym.nums_actions[:p]) + starting_player_actions[p]
         finishing_y = finishing_x - n
 
-        pivcol = finishing_v if not retro else finishing_x if finishing_y in basis else finishing_y
+        pivcol = (
+            finishing_v if not retro
+            else finishing_x if finishing_y in basis
+            else finishing_y
+        )
 
         retro = False
 
@@ -107,7 +115,8 @@ def polym_lcp_solver(polym: PolymatrixGame):
 
     eq_strategies = [
         combined_solution[
-            sum(polym.nums_actions[:player]) : sum(polym.nums_actions[:player+1])
+            sum(polym.nums_actions[:player]):
+            sum(polym.nums_actions[:player+1])
             ]
         for player in range(polym.N)
     ]
