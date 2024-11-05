@@ -1,9 +1,6 @@
 import numpy as np
 from itertools import product
 from .normal_form_game import NormalFormGame, Player
-from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
-from ..optimize.lcp_lemke import _get_solution
-
 
 def hh_payoff_player(
         nf: NormalFormGame,
@@ -19,16 +16,15 @@ def hh_payoff_player(
     Precise when the game can be represented with a polymatrix.
 
     Args:
-        my_player_number (_type_): The number of the player making the action.
-        my_action_number (_type_): The number of the action.
-        is_polymatrix :
+        my_player_number: The number of the player making the action.
+        my_action_number: The number of the action.
+        is_polymatrix:
             Is the game represented by this normal form
             actually a polymatrix game.
 
     Returns:
-        _type_:
-            Dictionary giving an approximate component
-            of the payoff at each action for each other player.
+        Dictionary giving an approximate component
+        of the payoff at each action for each other player.
     """
     action_combinations = product(*(
         [range(nf.nums_actions[p]) if p != my_player_number else [my_action_number]
@@ -77,7 +73,12 @@ def hh_payoff_player(
 
 
 class PolymatrixGame:
-
+    """
+    In a polymatrix game, the payoff to a player is the sum
+    of their payoffs from bimatrix games against each player.
+    i.e. If two opponents deviate, the change in payoff
+    is the sum of the changes in payoff of each deviation.
+    """
     def __str__(self) -> str:
         str_builder = ""
         for k, v in self.polymatrix.items():
@@ -103,7 +104,7 @@ class PolymatrixGame:
                 actually a polymatrix game.
 
         Returns:
-            _type_: New Polymatrix Game.
+            New Polymatrix Game.
         """
         polymatrix_builder = {
             (p1, p2): np.full((nf.nums_actions[p1], nf.nums_actions[p2]), -np.inf)
@@ -126,7 +127,7 @@ class PolymatrixGame:
         head to head games.
 
         Returns:
-            _type_: Tuple of minimum and maximum.
+            Tuple of minimum and maximum.
         """
         min_p = min([np.min(M) for M in self.polymatrix.values()])
         max_p = max([np.max(M) for M in self.polymatrix.values()])

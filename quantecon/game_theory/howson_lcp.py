@@ -4,6 +4,19 @@ from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
 
 def polym_lcp_solver(polym: PolymatrixGame):
+    """
+    Finds the Nash Equilbrium of a polymatrix game
+    using Howson's algorithm described in
+    https://www.jstor.org/stable/2634798
+    which utilises linear complimentarity.
+    
+    Args:
+        polym (PolymatrixGame): Polymatrix game to solve.
+
+    Returns:
+        Probability distribution across actions for each player
+        at Nash Equilibrium.
+    """    
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
     positive_cost_maker = polym.range_of_payoffs()[1] + LOW_AVOIDER

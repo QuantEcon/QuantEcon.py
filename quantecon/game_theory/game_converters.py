@@ -1,8 +1,24 @@
+"""
+Functions for converting between ways of storing games. 
+"""
+
 from .normal_form_game import NormalFormGame
 from itertools import product
 
 def qe_nfg_from_gam_file(filename):
-      
+    """
+    Makes a QuantEcon Normal Form Game from a gam file.
+    Gam files are described by GameTracer.
+    http://dags.stanford.edu/Games/gametracer.html
+
+    Args:
+        filename: path to gam file.
+
+    Returns:
+        NormalFormGame:
+            The QuantEcon Normal Form Game
+            described by the gam file. 
+    """      
     with open(filename, 'r') as file:
         lines = file.readlines()
         combined = [
