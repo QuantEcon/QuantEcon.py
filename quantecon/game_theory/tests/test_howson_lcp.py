@@ -1,8 +1,8 @@
 """
 Tests for howson_lcp.py
 """
-import numpy as np
-from numpy.testing import assert_allclose, assert_, assert_raises
+
+from numpy.testing import assert_
 from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
 from quantecon.game_theory.howson_lcp import polym_lcp_solver
 from quantecon.game_theory.polymatrix_game import PolymatrixGame
