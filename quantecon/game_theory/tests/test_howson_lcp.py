@@ -16,6 +16,7 @@ def test_polym_lcp_solver_where_solution_is_pure_NE():
     worked = nfg.is_nash(ne)
     assert_(worked)
 
+
 def test_polym_lcp_solver_where_lcp_solver_must_backtrack():
     filename = "gam_files/triggers_back_case.gam"
     nfg = qe_nfg_from_gam_file(filename)

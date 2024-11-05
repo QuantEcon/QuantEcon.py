@@ -1,9 +1,10 @@
 """
-Functions for converting between ways of storing games. 
+Functions for converting between ways of storing games.
 """
 
 from .normal_form_game import NormalFormGame
 from itertools import product
+
 
 def qe_nfg_from_gam_file(filename):
     """
@@ -17,8 +18,8 @@ def qe_nfg_from_gam_file(filename):
     Returns:
         NormalFormGame:
             The QuantEcon Normal Form Game
-            described by the gam file. 
-    """      
+            described by the gam file.
+    """
     with open(filename, 'r') as file:
         lines = file.readlines()
         combined = [
@@ -30,13 +31,14 @@ def qe_nfg_from_gam_file(filename):
         i = iter(combined)
         players = int(next(i))
         actions = [int(next(i)) for _ in range(players)]
-        
+
         nfg = NormalFormGame(actions)
 
         entries = [
                 {
                     tuple(reversed(action_combination)): float(next(i))
-                    for action_combination in product(*[range(a) for a in actions])
+                    for action_combination in product(
+                        *[range(a) for a in actions])
                 }
                 for _ in range(players)
             ]

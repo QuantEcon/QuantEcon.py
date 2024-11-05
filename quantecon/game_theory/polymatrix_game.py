@@ -2,6 +2,7 @@ import numpy as np
 from itertools import product
 from .normal_form_game import NormalFormGame, Player
 
+
 def hh_payoff_player(
         nf: NormalFormGame,
         my_player_number,
@@ -27,7 +28,9 @@ def hh_payoff_player(
         of the payoff at each action for each other player.
     """
     action_combinations = product(*(
-        [range(nf.nums_actions[p]) if p != my_player_number else [my_action_number]
+        [
+            range(nf.nums_actions[p]) if p != my_player_number
+            else [my_action_number]
             for p in range(nf.N)]
     ))
     my_player: Player = nf.players[my_player_number]
@@ -107,7 +110,8 @@ class PolymatrixGame:
             New Polymatrix Game.
         """
         polymatrix_builder = {
-            (p1, p2): np.full((nf.nums_actions[p1], nf.nums_actions[p2]), -np.inf)
+            (p1, p2): np.full(
+                (nf.nums_actions[p1], nf.nums_actions[p2]), -np.inf)
             for p1 in range(nf.N)
             for p2 in range(nf.N)
             if p1 != p2
