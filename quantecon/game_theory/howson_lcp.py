@@ -6,7 +6,7 @@ from ..optimize.lcp_lemke import _get_solution
 
 def polym_lcp_solver(polym: PolymatrixGame):
     """
-    Finds the Nash Equilbrium of a polymatrix game
+    Finds a Nash Equilbrium of a polymatrix game
     using Howson's algorithm described in
     https://www.jstor.org/stable/2634798
     which utilises linear complimentarity.
