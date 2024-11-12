@@ -24,14 +24,15 @@ def hh_payoff_player(
             actually a polymatrix game.
 
     Returns:
-        Dictionary giving an approximate component
+        Dictionary giving a (approximate) component
         of the payoff at each action for each other player.
     """
     action_combinations = product(*(
         [
             range(nf.nums_actions[p]) if p != my_player_number
             else [my_action_number]
-            for p in range(nf.N)]
+            for p in range(nf.N)
+        ]
     ))
     my_player: Player = nf.players[my_player_number]
     my_payoffs = my_player.payoff_array
@@ -59,9 +60,10 @@ def hh_payoff_player(
         hh_payoffs_array, residuals, _, _ = np.linalg.lstsq(
             hh_actions, combined_payoffs, rcond=None
         )
-        assert not residuals, "The game is not actually a polymatrix game"
+        assert np.allclose(residuals, 0), "The game is not actually a polymatrix game"
     else:
-        hh_payoffs_array = np.dot(np.linalg.pinv(hh_actions), combined_payoffs)
+        hh_payoffs_array = np.dot(
+            np.linalg.pinv(hh_actions), combined_payoffs)
 
     payoff_labels = [
         (p, a)
@@ -69,8 +71,9 @@ def hh_payoff_player(
         for a in range(nf.nums_actions[p])
     ]
 
-    payoffs = {label: payoff for label, payoff in zip(
-        payoff_labels, hh_payoffs_array)}
+    payoffs = {
+        label: payoff
+        for label, payoff in zip(payoff_labels, hh_payoffs_array)}
 
     return payoffs
 
@@ -82,6 +85,7 @@ class PolymatrixGame:
     i.e. If two opponents deviate, the change in payoff
     is the sum of the changes in payoff of each deviation.
     """
+
     def __str__(self) -> str:
         str_builder = ""
         for k, v in self.polymatrix.items():
@@ -99,6 +103,7 @@ class PolymatrixGame:
         """
         Creates a Polymatrix approximation to a
         Normal Form Game. Precise if possible.
+        With payoffs (not costs).
 
         Args:
             nf (NormalFormGame): Normal Form Game to approximate.
@@ -124,6 +129,22 @@ class PolymatrixGame:
                     polymatrix_builder[(p1, p2)][a1][a2] = payoff
 
         return cls(nf.N, nf.nums_actions, polymatrix_builder)
+
+    def to_nf(self):
+        nfg = NormalFormGame(self.nums_actions)
+
+        for action_combination in product(*[range(a) for a in self.nums_actions]):
+            nfg[action_combination] = tuple(
+                sum([
+                    self.polymatrix[(p1, p2)][action_combination[p1]
+                                              ][action_combination[p2]]
+                    for p2 in range(self.N)
+                    if p1 != p2
+                ])
+                for p1 in range(self.N)
+            )
+
+        return nfg
 
     def range_of_payoffs(self):
         """

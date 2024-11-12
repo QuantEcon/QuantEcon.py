@@ -44,8 +44,8 @@ def qe_nfg_from_gam_file(filename):
             ]
 
         for action_combination in product(*[range(a) for a in actions]):
-            nfg[tuple(reversed(action_combination))] = [
+            nfg[action_combination] = tuple(
                 entries[p][action_combination] for p in range(players)
-                ]
+            )
 
     return nfg
