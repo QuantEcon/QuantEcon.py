@@ -9,6 +9,12 @@ from quantecon.game_theory import NormalFormGame
 from itertools import product
 from numpy import isclose
 
+import os
+
+# Mimicing quantecon.tests.util.get_data_dir
+data_dir_name = "gam_files"
+this_dir = os.path.dirname(__file__)
+data_dir = os.path.join(this_dir, data_dir_name)
 
 def close_normal_form_games(
         nf1: NormalFormGame,
@@ -33,8 +39,8 @@ def close_normal_form_games(
 
 
 def test_normal_form_to_polymatrix_to_normal_form():
-    filename = "gam_files/big_polym.gam"
-    nfg = qe_nfg_from_gam_file(filename)
+    filename = "big_polym.gam"
+    nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
     polym = PolymatrixGame.from_nf(nfg, is_polymatrix=True)
     back_in_nf = polym.to_nf()
     are_close = close_normal_form_games(nfg, back_in_nf)
