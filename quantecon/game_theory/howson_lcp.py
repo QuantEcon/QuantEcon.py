@@ -153,6 +153,7 @@ def polym_lcp_solver(
     res = NashResult(NE=eq_strategies,
                      converged=converging,
                      num_iter=num_iter,
-                     max_iter=max_iter)
+                     max_iter=max_iter,
+                     init=starting_player_actions)
 
     return eq_strategies, res
