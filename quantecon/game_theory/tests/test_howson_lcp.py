@@ -308,7 +308,22 @@ def test_solves_multiplayer_rps_like():
     assert_(worked)
 
 
-class TestLemkeHowsonDegenerate():
+def test_different_starting():
+    filename = "triggers_back_case.gam"
+    nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
+    polymg = PolymatrixGame.from_nf(nfg)
+    starting = [3, 2, 2, 0, 3]
+    # We also notice that changing the start
+    # can avoid the backrtrack
+    ne = polym_lcp_solver(
+        polymg,
+        starting_player_actions=starting
+    )
+    worked = nfg.is_nash(ne)
+    assert_(worked)
+
+
+class TestHowsonLCPDegenerate():
     # Mostly copied from test_lemke_howson.py
     def setup_method(self):
         self.game_dicts = []
@@ -347,7 +362,7 @@ class TestLemkeHowsonDegenerate():
              'converged': True}
         self.game_dicts.append(d)
 
-    def test_lemke_howson_degenerate(self):
+    def test_howson_lcp_degenerate(self):
         for d in self.game_dicts:
             for k in d['NEs_dict'].keys():
                 NE_computed, res = polym_lcp_solver(
