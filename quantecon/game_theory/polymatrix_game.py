@@ -1,12 +1,15 @@
 import numpy as np
 from itertools import product
+from collections.abc import Sequence, Mapping
+from typing import Any, TypeAlias
 from .normal_form_game import NormalFormGame, Player
 
+Bimatrix: TypeAlias = Any
 
 def hh_payoff_player(
         nf: NormalFormGame,
-        my_player_number,
-        my_action_number,
+        my_player_number: int,
+        my_action_number: int,
         is_polymatrix=False
 ):
     """
@@ -97,7 +100,15 @@ class PolymatrixGame:
             str_builder += str(v) + "\n\n"
         return str_builder.rstrip()
 
-    def __init__(self, number_of_players, nums_actions, polymatrix) -> None:
+    def __init__(
+            self,
+            number_of_players: int,
+            nums_actions: Sequence[int],
+            polymatrix: Mapping[
+                tuple[int, int],
+                Bimatrix
+            ]
+    ) -> None:
         self.N = number_of_players
         self.nums_actions = nums_actions
         self.polymatrix = polymatrix
