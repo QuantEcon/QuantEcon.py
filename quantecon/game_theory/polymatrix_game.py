@@ -95,7 +95,7 @@ class PolymatrixGame:
         for k, v in self.polymatrix.items():
             str_builder += str(k) + ":\n"
             str_builder += str(v) + "\n\n"
-        return str_builder
+        return str_builder.rstrip()
 
     def __init__(self, number_of_players, nums_actions, polymatrix) -> None:
         self.N = number_of_players
