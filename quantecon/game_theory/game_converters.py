@@ -6,7 +6,7 @@ from .normal_form_game import NormalFormGame
 from itertools import product
 
 
-def qe_nfg_from_gam_file(filename):
+def qe_nfg_from_gam_file(filename: str):
     """
     Makes a QuantEcon Normal Form Game from a gam file.
     Gam files are described by GameTracer.
