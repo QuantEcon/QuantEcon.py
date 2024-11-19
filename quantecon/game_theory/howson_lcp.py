@@ -4,7 +4,7 @@ from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
 
 
-def polym_lcp_solver(polym: PolymatrixGame):
+def polym_lcp_solver(polymg: PolymatrixGame):
     """
     Finds a Nash Equilbrium of a polymatrix game
     using Howson's algorithm described in
@@ -12,7 +12,7 @@ def polym_lcp_solver(polym: PolymatrixGame):
     which utilises linear complimentarity.
 
     Args:
-        polym (PolymatrixGame): Polymatrix game to solve.
+        polymg (PolymatrixGame): Polymatrix game to solve.
 
     Returns:
         Probability distribution across actions for each player
@@ -20,34 +20,34 @@ def polym_lcp_solver(polym: PolymatrixGame):
     """
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
-    positive_cost_maker = polym.range_of_payoffs()[1] + LOW_AVOIDER
+    positive_cost_maker = polymg.range_of_payoffs()[1] + LOW_AVOIDER
     # Construct the LCP like Howson:
     M = np.vstack([
         np.hstack([
             np.zeros(
-                (polym.nums_actions[player], polym.nums_actions[player])
+                (polymg.nums_actions[player], polymg.nums_actions[player])
                 ) if p2 == player
-            else (positive_cost_maker - polym.polymatrix[(player, p2)])
-            for p2 in range(polym.N)
+            else (positive_cost_maker - polymg.polymatrix[(player, p2)])
+            for p2 in range(polymg.N)
         ] + [
             -np.outer(np.ones(
-                polym.nums_actions[player]), np.eye(polym.N)[player])
+                polymg.nums_actions[player]), np.eye(polymg.N)[player])
         ])
-        for player in range(polym.N)
+        for player in range(polymg.N)
     ] + [
         np.hstack([
             np.hstack([
-                np.outer(np.eye(polym.N)[player], np.ones(
-                    polym.nums_actions[player]))
-                for player in range(polym.N)
+                np.outer(np.eye(polymg.N)[player], np.ones(
+                    polymg.nums_actions[player]))
+                for player in range(polymg.N)
             ]
             ),
-            np.zeros((polym.N, polym.N))
+            np.zeros((polymg.N, polymg.N))
         ])
     ]
     )
-    total_actions = sum(polym.nums_actions)
-    q = np.hstack([np.zeros(total_actions), -np.ones(polym.N)])
+    total_actions = sum(polymg.nums_actions)
+    q = np.hstack([np.zeros(total_actions), -np.ones(polymg.N)])
 
     n = np.shape(M)[0]
     tableau = np.hstack([
@@ -61,24 +61,24 @@ def polym_lcp_solver(polym: PolymatrixGame):
 
     starting_player_actions = {
         player: 0
-        for player in range(polym.N)
+        for player in range(polymg.N)
     }
 
-    for player in range(polym.N):
-        row = sum(polym.nums_actions) + player
-        col = n + sum(polym.nums_actions[:player]) + \
+    for player in range(polymg.N):
+        row = sum(polymg.nums_actions) + player
+        col = n + sum(polymg.nums_actions[:player]) + \
             starting_player_actions[player]
         _pivoting(tableau, col, row)
         basis[row] = col
 
     # Array to store row indices in lex_min_ratio_test
-    argmins = np.empty(n + polym.N, dtype=np.int_)
+    argmins = np.empty(n + polymg.N, dtype=np.int_)
     p = 0
     retro = False
-    while p < polym.N:
-        finishing_v = sum(polym.nums_actions) + n + p
+    while p < polymg.N:
+        finishing_v = sum(polymg.nums_actions) + n + p
         finishing_x = n + \
-            sum(polym.nums_actions[:p]) + starting_player_actions[p]
+            sum(polymg.nums_actions[:p]) + starting_player_actions[p]
         finishing_y = finishing_x - n
 
         pivcol = (
@@ -115,10 +115,10 @@ def polym_lcp_solver(polym: PolymatrixGame):
 
     eq_strategies = [
         combined_solution[
-            sum(polym.nums_actions[:player]):
-            sum(polym.nums_actions[:player+1])
+            sum(polymg.nums_actions[:player]):
+            sum(polymg.nums_actions[:player+1])
             ]
-        for player in range(polym.N)
+        for player in range(polymg.N)
     ]
 
     return eq_strategies

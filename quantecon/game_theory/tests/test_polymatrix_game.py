@@ -41,7 +41,7 @@ def close_normal_form_games(
 def test_normal_form_to_polymatrix_to_normal_form():
     filename = "big_polym.gam"
     nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
-    polym = PolymatrixGame.from_nf(nfg, is_polymatrix=True)
-    back_in_nf = polym.to_nf()
+    polymg = PolymatrixGame.from_nf(nfg, is_polymatrix=True)
+    back_in_nf = polymg.to_nf()
     are_close = close_normal_form_games(nfg, back_in_nf)
     assert_(are_close)
