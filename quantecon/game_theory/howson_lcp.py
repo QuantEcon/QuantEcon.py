@@ -2,9 +2,15 @@ import numpy as np
 from .polymatrix_game import PolymatrixGame
 from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
+from .utilities import NashResult
 
 
-def polym_lcp_solver(polymg: PolymatrixGame):
+def polym_lcp_solver(
+        polymg: PolymatrixGame,
+        starting_player_actions=None,
+        max_iter=np.inf,
+        full_output=False,
+):
     """
     Finds a Nash Equilbrium of a polymatrix game
     using Howson's algorithm described in
@@ -26,7 +32,7 @@ def polym_lcp_solver(polymg: PolymatrixGame):
         np.hstack([
             np.zeros(
                 (polymg.nums_actions[player], polymg.nums_actions[player])
-                ) if p2 == player
+            ) if p2 == player
             else (positive_cost_maker - polymg.polymatrix[(player, p2)])
             for p2 in range(polymg.N)
         ] + [
@@ -59,23 +65,38 @@ def polym_lcp_solver(polymg: PolymatrixGame):
     basis = np.array(range(n))
     z = np.empty(n)
 
-    starting_player_actions = {
-        player: 0
-        for player in range(polymg.N)
-    }
+    if starting_player_actions is None:
+        starting_player_actions = {
+            player: 0
+            for player in range(polymg.N)
+        }
+    else:
+        valid_start = len(starting_player_actions) == polymg.N
+        for player in range(polymg.N):
+            valid_start = (
+                valid_start and
+                np.isclose(sum(starting_player_actions[player]), 1) and
+                len(starting_player_actions[player]
+                    ) == polymg.nums_actions[player]
+            )
+        assert valid_start, "Invalid starting actions."
 
     for player in range(polymg.N):
         row = sum(polymg.nums_actions) + player
         col = n + sum(polymg.nums_actions[:player]) + \
             starting_player_actions[player]
         _pivoting(tableau, col, row)
+        # These pivots do not count as iters
         basis[row] = col
+
+    num_iter = 0
+    converging = True
 
     # Array to store row indices in lex_min_ratio_test
     argmins = np.empty(n + polymg.N, dtype=np.int_)
     p = 0
     retro = False
-    while p < polymg.N:
+    while p < polymg.N and converging:
         finishing_v = sum(polymg.nums_actions) + n + p
         finishing_x = n + \
             sum(polymg.nums_actions[:p]) + starting_player_actions[p]
@@ -90,6 +111,11 @@ def polym_lcp_solver(polymg: PolymatrixGame):
         retro = False
 
         while True:
+
+            if num_iter == max_iter:
+                converging = False
+                break
+            num_iter += 1
 
             _, pivrow = _lex_min_ratio_test(
                 tableau, pivcol, 0, argmins,
@@ -117,8 +143,16 @@ def polym_lcp_solver(polymg: PolymatrixGame):
         combined_solution[
             sum(polymg.nums_actions[:player]):
             sum(polymg.nums_actions[:player+1])
-            ]
+        ]
         for player in range(polymg.N)
     ]
 
-    return eq_strategies
+    if not full_output:
+        return eq_strategies
+
+    res = NashResult(NE=eq_strategies,
+                     converged=converging,
+                     num_iter=num_iter,
+                     max_iter=max_iter)
+
+    return eq_strategies, res
