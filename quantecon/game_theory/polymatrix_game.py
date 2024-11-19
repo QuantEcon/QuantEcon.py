@@ -1,17 +1,18 @@
 import numpy as np
 from itertools import product
 from collections.abc import Sequence, Mapping
-from typing import Any, TypeAlias
+from typing import Any, TypeAlias, Self
 from .normal_form_game import NormalFormGame, Player
 
 Bimatrix: TypeAlias = Any
+
 
 def hh_payoff_player(
         nf: NormalFormGame,
         my_player_number: int,
         my_action_number: int,
         is_polymatrix=False
-):
+) -> Mapping[tuple[int, int], float]:
     """
     hh stands for head-to-head.
     Approximates the payoffs to a player when they play
@@ -114,7 +115,10 @@ class PolymatrixGame:
         self.polymatrix = polymatrix
 
     @classmethod
-    def from_nf(cls, nf: NormalFormGame, is_polymatrix=True):
+    def from_nf(
+        cls,
+        nf: NormalFormGame, is_polymatrix=True
+    ) -> Self:
         """
         Creates a Polymatrix approximation to a
         Normal Form Game. Precise if possible.
@@ -145,7 +149,7 @@ class PolymatrixGame:
 
         return cls(nf.N, nf.nums_actions, polymatrix_builder)
 
-    def to_nf(self):
+    def to_nf(self) -> NormalFormGame:
         nfg = NormalFormGame(self.nums_actions)
 
         for action_combination in product(*[range(a) for a in self.nums_actions]):
@@ -161,7 +165,7 @@ class PolymatrixGame:
 
         return nfg
 
-    def range_of_payoffs(self):
+    def range_of_payoffs(self) -> tuple[float, float]:
         """
         The lowest and highest components of payoff from
         head to head games.

@@ -3,6 +3,7 @@ from .polymatrix_game import PolymatrixGame
 from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
 from .utilities import NashResult
+from typing import Sequence, Union
 
 
 def polym_lcp_solver(
@@ -10,7 +11,7 @@ def polym_lcp_solver(
         starting_player_actions=None,
         max_iter=np.inf,
         full_output=False,
-):
+) -> Union[tuple[Sequence[int]], NashResult]:
     """
     Finds a Nash Equilbrium of a polymatrix game
     using Howson's algorithm described in
