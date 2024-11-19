@@ -3,10 +3,11 @@ Tests for howson_lcp.py
 """
 
 import numpy as np
-from numpy.testing import assert_
+from numpy.testing import assert_, assert_allclose
 from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
 from quantecon.game_theory.howson_lcp import polym_lcp_solver
 from quantecon.game_theory.polymatrix_game import PolymatrixGame
+from quantecon.game_theory import Player, NormalFormGame
 
 import os
 
@@ -305,3 +306,55 @@ def test_solves_multiplayer_rps_like():
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne, tol=1e-5)
     assert_(worked)
+
+
+class TestLemkeHowsonDegenerate():
+    # Mostly copied from test_lemke_howson.py
+    def setup_method(self):
+        self.game_dicts = []
+
+        # From von Stengel 2007 in Algorithmic Game Theory
+        bimatrix = [[(3, 3), (3, 3)],
+                    [(2, 2), (5, 6)],
+                    [(0, 3), (6, 1)]]
+        NEs_dict = {0: ([0, 1/3, 2/3], [1/3, 2/3])}
+        d = {'g': NormalFormGame(bimatrix),
+             'NEs_dict': NEs_dict,
+             'converged': True}
+        self.game_dicts.append(d)
+
+        # Some games that could potentially have
+        # problems with cycling.
+
+        A = np.array([[0, 0, 0],
+                      [0, 1, 1],
+                      [1, 1, 0]])
+        B = np.array([[1, 0, 1],
+                      [1, 1, 0],
+                      [0, 0, 2]])
+        NEs_dict = {0: ([0, 2/3, 1/3], [0, 1, 0])}
+        d = {'g': NormalFormGame((Player(A), Player(B))),
+             'NEs_dict': NEs_dict,
+             'converged': True}
+        self.game_dicts.append(d)
+
+        perm = [2, 0, 1]
+        C = A[:, perm]
+        D = B[perm, :]
+        NEs_dict = {0: ([0, 2/3, 1/3], [0, 0, 1])}
+        d = {'g': NormalFormGame((Player(C), Player(D))),
+             'NEs_dict': NEs_dict,
+             'converged': True}
+        self.game_dicts.append(d)
+
+    def test_lemke_howson_degenerate(self):
+        for d in self.game_dicts:
+            for k in d['NEs_dict'].keys():
+                NE_computed, res = polym_lcp_solver(
+                    PolymatrixGame.from_nf(d['g']),
+                    full_output=True
+                )
+                for action_computed, action in zip(NE_computed,
+                                                   d['NEs_dict'][k]):
+                    assert_allclose(action_computed, action)
+                assert_(res.converged == d['converged'])

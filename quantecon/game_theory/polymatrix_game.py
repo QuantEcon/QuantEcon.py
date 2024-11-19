@@ -61,7 +61,7 @@ def hh_payoff_player(
             hh_actions, combined_payoffs, rcond=None
         )
         assert np.allclose(
-            residuals, 0), "The game is not actually a polymatrix game"
+            residuals, 0), "The game is not actually a polymatrix game."
     else:
         hh_payoffs_array = np.dot(
             np.linalg.pinv(hh_actions), combined_payoffs)
@@ -103,7 +103,7 @@ class PolymatrixGame:
         self.polymatrix = polymatrix
 
     @classmethod
-    def from_nf(cls, nf: NormalFormGame, is_polymatrix=False):
+    def from_nf(cls, nf: NormalFormGame, is_polymatrix=True):
         """
         Creates a Polymatrix approximation to a
         Normal Form Game. Precise if possible.
