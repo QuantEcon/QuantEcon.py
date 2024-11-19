@@ -71,15 +71,12 @@ def polym_lcp_solver(
             for player in range(polymg.N)
         }
     else:
-        valid_start = len(starting_player_actions) == polymg.N
-        for player in range(polymg.N):
-            valid_start = (
-                valid_start and
-                np.isclose(sum(starting_player_actions[player]), 1) and
-                len(starting_player_actions[player]
-                    ) == polymg.nums_actions[player]
-            )
-        assert valid_start, "Invalid starting actions."
+        valid_start = (
+            len(starting_player_actions) == polymg.N and
+            all(a < max_a for a, max_a in zip(
+                starting_player_actions, polymg.nums_actions))
+        )
+        assert valid_start, "Invalid starting pure actions."
 
     for player in range(polymg.N):
         row = sum(polymg.nums_actions) + player
@@ -139,21 +136,22 @@ def polym_lcp_solver(
 
     combined_solution = _get_solution(tableau, basis, z)
 
-    eq_strategies = [
+    # might not actually be Nash Equilibrium if we hit max iter
+    NE = tuple(
         combined_solution[
             sum(polymg.nums_actions[:player]):
             sum(polymg.nums_actions[:player+1])
         ]
         for player in range(polymg.N)
-    ]
+    )
 
     if not full_output:
-        return eq_strategies
+        return NE
 
-    res = NashResult(NE=eq_strategies,
+    res = NashResult(NE=NE,
                      converged=converging,
                      num_iter=num_iter,
                      max_iter=max_iter,
                      init=starting_player_actions)
 
-    return eq_strategies, res
+    return NE, res
