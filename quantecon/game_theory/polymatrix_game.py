@@ -60,7 +60,8 @@ def hh_payoff_player(
         hh_payoffs_array, residuals, _, _ = np.linalg.lstsq(
             hh_actions, combined_payoffs, rcond=None
         )
-        assert np.allclose(residuals, 0), "The game is not actually a polymatrix game"
+        assert np.allclose(
+            residuals, 0), "The game is not actually a polymatrix game"
     else:
         hh_payoffs_array = np.dot(
             np.linalg.pinv(hh_actions), combined_payoffs)
@@ -84,6 +85,9 @@ class PolymatrixGame:
     of their payoffs from bimatrix games against each player.
     i.e. If two opponents deviate, the change in payoff
     is the sum of the changes in payoff of each deviation.
+
+    polymatrix[(a, b)] is a 2D matrix. Player number a is the row player
+    and player number b is the column player in this bimatrix.
     """
 
     def __str__(self) -> str:
