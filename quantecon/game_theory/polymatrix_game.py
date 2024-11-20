@@ -1,3 +1,13 @@
+""""
+Tools for working with games in Polymatrix form.
+
+In a Polymatrix Game, the payoff to a player is the sum
+of their payoffs from bimatrix games against each player.
+i.e. If two opponents deviate, the change in payoff
+is the sum of the changes in payoff of each deviation.
+
+"""
+
 import numpy as np
 from itertools import product
 from collections.abc import Sequence, Mapping
@@ -15,6 +25,8 @@ def hh_payoff_player(
         is_polymatrix: bool = False
 ) -> Mapping[tuple[int, int], float]:
     """
+    Head-to-head payoff components.
+
     hh stands for head-to-head.
     Approximates the payoffs to a player when they play
     an action with values at the actions of other players
@@ -96,15 +108,24 @@ def hh_payoff_player(
 
 class PolymatrixGame:
     """
-    In a Polymatrix Game, the payoff to a player is the sum
-    of their payoffs from bimatrix games against each player.
-    i.e. If two opponents deviate, the change in payoff
-    is the sum of the changes in payoff of each deviation.
+    Polymatrix Game.
 
-    polymatrix[(a, b)] is a 2D matrix, the payoff matrix of a
-    in the bimatrix game between a and b.
-    Player number a is the row player
-    and player number b is the column player.
+    `polymatrix[(a, b)]` is a 2D matrix, the payoff matrix of `a`
+    in the bimatrix game between `a` and `b`;
+    player number `a` is the row player
+    and player number `b` is the column player.
+
+    Attributes
+    ----------
+    number_of_players : int
+        Number of players.
+
+    nums_actions : Sequence[int]
+        The number of actions available to each player.
+
+    polymatrix : Mapping[ tuple[int, int], Matrix ]
+        Maps each pair of player numbers to a matrix.
+
     """
 
     def __str__(self) -> str:
@@ -135,6 +156,7 @@ class PolymatrixGame:
     ) -> Self:
         """
         Creates a Polymatrix from a Normal Form Game.
+
         Precise if possible; many Normal Form Games are not representable
         precisely with a Polymatrix.
         With payoffs (not costs).

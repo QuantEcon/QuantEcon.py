@@ -1,5 +1,6 @@
 """
 Functions for converting between ways of storing games.
+
 """
 
 from .normal_form_game import NormalFormGame
@@ -10,7 +11,7 @@ def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
     """
     Makes a QuantEcon Normal Form Game from a gam file.
 
-    Gam files are described by GameTracerc [1]_.
+    Gam files are described by GameTracer [1]_.
 
     Parameters
     ----------
@@ -24,7 +25,8 @@ def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
 
     References
     ----------
-    .. [1] http://dags.stanford.edu/Games/gametracer.html
+    .. [1] Bem Blum, Daphne Kohler, Christian Shelton
+       http://dags.stanford.edu/Games/gametracer.html
 
     """
     with open(filename, 'r') as file:

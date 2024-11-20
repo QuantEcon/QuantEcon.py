@@ -1,3 +1,8 @@
+"""
+Compute a Nash Equilibrium of a Polymatrix Game.
+
+"""
+
 import numpy as np
 from .polymatrix_game import PolymatrixGame
 from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
@@ -48,7 +53,9 @@ def polym_lcp_solver(
 
     References
     ----------
-    .. [1] https://www.jstor.org/stable/2634798
+    .. [1] Howson, Joseph T. “Equilibria of Polymatrix Games.”
+       Management Science 18, no. 5 (1972): 312–18.
+       http://www.jstor.org/stable/2634798.
 
     """
     LOW_AVOIDER = 2.0
