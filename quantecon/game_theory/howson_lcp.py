@@ -3,27 +3,46 @@ from .polymatrix_game import PolymatrixGame
 from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
 from .utilities import NashResult
-from typing import Sequence, Union
+from typing import Sequence, Union, Optional
 
 
 def polym_lcp_solver(
         polymg: PolymatrixGame,
-        starting_player_actions=None,
-        max_iter=np.inf,
-        full_output=False,
+        starting_player_actions: Optional[Sequence[int]] = None,
+        max_iter: int = -1,
+        full_output: bool = False,
 ) -> Union[tuple[Sequence[int]], NashResult]:
     """
     Finds a Nash Equilbrium of a polymatrix game
     using Howson's algorithm described in
     https://www.jstor.org/stable/2634798
-    which utilises linear complimentarity.
+    which utilises linear complementarity.
 
-    Args:
-        polymg (PolymatrixGame): Polymatrix game to solve.
+    Parameters
+    ----------
+    polymg : PolymatrixGame
+        Polymatrix game to solve.
 
-    Returns:
-        Probability distribution across actions for each player
-        at Nash Equilibrium.
+    starting_player_actions : Sequence[int], optional
+        Pure actions for each player at which the algorithm begins. Defaults to 
+        each player playing their first action.
+
+    max_iter : int, optional
+        Maximum number of iterations of the complementary pivoting before giving 
+        up. Howson proves that with enough iterations, it will reach a Nash 
+        Equilibrium. Defaults to never giving up.
+
+    full_output : bool, optional
+        When True, adds information about the run to the output actions and puts 
+        them in a NashResult. Defaults to False.
+
+    Returns
+    -------
+    tuple[Sequence[int]] or NashResult
+        The mixed actions at termination, a Nash Equilibrium if not stopped early 
+        by reaching `max_iter`. If `full_output`, then the number of iterations, 
+        whether it has converged, and the initial conditions of the algorithm are 
+        included in the returned `NashResult` alongside the actions.
     """
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
