@@ -172,7 +172,8 @@ class PolymatrixGame:
     def to_nf(self) -> NormalFormGame:
         nfg = NormalFormGame(self.nums_actions)
 
-        for action_combination in product(*[range(a) for a in self.nums_actions]):
+        for action_combination in product(
+                *[range(a) for a in self.nums_actions]):
             nfg[action_combination] = tuple(
                 sum([
                     self.polymatrix[(p1, p2)][action_combination[p1]

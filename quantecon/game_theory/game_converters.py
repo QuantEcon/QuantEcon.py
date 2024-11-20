@@ -9,8 +9,8 @@ from itertools import product
 def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
     """
     Makes a QuantEcon Normal Form Game from a gam file.
-    Gam files are described by GameTracer.
-    http://dags.stanford.edu/Games/gametracer.html
+
+    Gam files are described by GameTracerc [1]_.
 
     Parameters
     ----------
@@ -21,6 +21,11 @@ def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
     -------
     NormalFormGame
         The QuantEcon Normal Form Game described by the gam file.
+
+    References
+    ----------
+    .. [1] http://dags.stanford.edu/Games/gametracer.html
+
     """
     with open(filename, 'r') as file:
         lines = file.readlines()
