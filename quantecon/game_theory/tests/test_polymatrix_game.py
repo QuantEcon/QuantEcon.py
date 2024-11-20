@@ -16,6 +16,7 @@ data_dir_name = "gam_files"
 this_dir = os.path.dirname(__file__)
 data_dir = os.path.join(this_dir, data_dir_name)
 
+
 def close_normal_form_games(
         nf1: NormalFormGame,
         nf2: NormalFormGame,
@@ -38,10 +39,30 @@ def close_normal_form_games(
     return True
 
 
-def test_normal_form_to_polymatrix_to_normal_form():
+def test_different_games_are_not_close():
+    filename = "big_polym.gam"
+    nfg1 = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
+    filename = "triggers_back_case.gam"
+    nfg2 = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
+    are_close = close_normal_form_games(nfg1, nfg2)
+    assert_(not are_close)
+
+
+def test_normal_form_to_polymatrix_to_normal_form_multiplayer():
     filename = "big_polym.gam"
     nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
     polymg = PolymatrixGame.from_nf(nfg, is_polymatrix=True)
-    back_in_nf = polymg.to_nf()
+    back_in_nf = polymg.to_nfg()
+    are_close = close_normal_form_games(nfg, back_in_nf)
+    assert_(are_close)
+
+
+def test_normal_form_to_polymatrix_to_normal_form_bimatrix():
+    bimatrix = [[(3, 3), (3, 2)],
+                [(2, 2), (5, 6)],
+                [(0, 3), (6, 1)]]
+    nfg = NormalFormGame(bimatrix)
+    polymg = PolymatrixGame.from_nf(nfg, is_polymatrix=True)
+    back_in_nf = polymg.to_nfg()
     are_close = close_normal_form_games(nfg, back_in_nf)
     assert_(are_close)
