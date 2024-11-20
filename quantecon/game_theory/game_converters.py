@@ -12,13 +12,15 @@ def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
     Gam files are described by GameTracer.
     http://dags.stanford.edu/Games/gametracer.html
 
-    Args:
-        filename: path to gam file.
+    Parameters
+    ----------
+    filename : str
+        path to gam file.
 
-    Returns:
-        NormalFormGame:
-            The QuantEcon Normal Form Game
-            described by the gam file.
+    Returns
+    -------
+    NormalFormGame
+        The QuantEcon Normal Form Game described by the gam file.
     """
     with open(filename, 'r') as file:
         lines = file.readlines()
@@ -35,13 +37,13 @@ def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
         nfg = NormalFormGame(actions)
 
         entries = [
-                {
-                    tuple(reversed(action_combination)): float(next(i))
-                    for action_combination in product(
-                        *[range(a) for a in actions])
-                }
-                for _ in range(players)
-            ]
+            {
+                tuple(reversed(action_combination)): float(next(i))
+                for action_combination in product(
+                    *[range(a) for a in actions])
+            }
+            for _ in range(players)
+        ]
 
         for action_combination in product(*[range(a) for a in actions]):
             nfg[action_combination] = tuple(

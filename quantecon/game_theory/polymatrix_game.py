@@ -4,14 +4,15 @@ from collections.abc import Sequence, Mapping
 from typing import Any, TypeAlias, Self
 from .normal_form_game import NormalFormGame, Player
 
-Bimatrix: TypeAlias = Any
+# Matrix with rows and columns.
+Matrix: TypeAlias = Any
 
 
 def hh_payoff_player(
-        nf: NormalFormGame,
+        nfg: NormalFormGame,
         my_player_number: int,
         my_action_number: int,
-        is_polymatrix=False
+        is_polymatrix: bool = False
 ) -> Mapping[tuple[int, int], float]:
     """
     hh stands for head-to-head.
@@ -20,31 +21,41 @@ def hh_payoff_player(
     that try to sum to the payoff.
     Precise when the game can be represented with a polymatrix.
 
-    Args:
-        my_player_number: The number of the player making the action.
-        my_action_number: The number of the action.
-        is_polymatrix:
-            Is the game represented by this normal form
-            actually a polymatrix game.
+    Parameters
+    ----------
+    nfg : NormalFormGame
+        The game.
 
-    Returns:
+    my_player_number : int
+        The number of the player making the action.
+
+    my_action_number : int
+        The number of our player's action.
+
+    is_polymatrix : bool, optional
+        Is the game represented by this normal form
+        actually a polymatrix game. Defaults to False.
+
+    Returns
+    -------
+    Mapping[tuple[int, int], float]
         Dictionary giving a (approximate) component
-        of the payoff at each action for each other player.
+        of the payoff at each other player and their action.
     """
     action_combinations = product(*(
         [
-            range(nf.nums_actions[p]) if p != my_player_number
+            range(nfg.nums_actions[p]) if p != my_player_number
             else [my_action_number]
-            for p in range(nf.N)
+            for p in range(nfg.N)
         ]
     ))
-    my_player: Player = nf.players[my_player_number]
+    my_player: Player = nfg.players[my_player_number]
     my_payoffs = my_player.payoff_array
     hh_actions_and_payoffs = np.vstack([
         np.hstack(
             [
-                np.eye(nf.nums_actions[p])[action_combination[p]]
-                for p in range(nf.N) if p != my_player_number
+                np.eye(nfg.nums_actions[p])[action_combination[p]]
+                for p in range(nfg.N) if p != my_player_number
             ] + [
                 my_payoffs[
                     action_combination[my_player_number:]
@@ -72,8 +83,8 @@ def hh_payoff_player(
 
     payoff_labels = [
         (p, a)
-        for p in range(nf.N) if p != my_player_number
-        for a in range(nf.nums_actions[p])
+        for p in range(nfg.N) if p != my_player_number
+        for a in range(nfg.nums_actions[p])
     ]
 
     payoffs = {
@@ -85,13 +96,15 @@ def hh_payoff_player(
 
 class PolymatrixGame:
     """
-    In a polymatrix game, the payoff to a player is the sum
+    In a Polymatrix Game, the payoff to a player is the sum
     of their payoffs from bimatrix games against each player.
     i.e. If two opponents deviate, the change in payoff
     is the sum of the changes in payoff of each deviation.
 
-    polymatrix[(a, b)] is a 2D matrix. Player number a is the row player
-    and player number b is the column player in this bimatrix.
+    polymatrix[(a, b)] is a 2D matrix, the payoff matrix of a
+    in the bimatrix game between a and b.
+    Player number a is the row player
+    and player number b is the column player.
     """
 
     def __str__(self) -> str:
@@ -107,7 +120,7 @@ class PolymatrixGame:
             nums_actions: Sequence[int],
             polymatrix: Mapping[
                 tuple[int, int],
-                Bimatrix
+                Matrix
             ]
     ) -> None:
         self.N = number_of_players
@@ -117,21 +130,28 @@ class PolymatrixGame:
     @classmethod
     def from_nf(
         cls,
-        nf: NormalFormGame, is_polymatrix=True
+        nf: NormalFormGame,
+        is_polymatrix: bool = True
     ) -> Self:
         """
-        Creates a Polymatrix approximation to a
-        Normal Form Game. Precise if possible.
+        Creates a Polymatrix from a Normal Form Game.
+        Precise if possible; many Normal Form Games are not representable
+        precisely with a Polymatrix.
         With payoffs (not costs).
 
-        Args:
-            nf (NormalFormGame): Normal Form Game to approximate.
-            is_polymatrix :
-                Is the game represented by the normal form
-                actually a polymatrix game.
+        Parameters
+        ----------
+        nf : NormalFormGame
+            Normal Form Game to convert.
 
-        Returns:
-            New Polymatrix Game.
+        is_polymatrix : bool, optional
+            Is the Normal Form Game precisely convertible to a
+            Polymatrix Game. By default True
+
+        Returns
+        -------
+        Self
+            The Polymatrix Game.
         """
         polymatrix_builder = {
             (p1, p2): np.full(
@@ -170,7 +190,9 @@ class PolymatrixGame:
         The lowest and highest components of payoff from
         head to head games.
 
-        Returns:
+        Returns
+        -------
+        tuple[float, float]
             Tuple of minimum and maximum.
         """
         min_p = min([np.min(M) for M in self.polymatrix.values()])
