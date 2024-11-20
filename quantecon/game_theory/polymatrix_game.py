@@ -129,7 +129,7 @@ class PolymatrixGame:
     """
 
     def __str__(self) -> str:
-        str_builder = ""
+        str_builder = "Polymatrix Game:\n"
         for k, v in self.polymatrix.items():
             str_builder += str(k) + ":\n"
             str_builder += str(v) + "\n\n"
@@ -191,20 +191,40 @@ class PolymatrixGame:
 
         return cls(nf.N, nf.nums_actions, polymatrix_builder)
 
-    def to_nf(self) -> NormalFormGame:
-        nfg = NormalFormGame(self.nums_actions)
+    def get_player(self, player_idx: int) -> Player:
+        """
+        Calculates the payoff function of a player.
 
-        for action_combination in product(
-                *[range(a) for a in self.nums_actions]):
-            nfg[action_combination] = tuple(
-                sum([
-                    self.polymatrix[(p1, p2)][action_combination[p1]
-                                              ][action_combination[p2]]
-                    for p2 in range(self.N)
-                    if p1 != p2
-                ])
-                for p1 in range(self.N)
-            )
+        Parameters
+        ----------
+        player_idx : int
+            Player number who we want to extract.
+
+        Returns
+        -------
+        Player
+            Player object which has the player's payoff function.
+        """
+        self.N
+        opps = tuple(range(player_idx+1, self.N)) + tuple(range(player_idx))
+        newaxes = np.full((self.N-1, self.N-1), np.newaxis)
+        np.fill_diagonal(newaxes, slice(None))
+        payoff_array = sum([
+            self.polymatrix[(player_idx, opps[j])][:, *newaxes[j]]
+            for j in range(self.N-1)
+        ])
+        return Player(payoff_array)
+
+    def to_nfg(self) -> NormalFormGame:
+        """
+        Creates a Normal Form Game from the Polymatrix Game.
+
+        Returns
+        -------
+        NormalFormGame
+            The game in Normal Form.
+        """
+        nfg = NormalFormGame([self.get_player(i) for i in range(self.N)])
 
         return nfg
 

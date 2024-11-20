@@ -54,7 +54,7 @@ def test_solves_rock_paper_scissors():
         [3, 3],
         polymatrix
     )
-    nfg = polymg.to_nf()
+    nfg = polymg.to_nfg()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -100,7 +100,7 @@ def test_solves_rps_with_scissorless_third_player():
         [3, 3, 2],
         polymatrix
     )
-    nfg = polymg.to_nf()
+    nfg = polymg.to_nfg()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -148,7 +148,7 @@ def test_solves_rps_with_rocking_third_player():
         [3, 3, 3],
         polymatrix
     )
-    nfg = polymg.to_nf()
+    nfg = polymg.to_nfg()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -302,7 +302,7 @@ def test_solves_multiplayer_rps_like():
         [3, 2, 2, 2, 3, 2],
         polymatrix
     )
-    nfg = polymg.to_nf()
+    nfg = polymg.to_nfg()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne, tol=1e-5)
     assert_(worked)
