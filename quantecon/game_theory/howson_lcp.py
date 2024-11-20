@@ -13,10 +13,10 @@ def polym_lcp_solver(
         full_output: bool = False,
 ) -> Union[tuple[Sequence[int]], NashResult]:
     """
-    Finds a Nash Equilbrium of a polymatrix game
-    using Howson's algorithm described in
-    https://www.jstor.org/stable/2634798
-    which utilises linear complementarity.
+    Finds a Nash Equilbrium of a Polymatrix Game.
+
+    Uses Howson's algorithm which utilises
+    linear complementarity [1]_.
 
     Parameters
     ----------
@@ -24,25 +24,32 @@ def polym_lcp_solver(
         Polymatrix game to solve.
 
     starting_player_actions : Sequence[int], optional
-        Pure actions for each player at which the algorithm begins. Defaults to 
-        each player playing their first action.
+        Pure actions for each player at which the algorithm begins.
+        Defaults to each player playing their first action.
 
     max_iter : int, optional
-        Maximum number of iterations of the complementary pivoting before giving 
-        up. Howson proves that with enough iterations, it will reach a Nash 
-        Equilibrium. Defaults to never giving up.
+        Maximum number of iterations of the complementary
+        pivoting before giving up. Howson proves that with enough
+        iterations, it will reach a Nash Equilibrium.
+        Defaults to never giving up.
 
     full_output : bool, optional
-        When True, adds information about the run to the output actions and puts 
-        them in a NashResult. Defaults to False.
+        When True, adds information about the run to the output
+        actions and puts them in a NashResult. Defaults to False.
 
     Returns
     -------
     tuple[Sequence[int]] or NashResult
-        The mixed actions at termination, a Nash Equilibrium if not stopped early 
-        by reaching `max_iter`. If `full_output`, then the number of iterations, 
-        whether it has converged, and the initial conditions of the algorithm are 
-        included in the returned `NashResult` alongside the actions.
+        The mixed actions at termination, a Nash Equilibrium if
+        not stopped early by reaching `max_iter`. If `full_output`,
+        then the number of iterations, whether it has converged,
+        and the initial conditions of the algorithm are included
+        in the returned `NashResult` alongside the actions.
+
+    References
+    ----------
+    .. [1] https://www.jstor.org/stable/2634798
+
     """
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
@@ -160,7 +167,7 @@ def polym_lcp_solver(
     NE = tuple(
         combined_solution[
             sum(polymg.nums_actions[:player]):
-            sum(polymg.nums_actions[:player+1])
+            sum(polymg.nums_actions[:player + 1])
         ]
         for player in range(polymg.N)
     )
