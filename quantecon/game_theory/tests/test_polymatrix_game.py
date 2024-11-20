@@ -58,9 +58,9 @@ def test_normal_form_to_polymatrix_to_normal_form_multiplayer():
 
 
 def test_normal_form_to_polymatrix_to_normal_form_bimatrix():
-    bimatrix = [[(3, 3), (3, 2)],
-                [(2, 2), (5, 6)],
-                [(0, 3), (6, 1)]]
+    bimatrix = [[(54, 23), (72, 34)],
+                [(92, 32), (34, 36)],
+                [(57, 54), (76, 85)]]
     nfg = NormalFormGame(bimatrix)
     polymg = PolymatrixGame.from_nf(nfg, is_polymatrix=True)
     back_in_nf = polymg.to_nfg()
