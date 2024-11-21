@@ -205,13 +205,14 @@ class PolymatrixGame:
         Player
             Player object which has the player's payoff function.
         """
-        self.N
-        opps = tuple(range(player_idx+1, self.N)) + tuple(range(player_idx))
-        newaxes = np.full((self.N-1, self.N-1), np.newaxis)
-        np.fill_diagonal(newaxes, slice(None))
+        N = self.N
+        opps = tuple(range(player_idx+1, N)) + tuple(range(player_idx))
+        newaxes = np.full((N-1, N), np.newaxis)
+        newaxes[:, 0] = slice(None)
+        newaxes[range(N-1), range(1, N)] = slice(None)
         payoff_array = sum([
-            self.polymatrix[(player_idx, opps[j])][:, *newaxes[j]]
-            for j in range(self.N-1)
+            self.polymatrix[(player_idx, opps[j])][tuple(newaxes[j])]
+            for j in range(N-1)
         ])
         return Player(payoff_array)
 
