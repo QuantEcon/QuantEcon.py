@@ -8,7 +8,8 @@ from .polymatrix_game import PolymatrixGame
 
 from .normal_form_game import pure2mixed, best_response_2p
 from .random import (
-    random_game, covariance_game, random_pure_actions, random_mixed_actions
+    random_game, covariance_game, random_polymatrix_game,
+    random_pure_actions, random_mixed_actions
 )
 from .pure_nash import pure_nash_brute, pure_nash_brute_gen
 from .support_enumeration import support_enumeration, support_enumeration_gen
