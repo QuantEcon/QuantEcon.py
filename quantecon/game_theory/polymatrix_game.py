@@ -22,16 +22,20 @@ def hh_payoff_player(
         nfg: NormalFormGame,
         my_player_number: int,
         my_action_number: int,
-        is_polymatrix: bool = False
+        is_polymatrix: bool = True
 ) -> Mapping[tuple[int, int], float]:
     """
     Head-to-head payoff components.
 
     hh stands for head-to-head.
-    Approximates the payoffs to a player when they play
+    Calculates the payoffs to a player when they play
     an action with values at the actions of other players
     that try to sum to the payoff.
-    Precise when the game can be represented with a polymatrix.
+    Precise when the game can be represented with a polymatrix;
+    otherwise, an approximation using least squares on the
+    payoffs at every action combination.
+    If an approximation, it may drastically change the
+    game, use with caution.
 
     Parameters
     ----------
@@ -46,7 +50,7 @@ def hh_payoff_player(
 
     is_polymatrix : bool, optional
         Is the game represented by this normal form
-        actually a polymatrix game. Defaults to False.
+        actually a polymatrix game. Defaults to True.
 
     Returns
     -------
@@ -80,18 +84,18 @@ def hh_payoff_player(
     hh_actions = hh_actions_and_payoffs[:, :-1]
     combined_payoffs = hh_actions_and_payoffs[:, -1]
 
-    # different ways to solve the simultaneous equations
+    # Could use pinv, but this is clearer.
+    hh_payoffs_array, _, _, _ = np.linalg.lstsq(
+        hh_actions,
+        combined_payoffs,
+        rcond=None
+    )
     if is_polymatrix:
-        # this does not go much faster and
-        # could also be used for games with no actual polymatrix
-        hh_payoffs_array, residuals, _, _ = np.linalg.lstsq(
-            hh_actions, combined_payoffs, rcond=None
+        was_polymatrix = np.allclose(
+            hh_actions @ hh_payoffs_array,
+            combined_payoffs
         )
-        assert np.allclose(
-            residuals, 0), "The game is not actually a polymatrix game."
-    else:
-        hh_payoffs_array = np.dot(
-            np.linalg.pinv(hh_actions), combined_payoffs)
+        assert was_polymatrix, "The game is not actually a polymatrix game."
 
     payoff_labels = [
         (p, a)
