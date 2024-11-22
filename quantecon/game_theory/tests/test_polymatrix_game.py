@@ -2,7 +2,7 @@
 Tests for polymatrix_game.py
 """
 
-from numpy.testing import assert_
+from numpy.testing import assert_, assert_raises
 from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
 from quantecon.game_theory.polymatrix_game import PolymatrixGame
 from quantecon.game_theory import NormalFormGame
@@ -30,6 +30,8 @@ def close_normal_form_games(
     for action_combination in product(*[
             range(a) for a in nf1.nums_actions]):
         for player in range(nf1.N):
+            # Will change this to use player's payoff functions
+            # for efficiency
             if not isclose(
                 nf1[action_combination][player],
                 nf2[action_combination][player],
@@ -66,3 +68,26 @@ def test_normal_form_to_polymatrix_to_normal_form_bimatrix():
     back_in_nf = polymg.to_nfg()
     are_close = close_normal_form_games(nfg, back_in_nf)
     assert_(are_close)
+
+
+class TestApproximatingPolymatrix():
+    def setup_method(self):
+        filename = "minimum_effort_game.gam"
+        self.nfg = qe_nfg_from_gam_file(
+            os.path.join(data_dir, filename))
+
+    def test_comes_up_with_approximation(self):
+        polymg = PolymatrixGame.from_nf(
+            self.nfg, is_polymatrix=False)
+        back_in_nf = polymg.to_nfg()
+        assert_(not close_normal_form_games(
+            self.nfg,
+            back_in_nf
+        ))
+
+    def test_nonpolymatrix_gets_error_if_is_polymatrix_flag(self):
+        with assert_raises(AssertionError):
+            PolymatrixGame.from_nf(
+                self.nfg,
+                is_polymatrix=True
+            )
