@@ -1,6 +1,27 @@
 """
 Compute a Nash Equilibrium of a Polymatrix Game.
 
+Examples
+--------
+
+Find a Nash Equilibrium of a Matching Pennies Game.
+(This NE is unique so this works reliably.)
+
+>>> matrices = {
+...     (0, 1): [[1., -1.], [-1., 1.]],
+...     (1, 0): [[-1., 1.], [1., -1.]]
+... }
+>>> polymg = PolymatrixGame(2, [2, 2], matrices)
+>>> result = polym_lcp_solver(polymg, full_output=True)
+>>> print(result[0])
+(array([0.5, 0.5]), array([0.5, 0.5]))
+>>> print(result[1])
+        NE: (array([0.5, 0.5]), array([0.5, 0.5]))
+ converged: True
+      init: {0: 0, 1: 0}
+  max_iter: -1
+  num_iter: 4
+
 """
 
 import numpy as np
