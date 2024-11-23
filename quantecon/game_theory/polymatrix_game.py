@@ -16,7 +16,7 @@ Turn a Matching Pennies Normal Form Game into a Polymatrix Game.
 >>> nfg = NormalFormGame(matching_pennies_bimatrix)
 >>> polymg = PolymatrixGame.from_nf(nfg)
 >>> print(polymg)
-Polymatrix Game:
+2-player PolymatrixGame with payoff matrices:
 (0, 1):
 [[ 1. -1.]
  [-1.  1.]]
