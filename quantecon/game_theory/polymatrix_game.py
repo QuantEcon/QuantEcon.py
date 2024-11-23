@@ -34,7 +34,8 @@ could not be reliably quoted for this doctest.)
 import numpy as np
 from itertools import product
 from collections.abc import Sequence, Mapping
-from typing import Any, TypeAlias, Self
+# from typing import Any, TypeAlias, Self
+from typing import Any, TypeAlias
 from .normal_form_game import NormalFormGame, Player
 
 # Matrix with rows and columns.
@@ -180,7 +181,8 @@ class PolymatrixGame:
         cls,
         nf: NormalFormGame,
         is_polymatrix: bool = True
-    ) -> Self:
+        # ) -> Self:
+    ):
         """
         Creates a Polymatrix from a Normal Form Game.
 
