@@ -145,7 +145,7 @@ class PolymatrixGame:
 
     Attributes
     ----------
-    number_of_players : int
+    N : int
         Number of players.
 
     nums_actions : Sequence[int]
