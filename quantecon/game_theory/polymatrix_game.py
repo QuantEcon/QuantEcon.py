@@ -157,7 +157,7 @@ class PolymatrixGame:
     """
 
     def __str__(self) -> str:
-        str_builder = "Polymatrix Game:\n"
+        str_builder = f"{self.N}-player PolymatrixGame with payoff matrices:\n"
         for k, v in self.polymatrix.items():
             str_builder += str(k) + ":\n"
             str_builder += str(v) + "\n\n"
