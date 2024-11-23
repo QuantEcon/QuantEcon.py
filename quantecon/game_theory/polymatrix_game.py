@@ -47,7 +47,7 @@ def hh_payoff_player(
         my_player_number: int,
         my_action_number: int,
         is_polymatrix: bool = True
-) -> Mapping[tuple[int, int], float]:
+) -> dict[tuple[int, int], float]:
     """
     Head-to-head payoff components.
 
@@ -78,7 +78,7 @@ def hh_payoff_player(
 
     Returns
     -------
-    Mapping[tuple[int, int], float]
+    dict[tuple[int, int], float]
         Dictionary giving a (approximate) component
         of the payoff at each other player and their action.
     """

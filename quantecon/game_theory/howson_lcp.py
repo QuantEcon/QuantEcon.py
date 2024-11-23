@@ -30,6 +30,7 @@ from ..optimize.pivoting import _pivoting, _lex_min_ratio_test
 from ..optimize.lcp_lemke import _get_solution
 from .utilities import NashResult
 from typing import Sequence, Union, Optional
+from numpy.typing import NDArray
 
 
 def polym_lcp_solver(
@@ -37,7 +38,7 @@ def polym_lcp_solver(
         starting_player_actions: Optional[Sequence[int]] = None,
         max_iter: int = -1,
         full_output: bool = False,
-) -> Union[tuple[Sequence[int]], NashResult]:
+) -> Union[tuple[NDArray], NashResult]:
     """
     Finds a Nash Equilbrium of a Polymatrix Game.
 
@@ -65,7 +66,7 @@ def polym_lcp_solver(
 
     Returns
     -------
-    tuple[Sequence[int]] or NashResult
+    tuple[NDArray] or NashResult
         The mixed actions at termination, a Nash Equilibrium if
         not stopped early by reaching `max_iter`. If `full_output`,
         then the number of iterations, whether it has converged,
