@@ -6,6 +6,29 @@ of their payoffs from bimatrix games against each player.
 i.e. If two opponents deviate, the change in payoff
 is the sum of the changes in payoff of each deviation.
 
+Examples
+--------
+
+Turn a Matching Pennies Normal Form Game into a Polymatrix Game.
+
+>>> matching_pennies_bimatrix = [
+... [(1, -1), (-1, 1)], [(-1, 1), (1, -1)]]
+>>> nfg = NormalFormGame(matching_pennies_bimatrix)
+>>> polymg = PolymatrixGame.from_nf(nfg)
+>>> print(polymg)
+Polymatrix Game:
+(0, 1):
+[[ 1. -1.]
+ [-1.  1.]]
+<BLANKLINE>
+(1, 0):
+[[-1.  1.]
+ [ 1. -1.]]
+
+(An example of a multiplayer game is not given because
+then the polymatrix representation would not be unique and therefore
+could not be reliably quoted for this doctest.)  
+
 """
 
 import numpy as np

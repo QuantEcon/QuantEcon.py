@@ -1,6 +1,28 @@
 """
 Functions for converting between ways of storing games.
 
+Examples
+--------
+
+Create a QuantEcon NormalFormGame from a gam file storing
+a 3-player Minimum Effort Game
+
+>>> filepath = "./tests/gam_files/minimum_effort_game.gam"
+>>> nfg = qe_nfg_from_gam_file(filepath)
+>>> print(nfg)
+3-player NormalFormGame with payoff profile array:
+[[[[  1.,   1.,   1.],   [  1.,   1.,  -9.],   [  1.,   1., -19.]],
+  [[  1.,  -9.,   1.],   [  1.,  -9.,  -9.],   [  1.,  -9., -19.]],
+  [[  1., -19.,   1.],   [  1., -19.,  -9.],   [  1., -19., -19.]]],
+<BLANKLINE>
+ [[[ -9.,   1.,   1.],   [ -9.,   1.,  -9.],   [ -9.,   1., -19.]],
+  [[ -9.,  -9.,   1.],   [  2.,   2.,   2.],   [  2.,   2.,  -8.]],
+  [[ -9., -19.,   1.],   [  2.,  -8.,   2.],   [  2.,  -8.,  -8.]]],
+<BLANKLINE>
+ [[[-19.,   1.,   1.],   [-19.,   1.,  -9.],   [-19.,   1., -19.]],
+  [[-19.,  -9.,   1.],   [ -8.,   2.,   2.],   [ -8.,   2.,  -8.]],
+  [[-19., -19.,   1.],   [ -8.,  -8.,   2.],   [  3.,   3.,   3.]]]]
+
 """
 
 from .normal_form_game import NormalFormGame
