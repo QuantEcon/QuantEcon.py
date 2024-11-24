@@ -227,7 +227,7 @@ class MarkovChain:
         if values is None:
             self._state_values = None
         else:
-            values = np.asarray(values)
+            values = np.asanyarray(values)
             if (values.ndim < 1) or (values.shape[0] != self.n):
                 raise ValueError(
                     'state_values must be an array_like of length n'
