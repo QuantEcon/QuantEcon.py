@@ -70,6 +70,7 @@ numydoc_show_class_members= True
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_rtd_theme'
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
@@ -155,7 +156,7 @@ pygments_style = 'tango'
 # -- Options for HTML output ----------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
-    html_theme = 'default'
+    html_theme = 'sphinx_rtd_theme'
 else:  # Local build. Need to import rtd theme
   import sphinx_rtd_theme
   html_theme = "sphinx_rtd_theme"
