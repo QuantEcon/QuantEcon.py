@@ -24,9 +24,102 @@ a 3-player Minimum Effort Game
   [[-19., -19.,   1.],   [ -8.,  -8.,   2.],   [  3.,   3.,   3.]]]]
 
 """
+import numpy as np
+from .normal_form_game import Player, NormalFormGame
 
-from .normal_form_game import NormalFormGame
-from itertools import product
+
+def str2num(s):
+    if '.' in s:
+        return float(s)
+    return int(s)
+
+
+class GAMReader:
+    """
+    Reader object that converts a game in GameTracer gam format into
+    a NormalFormGame.
+
+    """
+    @classmethod
+    def from_file(cls, file_path):
+        """
+        Read from a gam format file.
+
+        Parameters
+        ----------
+        file_path : str
+            Path to gam file.
+
+        Returns
+        -------
+        NormalFormGame
+
+        """
+        with open(file_path, 'r') as f:
+            string = f.read()
+        return cls.parse(string)
+
+    @classmethod
+    def from_url(cls, url):
+        """
+        Read from a URL.
+
+        """
+        import urllib.request
+        with urllib.request.urlopen(url) as response:
+            string = response.read().decode()
+        return cls.parse(string)
+
+    @classmethod
+    def from_string(cls, string):
+        """
+        Read from a gam format string.
+
+        Parameters
+        ----------
+        string : str
+            String in gam format.
+
+        Returns
+        -------
+        NormalFormGame
+
+        Examples
+        --------
+        >>> string = \"\"\"\\
+        ... 2
+        ... 3 2
+        ...
+        ... 3 2 0 3 5 6 3 2 3 2 6 1\"\"\"
+        >>> g = GAMReader.from_string(string)
+        >>> print(g)
+        2-player NormalFormGame with payoff profile array:
+        [[[3, 3],  [3, 2]],
+         [[2, 2],  [5, 6]],
+         [[0, 3],  [6, 1]]]
+
+        """
+        return cls.parse(string)
+
+    @staticmethod
+    def parse(string):
+        tokens = string.split()
+
+        N = int(tokens.pop(0))
+        nums_actions = tuple(int(tokens.pop(0)) for _ in range(N))
+        payoffs = np.array([str2num(s) for s in tokens])
+
+        na = np.prod(nums_actions)
+        payoffs2d = payoffs.reshape(N, na)
+        players = [
+            Player(
+                payoffs2d[i, :].reshape(nums_actions, order='F').transpose(
+                    list(range(i, N)) + list(range(i))
+                )
+            ) for i in range(N)
+        ]
+
+        return NormalFormGame(players)
 
 
 def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
@@ -51,32 +144,4 @@ def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
        http://dags.stanford.edu/Games/gametracer.html
 
     """
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-        combined = [
-            token
-            for line in lines
-            for token in line.split()
-        ]
-
-        i = iter(combined)
-        players = int(next(i))
-        actions = [int(next(i)) for _ in range(players)]
-
-        nfg = NormalFormGame(actions)
-
-        entries = [
-            {
-                tuple(reversed(action_combination)): float(next(i))
-                for action_combination in product(
-                    *[range(a) for a in actions])
-            }
-            for _ in range(players)
-        ]
-
-        for action_combination in product(*[range(a) for a in actions]):
-            nfg[action_combination] = tuple(
-                entries[p][action_combination] for p in range(players)
-            )
-
-    return nfg
+    return GAMReader.from_file(filename)
