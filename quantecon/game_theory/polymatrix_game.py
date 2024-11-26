@@ -35,12 +35,15 @@ import numpy as np
 from itertools import product
 from math import isqrt
 from collections.abc import Sequence, Mapping
+
 # from typing import Any, TypeAlias, Self
 from typing import Any, TypeAlias
+from numpy.typing import NDArray
+
 from .normal_form_game import NormalFormGame, Player
 
 # Matrix with rows and columns.
-Matrix: TypeAlias = Any
+Matrix: TypeAlias = NDArray
 
 
 def hh_payoff_player(

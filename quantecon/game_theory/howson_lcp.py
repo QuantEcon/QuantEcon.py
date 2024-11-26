@@ -8,8 +8,8 @@ Find a Nash Equilibrium of a Matching Pennies Game.
 (This NE is unique so this works reliably.)
 
 >>> matrices = {
-...     (0, 1): [[1., -1.], [-1., 1.]],
-...     (1, 0): [[-1., 1.], [1., -1.]]
+...     (0, 1): np.array([[1., -1.], [-1., 1.]]),
+...     (1, 0): np.array([[-1., 1.], [1., -1.]])
 ... }
 >>> polymg = PolymatrixGame(matrices)
 >>> result = polym_lcp_solver(polymg, full_output=True)
