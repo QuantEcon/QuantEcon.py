@@ -160,5 +160,5 @@ class TestPolymatrixGame():
             polymatrix,
             nums_actions=[3, 3, 3]
         )
-        sample_from_filled_action = polymg.polymatrix[(2,0)][2][0]
+        sample_from_filled_action = polymg.polymatrix[(2, 0)][2][0]
         assert_(sample_from_filled_action < -500)
