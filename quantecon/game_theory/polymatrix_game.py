@@ -35,7 +35,7 @@ import numpy as np
 from itertools import product
 from math import isqrt
 
-from collections.abc import Sequence, Mapping
+from collections.abc import Sequence, Mapping, Iterable
 # from typing import TypeAlias, Self
 from numpy.typing import NDArray
 
@@ -145,10 +145,10 @@ class PolymatrixGame:
 
     Attributes
     ----------
-    N : int
+    N : scalar(int)
         Number of players.
 
-    nums_actions : Sequence[int]
+    nums_actions : tuple(int)
         The number of actions available to each player.
 
     polymatrix : dict[tuple(int), ndarray(float, ndim=2)]
@@ -171,7 +171,7 @@ class PolymatrixGame:
                 tuple[int, int],
                 Sequence[Sequence[float]]
             ],
-            nums_actions: Sequence[int] = None
+            nums_actions: Iterable[int] = None
     ) -> None:
         """_summary_
 
@@ -182,10 +182,13 @@ class PolymatrixGame:
             inferred from this if `nums_actions` is left None.
             This inferrence uses the number of actions they have
             against the next player.
-        nums_actions : Sequence[int], optional
+            Actions with unspecified payoff are given
+            payoff of `-np.inf`.
+        nums_actions : Iterable[int], optional
             If desired, nums_actions can be set so that unspecified
             matchups in the polymatrix will be filled with matrices
-            of 0s and unspecified actions give payoff of `-np.inf`.
+            of 0s (while unspecified actions give payoff
+            of `-np.inf`).
         """
         if nums_actions is None:
             self.N = (isqrt(4*len(polymatrix)+1) + 1) // 2
@@ -195,7 +198,7 @@ class PolymatrixGame:
             )
         else:
             self.N = len(nums_actions)
-            self.nums_actions = nums_actions
+            self.nums_actions = tuple(nums_actions)
         matchups = [
             (p1, p2)
             for p1 in range(self.N)
