@@ -34,16 +34,12 @@ could not be reliably quoted for this doctest.)
 import numpy as np
 from itertools import product
 from math import isqrt
-from collections.abc import Sequence, Mapping
 
-# from typing import Any, TypeAlias, Self
-from typing import TypeAlias
+from collections.abc import Sequence, Mapping
+# from typing import TypeAlias, Self
 from numpy.typing import NDArray
 
 from .normal_form_game import NormalFormGame, Player
-
-# Matrix with rows and columns.
-Matrix: TypeAlias = NDArray
 
 
 def hh_payoff_player(
@@ -155,7 +151,7 @@ class PolymatrixGame:
     nums_actions : Sequence[int]
         The number of actions available to each player.
 
-    polymatrix : Mapping[ tuple[int, int], Matrix ]
+    polymatrix : dict[tuple(int), ndarray(float, ndim=2)]
         Maps each pair of player numbers to a matrix.
 
     """
@@ -173,16 +169,15 @@ class PolymatrixGame:
             self,
             polymatrix: Mapping[
                 tuple[int, int],
-                Matrix
+                Sequence[Sequence[float]]
             ],
             nums_actions: Sequence[int] = None
     ) -> None:
-        """
-        Constructor for PolymatrixGame
+        """_summary_
 
         Parameters
         ----------
-        polymatrix : Mapping[ tuple[int, int], Matrix ]
+        polymatrix : Mapping[ tuple[int, int], Sequence[Sequence[float]] ]
             Polymatrix. Numbers of players and actions can be
             inferred from this if `nums_actions` is left None.
             This inferrence uses the number of actions they have
@@ -207,14 +202,14 @@ class PolymatrixGame:
             for p2 in range(self.N)
             if p1 != p2
         ]
-        self.polymatrix: dict[tuple[int, int], Matrix] = {}
+        self.polymatrix: dict[tuple[int, int], NDArray] = {}
         for (p1, p2) in matchups:
             rows = self.nums_actions[p1]
             cols = self.nums_actions[p2]
-            incoming = polymatrix.get(
+            incoming = np.asarray(polymatrix.get(
                 (p1, p2),
                 np.zeros((rows, cols))
-            )
+            ))
             matrix_builder = np.full((rows, cols), -np.inf)
             matrix_builder[:incoming.shape[0],
                            :incoming.shape[1]] = incoming[:rows, :cols]
