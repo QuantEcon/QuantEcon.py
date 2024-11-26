@@ -181,7 +181,7 @@ def polym_lcp_solver(
                 p += 1
                 break
             elif leaving_var == finishing_v:
-                print("entering the backtracking case")
+                # print("entering the backtracking case")
                 p -= 1
                 retro = True
                 break

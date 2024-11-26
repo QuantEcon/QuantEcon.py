@@ -10,7 +10,7 @@ from numpy import allclose, zeros
 import os
 
 # Mimicing quantecon.tests.util.get_data_dir
-data_dir_name = "gam_files"
+data_dir_name = "game_files"
 this_dir = os.path.dirname(__file__)
 data_dir = os.path.join(this_dir, data_dir_name)
 
