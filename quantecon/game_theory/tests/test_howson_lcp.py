@@ -5,10 +5,12 @@ Tests for howson_lcp.py
 import numpy as np
 from numpy.testing import assert_, assert_allclose
 from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
-from quantecon.game_theory.howson_lcp import polym_lcp_solver
-from quantecon.game_theory.polymatrix_game import PolymatrixGame
-from quantecon.game_theory import Player, NormalFormGame
-
+from quantecon.game_theory import (
+    Player,
+    NormalFormGame,
+    PolymatrixGame,
+    polym_lcp_solver
+)
 import os
 
 

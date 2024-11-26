@@ -4,9 +4,8 @@ Tests for polymatrix_game.py
 
 from numpy.testing import assert_, assert_raises
 from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
-from quantecon.game_theory.polymatrix_game import PolymatrixGame
-from quantecon.game_theory import NormalFormGame
-from numpy import allclose
+from quantecon.game_theory import NormalFormGame, PolymatrixGame
+from numpy import allclose, zeros
 
 import os
 
@@ -90,3 +89,76 @@ class TestPolymatrixGame():
                 self.non_pmg,
                 is_polymatrix=True
             )
+
+    def test_matchups_get_filled_with_zeros(self):
+        polymatrix = {
+            (0, 1): [
+                [1, -10,  10],
+                [10,   1, -10],
+                [-10,  10,   1]
+            ],
+            (0, 2): [
+                [1, -10],
+                [15,   1],
+                [-10,   1]
+            ],
+            (1, 0): [
+                [1, -10,  10],
+                [10,   1, -10],
+                [-10,  10,   1]
+            ],
+            # we will omit (1, 2) and see it get filled
+            (2, 0): [
+                [1, -10,  10],
+                [10,   1, -10],
+            ],
+            (2, 1): [
+                [1, -10,  10],
+                [10,   1, -10],
+            ]
+        }
+        polymg = PolymatrixGame(
+            polymatrix,
+            nums_actions=[3, 3, 2]
+        )
+        filled_payoffs = polymg.polymatrix[(1, 2)]
+        assert_(filled_payoffs.shape == (3, 2))
+        assert_(allclose(filled_payoffs, zeros((3, 2))))
+
+    def test_actions_get_filled_with_big_negative(self):
+        polymatrix = {
+            (0, 1): [
+                [0, -10,  10],
+                [10,   0, -10],
+                [-10,  10,   0]
+            ],
+            (0, 2): [
+                [0, -10],
+                [15,   0],
+                [-10,   0]
+            ],
+            (1, 0): [
+                [0, -10,  10],
+                [10,   0, -10],
+                [-10,  10,   0]
+            ],
+            (1, 2): [
+                [0, -10],
+                [15,   0],
+                [-10,   0]
+            ],
+            (2, 0): [
+                [0, -10,  10],
+                [10,   0, -10],
+            ],
+            (2, 1): [
+                [0, -10,  10],
+                [10,   0, -10],
+            ]
+        }
+        polymg = PolymatrixGame(
+            polymatrix,
+            nums_actions=[3, 3, 3]
+        )
+        sample_from_filled_action = polymg.polymatrix[(2,0)][2][0]
+        assert_(sample_from_filled_action < -500)
