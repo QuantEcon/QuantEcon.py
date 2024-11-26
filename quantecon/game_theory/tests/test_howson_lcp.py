@@ -373,7 +373,7 @@ class TestHowsonLCPDegenerate():
 
 def test_solves_huge_7_player_polymatrix():
     filename = "huge_7_player_polymatrix.pkl"
-    with open (os.path.join(data_dir, filename), 'rb') as file:
+    with open(os.path.join(data_dir, filename), 'rb') as file:
         polymg: PolymatrixGame = pickle.load(file)
     assert_(polymg.nums_actions == (8, 8, 8, 8, 8, 8, 8))
     ne = polym_lcp_solver(polymg)
