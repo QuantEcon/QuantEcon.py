@@ -12,7 +12,7 @@ Examples
 Turn a Matching Pennies Normal Form Game into a Polymatrix Game.
 
 >>> matching_pennies_bimatrix = [
-... [(1, -1), (-1, 1)], [(-1, 1), (1, -1)]]
+...     [(1, -1), (-1, 1)], [(-1, 1), (1, -1)]]
 >>> nfg = NormalFormGame(matching_pennies_bimatrix)
 >>> polymg = PolymatrixGame.from_nf(nfg)
 >>> print(polymg)
@@ -33,6 +33,7 @@ could not be reliably quoted for this doctest.)
 
 import numpy as np
 from itertools import product
+from math import isqrt
 from collections.abc import Sequence, Mapping
 # from typing import Any, TypeAlias, Self
 from typing import Any, TypeAlias
@@ -157,7 +158,9 @@ class PolymatrixGame:
     """
 
     def __str__(self) -> str:
-        str_builder = f"{self.N}-player PolymatrixGame with payoff matrices:\n"
+        str_builder = (
+            f"{self.N}-player PolymatrixGame with payoff matrices:\n"
+        )
         for k, v in self.polymatrix.items():
             str_builder += str(k) + ":\n"
             str_builder += str(v) + "\n\n"
@@ -165,16 +168,54 @@ class PolymatrixGame:
 
     def __init__(
             self,
-            number_of_players: int,
-            nums_actions: Sequence[int],
             polymatrix: Mapping[
                 tuple[int, int],
                 Matrix
-            ]
+            ],
+            nums_actions: Sequence[int] = None
     ) -> None:
-        self.N = number_of_players
-        self.nums_actions = nums_actions
-        self.polymatrix = polymatrix
+        """
+        Constructor for PolymatrixGame
+
+        Parameters
+        ----------
+        polymatrix : Mapping[ tuple[int, int], Matrix ]
+            Polymatrix. Numbers of players and actions can be
+            inferred from this if `nums_actions` is left None.
+            This inferrence uses the number of actions they have
+            against the next player.
+        nums_actions : Sequence[int], optional
+            If desired, nums_actions can be set so that unspecified
+            matchups in the polymatrix will be filled with matrices
+            of 0s and unspecified actions give payoff of `-np.inf`.
+        """
+        if nums_actions is None:
+            self.N = (isqrt(4*len(polymatrix)+1) + 1) // 2
+            self.nums_actions = tuple(
+                np.shape(polymatrix[(p1, (p1 + 1) % self.N)])[0]
+                for p1 in range(self.N)
+            )
+        else:
+            self.N = len(nums_actions)
+            self.nums_actions = nums_actions
+        matchups = [
+            (p1, p2)
+            for p1 in range(self.N)
+            for p2 in range(self.N)
+            if p1 != p2
+        ]
+        self.polymatrix: dict[tuple[int, int], Matrix] = {}
+        for (p1, p2) in matchups:
+            rows = self.nums_actions[p1]
+            cols = self.nums_actions[p2]
+            incoming = polymatrix.get(
+                (p1, p2),
+                np.zeros((rows, cols))
+            )
+            matrix_builder = np.full((rows, cols), -np.inf)
+            matrix_builder[:incoming.shape[0],
+                           :incoming.shape[1]] = incoming[:rows, :cols]
+            self.polymatrix[(p1, p2)] = matrix_builder
 
     @classmethod
     def from_nf(
@@ -218,7 +259,7 @@ class PolymatrixGame:
                 for ((p2, a2), payoff) in payoffs.items():
                     polymatrix_builder[(p1, p2)][a1][a2] = payoff
 
-        return cls(nf.N, nf.nums_actions, polymatrix_builder)
+        return cls(polymatrix_builder)
 
     def get_player(self, player_idx: int) -> Player:
         """

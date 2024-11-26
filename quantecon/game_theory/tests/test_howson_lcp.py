@@ -50,8 +50,6 @@ def test_solves_rock_paper_scissors():
         ])
     }
     polymg = PolymatrixGame(
-        2,
-        [3, 3],
         polymatrix
     )
     nfg = polymg.to_nfg()
@@ -96,8 +94,6 @@ def test_solves_rps_with_scissorless_third_player():
         ])
     }
     polymg = PolymatrixGame(
-        3,
-        [3, 3, 2],
         polymatrix
     )
     nfg = polymg.to_nfg()
@@ -144,8 +140,6 @@ def test_solves_rps_with_rocking_third_player():
         ])
     }
     polymg = PolymatrixGame(
-        3,
-        [3, 3, 3],
         polymatrix
     )
     nfg = polymg.to_nfg()
@@ -298,9 +292,8 @@ def test_solves_multiplayer_rps_like():
         ])
     }
     polymg = PolymatrixGame(
-        6,
-        [3, 2, 2, 2, 3, 2],
-        polymatrix
+        polymatrix,
+        nums_actions=[3, 2, 2, 2, 3, 2],
     )
     nfg = polymg.to_nfg()
     ne = polym_lcp_solver(polymg)

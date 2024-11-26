@@ -11,7 +11,7 @@ Find a Nash Equilibrium of a Matching Pennies Game.
 ...     (0, 1): [[1., -1.], [-1., 1.]],
 ...     (1, 0): [[-1., 1.], [1., -1.]]
 ... }
->>> polymg = PolymatrixGame(2, [2, 2], matrices)
+>>> polymg = PolymatrixGame(matrices)
 >>> result = polym_lcp_solver(polymg, full_output=True)
 >>> print(result[0])
 (array([0.5, 0.5]), array([0.5, 0.5]))

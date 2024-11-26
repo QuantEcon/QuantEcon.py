@@ -149,7 +149,7 @@ def random_polymatrix_game(nums_actions, random_state=None):
         for i, j in zip(*pairs)
     }
 
-    return PolymatrixGame(N, nums_actions, polymatrix)
+    return PolymatrixGame(polymatrix)
 
 
 def random_pure_actions(nums_actions, random_state=None):
