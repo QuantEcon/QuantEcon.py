@@ -27,7 +27,7 @@ Turn a Matching Pennies Normal Form Game into a Polymatrix Game.
 
 (An example of a multiplayer game is not given because
 then the polymatrix representation would not be unique and therefore
-could not be reliably quoted for this doctest.)  
+could not be reliably quoted for this doctest.)
 
 """
 
@@ -37,7 +37,7 @@ from math import isqrt
 from collections.abc import Sequence, Mapping
 
 # from typing import Any, TypeAlias, Self
-from typing import Any, TypeAlias
+from typing import TypeAlias
 from numpy.typing import NDArray
 
 from .normal_form_game import NormalFormGame, Player
