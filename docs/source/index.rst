@@ -11,13 +11,15 @@ mainly used by developers internal to the package.
 .. toctree::
    :maxdepth: 2
 
+   setup
    game_theory
    markov
    optimize
    random
    tools
    util
-
+   contributing
+   
 Indices and tables
 ==================
 

@@ -7,3 +7,4 @@ sympy
 scipy>=1.5
 requests
 matplotlib
+sphinx_rtd_theme
