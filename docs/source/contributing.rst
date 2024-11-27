@@ -7,7 +7,7 @@ a good place to start is the `project issue tracker <http://github.com/QuantEcon
 Set up a Conda development environment
 --------------------------------------
 
-One of the advantages of the `Anaconda Python environment <https://www.anaconda.com/distribution/>`_ is that it is
+One of the advantages of the `Anaconda Python environment <https://www.anaconda.com/download>`_ is that it is
 cheap to set up (and discard) Python environments for development versions of packages and populate them with your
 favorite scientific tools. 
 
