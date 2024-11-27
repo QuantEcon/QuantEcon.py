@@ -28,7 +28,7 @@ Write documentation
 
 We try to maintain a simple and consistent format for inline documentation, known in the Python world as docstrings. 
 
-The format we use is known as `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html#overview>`_. 
+The format we use is known as `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_. 
 
 It was developed by the numpy and scipy teams and is used in many popular packages. 
 
