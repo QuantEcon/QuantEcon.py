@@ -9,10 +9,14 @@ Set up a Conda development environment
 
 One of the advantages of the `Anaconda Python environment <https://www.anaconda.com/distribution/>`_ is that it is
 cheap to set up (and discard) Python environments for development versions of packages and populate them with your
-favorite scientific tools. For example, if you're working on QuantEcon.py you might find it useful to set up an
+favorite scientific tools. 
+
+For example, if you're working on QuantEcon.py you might find it useful to set up an
 environment (containing NumPy, SciPy, etc.) that uses your development version rather than the default ones. 
 
 This facilitates contributing to QuantEcon.py without worrying about corrupting the Python environment on which your other work depends.
+
+You can learn more about `managing environments here <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_
 
 Write tests
 -----------
@@ -23,19 +27,20 @@ Write documentation
 -------------------
 
 We try to maintain a simple and consistent format for inline documentation, known in the Python world as docstrings. 
-The format we use is known as `numpydoc <https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`_. 
+
+The format we use is known as `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html#overview>`_. 
+
 It was developed by the numpy and scipy teams and is used in many popular packages. 
 
 Adhering to this standard helps us
 
 *   Provide a sense of consistency throughout the library
-
 *   Give users instant access to necessary information at the interpreter prompt (either via the built-in Python function help(object_name) or the Jupyter object_name?)
-
 *   Easily generate a reference manual using sphinx's autodoc and apidoc
 
-Instructions to compile a local version of the documentation can be found `here <https://github.com/QuantEcon/QuantEcon.py/tree/master/docs>`_. 
-This can be useful if you would like to check how your docstrings render in html prior to submitting a pull request.
+It is always useful to build the docs locally before setting up a pull request, and lets you check how your docstrings render in html prior to submitting a pull request.
+
+However once you open a PR a preview of the docs is provided as one of the GitHub Actions.
 
 Further questions
 -----------------

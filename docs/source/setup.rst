@@ -63,9 +63,9 @@ Once you have downloaded the source files then the package can be installed by r
 .. code:: bash
 	
     cd QuantEcon.py
-    pip install ./
+    pip install .
 
-(To learn the basics about setting up Git see `this link <https://help.github.com/articles/set-up-git/>`_).
+(To learn the basics about setting up Git see `this link <https://docs.github.com/en/get-started/getting-started-with-git/set-up-git>`_).
 
 Examples and Sample Code
 ------------------------
