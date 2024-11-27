@@ -7,6 +7,7 @@ which includes a full suite of scientific python tools.
 Next you can install quantecon by opening a terminal prompt and typing
 
 .. code:: python
+    
     pip install quantecon
 
 

@@ -146,7 +146,9 @@ mainly used by developers internal to the package.
    random
    tools
    util
-
+   setup
+   contributing
+   
 Indices and tables
 ==================
 
