@@ -13,24 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v3
+    - uses: conda-incubator/setup-miniconda@v3
       with:
-        python-version: '3.12'
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
-      run: |
-        conda install -c conda-forge libmamba
-        conda env update --file environment_np2.yml --name base
+        auto-update-conda: true
+        environment-file: environment_np2.yml
+        python-version: '3.13'
     - name: Conda info
       shell: bash -l {0}
       run: |
         conda info
         conda list
     - name: Test with pytest
+      shell: bash -l {0}
       run: |
         conda install pytest
         pytest

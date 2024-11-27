@@ -2,12 +2,13 @@ name: qe
 channels:
   - conda-forge
   - defaults
+  - numba
 dependencies:
   - coverage
   - numpy>=2
   - scipy
   - pandas
-  - numba
+  - numba=0.61.0rc1
   - sympy
   - ipython
   - flake8
