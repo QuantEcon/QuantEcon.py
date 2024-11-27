@@ -6,11 +6,14 @@ Game theory
 
    game_theory/brd
    game_theory/fictplay
+   game_theory/game_converters
+   game_theory/howson_lcp
    game_theory/lemke_howson
    game_theory/localint
    game_theory/logitdyn
    game_theory/mclennan_tourky
    game_theory/normal_form_game
+   game_theory/polymatrix_game
    game_theory/pure_nash
    game_theory/random
    game_theory/repeated_game
