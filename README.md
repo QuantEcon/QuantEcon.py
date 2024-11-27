@@ -20,6 +20,10 @@ Next you can install quantecon by opening a terminal prompt and typing
 
     pip install quantecon
 
+or using conda-forge by typing
+
+    conda install -c conda-forge quantecon
+
 ## Usage
 
 Once `quantecon` has been installed you should be able to import it as follows:
@@ -78,3 +82,7 @@ number = {93},
 pages = {5585}
 }
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=quantecon/quantecon.py&type=Date)](https://star-history.com/#quantecon/quantecon.py&Date)
