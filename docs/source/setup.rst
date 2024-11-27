@@ -6,9 +6,15 @@ which includes a full suite of scientific python tools.
 
 Next you can install quantecon by opening a terminal prompt and typing
 
-.. code:: python
-    
+.. code:: bash
+
     pip install quantecon
+
+and using `conda-forge` by typing
+
+.. code:: bash
+
+    conda install -c conda-forge quantecon
 
 
 Usage
