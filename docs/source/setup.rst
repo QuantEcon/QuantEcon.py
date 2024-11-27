@@ -16,6 +16,12 @@ and using `conda-forge` by typing
 
     conda install -c conda-forge quantecon
 
+.. note::
+    There are `quantecon` packages available in both the main `anaconda` channel
+    and the `conda-forge` channel. The official channel often lags behind the most
+    recent release that is available on `conda-forge`
+    
+    You can see the latest `versions here <https://anaconda.org/search?q=quantecon>`_
 
 Usage
 -----
