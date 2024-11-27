@@ -7,7 +7,8 @@ from numpy.testing import (
     assert_allclose, assert_raises, assert_, assert_array_equal
 )
 from quantecon.game_theory import (
-    random_game, covariance_game, random_pure_actions, random_mixed_actions,
+    random_game, covariance_game, random_polymatrix_game,
+    random_pure_actions, random_mixed_actions,
 )
 
 
@@ -54,6 +55,25 @@ def test_covariance_game():
         assert_allclose(g.payoff_profile_array.sum(axis=-1),
                         np.zeros(nums_actions),
                         atol=1e-10)
+
+
+def test_random_polymatrix_game():
+    nums_actions = (2, 3, 4)
+    N = len(nums_actions)
+    polymg = random_polymatrix_game(nums_actions)
+    assert_(polymg.nums_actions == nums_actions)
+    assert_(len(polymg.polymatrix) == N * (N-1))
+
+    seed = 139545920511518866634803637037486881822
+    polymgs = [
+        random_polymatrix_game(nums_actions,
+                               random_state=np.random.default_rng(seed))
+        for i in range(2)
+    ]
+
+    pairs = np.where(np.arange(N)[:, np.newaxis] != np.arange(N))
+    for i, j in zip(*pairs):
+        assert_array_equal(*[polymg.polymatrix[(i, j)] for polymg in polymgs])
 
 
 def test_random_game_value_error():

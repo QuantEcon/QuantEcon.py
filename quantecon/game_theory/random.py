@@ -6,6 +6,7 @@ Generate random NormalFormGame instances.
 import numpy as np
 
 from .normal_form_game import Player, NormalFormGame
+from .polymatrix_game import PolymatrixGame
 from ..util import check_random_state, rng_integers
 from ..random.utilities import _probvec_cpu
 
@@ -114,6 +115,41 @@ def covariance_game(nums_actions, rho, random_state=None):
         random_state.multivariate_normal(mean, cov, nums_actions)
     g = NormalFormGame(payoff_profile_array)
     return g
+
+
+def random_polymatrix_game(nums_actions, random_state=None):
+    """
+    Return a random PolymatrixGame instance where the payoffs are drawn
+    independently from the uniform distribution on [0, 1).
+
+    Parameters
+    ----------
+    nums_actions : tuple(int)
+        Tuple of the numbers of actions, one for each player.
+
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
+
+    Returns
+    -------
+    PolymatrixGame
+
+    """
+    N = len(nums_actions)
+    if N == 0:
+        raise ValueError('nums_actions must be non-empty')
+    pairs = np.where(np.arange(N)[:, np.newaxis] != np.arange(N))
+
+    random_state = check_random_state(random_state)
+    polymatrix = {
+        (i, j): random_state.random((nums_actions[i], nums_actions[j]))
+        for i, j in zip(*pairs)
+    }
+
+    return PolymatrixGame(polymatrix)
 
 
 def random_pure_actions(nums_actions, random_state=None):
