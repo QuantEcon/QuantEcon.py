@@ -7,7 +7,7 @@ a good place to start is the `project issue tracker <http://github.com/QuantEcon
 Set up a Conda development environment
 --------------------------------------
 
-One of the advantages of the `Anaconda Python environment <https://www.anaconda.com/distribution/>`_ is that it is
+One of the advantages of the `Anaconda Python environment <https://www.anaconda.com/download>`_ is that it is
 cheap to set up (and discard) Python environments for development versions of packages and populate them with your
 favorite scientific tools. 
 
@@ -28,7 +28,7 @@ Write documentation
 
 We try to maintain a simple and consistent format for inline documentation, known in the Python world as docstrings. 
 
-The format we use is known as `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html#overview>`_. 
+The format we use is known as `numpydoc <https://numpydoc.readthedocs.io/en/latest/format.html>`_. 
 
 It was developed by the numpy and scipy teams and is used in many popular packages. 
 
