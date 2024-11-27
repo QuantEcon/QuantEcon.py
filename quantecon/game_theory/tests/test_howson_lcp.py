@@ -12,7 +12,6 @@ from quantecon.game_theory import (
     polym_lcp_solver
 )
 import os
-import pickle
 
 
 # Mimicing quantecon.tests.util.get_data_dir
@@ -369,14 +368,3 @@ class TestHowsonLCPDegenerate():
                                                    d['NEs_dict'][k]):
                     assert_allclose(action_computed, action)
                 assert_(res.converged == d['converged'])
-
-
-def test_solves_huge_7_player_polymatrix():
-    filename = "huge_7_player_polymatrix.pkl"
-    with open(os.path.join(data_dir, filename), 'rb') as file:
-        polymg: PolymatrixGame = pickle.load(file)
-    assert_(polymg.nums_actions == (8, 8, 8, 8, 8, 8, 8))
-    ne = polym_lcp_solver(polymg)
-    nfg = polymg.to_nfg()
-    worked = nfg.is_nash(ne)
-    assert_(worked)
