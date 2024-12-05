@@ -258,7 +258,7 @@ class Player:
             if isinstance(action, numbers.Integral):  # pure action
                 return payoff_array.take(action, axis=-1)
             else:  # mixed action
-                return payoff_array.dot(action)
+                return payoff_array @ action
 
         if self.num_opponents == 1:
             payoff_vector = \
