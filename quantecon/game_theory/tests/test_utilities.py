@@ -39,13 +39,3 @@ def test_copy_action_profile_to():
     _copy_action_profile_to(dst, mixed_actions)
     for x, y in zip(dst, mixed_actions):
         assert_array_equal(x, y)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
