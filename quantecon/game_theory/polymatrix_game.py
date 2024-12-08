@@ -39,7 +39,7 @@ from collections.abc import Sequence, Mapping, Iterable
 # from typing import TypeAlias, Self
 from numpy.typing import NDArray
 
-from .normal_form_game import NormalFormGame, Player
+from .normal_form_game import NormalFormGame, Player, _nums_actions2string
 
 
 def hh_payoff_player(
@@ -155,6 +155,10 @@ class PolymatrixGame:
         Maps each pair of player numbers to a matrix.
 
     """
+    def __repr__(self):
+        s = '<{nums_actions} {N}-player PolymatrixGame>'
+        return s.format(nums_actions=_nums_actions2string(self.nums_actions),
+                        N=self.N)
 
     def __str__(self) -> str:
         str_builder = (
