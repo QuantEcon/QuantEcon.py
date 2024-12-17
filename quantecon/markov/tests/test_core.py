@@ -586,5 +586,5 @@ def test_raises_value_error_simulate_init_out_of_range():
 
 def test_raises_non_homogeneous_state_values():
     P = [[0.4, 0.6], [0.2, 0.8]]
-    state_values = [(0, 1), 2]
+    state_values = np.array([(0, 1), 2], dtype=object)
     assert_raises(ValueError, MarkovChain, P, state_values=state_values)

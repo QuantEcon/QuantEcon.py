@@ -290,7 +290,7 @@ def test_raises_value_error_non_sym():
 
 def test_raises_non_homogeneous_node_labels():
     adj_matrix = [[1, 0], [0, 1]]
-    node_labels = [(0, 1), 2]
+    node_labels = np.array([(0, 1), 2], dtype=object)
     assert_raises(ValueError, DiGraph, adj_matrix, node_labels=node_labels)
 
 
