@@ -1,6 +1,125 @@
-"""
-Contain a Numba-jitted linear programming solver based on the Simplex
-Method.
+r"""
+Contain `linprog_simplex`, a Numba-jitted linear programming solver
+based on the Simplex Method.
+
+The formulation of linear program `linprog_simplex` assumes is:
+
+maximize::
+
+    c @ x
+
+subject to::
+
+    A_ub @ x <= b_ub
+    A_eq @ x == b_eq
+           x >= 0
+
+Examples
+--------
+1. A problem inequality constraints:
+
+   .. math::
+
+       \max_{x_0, x_1, x_2, x_3}\ \ & 2x_0 + 4x_1 + x_2 + x_3 \\
+       \mbox{such that}\ \ & 2x_0 + x_1 \leq 3, \\
+       & x_1 + 4x_2 + x_3 \leq 3, \\
+       & x_0 + 3x_1 + x_3 \leq 4, \\
+       & x_0, x_1, x_2, x_3 \geq 0.
+
+   Solve this problem with `linprog_simplex`:
+
+   >>> c = np.array([2, 4, 1, 1])
+   >>> A_ub = np.array([[2, 1, 0, 0], [0, 1, 4, 1], [1, 3, 0, 1]])
+   >>> b_ub = np.array([3, 3, 4])
+   >>> res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
+
+   The solution found:
+
+   >>> res.x
+   array([1. , 1. , 0.5, 0. ])
+
+   The optimal value:
+
+   >>> res.fun
+   6.5
+
+   `linprog_simplex` solves the dual problem, too. The dual solution
+   found:
+
+   >>> res.lambd
+   array([0.45, 0.25, 1.1 ])
+
+2. A problem equality constraints:
+
+   .. math::
+
+       \max_{x_0, x_1, x_2, x_3}\ \ & 2x_0 - 3x_1 + x_2 + x_3 \\
+       \mbox{such that}\ \ & x_0 + 2x_1 + x_2 + x_3 = 3, \\
+       & x_0 - 2x_1 + 2x_2 + x_3 = -2, \\
+       & 3x_0 - x_1 - x_3 = -1, \\
+       & x_0, x_1, x_2, x_3 \geq 0.
+
+   Solve this problem with `linprog_simplex`:
+
+   >>> c = np.array([2, -3, 1, 1])
+   >>> A_eq = np.array([[1, 2, 1, 1], [1, -2, 2, 1], [3, -1, 0, -1]])
+   >>> b_eq = np.array([3, -2, -1])
+   >>> res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+
+   The solution found:
+
+   >>> res.x
+   array([0.1875, 1.25  , 0.    , 0.3125])
+
+   The optimal value:
+
+   >>> res.fun
+   -3.0625
+
+   The dual solution:
+
+   >>> res.lambd
+   array([-0.0625,  1.3125,  0.25  ])
+
+3. Consider the following minimization problem (an example from the
+   documentation for `scipy.optimize.linprog`):
+
+   .. math::
+
+       \min_{x_0, x_1}\ \ & -x_0 + 4x_1 \\
+       \mbox{such that}\ \ & -3x_0 + x_1 \leq 6, \\
+       & -x_0 - 2x_1 \geq -4, \\
+       & x_1 \geq -3.
+
+   The problem is not represented in the form accepted by
+   `linprog_simplex`. Transforming the variables by :math:`x_0 = z_0 -
+   z_1` and :math:`x_1 + 3 = z_2`, and multiply the objective function
+   by :math:`-1`, we thus solve the following equivalent maximization
+   problem:
+
+   .. math::
+
+       \max_{z_0, z_1, z_2}\ \ & z_0 + z_1 - 4z_2 \\
+       \mbox{such that}\ \ & -3z_0 -3z_1 + z_2 \leq 9, \\
+       & z_0 + z_1 + 2z_2 \leq -2, \\
+       & z_0, z_1, z_2 \geq 0.
+
+   Solve the latter problem with `linprog_simplex`:
+
+   >>> c = np.array([1, 1, -4])
+   >>> A = np.array([[-3, -3, 1], [1, 1, 2]])
+   >>> b = np.array([9, 10])
+   >>> res = linprog_simplex(c, A_ub=A, b_ub=b)
+
+   The optimal value of the original problem:
+
+   >>> -(res.fun + 12)  # -(z_0 + z_1 - 4 (z_2 - 3))
+   -22.0
+
+   And the solution found:
+
+   >>> res.x[0] - res.x[1], res.x[2] - 3  # (z_0 - z_1, z_2 - 3)
+   (10.0, -3.0)
 
 """
 from collections import namedtuple
@@ -127,7 +246,7 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                     0 : Optimization terminated successfully
                     1 : Iteration limit reached
                     2 : Problem appears to be infeasible
-                    3 : Problem apperas to be unbounded
+                    3 : Problem appears to be unbounded
 
             num_iter : int
                 The number of iterations performed.
@@ -466,10 +585,10 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
         status = 2
         return success, status, num_iter_1
 
-    # Check artifial variables have been eliminated
+    # Check artificial variables have been eliminated
     tol_piv = piv_options.tol_piv
     for i in range(L):
-        if basis[i] >= nm:  # Artifial variable not eliminated
+        if basis[i] >= nm:  # Artificial variable not eliminated
             for j in range(nm):
                 if tableau[i, j] < -tol_piv or \
                    tableau[i, j] > tol_piv:  # Treated nonzero
