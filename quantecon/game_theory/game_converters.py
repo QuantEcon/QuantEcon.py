@@ -7,8 +7,11 @@ Examples
 Create a QuantEcon NormalFormGame from a gam file storing
 a 3-player Minimum Effort Game
 
->>> filepath = "./tests/gam_files/minimum_effort_game.gam"
->>> nfg = qe_nfg_from_gam_file(filepath)
+>>> import os
+>>> import quantecon.game_theory as gt
+>>> filepath = os.path.dirname(gt.__file__)
+>>> filepath += "/tests/game_files/minimum_effort_game.gam"
+>>> nfg = gt.qe_nfg_from_gam_file(filepath)
 >>> print(nfg)
 3-player NormalFormGame with payoff profile array:
 [[[[  1.,   1.,   1.],   [  1.,   1.,  -9.],   [  1.,   1., -19.]],
