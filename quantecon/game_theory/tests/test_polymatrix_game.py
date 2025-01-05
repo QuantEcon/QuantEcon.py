@@ -3,7 +3,7 @@ Tests for polymatrix_game.py
 """
 
 from numpy.testing import assert_, assert_raises
-from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
+from quantecon.game_theory.game_converters import from_gam
 from quantecon.game_theory import NormalFormGame, PolymatrixGame
 from numpy import allclose, zeros
 
@@ -39,13 +39,13 @@ class TestPolymatrixGame():
     @classmethod
     def setup_class(cls):
         filename = "minimum_effort_game.gam"
-        cls.non_pmg = qe_nfg_from_gam_file(
+        cls.non_pmg = from_gam(
             os.path.join(data_dir, filename))
         filename = "big_polym.gam"
-        cls.pmg1 = qe_nfg_from_gam_file(
+        cls.pmg1 = from_gam(
             os.path.join(data_dir, filename))
         filename = "triggers_back_case.gam"
-        cls.pmg2 = qe_nfg_from_gam_file(
+        cls.pmg2 = from_gam(
             os.path.join(data_dir, filename))
         bimatrix = [[(54, 23), (72, 34)],
                     [(92, 32), (34, 36)],

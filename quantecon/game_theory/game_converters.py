@@ -11,7 +11,7 @@ a 3-player Minimum Effort Game
 >>> import quantecon.game_theory as gt
 >>> filepath = os.path.dirname(gt.__file__)
 >>> filepath += "/tests/game_files/minimum_effort_game.gam"
->>> nfg = gt.qe_nfg_from_gam_file(filepath)
+>>> nfg = gt.from_gam(filepath)
 >>> print(nfg)
 3-player NormalFormGame with payoff profile array:
 [[[[  1.,   1.,   1.],   [  1.,   1.,  -9.],   [  1.,   1., -19.]],
@@ -203,7 +203,7 @@ class GAMWriter:
         return s.rstrip()
 
 
-def qe_nfg_from_gam_file(filename: str) -> NormalFormGame:
+def from_gam(filename: str) -> NormalFormGame:
     """
     Makes a QuantEcon Normal Form Game from a gam file.
 
