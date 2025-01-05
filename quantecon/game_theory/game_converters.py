@@ -226,3 +226,21 @@ def from_gam(filename: str) -> NormalFormGame:
 
     """
     return GAMReader.from_file(filename)
+
+
+def to_gam(g, file_path=None):
+    """
+    Write a NormalFormGame to a file in gam format.
+
+    Parameters
+    ----------
+    g : NormalFormGame
+
+    file_path : str, optional(default=None)
+        Path to the file to write to. If None, the result is returned as
+        a string.
+
+    """
+    if file_path is None:
+        return GAMWriter.to_string(g)
+    return GAMWriter.to_file(g, file_path)

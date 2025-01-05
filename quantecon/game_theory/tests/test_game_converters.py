@@ -5,10 +5,10 @@ Tests for game_theory/game_converters.py
 import os
 from tempfile import NamedTemporaryFile
 from numpy.testing import assert_string_equal
-from quantecon.game_theory import NormalFormGame, GAMWriter
+from quantecon.game_theory import NormalFormGame, GAMWriter, to_gam
 
 
-class TestGAMWrite:
+class TestGAMWriter:
     def setup_method(self):
         nums_actions = (2, 2, 2)
         g = NormalFormGame(nums_actions)
@@ -45,3 +45,17 @@ class TestGAMWrite:
         s_actual = GAMWriter.to_string(self.g)
 
         assert_string_equal(s_actual, self.s_desired)
+
+    def test_to_gam(self):
+        s_actual = to_gam(self.g)
+        assert_string_equal(s_actual, self.s_desired)
+
+        with NamedTemporaryFile(delete=False) as tmp_file:
+            temp_path = tmp_file.name
+            to_gam(self.g, temp_path)
+
+        with open(temp_path, 'r') as f:
+            s_actual = f.read()
+        assert_string_equal(s_actual, self.s_desired + '\n')
+
+        os.remove(temp_path)
