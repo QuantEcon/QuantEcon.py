@@ -67,7 +67,7 @@ srcclean:
 
 myhtml:
 	make srcclean
-	cd .. && python setup.py install && cd docs
+	cd .. && pip install . && cd docs
 	python qe_apidoc.py
 	make html
 
