@@ -4,7 +4,7 @@ Tests for howson_lcp.py
 
 import numpy as np
 from numpy.testing import assert_, assert_allclose
-from quantecon.game_theory.game_converters import qe_nfg_from_gam_file
+from quantecon.game_theory.game_converters import from_gam
 from quantecon.game_theory import (
     Player,
     NormalFormGame,
@@ -22,7 +22,7 @@ data_dir = os.path.join(this_dir, data_dir_name)
 
 def test_polym_lcp_solver_where_solution_is_pure_NE():
     filename = "big_polym.gam"
-    nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
+    nfg = from_gam(os.path.join(data_dir, filename))
     polymg = PolymatrixGame.from_nf(nfg)
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
@@ -31,7 +31,7 @@ def test_polym_lcp_solver_where_solution_is_pure_NE():
 
 def test_polym_lcp_solver_where_lcp_solver_must_backtrack():
     filename = "triggers_back_case.gam"
-    nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
+    nfg = from_gam(os.path.join(data_dir, filename))
     polymg = PolymatrixGame.from_nf(nfg)
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
@@ -305,7 +305,7 @@ def test_solves_multiplayer_rps_like():
 
 def test_different_starting():
     filename = "triggers_back_case.gam"
-    nfg = qe_nfg_from_gam_file(os.path.join(data_dir, filename))
+    nfg = from_gam(os.path.join(data_dir, filename))
     polymg = PolymatrixGame.from_nf(nfg)
     starting = [3, 2, 2, 0, 3]
     # We also notice that changing the start
