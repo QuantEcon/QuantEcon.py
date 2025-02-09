@@ -49,7 +49,7 @@ class LogitDynamics:
 
         for player in self.players:
             payoff_array_rotated = \
-                player.payoff_array.transpose(list(range(1, self.N)) + [0])
+                player.payoff_array.transpose((*range(1, self.N), 0))
             payoff_array_rotated -= \
                 payoff_array_rotated.max(axis=-1)[..., np.newaxis]
             player.logit_choice_cdfs = \

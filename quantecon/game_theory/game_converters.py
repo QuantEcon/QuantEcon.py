@@ -139,7 +139,7 @@ class GAMReader:
         players = [
             Player(
                 payoffs2d[i, :].reshape(nums_actions, order='F').transpose(
-                    list(range(i, N)) + list(range(i))
+                    (*range(i, N), *range(i))
                 )
             ) for i in range(N)
         ]
@@ -196,7 +196,7 @@ class GAMWriter:
         for i, player in enumerate(g.players):
             payoffs = np.array2string(
                 player.payoff_array.transpose(
-                    list(range(g.N-i, g.N)) + list(range(g.N-i))
+                    (*range(g.N-i, g.N), *range(g.N-i))
                 ).ravel(order='F'))[1:-1]
             s += ' '.join(payoffs.split()) + ' '
 

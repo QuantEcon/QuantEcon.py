@@ -640,8 +640,9 @@ class NormalFormGame:
                 )
                 for i, payoff_array in enumerate(payoff_arrays):
                     payoff_array[:] = \
-                        data.take(i, axis=-1).transpose(list(range(i, N)) +
-                                                        list(range(i)))
+                        data.take(i, axis=-1).transpose(
+                            (*range(i, N), *range(i))
+                        )
                 self.players = tuple(
                     Player(payoff_array) for payoff_array in payoff_arrays
                 )
@@ -663,8 +664,7 @@ class NormalFormGame:
             np.empty(self.players[0].payoff_array.shape + (N,), dtype=dtype)
         for i, player in enumerate(self.players):
             payoff_profile_array[..., i] = \
-                player.payoff_array.transpose(list(range(N-i, N)) +
-                                              list(range(N-i)))
+                player.payoff_array.transpose((*range(N-i, N), *range(N-i)))
         return payoff_profile_array
 
     def __repr__(self):
