@@ -5,6 +5,12 @@ Import the main names to top level.
 
 __version__ = '0.7.2'
 
+# Silent the upstream(openmp via numba) warnings
+# The following flag is used to silent the warning.
+# For more details see: https://github.com/QuantEcon/QuantEcon.py/issues/627
+import os
+os.environ['KMP_WARNINGS'] = 'off'
+
 try:
     import numba
 except:
