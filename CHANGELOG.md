@@ -1,5 +1,11 @@
 # Changelog
 
+Future CHANGELOG entries will be documented under the [release notes on GitHub](https://github.com/QuantEcon/QuantEcon.py/releases)
+
+## Ver 0.8.0 (13th-Feb-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.8.0)
+
 ## Ver 0.7.2 (14th-March-2024)
 
 ### Fix
