@@ -107,3 +107,13 @@ class TestLCPLemke:
 
         res = lcp_lemke(M, q)
         _assert_success(res, M, q)
+
+    def test_bug_768(self):
+        n = 10
+        seed = 0
+        rng = np.random.RandomState(seed)
+        A = rng.standard_normal((n, n))
+        M = A.T @ A + np.eye(n)
+        q = rng.standard_normal(n)
+        res = lcp_lemke(M, q)
+        _assert_success(res, M, q)

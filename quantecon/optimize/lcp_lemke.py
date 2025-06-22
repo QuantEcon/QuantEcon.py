@@ -150,7 +150,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
         ratio = q[i] / d[i]
         if ratio <= ratio_min + piv_options.tol_ratio_diff:
             pivrow = i
-            ratio = ratio_min
+            ratio_min = ratio
 
     _pivoting(tableau, pivcol, pivrow)
     basis[pivrow], pivcol = pivcol, pivrow + n
