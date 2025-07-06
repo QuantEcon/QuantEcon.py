@@ -11,6 +11,8 @@ A high performance, open source Python code library for economics
 [![Build Status](https://github.com/QuantEcon/QuantEcon.py/actions/workflows/ci.yml/badge.svg)](https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Abuild)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.svg)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 [![Documentation Status](https://readthedocs.org/projects/quanteconpy/badge/?version=latest)](https://quanteconpy.readthedocs.io/en/latest/?badge=latest)
+[![PyPI Version](https://img.shields.io/pypi/v/quantecon.svg)](https://pypi.org/project/quantecon/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/quantecon.svg)](https://pypi.org/project/quantecon/)
 
 ## Installation
 
