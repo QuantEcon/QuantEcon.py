@@ -150,10 +150,6 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
         msg = "Check your method input. Should be {} or {}".format(*methods)
         raise ValueError(msg)
 
-    # == Set up == #
-    error = tolerance + 1
-    fail_msg = "Convergence failed after {} iterations."
-
     # == Make sure that all array_likes are np arrays, two-dimensional == #
     A, B, Q, R = np.atleast_2d(A, B, Q, R)
     n, k = R.shape[0], Q.shape[0]
@@ -164,10 +160,15 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
         N = np.atleast_2d(N)
 
     if method == 'qz':
-        X = sp_solve_discrete_are(A, B, Q, R, s=N.T)
+        X = sp_solve_discrete_are(A, B, Q, R, e=I, s=N.T)
         return X
 
     # if method == 'doubling'
+
+    # == Set up == #
+    error = tolerance + 1
+    fail_msg = "Convergence failed after {} iterations."
+
     # == Choose optimal value of gamma in R_hat = R + gamma B'B == #
     current_min = np.inf
     candidates = (0.01, 0.1, 0.25, 0.5, 1.0, 2.0, 10.0, 100.0, 10e5)
