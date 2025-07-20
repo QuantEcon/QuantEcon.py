@@ -2,7 +2,7 @@ r"""
 Contain `linprog_simplex`, a Numba-jitted linear programming solver
 based on the Simplex Method.
 
-The formulation of linear program `linprog_simplex` assumes is:
+The formulation of linear program that `linprog_simplex` assumes is:
 
 maximize::
 
@@ -16,7 +16,7 @@ subject to::
 
 Examples
 --------
-1. A problem inequality constraints:
+1. A problem with inequality constraints:
 
    .. math::
 
@@ -49,7 +49,7 @@ Examples
    >>> res.lambd
    array([0.45, 0.25, 1.1 ])
 
-2. A problem equality constraints:
+2. A problem with equality constraints:
 
    .. math::
 
@@ -99,27 +99,27 @@ Examples
 
    .. math::
 
-       \max_{z_0, z_1, z_2}\ \ & z_0 + z_1 - 4z_2 \\
-       \mbox{such that}\ \ & -3z_0 -3z_1 + z_2 \leq 9, \\
-       & z_0 + z_1 + 2z_2 \leq -2, \\
+       \max_{z_0, z_1, z_2}\ \ & z_0 - z_1 - 4z_2 \\
+       \mbox{such that}\ \ & -3z_0 + 3z_1 + z_2 \leq 9, \\
+       & z_0 - z_1 + 2z_2 \leq 10, \\
        & z_0, z_1, z_2 \geq 0.
 
    Solve the latter problem with `linprog_simplex`:
 
-   >>> c = np.array([1, 1, -4])
-   >>> A = np.array([[-3, -3, 1], [1, 1, 2]])
+   >>> c = np.array([1, -1, -4])
+   >>> A = np.array([[-3, 3, 1], [1, -1, 2]])
    >>> b = np.array([9, 10])
    >>> res = linprog_simplex(c, A_ub=A, b_ub=b)
 
    The optimal value of the original problem:
 
-   >>> -(res.fun + 12)  # -(z_0 + z_1 - 4 (z_2 - 3))
-   -22.0
+   >>> -(res.fun + 12)  # -(z_0 - z_1 - 4 (z_2 - 3))
+   -21.999999999999996
 
    And the solution found:
 
    >>> res.x[0] - res.x[1], res.x[2] - 3  # (z_0 - z_1, z_2 - 3)
-   (10.0, -3.0)
+   (np.float64(9.999999999999998), np.float64(-3.0))
 
 """
 from collections import namedtuple
@@ -192,7 +192,7 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
         ndarray of shape (k,).
 
     max_iter : int, optional(default=10**6)
-        Maximum number of iteration to perform.
+        Maximum number of iterations to perform.
 
     piv_options : PivOptions, optional
         PivOptions namedtuple to set the following tolerance values:
@@ -204,7 +204,7 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                 Pivot tolerance (default={TOL_PIV}).
 
             tol_ratio_diff : float
-                Tolerance used in the the lexicographic pivoting
+                Tolerance used in the lexicographic pivoting
                 (default={TOL_RATIO_DIFF}).
 
     tableau : ndarray(float, ndim=2), optional
