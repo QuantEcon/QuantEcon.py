@@ -15,6 +15,7 @@
 import sys
 import os
 import pip
+from datetime import datetime
 
 try:
     from mock import Mock as MagicMock
@@ -101,7 +102,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'QuantEcon'
-copyright = u'2014, QuantEcon Developer Team'
+year = datetime.now().year
+copyright = f'2008-{year}, QuantEcon Developer Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
