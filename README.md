@@ -50,7 +50,7 @@ If your version is below what’s available on [PyPI](https://pypi.python.org/p
 Many examples of QuantEcon.py in action can be found at [Quantitative Economics](https://lectures.quantecon.org/). See also the
 
 *   [Documentation](https://quanteconpy.readthedocs.org/en/latest/)
-*   [Notebook gallery](https://notes.quantecon.org)
+*   [Notebook gallery](https://github.com/QuantEcon/notebook-gallery)
 
 QuantEcon.py is supported financially by the [Alfred P. Sloan Foundation](http://www.sloan.org/) and is part of the [QuantEcon organization](https://quantecon.org).
 
