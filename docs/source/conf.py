@@ -103,7 +103,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'QuantEcon'
 year = datetime.now().year
-copyright = f'2008-{year}, QuantEcon Developer Team'
+copyright = f'2014-{year}, QuantEcon Developer Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
