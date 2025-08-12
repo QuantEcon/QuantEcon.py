@@ -62,7 +62,7 @@ def dare_tjm_3(method):
     B = I
     R = [[1, r],
          [r, r*r]]
-    Q = I - np.dot(A.T, A) + np.dot(A.T, np.linalg.solve(R + I, A))
+    Q = I - (A.T @ A) + (A.T @ np.linalg.solve(R + I, A))
     X = solve_discrete_riccati(A, B, Q, R, method=method)
     Y = np.identity(2)
     assert_allclose(X, Y, atol=1e-07)

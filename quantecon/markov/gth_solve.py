@@ -83,12 +83,12 @@ def gth_solve(A, overwrite=False, use_jit=True):
             break
         A1[k+1:n, k] /= scale
 
-        A1[k+1:n, k+1:n] += np.dot(A1[k+1:n, k:k+1], A1[k:k+1, k+1:n])
+        A1[k+1:n, k+1:n] += A1[k+1:n, k:k+1] @ A1[k:k+1, k+1:n]
 
     # === Backward substitution === #
     x[n-1] = 1
     for k in range(n-2, -1, -1):
-        x[k] = np.dot(x[k+1:n], A1[k+1:n, k])
+        x[k] = x[k+1:n] @ A1[k+1:n, k]
 
     # === Normalization === #
     x /= np.sum(x)
