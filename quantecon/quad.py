@@ -268,6 +268,9 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
     sig2 : array_like(float), optional(default=eye(d))
         A d x d array representing the variance-covariance matrix of the
         multivariate normal distribution.
+    
+    usesqrtm : bool, optional(default=False)
+        Whether to use matrix square root method for decomposition.
 
     Returns
     -------

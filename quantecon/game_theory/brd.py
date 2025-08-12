@@ -164,8 +164,26 @@ class KMR(BRD):
 
     def play(self, action, action_dist, **options):
         """
-        See `play` in `BRD`.
+        Return a new action distribution using mutational best response.
+        
+        With probability epsilon, the player chooses a random action 
+        (mutation), otherwise plays the best response.
+        
+        Parameters
+        ----------
+        action : scalar(int)
+            Pure action of player who takes action.
 
+        action_dist : ndarray(int)
+            The initial action distribution of players.
+
+        **options : 
+            Keyword arguments passed to the best response method.
+            
+        Returns
+        -------
+        ndarray(int)
+            New action distribution.
         """
         tie_breaking = options.get('tie_breaking', self.tie_breaking)
         tol = options.get('tol', None)
@@ -223,8 +241,26 @@ class SamplingBRD(BRD):
 
     def play(self, action, action_dist, **options):
         """
-        See `play` in `BRD`.
+        Return a new action distribution using sampling best response.
+        
+        The player samples k opponents' actions and computes the best response
+        to the resulting sample distribution.
+        
+        Parameters
+        ----------
+        action : scalar(int)
+            Pure action of player who takes action.
 
+        action_dist : ndarray(int)
+            The initial action distribution of players.
+
+        **options : 
+            Keyword arguments passed to the best response method.
+            
+        Returns
+        -------
+        ndarray(int)
+            New action distribution.
         """
         tie_breaking = options.get('tie_breaking', self.tie_breaking)
         tol = options.get('tol', None)
