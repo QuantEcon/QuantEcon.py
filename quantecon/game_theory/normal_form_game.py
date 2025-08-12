@@ -306,7 +306,7 @@ class Player:
         if isinstance(own_action, numbers.Integral):
             return payoff_vector[own_action] >= payoff_max - tol
         else:
-            return np.dot(own_action, payoff_vector) >= payoff_max - tol
+            return own_action @ payoff_vector >= payoff_max - tol
 
     def best_response(self, opponents_actions, tie_breaking='smallest',
                       payoff_perturbation=None, tol=None, random_state=None):

@@ -396,12 +396,12 @@ class LinearStateSpace:
 
         # Create room for coefficients
         xcoef = [C]
-        ycoef = [np.dot(G, C)]
+        ycoef = [G @ C]
 
         for i in range(j):
-            xcoef.append(np.dot(Apower, C))
-            ycoef.append(np.dot(G, np.dot(Apower, C)))
-            Apower = np.dot(Apower, A)
+            xcoef.append(Apower @ C)
+            ycoef.append(G @ (Apower @ C))
+            Apower = Apower @ A
 
         return xcoef, ycoef
 
