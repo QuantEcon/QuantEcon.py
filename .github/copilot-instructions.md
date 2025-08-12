@@ -123,10 +123,14 @@ Core runtime dependencies (auto-installed in conda env):
 - Some tests marked as "slow" - use `pytest -m "not slow"` to skip them during development
 
 ### Repository Status
-- Current version: 0.8.2
+- Current version: Check `quantecon/__init__.py` for `__version__` variable
 - Build system: flit (modern Python packaging)
 - License: MIT
 - Documentation: ReadTheDocs (quanteconpy.readthedocs.io)
+
+### Maintenance Notes
+- When creating new releases, verify that timing expectations and test counts in these instructions remain accurate
+- Version information is dynamically referenced to avoid hardcoded values
 
 ## Quick Reference Commands
 
