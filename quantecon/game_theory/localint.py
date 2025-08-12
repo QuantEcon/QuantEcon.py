@@ -55,7 +55,7 @@ class LocalInteraction:
             (np.ones(self.N, dtype=int), actions, np.arange(self.N+1)),
             shape=(self.N, self.num_actions))
 
-        opponent_act_dict = self.adj_matrix[player_ind].dot(
+        opponent_act_dict = (self.adj_matrix[player_ind] @
             actions_matrix).toarray()
 
         for k, i in enumerate(player_ind):

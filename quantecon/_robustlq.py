@@ -253,9 +253,9 @@ class RBLQ:
             iterate += 1
             P = new_P
         I = np.identity(self.j)
-        S1 = P.dot(C)
-        S2 = C.T.dot(S1)
-        K = inv(theta * I - S2).dot(S1.T).dot(A - B.dot(F))
+        S1 = P @ C
+        S2 = C.T @ S1
+        K = inv(theta * I - S2) @ S1.T @ (A - B @ F)
 
         return F, K, P
 
@@ -387,14 +387,14 @@ class RBLQ:
         # == Solve for policies and costs using agent 2's problem == #
         K_F, P_F = self.F_to_K(F)
         I = np.identity(self.j)
-        H = inv(I - C.T.dot(P_F.dot(C)) / theta)
+        H = inv(I - C.T @ P_F @ C / theta)
         d_F = np.log(det(H))
 
         # == Compute O_F and o_F == #
         AO = np.sqrt(beta) * (A - (B @ F) + (C @ K_F))
         O_F = solve_discrete_lyapunov(AO.T, beta * (K_F.T @ K_F))
         ho = (np.trace(H - 1) - d_F) / 2.0
-        tr = np.trace(O_F @ C.dot(H.dot(C.T)))
+        tr = np.trace(O_F @ C @ H @ C.T)
         o_F = (ho + beta * tr) / (1 - beta)
 
         return K_F, P_F, d_F, O_F, o_F

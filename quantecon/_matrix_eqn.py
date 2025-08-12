@@ -72,8 +72,8 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
 
         while diff > 1e-15:
 
-            alpha1 = alpha0.dot(alpha0)
-            gamma1 = gamma0 + (alpha0.dot(gamma0) @ alpha0.conjugate().T)
+            alpha1 = alpha0 @ alpha0
+            gamma1 = gamma0 + (alpha0 @ gamma0 @ alpha0.conjugate().T)
 
             diff = np.max(np.abs(gamma1 - gamma0))
             alpha0 = alpha1

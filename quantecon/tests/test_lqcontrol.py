@@ -83,7 +83,7 @@ class TestLQControl:
 
         for method in self.methods:
             P, F, d = lq_mat.stationary_values(method=method)
-            val_func_lq = (x0 @ P).dot(x0)
+            val_func_lq = x0 @ P @ x0
 
             assert_allclose(f_answer, F, atol=1e-3)
             assert_allclose(val_func_lq, val_func_answer, atol=1e-3)
