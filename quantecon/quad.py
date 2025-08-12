@@ -24,11 +24,37 @@ __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
 
 @vectorize(nopython=True)
 def gammaln(x):
+    """
+    Natural logarithm of the gamma function.
+    
+    Parameters
+    ----------
+    x : float
+        Input value.
+        
+    Returns
+    -------
+    float
+        Natural logarithm of gamma(x).
+    """
     return math.lgamma(x)
 
 
 @vectorize(nopython=True)
 def fix(x):
+    """
+    Round towards zero.
+    
+    Parameters
+    ----------
+    x : float
+        Input value.
+        
+    Returns
+    -------
+    float
+        Rounded value towards zero.
+    """
     if x < 0:
         return math.ceil(x)
     else:

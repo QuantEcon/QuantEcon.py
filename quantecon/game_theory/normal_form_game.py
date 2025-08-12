@@ -658,6 +658,15 @@ class NormalFormGame:
 
     @property
     def payoff_profile_array(self):
+        """
+        Return the payoff profile array of the game.
+        
+        Returns
+        -------
+        ndarray(float, ndim=N+1)
+            Array of shape (n_0, ..., n_{N-1}, N) containing the payoff
+            profiles, where the last axis represents the players.
+        """
         N = self.N
         dtype = self.dtype
         payoff_profile_array = \

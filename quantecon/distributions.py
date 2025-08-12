@@ -36,18 +36,39 @@ class BetaBinomial:
 
     @property
     def mean(self):
-        "mean"
+        """
+        Mean of the Beta-binomial distribution.
+        
+        Returns
+        -------
+        float
+            The mean of the distribution, equal to n * a / (a + b).
+        """
         n, a, b = self.n, self.a, self.b
         return n * a / (a + b)
 
     @property
     def std(self):
-        "standard deviation"
+        """
+        Standard deviation of the Beta-binomial distribution.
+        
+        Returns
+        -------
+        float
+            The standard deviation of the distribution.
+        """
         return sqrt(self.var)
 
     @property
     def var(self):
-        "Variance"
+        """
+        Variance of the Beta-binomial distribution.
+        
+        Returns
+        -------
+        float
+            The variance of the distribution.
+        """
         n, a, b = self.n, self.a, self.b
         top = n*a*b * (a + b + n)
         btm = (a+b)**2.0 * (a+b+1.0)
@@ -55,7 +76,14 @@ class BetaBinomial:
 
     @property
     def skew(self):
-        "skewness"
+        """
+        Skewness of the Beta-binomial distribution.
+        
+        Returns
+        -------
+        float
+            The skewness of the distribution.
+        """
         n, a, b = self.n, self.a, self.b
         t1 = (a+b+2*n) * (b - a) / (a+b+2)
         t2 = sqrt((1+a+b) / (n*a*b * (n+a+b)))

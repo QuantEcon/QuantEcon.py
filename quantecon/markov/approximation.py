@@ -232,6 +232,19 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
 
 @njit
 def std_norm_cdf(x):
+    """
+    Standard normal cumulative distribution function.
+    
+    Parameters
+    ----------
+    x : float
+        Input value.
+        
+    Returns
+    -------
+    float
+        CDF value at x for standard normal distribution.
+    """
     return 0.5 * erfc(-x / sqrt(2))
 
 

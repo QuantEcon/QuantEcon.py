@@ -220,10 +220,26 @@ class MarkovChain:
 
     @property
     def state_values(self):
+        """
+        State values of the MarkovChain.
+        
+        Returns
+        -------
+        ndarray or None
+            Array of state values if set, None otherwise.
+        """
         return self._state_values
 
     @state_values.setter
     def state_values(self, values):
+        """
+        Set state values of the MarkovChain.
+        
+        Parameters
+        ----------
+        values : array_like or None
+            Array of state values with length n, or None to unset.
+        """
         if values is None:
             self._state_values = None
         else:
@@ -313,40 +329,117 @@ class MarkovChain:
 
     @property
     def digraph(self):
+        """
+        Directed graph representation of the Markov chain.
+        
+        Returns
+        -------
+        DiGraph
+            Directed graph with nodes as states and edges as positive 
+            transition probabilities.
+        """
         if self._digraph is None:
             self._digraph = DiGraph(self.P, node_labels=self.state_values)
         return self._digraph
 
     @property
     def is_irreducible(self):
+        """
+        Whether the Markov chain is irreducible.
+        
+        Returns
+        -------
+        bool
+            True if the Markov chain is irreducible, False otherwise.
+        """
         return self.digraph.is_strongly_connected
 
     @property
     def num_communication_classes(self):
+        """
+        Number of communication classes.
+        
+        Returns
+        -------
+        int
+            Number of communication classes (strongly connected components).
+        """
         return self.digraph.num_strongly_connected_components
 
     @property
     def communication_classes_indices(self):
+        """
+        Indices of the communication classes.
+        
+        Returns
+        -------
+        list(list(int))
+            List of lists, each containing the indices of states in a 
+            communication class.
+        """
         return self.digraph.strongly_connected_components_indices
 
     @property
     def communication_classes(self):
+        """
+        Communication classes of the Markov chain.
+        
+        Returns
+        -------
+        list(list)
+            List of lists, each containing the state values in a 
+            communication class.
+        """
         return self.digraph.strongly_connected_components
 
     @property
     def num_recurrent_classes(self):
+        """
+        Number of recurrent classes.
+        
+        Returns
+        -------
+        int
+            Number of recurrent classes.
+        """
         return self.digraph.num_sink_strongly_connected_components
 
     @property
     def recurrent_classes_indices(self):
+        """
+        Indices of the recurrent classes.
+        
+        Returns
+        -------
+        list(list(int))
+            List of lists, each containing the indices of states in a 
+            recurrent class.
+        """
         return self.digraph.sink_strongly_connected_components_indices
 
     @property
     def recurrent_classes(self):
+        """
+        Recurrent classes of the Markov chain.
+        
+        Returns
+        -------
+        list(list)
+            List of lists, each containing the state values in a 
+            recurrent class.
+        """
         return self.digraph.sink_strongly_connected_components
 
     @property
     def is_aperiodic(self):
+        """
+        Whether the Markov chain is aperiodic.
+        
+        Returns
+        -------
+        bool
+            True if the Markov chain is aperiodic, False otherwise.
+        """
         if self.is_irreducible:
             return self.digraph.is_aperiodic
         else:
@@ -354,6 +447,16 @@ class MarkovChain:
 
     @property
     def period(self):
+        """
+        Period of the Markov chain.
+        
+        Returns
+        -------
+        int
+            Period of the Markov chain. For irreducible chains, this is
+            the period of any state. For reducible chains, this is the
+            least common multiple of the periods of recurrent classes.
+        """
         if self.is_irreducible:
             return self.digraph.period
         else:
@@ -367,6 +470,20 @@ class MarkovChain:
 
     @property
     def cyclic_classes(self):
+        """
+        Cyclic classes of the Markov chain.
+        
+        Returns
+        -------
+        list(list)
+            List of lists, each containing the state values in a 
+            cyclic class.
+            
+        Raises
+        ------
+        NotImplementedError
+            If the Markov chain is reducible.
+        """
         if not self.is_irreducible:
             raise NotImplementedError(
                 'Not defined for a reducible Markov chain'
