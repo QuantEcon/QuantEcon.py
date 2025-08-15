@@ -225,12 +225,12 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
         stationary_distributions = self.stationary
 
         if self.n_stat_dists == 1:
-            assert_allclose(stationary_distributions @ mc.P,
+            assert_allclose(np.dot(stationary_distributions, mc.P),
                             stationary_distributions, atol=self.TOL)
         else:
             for i in range(self.n_stat_dists):
                 curr_v = stationary_distributions[i, :]
-                assert_allclose(curr_v @ mc.P, curr_v, atol=self.TOL)
+                assert_allclose(np.dot(curr_v, mc.P), curr_v, atol=self.TOL)
 
 
 def test_simulate_shape():

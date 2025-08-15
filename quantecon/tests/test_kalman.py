@@ -17,8 +17,8 @@ class TestKalman:
         self.G = np.eye(2) * .5
         self.H = np.eye(2) * np.sqrt(0.2)
 
-        self.Q = self.C @ self.C.T
-        self.R = self.H @ self.H.T
+        self.Q = np.dot(self.C, self.C.T)
+        self.R = np.dot(self.H, self.H.T)
 
         ss = LinearStateSpace(self.A, self.C, self.G, self.H)
 
@@ -38,13 +38,13 @@ class TestKalman:
         for method in self.methods:
             sig_inf, kal_gain = kf.stationary_values(method=method)
 
-            mat_inv = np.linalg.inv(G @ sig_inf @ G.T + R)
+            mat_inv = np.linalg.inv(G.dot(sig_inf).dot(G.T) + R)
 
             # Compute the kalmain gain and sigma infinity according to the
             # recursive equations and compare
-            kal_recursion = (A @ sig_inf) @ G.T @ mat_inv
-            sig_recursion = (A @ sig_inf @ A.T -
-                                kal_recursion @ G @ sig_inf @ A.T + Q)
+            kal_recursion = np.dot(A, sig_inf).dot(G.T).dot(mat_inv)
+            sig_recursion = (A.dot(sig_inf).dot(A.T) -
+                                kal_recursion.dot(G).dot(sig_inf).dot(A.T) + Q)
 
             assert_allclose(kal_gain, kal_recursion, rtol=1e-4, atol=1e-2)
             assert_allclose(sig_inf, sig_recursion, rtol=1e-4, atol=1e-2)
@@ -75,12 +75,12 @@ class TestKalman:
         kf.set_state(curr_x, curr_sigma)
         kf.update(y_observed)
 
-        mat_inv = np.linalg.inv(G @ curr_sigma @ G.T + R)
-        curr_k = (A @ curr_sigma) @ G.T @ mat_inv
-        new_sigma = (A @ curr_sigma @ A.T -
-                    curr_k @ G @ curr_sigma @ A.T + Q)
+        mat_inv = np.linalg.inv(G.dot(curr_sigma).dot(G.T) + R)
+        curr_k = np.dot(A, curr_sigma).dot(G.T).dot(mat_inv)
+        new_sigma = (A.dot(curr_sigma).dot(A.T) -
+                    curr_k.dot(G).dot(curr_sigma).dot(A.T) + Q)
 
-        new_xhat = A @ curr_x + curr_k @ (y_observed - G @ curr_x)
+        new_xhat = A.dot(curr_x) + curr_k.dot(y_observed - G.dot(curr_x))
 
         assert_allclose(kf.Sigma, new_sigma, rtol=1e-4, atol=1e-2)
         assert_allclose(kf.x_hat, new_xhat, rtol=1e-4, atol=1e-2)
