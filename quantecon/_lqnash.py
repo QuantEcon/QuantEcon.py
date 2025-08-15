@@ -30,7 +30,7 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
 
     Parameters
     ----------
-    A : scalar(float) or array_like(float)
+    A : array_like(float)
         Corresponds to the above equation, should be of size (n, n)
     B1 : scalar(float) or array_like(float)
         As above, size (n, k_1)
@@ -117,22 +117,22 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
         H1 = G1 @ B1.T @ P1
 
         # break up the computation of F1, F2
-        F1_left = v1 - ((H1 @ B2 + G1 @ M1.T) @
-                           (H2 @ B1 + G2 @ M2.T))
-        F1_right = H1 @ A + G1 @ W1.T - ((H1 @ B2 + G1 @ M1.T) @
-                                                (H2 @ A + G2 @ W2.T))
+        F1_left = v1 - ((H1 @ B2 + G1.dot(M1.T)) @
+                           (H2 @ B1 + G2.dot(M2.T)))
+        F1_right = H1 @ A + G1.dot(W1.T) - ((H1 @ B2 + G1.dot(M1.T)) @
+                                                (H2 @ A + G2.dot(W2.T)))
         F1 = solve(F1_left, F1_right)
-        F2 = H2 @ A + G2 @ W2.T - ((H2 @ B1 + G2 @ M2.T) @ F1)
+        F2 = H2 @ A + G2.dot(W2.T) - ((H2 @ B1 + G2.dot(M2.T)) @ F1)
 
         Lambda1 = A - B2 @ F2
         Lambda2 = A - B1 @ F1
-        Pi1 = R1 + (F2.T @ S1 @ F2)
-        Pi2 = R2 + (F1.T @ S2 @ F1)
+        Pi1 = R1 + (F2.T @ S1.dot(F2))
+        Pi2 = R2 + (F1.T @ S2.dot(F1))
 
         P1 = (Lambda1.T @ P1 @ Lambda1) + Pi1 - \
-             ((Lambda1.T @ P1 @ B1) + W1 - F2.T @ M1) @ F1
+             ((Lambda1.T @ P1 @ B1) + W1 - F2.T.dot(M1)) @ F1
         P2 = (Lambda2.T @ P2 @ Lambda2) + Pi2 - \
-             ((Lambda2.T @ P2 @ B2) + W2 - F1.T @ M2) @ F2
+             ((Lambda2.T @ P2 @ B2) + W2 - F1.T.dot(M2)) @ F2
 
         dd = np.max(np.abs(F10 - F1)) + np.max(np.abs(F20 - F2))
 
