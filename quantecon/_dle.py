@@ -76,11 +76,11 @@ class DLE(object):
         uc = np.hstack((np.eye(self.nc), np.zeros((self.nc, self.ng))))
         ug = np.hstack((np.zeros((self.ng, self.nc)), np.eye(self.ng)))
         phiin = np.linalg.inv(np.hstack((self.phic, self.phig)))
-        phiinc = uc.dot(phiin)
-        b11 = - self.thetah.dot(phiinc).dot(self.phii)
-        a1 = self.thetah.dot(phiinc).dot(self.gamma)
-        a12 = np.vstack((self.thetah.dot(phiinc).dot(
-            self.ud), np.zeros((self.nk, self.nz))))
+        phiinc = uc @ phiin
+        b11 = - self.thetah @ phiinc @ self.phii
+        a1 = self.thetah @ phiinc @ self.gamma
+        a12 = np.vstack((self.thetah @ phiinc @
+            self.ud, np.zeros((self.nk, self.nz))))
 
         # === Creation of the A Matrix for the state transition of the LQ problem === #
 
@@ -100,11 +100,11 @@ class DLE(object):
 
         # === Define R,W and Q for the payoff function of the LQ problem === #
 
-        self.H = np.hstack((self.llambda, self.pih.dot(uc).dot(phiin).dot(self.gamma), self.pih.dot(
-            uc).dot(phiin).dot(self.ud) - self.ub, -self.pih.dot(uc).dot(phiin).dot(self.phii)))
-        self.G = ug.dot(phiin).dot(
+        self.H = np.hstack((self.llambda, self.pih @ uc @ phiin @ self.gamma, self.pih @
+            uc @ phiin @ self.ud - self.ub, -self.pih @ uc @ phiin @ self.phii))
+        self.G = (ug @ phiin @
             np.hstack((np.zeros((self.nd, self.nh)), self.gamma, self.ud, -self.phii)))
-        self.S = (self.G.T.dot(self.G) + self.H.T.dot(self.H)) / 2
+        self.S = (self.G.T @ self.G + self.H.T @ self.H) / 2
 
         self.nx = self.nh + self.nk + self.nz
         self.n = self.ni + self.nh + self.nk + self.nz
@@ -122,7 +122,7 @@ class DLE(object):
 
         # === Construct output matrices for our economy using the solution to the LQ problem === #
 
-        self.A0 = self.A - self.B.dot(self.F)
+        self.A0 = self.A - self.B @ self.F
 
         self.Sh = self.A0[0:self.nh, 0:self.nx]
         self.Sk = self.A0[self.nh:self.nh + self.nk, 0:self.nx]
@@ -131,12 +131,12 @@ class DLE(object):
         self.Si = -self.F
         self.Sd = np.hstack((np.zeros((self.nd, self.nh + self.nk)), self.ud))
         self.Sb = np.hstack((np.zeros((self.nb, self.nh + self.nk)), self.ub))
-        self.Sc = uc.dot(phiin).dot(-self.phii.dot(self.Si) +
-                                    self.gamma.dot(self.Sk1) + self.Sd)
-        self.Sg = ug.dot(phiin).dot(-self.phii.dot(self.Si) +
-                                    self.gamma.dot(self.Sk1) + self.Sd)
-        self.Ss = self.llambda.dot(np.hstack((np.eye(self.nh), np.zeros(
-            (self.nh, self.nk + self.nz))))) + self.pih.dot(self.Sc)
+        self.Sc = uc @ phiin @ (-self.phii @ self.Si +
+                                    self.gamma @ self.Sk1 + self.Sd)
+        self.Sg = ug @ phiin @ (-self.phii @ self.Si +
+                                    self.gamma @ self.Sk1 + self.Sd)
+        self.Ss = self.llambda @ np.hstack((np.eye(self.nh), np.zeros(
+            (self.nh, self.nk + self.nz)))) + self.pih @ self.Sc
 
         # ===  Calculate eigenvalues of A0 === #
         self.A110 = self.A0[0:self.nh + self.nk, 0:self.nh + self.nk]
@@ -146,14 +146,14 @@ class DLE(object):
         # === Construct matrices for Lagrange Multipliers === #
 
         self.Mk = -2 * self.beta.item() * (np.hstack((np.zeros((self.nk, self.nh)), np.eye(
-            self.nk), np.zeros((self.nk, self.nz))))).dot(self.P).dot(self.A0)
+            self.nk), np.zeros((self.nk, self.nz))))) @ self.P @ self.A0
         self.Mh = -2 * self.beta.item() * (np.hstack((np.eye(self.nh), np.zeros(
-            (self.nh, self.nk)), np.zeros((self.nh, self.nz))))).dot(self.P).dot(self.A0)
+            (self.nh, self.nk)), np.zeros((self.nh, self.nz))))) @ self.P @ self.A0
         self.Ms = -(self.Sb - self.Ss)
-        self.Md = -(np.linalg.inv(np.vstack((self.phic.T, self.phig.T))).dot(
-            np.vstack((self.thetah.T.dot(self.Mh) + self.pih.T.dot(self.Ms), -self.Sg))))
-        self.Mc = -(self.thetah.T.dot(self.Mh) + self.pih.T.dot(self.Ms))
-        self.Mi = -(self.thetak.T.dot(self.Mk))
+        self.Md = -(np.linalg.inv(np.vstack((self.phic.T, self.phig.T))) @
+            np.vstack((self.thetah.T @ self.Mh + self.pih.T @ self.Ms, -self.Sg)))
+        self.Mc = -(self.thetah.T @ self.Mh + self.pih.T @ self.Ms)
+        self.Mi = -(self.thetak.T @ self.Mk)
 
     def compute_steadystate(self, nnc=2):
         """
@@ -168,13 +168,13 @@ class DLE(object):
         zx = np.eye(self.A0.shape[0])-self.A0
         self.zz = nullspace(zx)
         self.zz /= self.zz[nnc]
-        self.css = self.Sc.dot(self.zz)
-        self.sss = self.Ss.dot(self.zz)
-        self.iss = self.Si.dot(self.zz)
-        self.dss = self.Sd.dot(self.zz)
-        self.bss = self.Sb.dot(self.zz)
-        self.kss = self.Sk.dot(self.zz)
-        self.hss = self.Sh.dot(self.zz)
+        self.css = self.Sc @ self.zz
+        self.sss = self.Ss @ self.zz
+        self.iss = self.Si @ self.zz
+        self.dss = self.Sd @ self.zz
+        self.bss = self.Sb @ self.zz
+        self.kss = self.Sk @ self.zz
+        self.hss = self.Sh @ self.zz
 
     def compute_sequence(self, x0, ts_length=None, Pay=None):
         """
@@ -195,14 +195,14 @@ class DLE(object):
         lq = LQ(self.Q, self.R, self.A, self.B,
                 self.C, N=self.W, beta=self.beta)
         xp, up, wp = lq.compute_sequence(x0, ts_length)
-        self.h = self.Sh.dot(xp)
-        self.k = self.Sk.dot(xp)
-        self.i = self.Si.dot(xp)
-        self.b = self.Sb.dot(xp)
-        self.d = self.Sd.dot(xp)
-        self.c = self.Sc.dot(xp)
-        self.g = self.Sg.dot(xp)
-        self.s = self.Ss.dot(xp)
+        self.h = self.Sh @ xp
+        self.k = self.Sk @ xp
+        self.i = self.Si @ xp
+        self.b = self.Sb @ xp
+        self.d = self.Sd @ xp
+        self.c = self.Sc @ xp
+        self.g = self.Sg @ xp
+        self.s = self.Ss @ xp
 
         # === Value of J-period risk-free bonds === #
         # === See p.145: Equation (7.11.2) === #
@@ -212,12 +212,12 @@ class DLE(object):
         self.R2_Price = np.empty((ts_length + 1, 1))
         self.R5_Price = np.empty((ts_length + 1, 1))
         for i in range(ts_length + 1):
-            self.R1_Price[i, 0] = self.beta * e1.dot(self.Mc).dot(np.linalg.matrix_power(
-                self.A0, 1)).dot(xp[:, i]) / e1.dot(self.Mc).dot(xp[:, i])
-            self.R2_Price[i, 0] = self.beta**2 * e1.dot(self.Mc).dot(
-                np.linalg.matrix_power(self.A0, 2)).dot(xp[:, i]) / e1.dot(self.Mc).dot(xp[:, i])
-            self.R5_Price[i, 0] = self.beta**5 * e1.dot(self.Mc).dot(
-                np.linalg.matrix_power(self.A0, 5)).dot(xp[:, i]) / e1.dot(self.Mc).dot(xp[:, i])
+            self.R1_Price[i, 0] = self.beta * e1 @ self.Mc @ np.linalg.matrix_power(
+                self.A0, 1) @ xp[:, i] / (e1 @ self.Mc @ xp[:, i])
+            self.R2_Price[i, 0] = self.beta**2 * (e1 @ self.Mc @
+                np.linalg.matrix_power(self.A0, 2) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])
+            self.R5_Price[i, 0] = self.beta**5 * (e1 @ self.Mc @
+                np.linalg.matrix_power(self.A0, 5) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])
 
         # === Gross rates of return on 1-period risk-free bonds === #
         self.R1_Gross = 1 / self.R1_Price
@@ -231,20 +231,20 @@ class DLE(object):
         # === Value of asset whose payout vector is Pay*xt === #
         # See p.145: Equation (7.11.1)
         if isinstance(Pay, np.ndarray) == True:
-            self.Za = Pay.T.dot(self.Mc)
+            self.Za = Pay.T @ self.Mc
             self.Q = solve_discrete_lyapunov(
                 self.A0.T * self.beta**0.5, self.Za)
             self.q = self.beta / (1 - self.beta) * \
-                np.trace(self.C.T.dot(self.Q).dot(self.C))
+                np.trace(self.C.T @ self.Q @ self.C)
             self.Pay_Price = np.empty((ts_length + 1, 1))
             self.Pay_Gross = np.empty((ts_length + 1, 1))
             self.Pay_Gross[0, 0] = np.nan
             for i in range(ts_length + 1):
-                self.Pay_Price[i, 0] = (xp[:, i].T.dot(self.Q).dot(
-                    xp[:, i]) + self.q) / e1.dot(self.Mc).dot(xp[:, i])
+                self.Pay_Price[i, 0] = (xp[:, i].T @ self.Q @
+                    xp[:, i] + self.q) / (e1 @ self.Mc @ xp[:, i])
             for i in range(ts_length):
                 self.Pay_Gross[i + 1, 0] = self.Pay_Price[i + 1,
-                                                          0] / (self.Pay_Price[i, 0] - Pay.dot(xp[:, i]))
+                                                          0] / (self.Pay_Price[i, 0] - Pay @ xp[:, i])
         return
 
     def irf(self, ts_length=100, shock=None):
@@ -276,22 +276,22 @@ class DLE(object):
         self.b_irf = np.empty((ts_length, self.nb))
 
         for i in range(ts_length):
-            self.c_irf[i, :] = self.Sc.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.s_irf[i, :] = self.Ss.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.i_irf[i, :] = self.Si.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.k_irf[i, :] = self.Sk.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.h_irf[i, :] = self.Sh.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.g_irf[i, :] = self.Sg.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.d_irf[i, :] = self.Sd.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
-            self.b_irf[i, :] = self.Sb.dot(
-                np.linalg.matrix_power(self.A0, i)).dot(self.C).dot(shock).T
+            self.c_irf[i, :] = (self.Sc @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.s_irf[i, :] = (self.Ss @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.i_irf[i, :] = (self.Si @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.k_irf[i, :] = (self.Sk @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.h_irf[i, :] = (self.Sh @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.g_irf[i, :] = (self.Sg @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.d_irf[i, :] = (self.Sd @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
+            self.b_irf[i, :] = (self.Sb @
+                np.linalg.matrix_power(self.A0, i) @ self.C @ shock).T
 
         return
 
@@ -305,13 +305,13 @@ class DLE(object):
         Ac2 = np.hstack((np.zeros((self.nz, self.nh)), self.a22))
         Ac = np.vstack((Ac1, Ac2))
         Bc = np.vstack((self.thetah, np.zeros((self.nz, self.nc))))
-        Rc1 = np.hstack((self.llambda.T.dot(self.llambda), -
-                         self.llambda.T.dot(self.ub)))
-        Rc2 = np.hstack((-self.ub.T.dot(self.llambda), self.ub.T.dot(self.ub)))
+        Rc1 = np.hstack((self.llambda.T @ self.llambda, -
+                         self.llambda.T @ self.ub))
+        Rc2 = np.hstack((-self.ub.T @ self.llambda, self.ub.T @ self.ub))
         Rc = np.vstack((Rc1, Rc2))
-        Qc = self.pih.T.dot(self.pih)
+        Qc = self.pih.T @ self.pih
         Nc = np.hstack(
-            (self.pih.T.dot(self.llambda), -self.pih.T.dot(self.ub)))
+            (self.pih.T @ self.llambda, -self.pih.T @ self.ub))
 
         lq_aux = LQ(Qc, Rc, Ac, Bc, N=Nc, beta=self.beta)
 
@@ -320,9 +320,9 @@ class DLE(object):
         self.F_b = F1[:, 0:self.nh]
         self.F_f = F1[:, self.nh:]
 
-        self.pihat = np.linalg.cholesky(self.pih.T.dot(
-            self.pih) + self.beta.dot(self.thetah.T).dot(P1[0:self.nh, 0:self.nh]).dot(self.thetah)).T
-        self.llambdahat = self.pihat.dot(self.F_b)
-        self.ubhat = - self.pihat.dot(self.F_f)
+        self.pihat = np.linalg.cholesky((self.pih.T @
+            self.pih) + (self.beta @ self.thetah.T @ P1[0:self.nh, 0:self.nh] @ self.thetah)).T
+        self.llambdahat = self.pihat @ self.F_b
+        self.ubhat = - self.pihat @ self.F_f
 
         return
