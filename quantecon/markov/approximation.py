@@ -115,9 +115,24 @@ def rouwenhorst(n, rho, sigma, mu=0.):
 
     def row_build_mat(n, p, q):
         """
+        Build the transition matrix for the Rouwenhorst method.
+        
         This method uses the values of p and q to build the transition
-        matrix for the rouwenhorst method
-
+        matrix for the rouwenhorst method.
+        
+        Parameters
+        ----------
+        n : int
+            The size of the transition matrix (number of states).
+        p : float
+            First probability parameter.
+        q : float 
+            Second probability parameter.
+            
+        Returns
+        -------
+        ndarray(float, ndim=2)
+            The n x n transition matrix.
         """
 
         if n == 2:
@@ -232,6 +247,19 @@ def tauchen(n, rho, sigma, mu=0., n_std=3):
 
 @njit
 def std_norm_cdf(x):
+    """
+    Standard normal cumulative distribution function.
+    
+    Parameters
+    ----------
+    x : float
+        Input value.
+        
+    Returns
+    -------
+    float
+        CDF value at x for standard normal distribution.
+    """
     return 0.5 * erfc(-x / sqrt(2))
 
 

@@ -29,7 +29,11 @@ class __Timer__:
     def tic(self):
         """
         Save time for future use with `tac()` or `toc()`.
-
+        
+        Returns
+        -------
+        None
+            This function doesn't return a value.
         """
         t = time.time()
         self.start = t
