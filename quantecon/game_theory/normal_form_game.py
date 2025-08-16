@@ -562,6 +562,10 @@ class NormalFormGame:
     payoff_arrays : tuple(ndarray(float, ndim=N))
         Tuple of the payoff arrays, one for each player.
 
+    payoff_profile_array : ndarray(float, ndim=N+1)
+        Array of shape (n_0, ..., n_{N-1}, N) containing the payoff
+        profiles, where the last axis represents the players.
+
     """
     def __init__(self, data, dtype=None):
         # data represents an array_like of Players

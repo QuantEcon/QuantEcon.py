@@ -32,6 +32,19 @@ from .normal_form_game import Player, NormalFormGame
 
 
 def str2num(s):
+    """
+    Convert string to appropriate numeric type.
+    
+    Parameters
+    ----------
+    s : str
+        String representation of a number.
+    
+    Returns
+    -------
+    int or float
+        Integer if no decimal point, otherwise float.
+    """
     if '.' in s:
         return float(s)
     return int(s)

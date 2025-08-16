@@ -165,7 +165,6 @@ class KMR(BRD):
     def play(self, action, action_dist, **options):
         """
         See `play` in `BRD`.
-
         """
         tie_breaking = options.get('tie_breaking', self.tie_breaking)
         tol = options.get('tol', None)
@@ -224,7 +223,6 @@ class SamplingBRD(BRD):
     def play(self, action, action_dist, **options):
         """
         See `play` in `BRD`.
-
         """
         tie_breaking = options.get('tie_breaking', self.tie_breaking)
         tol = options.get('tol', None)

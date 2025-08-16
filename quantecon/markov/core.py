@@ -112,6 +112,13 @@ class MarkovChain:
     P : ndarray or scipy.sparse.csr_matrix (float, ndim=2)
         See Parameters
 
+    state_values : array_like or None
+        Array of state values if set, None otherwise.
+
+    digraph : DiGraph
+        Directed graph representation of the Markov chain with nodes as 
+        states and edges as positive transition probabilities.
+
     stationary_distributions : array_like(float, ndim=2)
         Array containing stationary distributions, one for each
         recurrent class, as rows.
@@ -224,6 +231,14 @@ class MarkovChain:
 
     @state_values.setter
     def state_values(self, values):
+        """
+        Set state values of the MarkovChain.
+        
+        Parameters
+        ----------
+        values : array_like or None
+            Array of state values with length n, or None to unset.
+        """
         if values is None:
             self._state_values = None
         else:

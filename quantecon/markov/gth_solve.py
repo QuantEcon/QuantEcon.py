@@ -36,14 +36,17 @@ def gth_solve(A, overwrite=False, use_jit=True):
     ----------
     A : array_like(float, ndim=2)
         Stochastic matrix or generator matrix. Must be of shape n x n.
+    
+    overwrite : bool, optional(default=False)
+        Whether to overwrite `A`.
+    
+    use_jit : bool, optional(default=True)
+        Whether to use JIT compilation for performance.
 
     Returns
     -------
     x : numpy.ndarray(float, ndim=1)
         Stationary distribution of `A`.
-
-    overwrite : bool, optional(default=False)
-        Whether to overwrite `A`.
 
     References
     ----------
