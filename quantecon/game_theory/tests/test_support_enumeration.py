@@ -3,8 +3,7 @@ Tests for support_enumeration.py
 
 """
 import numpy as np
-from numpy.testing import assert_allclose
-from nose.tools import eq_, raises
+from numpy.testing import assert_allclose, assert_, assert_raises
 from quantecon.util import check_random_state
 from quantecon.game_theory import Player, NormalFormGame, support_enumeration
 
@@ -20,7 +19,7 @@ def random_skew_sym(n, m=None, random_state=None):
     if m is None:
         m = n
     random_state = check_random_state(random_state)
-    B = random_state.random_sample((n, m))
+    B = random_state.random((n, m))
     A = np.empty((n+m, n+m))
     A[:n, :n] = 0
     A[n:, n:] = 0
@@ -30,7 +29,7 @@ def random_skew_sym(n, m=None, random_state=None):
 
 
 class TestSupportEnumeration():
-    def setUp(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # From von Stengel 2007 in Algorithmic Game Theory
@@ -56,7 +55,7 @@ class TestSupportEnumeration():
     def test_support_enumeration(self):
         for d in self.game_dicts:
             NEs_computed = support_enumeration(d['g'])
-            eq_(len(NEs_computed), len(d['NEs']))
+            assert_(len(NEs_computed) == len(d['NEs']))
             for actions_computed, actions in zip(NEs_computed, d['NEs']):
                 for action_computed, action in zip(actions_computed, actions):
                     assert_allclose(action_computed, action)
@@ -69,19 +68,8 @@ class TestSupportEnumeration():
         support_enumeration(g)
 
 
-@raises(TypeError)
 def test_support_enumeration_invalid_g():
     bimatrix = [[(3, 3), (3, 2)],
                 [(2, 2), (5, 6)],
                 [(0, 3), (6, 1)]]
-    support_enumeration(bimatrix)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+    assert_raises(TypeError, support_enumeration, bimatrix)

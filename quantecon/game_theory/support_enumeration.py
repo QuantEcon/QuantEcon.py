@@ -49,14 +49,14 @@ def support_enumeration_gen(g):
         NormalFormGame instance with 2 players.
 
     Yields
-    -------
+    ------
     tuple(ndarray(float, ndim=1))
         Tuple of Nash equilibrium mixed actions.
 
     """
     try:
         N = g.N
-    except:
+    except AttributeError:
         raise TypeError('input must be a 2-player NormalFormGame')
     if N != 2:
         raise NotImplementedError('Implemented only for 2-player games')
@@ -83,6 +83,8 @@ def _support_enumeration_gen(payoff_matrices):
     """
     nums_actions = payoff_matrices[0].shape
     n_min = min(nums_actions)
+    flags_vecs = (np.empty(nums_actions[0], np.bool_),
+                  np.empty(nums_actions[1], np.bool_))
 
     for k in range(1, n_min+1):
         supps = (np.arange(0, k, 1, np.int_), np.empty(k, np.int_))
@@ -90,13 +92,16 @@ def _support_enumeration_gen(payoff_matrices):
         A = np.empty((k+1, k+1))
 
         while supps[0][-1] < nums_actions[0]:
-            supps[1][:] = np.arange(k)
+            for i in range(k):
+                supps[1][i] = i
             while supps[1][-1] < nums_actions[1]:
                 if _indiff_mixed_action(
-                    payoff_matrices[0], supps[0], supps[1], A, actions[1]
+                    payoff_matrices[0], supps[0], supps[1],
+                    A, flags_vecs[0], actions[1]
                 ):
                     if _indiff_mixed_action(
-                        payoff_matrices[1], supps[1], supps[0], A, actions[0]
+                        payoff_matrices[1], supps[1], supps[0],
+                        A, flags_vecs[1], actions[0]
                     ):
                         out = (np.zeros(nums_actions[0]),
                                np.zeros(nums_actions[1]))
@@ -109,7 +114,8 @@ def _support_enumeration_gen(payoff_matrices):
 
 
 @jit(nopython=True, cache=True)
-def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
+def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp,
+                         A, own_supp_flags, out):
     """
     Given a player's payoff matrix `payoff_matrix`, an array `own_supp`
     of this player's actions, and an array `opp_supp` of the opponent's
@@ -118,7 +124,8 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
     among the actions in `own_supp`, if any such exists. Return `True`
     if such a mixed action exists and actions in `own_supp` are indeed
     best responses to it, in which case the outcome is stored in `out`;
-    `False` otherwise. Array `A` is used in intermediate steps.
+    `False` otherwise. Arrays `A` and `own_supp_flags` are used in
+    intermediate steps.
 
     Parameters
     ----------
@@ -133,6 +140,9 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
 
     A : ndarray(float, ndim=2)
         Array used in intermediate steps, of shape (k+1, k+1).
+
+    own_supp_flags : ndarray(bool, ndim=1)
+        Array used in intermediate steps, of length m.
 
     out : ndarray(float, ndim=1)
         Array of length k+1 to store the k nonzero values of the desired
@@ -167,7 +177,7 @@ def _indiff_mixed_action(payoff_matrix, own_supp, opp_supp, A, out):
     if k == m:
         return True
 
-    own_supp_flags = np.zeros(m, np.bool_)
+    own_supp_flags[:] = False
     own_supp_flags[own_supp] = True
 
     for i in range(m):

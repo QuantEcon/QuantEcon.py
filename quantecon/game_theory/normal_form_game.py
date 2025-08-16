@@ -133,7 +133,7 @@ import numpy as np
 import numpy.typing as npt
 from numba import jit
 
-from ..util import check_random_state
+from ..util import check_random_state, rng_integers
 
 
 # Mypy
@@ -357,11 +357,12 @@ class Player:
             Tolerance level used in determining best responses. If None,
             default to the value of the `tol` attribute.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used. Relevant only when tie_breaking='random'.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used. Relevant only when
+            tie_breaking='random'.
 
         Returns
         -------
@@ -410,11 +411,11 @@ class Player:
         actions : array_like(int), optional(default=None)
             An array of integers representing pure actions.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -434,7 +435,7 @@ class Player:
         if n == 1:
             idx = 0
         else:
-            idx = random_state.randint(n)
+            idx = rng_integers(random_state, n)
 
         if actions is not None:
             return actions[idx]
@@ -461,11 +462,9 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `lemke_howson` from `quantecon.game_theory` is used
-            to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'`, `'interior-point'`,
-            or `'revised simplex'`, then `scipy.optimize.linprog` is
-            used with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used.
+            Otherwise `scipy.optimize.linprog` is used with the method
+            as specified by `method`.
 
         Returns
         -------
@@ -492,11 +491,10 @@ class Player:
             D.shape = (D.shape[0], np.prod(D.shape[1:]))
 
         if method is None:
-            from .lemke_howson import lemke_howson
-            g_zero_sum = NormalFormGame([Player(D), Player(-D.T)])
-            NE = lemke_howson(g_zero_sum)
-            return NE[0] @ D @ NE[1] > tol
-        elif method in ['simplex', 'interior-point', 'revised simplex']:
+            from ..optimize.minmax import minmax
+            v, _, _ = minmax(D)
+            return v > tol
+        else:
             from scipy.optimize import linprog
             m, n = D.shape
             A_ub = np.empty((n, m+1))
@@ -509,8 +507,12 @@ class Player:
             b_eq = np.ones(1)
             c = np.zeros(m+1)
             c[-1] = -1
-            res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
-                          method=method)
+            try:
+                res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                              method=method)
+            except ValueError:
+                raise ValueError("Unknown method '{0}'".format(method))
+
             if res.success:
                 return res.x[-1] > tol
             elif res.status == 2:  # infeasible
@@ -518,8 +520,6 @@ class Player:
             else:  # pragma: no cover
                 msg = 'scipy.optimize.linprog returned {0}'.format(res.status)
                 raise RuntimeError(msg)
-        else:
-            raise ValueError('Unknown method {0}'.format(method))
 
     def dominated_actions(
         self, tol: Optional[float] = None, method: Optional[str] = None) -> List[int]:
@@ -534,11 +534,10 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `lemke_howson` from `quantecon.game_theory` is used
-            to solve for a Nash equilibrium of an auxiliary zero-sum
-            game. If `method` is set to `'simplex'`, `'interior-point'`,
-            or `'revised simplex'`, then `scipy.optimize.linprog` is
-            used with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used. If
+            `method` is set to `'simplex'`, `'interior-point'`, or
+            `'revised simplex'`, then `scipy.optimize.linprog` is used
+            with the method as specified by `method`.
 
         Returns
         -------
@@ -669,8 +668,9 @@ class NormalFormGame:
                 )
                 for i, payoff_array in enumerate(payoff_arrays):
                     payoff_array[:] = \
-                        data.take(i, axis=-1).transpose(list(range(i, N)) +
-                                                        list(range(i)))
+                        data.take(i, axis=-1).transpose(
+                            (*range(i, N), *range(i))
+                        )
                 self.players = tuple(
                     Player(payoff_array) for payoff_array in payoff_arrays
                 )
@@ -692,8 +692,7 @@ class NormalFormGame:
             np.empty(self.players[0].payoff_array.shape + (N,), dtype=dtype)
         for i, player in enumerate(self.players):
             payoff_profile_array[..., i] = \
-                player.payoff_array.transpose(list(range(N-i, N)) +
-                                              list(range(N-i)))
+                player.payoff_array.transpose((*range(N-i, N), *range(N-i)))
         return payoff_profile_array
 
     def __repr__(self) -> str:

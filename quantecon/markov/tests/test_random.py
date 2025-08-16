@@ -4,9 +4,9 @@ Tests for markov/random.py
 """
 import numpy as np
 from numpy.testing import (
-    assert_array_equal, assert_raises, assert_array_almost_equal_nulp
+    assert_array_equal, assert_raises, assert_array_almost_equal_nulp,
+    assert_
 )
-from nose.tools import eq_, ok_
 
 from quantecon.markov import (
     random_markov_chain, random_stochastic_matrix, random_discrete_dp
@@ -52,7 +52,7 @@ def test_random_stochastic_matrix_dense():
     Ps = [random_stochastic_matrix(n, sparse=sparse),
           random_stochastic_matrix(n, k, sparse=sparse)]
     for P in Ps:
-        ok_(np.all(P >= 0))
+        assert_(np.all(P >= 0))
         assert_array_almost_equal_nulp(P.sum(axis=1), np.ones(n))
 
 
@@ -62,7 +62,7 @@ def test_random_stochastic_matrix_sparse():
     Ps = [random_stochastic_matrix(n, sparse=sparse),
           random_stochastic_matrix(n, k, sparse=sparse)]
     for P in Ps:
-        ok_(np.all(P.data >= 0))
+        assert_(np.all(P.data >= 0))
         assert_array_almost_equal_nulp(P.sum(axis=1), np.ones(n))
 
 
@@ -89,7 +89,7 @@ def test_random_stochastic_matrix_k_1():
 
 
 class TestRandomDiscreteDP:
-    def setUp(self):
+    def setup_method(self):
         self.num_states, self.num_actions = 5, 4
         self.num_sa = self.num_states * self.num_actions
         self.k = 3
@@ -111,12 +111,12 @@ class TestRandomDiscreteDP:
     def test_shape(self):
         n, m, L = self.num_states, self.num_actions, self.num_sa
 
-        eq_(self.ddp.R.shape, (n, m))
-        eq_(self.ddp.Q.shape, (n, m, n))
+        assert_(self.ddp.R.shape == (n, m))
+        assert_(self.ddp.Q.shape == (n, m, n))
 
         for ddp in self.ddps_sa.values():
-            eq_(ddp.R.shape, (L,))
-            eq_(ddp.Q.shape, (L, n))
+            assert_(ddp.R.shape == (L,))
+            assert_(ddp.Q.shape == (L, n))
 
     def test_nonzero(self):
         n, m, L, k = self.num_states, self.num_actions, self.num_sa, self.k
@@ -138,14 +138,4 @@ class TestRandomDiscreteDP:
 
     def test_equal_beta(self):
         for ddp in self.ddps_sa.values():
-            eq_(ddp.beta, self.ddp.beta)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+            assert_(ddp.beta == self.ddp.beta)

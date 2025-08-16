@@ -14,7 +14,7 @@ import math
 import numpy as np
 import scipy.linalg as la
 from numba import jit, vectorize
-from .ce_util import ckron, gridmake
+from ._ce_util import ckron, gridmake
 from .util import check_random_state
 
 __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
@@ -113,11 +113,12 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     equidist_pp : array_like, optional(default=None)
         TODO: I don't know what this does
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number
+        generator for reproducibility. If None, a randomly
+        initialized RandomState is used. Relevant only when setting
+        `kind='R'`.
 
     Returns
     -------
@@ -155,7 +156,8 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     if b.size == 1:
         b = np.repeat(b, d)
 
-    i = np.arange(1, n + 1)
+    # Specify `dtype=np.int64` to avoid overflow on Windows
+    i = np.arange(1, n + 1, dtype=np.int64)
 
     if kind.upper() == "N":  # Neiderreiter
         j = 2.0 ** (np.arange(1, d+1) / (d+1))
@@ -170,7 +172,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
         nodes = np.outer(i * (i+1) / 2, j)
         nodes = (nodes - fix(nodes)).squeeze()
     elif kind.upper() == "R":  # pseudo-random
-        nodes = random_state.rand(n, d).squeeze()
+        nodes = random_state.random((n, d)).squeeze()
     else:
         raise ValueError("Unknown sequence requested")
 
@@ -468,7 +470,7 @@ def qnwunif(n, a, b):
     return nodes, weights
 
 
-def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
+def quadrect(f, n, a, b, kind='lege', random_state=None, *args, **kwargs):
     """
     Integrate the d-dimensional function f on a rectangle with lower and
     upper bound for dimension i defined by a[i] and b[i], respectively;
@@ -509,6 +511,12 @@ def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
         H    - Haber  equidistributed sequence
         R    - Monte Carlo
 
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used. Relevant only when setting `kind='R'`.
+
     *args, **kwargs :
         Other arguments passed to the function f
 
@@ -537,7 +545,7 @@ def quadrect(f, n, a, b, kind='lege', *args, **kwargs):
     elif kind.lower() == "simp":
         nodes, weights = qnwsimp(n, a, b)
     else:
-        nodes, weights = qnwequi(n, a, b, kind)
+        nodes, weights = qnwequi(n, a, b, kind, random_state=random_state)
 
     out = weights.dot(f(nodes, *args, **kwargs))
     return out

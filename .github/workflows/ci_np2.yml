@@ -1,0 +1,30 @@
+name: conda-build (NumPy v2)
+
+on:
+  push:
+  pull_request:
+    branches: [ $default-branch ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        environment-file: environment_np2.yml
+        python-version: '3.13'
+    - name: Conda info
+      shell: bash -l {0}
+      run: |
+        conda info
+        conda list
+    - name: Test with pytest
+      shell: bash -l {0}
+      run: |
+        conda install pytest
+        pytest

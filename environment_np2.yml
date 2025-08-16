@@ -1,0 +1,19 @@
+name: qe
+channels:
+  - conda-forge
+  - defaults
+  - numba
+dependencies:
+  - coverage
+  - numpy>=2
+  - scipy
+  - pandas
+  - numba>=0.61
+  - sympy
+  - ipython
+  - flake8
+  - requests
+  - urllib3>=2
+  - flit
+  - chardet # python>3.9,osx
+  - pytest

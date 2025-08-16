@@ -24,7 +24,7 @@ In order to generate the documentation, follow these steps:
 1. Install the `quantecon` python library locally. Do to this enter the commands below:
 ```
 cd ..
-python setup.py install
+pip install .
 cd docs
 ```
 2. From this directory, execute the local file `qe_apidoc.py` (for an explanation of what the file does, see the module level docstring in the file)
@@ -50,7 +50,7 @@ srcclean:
 
 myhtml:
     make srcclean
-    cd .. && python setup.py install && cd docs
+    cd .. && pip install . && cd docs
     python qe_apidoc.py
     make html
 ```

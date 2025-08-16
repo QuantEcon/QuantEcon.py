@@ -11,7 +11,8 @@ Tardos, and V. Vazirani eds., Algorithmic Game Theory, 2007.
 """
 import numpy as np
 import scipy.spatial
-from numba import jit, guvectorize
+from numba import jit, guvectorize, types
+from numba.typed import Dict
 
 
 def vertex_enumeration(g, qhull_options=None):
@@ -59,7 +60,7 @@ def vertex_enumeration_gen(g, qhull_options=None):
         manual <http://www.qhull.org>`_  for details.
 
     Yields
-    -------
+    ------
     tuple(ndarray(float, ndim=1))
         Tuple of Nash equilibrium mixed actions.
 
@@ -109,22 +110,30 @@ def _vertex_enumeration_gen(labelings_bits_tup, equations_tup, trans_recips):
     ZERO_LABELING0_BITS = (np.uint64(1) << np.uint64(m)) - np.uint64(1)
     COMPLETE_LABELING_BITS = (np.uint64(1) << np.uint64(m+n)) - np.uint64(1)
 
+    labelings_bits_dict1 = Dict.empty(key_type=types.uint64,
+                                      value_type=types.intp)
+    for j in range(num_vertices1):
+        labelings_bits_dict1[labelings_bits_tup[1][j]] = j
+
     for i in range(num_vertices0):
-        if labelings_bits_tup[0][i] == ZERO_LABELING0_BITS:
+        bits0 = labelings_bits_tup[0][i]
+        if bits0 == ZERO_LABELING0_BITS:
             continue
-        for j in range(num_vertices1):
-            xor = labelings_bits_tup[0][i] ^ labelings_bits_tup[1][j]
-            if xor == COMPLETE_LABELING_BITS:
-                yield _get_mixed_actions(
-                    labelings_bits_tup[0][i],
-                    (equations_tup[0][i], equations_tup[1][j]),
-                    trans_recips
-                )
-                break
+        complement0 = bits0 ^ COMPLETE_LABELING_BITS
+        try:
+            j = labelings_bits_dict1[complement0]
+        except Exception:
+            continue
+
+        yield _get_mixed_actions(
+            bits0,
+            (equations_tup[0][i], equations_tup[1][j]),
+            trans_recips
+        )
 
 
 class _BestResponsePolytope:
-    """
+    r"""
     Class that represents a best response polytope for a player in a
     two-player normal form game.
 
@@ -186,7 +195,7 @@ class _BestResponsePolytope:
         Dimension of the polytope.
 
     hull : scipy.spatial.ConvexHull
-        `ConvexHull` instance reprensenting the polar polytope.
+        `ConvexHull` instance representing the polar polytope.
 
     num_vertices : scalar(int)
         Number of the vertices identified by `ConvexHull`.

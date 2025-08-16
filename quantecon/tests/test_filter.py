@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.filter import hamilton_filter
+from quantecon import hamilton_filter
 from quantecon.tests.util import get_data_dir
 
 def test_hamilton_filter():
@@ -24,7 +24,3 @@ def test_hamilton_filter():
     assert_allclose(data['matlab_cyc'], data['hamilton_cyc'],
                     rtol = 1e-07, atol = 1e-07)
     assert_allclose(data['matlab_cyc_rw'], data['hamilton_cyc_rw'])
-
-
-if __name__ == '__main__':
-    test_hamilton_filter()

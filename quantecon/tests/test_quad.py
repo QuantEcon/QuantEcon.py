@@ -11,7 +11,6 @@ a section of comments.
 
 """
 import os
-import unittest
 from scipy.io import loadmat
 import numpy as np
 from numpy.testing import assert_allclose
@@ -85,10 +84,10 @@ mu_3d = data['mu_3d']
 sigma2_3d = data['sigma2_3d']
 
 
-class TestQuadrect(unittest.TestCase):
+class TestQuadrect:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         ## Create Python Data for quadrect
         # Create the python data -- similar to notebook code
         kinds = ["trap", "simp", "lege", "N", "W", "H", "R"]
@@ -101,7 +100,7 @@ class TestQuadrect(unittest.TestCase):
 
         # Integration parameters
         n = np.array([5, 11, 21, 51, 101, 401])  # number of nodes
-        np.random.seed(42)  # same seed as ML code.
+        random_state = np.random.RandomState(42) # same seed as ML code.
         a, b = -1, 1  # endpoints
 
         # Set up pandas DataFrame to hold results
@@ -115,10 +114,9 @@ class TestQuadrect(unittest.TestCase):
             for kind in kinds:
                 for num in n:
                     num_in = num ** 2 if len(kind) == 1 else num
-                    quad_rect_res1d.loc[func_name, num][kind] = quadrect(func,
-                                                                        num_in,
-                                                                        a, b,
-                                                                        kind)
+                    quad_rect_res1d.loc[(func_name, num), kind] = \
+                        quadrect(func, num_in, a, b, kind,
+                                 random_state=random_state)
 
         cls.data1d = quad_rect_res1d
 
@@ -136,10 +134,10 @@ class TestQuadrect(unittest.TestCase):
 
         for num in n:
             for kind in kinds2[:4]:
-                data2.loc[num**2][kind] = quadrect(f1_2, [num, num],
+                data2.loc[num**2, kind] = quadrect(f1_2, [num, num],
                                                   a[0], b[0], kind)
             for kind in kinds2[4:]:
-                data2.loc[num**2][kind] = quadrect(f1_2, num**2, a[0],
+                data2.loc[num**2, kind] = quadrect(f1_2, num**2, a[0],
                                                   b[0], kind)
 
         cls.data2d1 = data2
@@ -151,7 +149,7 @@ class TestQuadrect(unittest.TestCase):
 
         for num in n3:
             for kind in kinds2[3:]:
-                data3.loc[num][kind] = quadrect(f2_2, num, a[1], b[1], kind)
+                data3.loc[num, kind] = quadrect(f2_2, num, a[1], b[1], kind)
 
         cls.data2d2 = data3
 
@@ -227,10 +225,10 @@ class TestQuadrect(unittest.TestCase):
         assert_allclose(self.data2d2['H'], self.ml_data2d2['H'])
 
 
-class TestQnwcheb(unittest.TestCase):
+class TestQnwcheb:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_cheb_1, cls.w_cheb_1 = qnwcheb(n, a, b)
         cls.x_cheb_3, cls.w_cheb_3 = qnwcheb(n_3, a_3, b_3)
 
@@ -247,10 +245,10 @@ class TestQnwcheb(unittest.TestCase):
         assert_allclose(self.w_cheb_3, data['w_cheb_3'])
 
 
-class TestQnwequiN(unittest.TestCase):
+class TestQnwequiN:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_equiN_1, cls.w_equiN_1 = qnwequi(n, a, b, "N")
         cls.x_equiN_3, cls.w_equiN_3 = qnwequi(n_3, a_3, b_3, "N")
 
@@ -267,10 +265,10 @@ class TestQnwequiN(unittest.TestCase):
         assert_allclose(self.w_equiN_3, data['w_equiN_3'])
 
 
-class TestQnwequiW(unittest.TestCase):
+class TestQnwequiW:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_equiW_1, cls.w_equiW_1 = qnwequi(n, a, b, "W")
         cls.x_equiW_3, cls.w_equiW_3 = qnwequi(n_3, a_3, b_3, "W")
 
@@ -287,10 +285,10 @@ class TestQnwequiW(unittest.TestCase):
         assert_allclose(self.w_equiW_3, data['w_equiW_3'])
 
 
-class TestQnwequiH(unittest.TestCase):
+class TestQnwequiH:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_equiH_1, cls.w_equiH_1 = qnwequi(n, a, b, "H")
         cls.x_equiH_3, cls.w_equiH_3 = qnwequi(n_3, a_3, b_3, "H")
 
@@ -307,10 +305,10 @@ class TestQnwequiH(unittest.TestCase):
         assert_allclose(self.w_equiH_3, data['w_equiH_3'])
 
 
-class TestQnwequiR(unittest.TestCase):
+class TestQnwequiR:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_equiR_1, cls.w_equiR_1 = qnwequi(n, a, b, "R", random_state=41)
         temp, cls.w_equiR_3 = qnwequi(n_3, a_3, b_3, "R", random_state=42)
 
@@ -344,10 +342,10 @@ class TestQnwequiR(unittest.TestCase):
         assert_allclose(self.w_equiR_3, data['w_equiR_3'])
 
 
-class TestQnwlege(unittest.TestCase):
+class TestQnwlege:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_lege_1, cls.w_lege_1 = qnwlege(n, a, b)
         cls.x_lege_3, cls.w_lege_3 = qnwlege(n_3, a_3, b_3)
 
@@ -364,10 +362,10 @@ class TestQnwlege(unittest.TestCase):
         assert_allclose(self.w_lege_3, data['w_lege_3'])
 
 
-class TestQnwnorm(unittest.TestCase):
+class TestQnwnorm:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_norm_1, cls.w_norm_1 = qnwnorm(n, a, b)
         cls.x_norm_3, cls.w_norm_3 = qnwnorm(n_3, mu_3d, sigma2_3d)
 
@@ -384,10 +382,10 @@ class TestQnwnorm(unittest.TestCase):
         assert_allclose(self.w_norm_3, data['w_norm_3'])
 
 
-class TestQnwlogn(unittest.TestCase):
+class TestQnwlogn:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_logn_1, cls.w_logn_1 = qnwlogn(n, a, b)
         cls.x_logn_3, cls.w_logn_3 = qnwlogn(n_3, mu_3d, sigma2_3d)
 
@@ -404,10 +402,10 @@ class TestQnwlogn(unittest.TestCase):
         assert_allclose(self.w_logn_3, data['w_logn_3'])
 
 
-class TestQnwsimp(unittest.TestCase):
+class TestQnwsimp:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_simp_1, cls.w_simp_1 = qnwsimp(n, a, b)
         cls.x_simp_3, cls.w_simp_3 = qnwsimp(n_3, a_3, b_3)
 
@@ -424,10 +422,10 @@ class TestQnwsimp(unittest.TestCase):
         assert_allclose(self.w_simp_3, data['w_simp_3'])
 
 
-class TestQnwtrap(unittest.TestCase):
+class TestQnwtrap:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_trap_1, cls.w_trap_1 = qnwtrap(n, a, b)
         cls.x_trap_3, cls.w_trap_3 = qnwtrap(n_3, a_3, b_3)
 
@@ -444,10 +442,10 @@ class TestQnwtrap(unittest.TestCase):
         assert_allclose(self.w_trap_3, data['w_trap_3'])
 
 
-class TestQnwunif(unittest.TestCase):
+class TestQnwunif:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_unif_1, cls.w_unif_1 = qnwunif(n, a, b)
         cls.x_unif_3, cls.w_unif_3 = qnwunif(n_3, a_3, b_3)
 
@@ -464,10 +462,10 @@ class TestQnwunif(unittest.TestCase):
         assert_allclose(self.w_unif_3, data['w_unif_3'])
 
 
-class TestQnwbeta(unittest.TestCase):
+class TestQnwbeta:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_beta_1, cls.w_beta_1 = qnwbeta(n, b, b + 1.0)
         cls.x_beta_3, cls.w_beta_3 = qnwbeta(n_3, b_3, b_3 + 1.0)
 
@@ -484,10 +482,10 @@ class TestQnwbeta(unittest.TestCase):
         assert_allclose(self.w_beta_3, data['w_beta_3'])
 
 
-class TestQnwgamm(unittest.TestCase):
+class TestQnwgamm:
 
     @classmethod
-    def setUpClass(cls):
+    def setup_method(cls):
         cls.x_gamm_1, cls.w_gamm_1 = qnwgamma(n, b)
         cls.x_gamm_3, cls.w_gamm_3 = qnwgamma(n_3, b_3)
 

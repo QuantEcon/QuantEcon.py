@@ -86,8 +86,8 @@ from scipy import sparse
 from numba import jit
 
 from .gth_solve import gth_solve
-from ..graph_tools import DiGraph
-from ..util import searchsorted, check_random_state
+from .._graph_tools import DiGraph
+from ..util import searchsorted, check_random_state, rng_integers
 
 
 class MarkovChain:
@@ -273,7 +273,6 @@ class MarkovChain:
         else:
             raise ValueError('invalid value')
 
-
     def _get_index(self, value):
         """
         Return the index of the given value in `state_values`.
@@ -358,11 +357,9 @@ class MarkovChain:
         if self.is_irreducible:
             return self.digraph.period
         else:
-            rec_classes = self.recurrent_classes
-
             # Determine the period, the LCM of the periods of rec_classes
             d = 1
-            for rec_class in rec_classes:
+            for rec_class in self.recurrent_classes_indices:
                 period = self.digraph.subgraph(rec_class).period
                 d = (d * period) // gcd(d, period)
 
@@ -420,7 +417,7 @@ class MarkovChain:
     def cdfs(self):
         if (self._cdfs is None) and not self.is_sparse:
             # See issue #137#issuecomment-96128186
-            cdfs = np.empty((self.n, self.n), order='C')
+            cdfs = np.empty((self.n, self.n), order='C', dtype=self.P.dtype)
             np.cumsum(self.P, axis=-1, out=cdfs)
             self._cdfs = cdfs
         return self._cdfs
@@ -431,7 +428,7 @@ class MarkovChain:
             data = self.P.data
             indptr = self.P.indptr
 
-            cdfs1d = np.empty(self.P.nnz, order='C')
+            cdfs1d = np.empty(self.P.nnz, order='C', dtype=data.dtype)
             for i in range(self.n):
                 cdfs1d[indptr[i]:indptr[i+1]] = \
                     data[indptr[i]:indptr[i+1]].cumsum()
@@ -456,11 +453,11 @@ class MarkovChain:
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -493,7 +490,7 @@ class MarkovChain:
                 dim = 2
                 k = num_reps
             if init is None:
-                init_states = random_state.randint(self.n, size=k)
+                init_states = rng_integers(random_state, self.n, size=k)
             elif isinstance(init, numbers.Integral):
                 # Check init is in the state space
                 if init >= self.n or init < -self.n:
@@ -508,7 +505,7 @@ class MarkovChain:
         X = np.empty((k, ts_length), dtype=int)
 
         # Random values, uniformly sampled from [0, 1)
-        random_values = random_state.random_sample(size=(k, ts_length-1))
+        random_values = random_state.random(size=(k, ts_length-1))
 
         # Generate sample paths and store in X
         if not self.is_sparse:  # Dense
@@ -543,11 +540,11 @@ class MarkovChain:
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
 
-        random_state : int or np.random.RandomState, optional
-            Random seed (integer) or np.random.RandomState instance to
-            set the initial state of the random number generator for
-            reproducibility. If None, a randomly initialized RandomState
-            is used.
+        random_state : int or np.random.RandomState/Generator, optional
+            Random seed (integer) or np.random.RandomState or Generator
+            instance to set the initial state of the random number
+            generator for reproducibility. If None, a randomly
+            initialized RandomState is used.
 
         Returns
         -------
@@ -688,11 +685,11 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     sample_size : scalar(int), optional(default=1000)
         The length of the sample path.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -706,7 +703,7 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
         X_0 = init
     else:
         cdf0 = np.cumsum(init)
-        u_0 = random_state.random_sample()
+        u_0 = random_state.random()
         X_0 = searchsorted(cdf0, u_0)
 
     mc = MarkovChain(P)

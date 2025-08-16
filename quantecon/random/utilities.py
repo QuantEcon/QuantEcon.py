@@ -4,8 +4,8 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import numpy as np
-from numba import guvectorize, generated_jit, types
-
+from numba import guvectorize, types
+from numba.extending import overload
 from ..util import check_random_state, searchsorted
 
 
@@ -23,11 +23,11 @@ def probvec(m, k, random_state=None, parallel=True):
     k : scalar(int)
         Dimension of each probability vectors.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     parallel : bool(default=True)
         Whether to use multi-core CPU (parallel=True) or single-threaded
@@ -51,7 +51,7 @@ def probvec(m, k, random_state=None, parallel=True):
 
     # if k >= 2
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=(m, k-1))
+    r = random_state.random(size=(m, k-1))
     x = np.empty((m, k))
 
     # Parse Parallel Option #
@@ -63,7 +63,7 @@ def probvec(m, k, random_state=None, parallel=True):
     return x
 
 
-def _probvec(r, out):
+def _probvec(r, out):  # pragma: no cover
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
@@ -113,11 +113,11 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     num_trials : scalar(int), optional(default=None)
         Number of trials.
 
-    random_state : int or np.random.RandomState, optional
-        Random seed (integer) or np.random.RandomState instance to set
-        the initial state of the random number generator for
-        reproducibility. If None, a randomly initialized RandomState is
-        used.
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, a randomly initialized RandomState
+        is used.
 
     Returns
     -------
@@ -146,7 +146,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     size = k if num_trials is None else (num_trials, k)
 
     random_state = check_random_state(random_state)
-    r = random_state.random_sample(size=size)
+    r = random_state.random(size=size)
     result = _sample_without_replacement(n, r)
 
     return result
@@ -164,12 +164,12 @@ def _sample_without_replacement(n, r, out):
     # Logic taken from random.sample in the standard library
     pool = np.arange(n)
     for j in range(k):
-        idx = int(np.floor(r[j] * (n-j)))  # np.floor returns a float
+        idx = np.intp(np.floor(r[j] * (n-j)))  # np.floor returns a float
         out[j] = pool[idx]
         pool[idx] = pool[n-j-1]
 
 
-@generated_jit(nopython=True)
+# Pure python implementation that will run if the JIT compiler is disabled
 def draw(cdf, size=None):
     """
     Generate a random sample according to the cumulative distribution
@@ -198,15 +198,29 @@ def draw(cdf, size=None):
     array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
 
     """
+    if isinstance(size, int):
+        rs = np.random.random(size)
+        out = np.empty(size, dtype=np.int_)
+        for i in range(size):
+            out[i] = searchsorted(cdf, rs[i])
+        return out
+    else:
+        r = np.random.random()
+        return searchsorted(cdf, r)
+
+
+# Overload for the `draw` function
+@overload(draw)
+def ol_draw(cdf, size=None):
     if isinstance(size, types.Integer):
-        def draw_impl(cdf, size):
+        def draw_impl(cdf, size=None):
             rs = np.random.random(size)
             out = np.empty(size, dtype=np.int_)
             for i in range(size):
                 out[i] = searchsorted(cdf, rs[i])
             return out
     else:
-        def draw_impl(cdf, size):
+        def draw_impl(cdf, size=None):
             r = np.random.random()
             return searchsorted(cdf, r)
     return draw_impl

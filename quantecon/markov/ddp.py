@@ -79,7 +79,8 @@ algorithms:
 
 * value iteration;
 * policy iteration;
-* modified policy iteration.
+* modified policy iteration;
+* linear programming.
 
 Policy iteration computes an exact optimal policy in finitely many
 iterations, while value iteration and modified policy iteration return
@@ -97,6 +98,10 @@ employ the norm-based and span-based termination rules, respectively.
   :math:`\mathrm{span}(T v - v) < [(1 - \beta) / \beta] \varepsilon` is
   satisfied, where :math:`\mathrm{span}(z) = \max(z) - \min(z)`.
 
+The linear programming method solves the problem as a linear program by
+the simplex method with `optimize.linprog_simplex` routines (implemented
+only for dense matrix formulation).
+
 References
 ----------
 
@@ -107,9 +112,13 @@ Programming, Wiley-Interscience, 2005.
 import warnings
 import numpy as np
 import scipy.sparse as sp
-from numba import jit
 
 from .core import MarkovChain
+from ._ddp_linprog_simplex import ddp_linprog_simplex
+from .utilities import (
+    _fill_dense_Q, _s_wise_max_argmax, _s_wise_max, _find_indices,
+    _has_sorted_sa_indices, _generate_a_indptr
+)
 
 
 class DiscreteDP:
@@ -275,6 +284,16 @@ class DiscreteDP:
     array([ -8.57142826, -19.99999965])
     >>> res.num_iter  # Number of iterations
     3
+
+    *Linear programming*
+
+    >>> res = ddp.solve(method='linear_programming', v_init=[0, 0])
+    >>> res.sigma  # Optimal policy function
+    array([0, 0])
+    >>> res.v  # Optimal value function
+    array([ -8.57142857, -20.        ])
+    >>> res.num_iter  # Number of iterations (within the LP solver)
+    4
 
     """
     def __init__(self, R, Q, beta, s_indices=None, a_indices=None):
@@ -491,9 +510,6 @@ class DiscreteDP:
         The product form uses the version of the init method taking
         `R`, `Q` and `beta`.
 
-        Parameters
-        ----------
-
         Returns
         -------
         ddp_sa : DiscreteDP
@@ -706,14 +722,14 @@ class DiscreteDP:
         method : str, optinal(default='policy_iteration')
             Solution method, str in {'value_iteration', 'vi',
             'policy_iteration', 'pi', 'modified_policy_iteration',
-            'mpi'}.
+            'mpi', 'linear_programming', 'lp'}.
 
         v_init : array_like(float, ndim=1), optional(default=None)
             Initial value function, of length n. If None, `v_init` is
-            set such that v_init(s) = max_a r(s, a) for value iteration
-            and policy iteration; for modified policy iteration,
-            v_init(s) = min_(s_next, a) r(s_next, a)/(1 - beta) to guarantee
-            convergence.
+            set such that v_init(s) = max_a r(s, a) for value iteration,
+            policy iteration, and linear programming; for modified
+            policy iteration, v_init(s) = min_(s_next, a)
+            r(s_next, a)/(1 - beta) to guarantee convergence.
 
         epsilon : scalar(float), optional(default=None)
             Value for epsilon-optimality. If None, the value stored in
@@ -746,6 +762,9 @@ class DiscreteDP:
                                                  epsilon=epsilon,
                                                  max_iter=max_iter,
                                                  k=k)
+        elif method in ['linear_programming', 'lp']:
+            res = self.linprog_simplex(v_init=v_init,
+                                       max_iter=max_iter)
         else:
             raise ValueError('invalid method')
 
@@ -892,6 +911,40 @@ class DiscreteDP:
 
         return res
 
+    def linprog_simplex(self, v_init=None, max_iter=None):
+        if self.beta == 1:
+            raise NotImplementedError(self._error_msg_no_discounting)
+
+        if self._sparse:
+            raise NotImplementedError('method invalid for sparse formulation')
+
+        if max_iter is None:
+            max_iter = self.max_iter * self.num_states
+
+        # What for initial condition?
+        if v_init is None:
+            v_init = self.s_wise_max(self.R)
+        v_init = np.asarray(v_init)
+
+        sigma = self.compute_greedy(v_init)
+
+        ddp_sa = self.to_sa_pair_form(sparse=False)
+        R, Q = ddp_sa.R, ddp_sa.Q
+        a_indices, a_indptr = ddp_sa.a_indices, ddp_sa.a_indptr
+
+        _, num_iter, v, sigma = ddp_linprog_simplex(
+            R, Q, self.beta, a_indices, a_indptr, sigma, max_iter=max_iter
+        )
+
+        res = DPSolveResult(v=v,
+                            sigma=sigma,
+                            num_iter=num_iter,
+                            mc=self.controlled_mc(sigma),
+                            method='linear programming',
+                            max_iter=max_iter)
+
+        return res
+
     def controlled_mc(self, sigma):
         """
         Returns the controlled Markov chain for a given policy `sigma`.
@@ -1025,97 +1078,3 @@ def backward_induction(ddp, T, v_term=None):
         ddp.bellman_operator(vs[t, :], Tv=vs[t-1, :], sigma=sigmas[t-1, :])
 
     return vs, sigmas
-
-
-@jit(nopython=True)
-def _fill_dense_Q(s_indices, a_indices, Q_in, Q_out):
-    L = Q_in.shape[0]
-    for i in range(L):
-        Q_out[s_indices[i], a_indices[i], :] = Q_in[i, :]
-
-    return Q_out
-
-
-@jit(nopython=True)
-def _s_wise_max_argmax(a_indices, a_indptr, vals, out_max, out_argmax):
-    n = len(out_max)
-    for i in range(n):
-        if a_indptr[i] != a_indptr[i+1]:
-            m = a_indptr[i]
-            for j in range(a_indptr[i]+1, a_indptr[i+1]):
-                if vals[j] > vals[m]:
-                    m = j
-            out_max[i] = vals[m]
-            out_argmax[i] = a_indices[m]
-
-
-@jit(nopython=True)
-def _s_wise_max(a_indices, a_indptr, vals, out_max):
-    n = len(out_max)
-    for i in range(n):
-        if a_indptr[i] != a_indptr[i+1]:
-            m = a_indptr[i]
-            for j in range(a_indptr[i]+1, a_indptr[i+1]):
-                if vals[j] > vals[m]:
-                    m = j
-            out_max[i] = vals[m]
-
-
-@jit(nopython=True)
-def _find_indices(a_indices, a_indptr, sigma, out):
-    n = len(sigma)
-    for i in range(n):
-        for j in range(a_indptr[i], a_indptr[i+1]):
-            if sigma[i] == a_indices[j]:
-                out[i] = j
-
-
-@jit(nopython=True)
-def _has_sorted_sa_indices(s_indices, a_indices):
-    """
-    Check whether `s_indices` and `a_indices` are sorted in
-    lexicographic order.
-
-    Parameters
-    ----------
-    s_indices, a_indices : ndarray(ndim=1)
-
-    Returns
-    -------
-    bool
-        Whether `s_indices` and `a_indices` are sorted.
-
-    """
-    L = len(s_indices)
-    for i in range(L-1):
-        if s_indices[i] > s_indices[i+1]:
-            return False
-        if s_indices[i] == s_indices[i+1]:
-            if a_indices[i] >= a_indices[i+1]:
-                return False
-    return True
-
-
-@jit(nopython=True)
-def _generate_a_indptr(num_states, s_indices, out):
-    """
-    Generate `a_indptr`; stored in `out`. `s_indices` is assumed to be
-    in sorted order.
-
-    Parameters
-    ----------
-    num_states : scalar(int)
-
-    s_indices : ndarray(int, ndim=1)
-
-    out : ndarray(int, ndim=1)
-        Length must be num_states+1.
-
-    """
-    idx = 0
-    out[0] = 0
-    for s in range(num_states-1):
-        while(s_indices[idx] == s):
-            idx += 1
-        out[s+1] = idx
-    out[num_states] = len(s_indices)

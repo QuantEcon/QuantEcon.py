@@ -2,17 +2,15 @@
 Tests for the kalman.py
 
 """
-import sys
-import unittest
 import numpy as np
 from numpy.testing import assert_allclose
-from quantecon.lss import LinearStateSpace
-from quantecon.kalman import Kalman
+from quantecon import LinearStateSpace
+from quantecon import Kalman
 
 
-class TestKalman(unittest.TestCase):
+class TestKalman:
 
-    def setUp(self):
+    def setup_method(self):
         # Initial Values
         self.A = np.array([[.95, 0], [0., .95]])
         self.C = np.eye(2) * np.sqrt(0.5)
@@ -29,7 +27,7 @@ class TestKalman(unittest.TestCase):
         self.methods = ['doubling', 'qz']
 
 
-    def tearDown(self):
+    def teardown_method(self):
         del self.kf
 
 
@@ -86,7 +84,3 @@ class TestKalman(unittest.TestCase):
 
         assert_allclose(kf.Sigma, new_sigma, rtol=1e-4, atol=1e-2)
         assert_allclose(kf.x_hat, new_xhat, rtol=1e-4, atol=1e-2)
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestKalman)
-    unittest.TextTestRunner(verbosity=2, stream=sys.stderr).run(suite)

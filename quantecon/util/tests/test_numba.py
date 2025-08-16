@@ -3,10 +3,14 @@ Tests for Numba support utilities
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_
 from numba import jit
-from nose.tools import eq_, ok_
 from quantecon.util.numba import _numba_linalg_solve, comb_jit
+
+
+@jit(nopython=True)
+def _numba_linalg_solve_jitted(a, b):
+    return _numba_linalg_solve(a, b)
 
 
 @jit(nopython=True)
@@ -15,7 +19,7 @@ def numba_linalg_solve_orig(a, b):
 
 
 class TestNumbaLinalgSolve:
-    def setUp(self):
+    def setup_method(self):
         self.dtypes = [np.float32, np.float64]
         self.a = np.array([[3, 2, 0], [1, -1, 0], [0, 5, 1]])
         self.b_1dim = np.array([2, 4, -1])
@@ -27,8 +31,8 @@ class TestNumbaLinalgSolve:
             a = np.asfortranarray(self.a, dtype=dtype)
             b = np.asfortranarray(self.b_1dim, dtype=dtype)
             sol_orig = numba_linalg_solve_orig(a, b)
-            r = _numba_linalg_solve(a, b)
-            eq_(r, 0)
+            r = _numba_linalg_solve_jitted(a, b)
+            assert_(r == 0)
             assert_array_equal(b, sol_orig)
 
     def test_b_2dim(self):
@@ -36,8 +40,8 @@ class TestNumbaLinalgSolve:
             a = np.asfortranarray(self.a, dtype=dtype)
             b = np.asfortranarray(self.b_2dim, dtype=dtype)
             sol_orig = numba_linalg_solve_orig(a, b)
-            r = _numba_linalg_solve(a, b)
-            eq_(r, 0)
+            r = _numba_linalg_solve_jitted(a, b)
+            assert_(r == 0)
             assert_array_equal(b, sol_orig)
 
     def test_singular_a(self):
@@ -45,39 +49,29 @@ class TestNumbaLinalgSolve:
             for dtype in self.dtypes:
                 a = np.asfortranarray(self.a_singular, dtype=dtype)
                 b = np.asfortranarray(b, dtype=dtype)
-                r = _numba_linalg_solve(a, b)
-                ok_(r != 0)
+                r = _numba_linalg_solve_jitted(a, b)
+                assert_(r != 0)
 
 
 class TestCombJit:
-    def setUp(self):
+    def setup_method(self):
         self.MAX_INTP = np.iinfo(np.intp).max
 
     def test_comb(self):
         N, k = 10, 3
         N_choose_k = 120
-        eq_(comb_jit(N, k), N_choose_k)
+        assert_(comb_jit(N, k) == N_choose_k)
 
     def test_comb_zeros(self):
-        eq_(comb_jit(2, 3), 0)
-        eq_(comb_jit(-1, 3), 0)
-        eq_(comb_jit(2, -1), 0)
+        assert_(comb_jit(2, 3) == 0)
+        assert_(comb_jit(-1, 3) == 0)
+        assert_(comb_jit(2, -1) == 0)
 
-        eq_(comb_jit(self.MAX_INTP, 2), 0)
+        assert_(comb_jit(self.MAX_INTP, 2) == 0)
 
-        N = np.int(self.MAX_INTP**0.5 * 2**0.5) + 1
-        eq_(comb_jit(N, 2), 0)
+        N = np.intp(self.MAX_INTP**0.5 * 2**0.5) + 1
+        assert_(comb_jit(N, 2) == 0)
 
     def test_max_intp(self):
-        eq_(comb_jit(self.MAX_INTP, 0), 1)
-        eq_(comb_jit(self.MAX_INTP, 1), self.MAX_INTP)
-
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
+        assert_(comb_jit(self.MAX_INTP, 0) == 1)
+        assert_(comb_jit(self.MAX_INTP, 1) == self.MAX_INTP)

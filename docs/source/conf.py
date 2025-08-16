@@ -15,6 +15,7 @@
 import sys
 import os
 import pip
+from datetime import datetime
 
 try:
     from mock import Mock as MagicMock
@@ -70,6 +71,7 @@ numydoc_show_class_members= True
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
@@ -100,14 +102,16 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'QuantEcon'
-copyright = u'2014, QuantEcon Developer Team'
+year = datetime.now().year
+copyright = f'2014-{year}, QuantEcon Developer Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-from version import version as quantecon_version
+import quantecon
+quantecon_version = quantecon.__version__
 version = quantecon_version
 # The full version, including alpha/beta/rc tags.
 release = quantecon_version
@@ -152,13 +156,7 @@ pygments_style = 'tango'
 
 
 # -- Options for HTML output ----------------------------------------------
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
-    html_theme = 'default'
-else:  # Local build. Need to import rtd theme
-  import sphinx_rtd_theme
-  html_theme = "sphinx_rtd_theme"
-  html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -187,7 +185,7 @@ else:  # Local build. Need to import rtd theme
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

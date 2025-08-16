@@ -8,7 +8,7 @@ from quantecon.game_theory import NormalFormGame, RepeatedGame
 
 
 class TestAS():
-    def setUp(self):
+    def setup_method(self):
         self.game_dicts = []
 
         # Example from Abreu and Sannikov (2014)
@@ -47,12 +47,3 @@ class TestAS():
                 hull = rpg.equilibrium_payoffs(method=method,
                                                options={'u_init': d['u']})
                 assert_allclose(hull.points[hull.vertices], d['vertices'])
-
-if __name__ == '__main__':
-    import sys
-    import nose
-
-    argv = sys.argv[:]
-    argv.append('--verbose')
-    argv.append('--nocapture')
-    nose.main(argv=argv, defaultTest=__file__)
