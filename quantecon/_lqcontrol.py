@@ -136,7 +136,7 @@ class LQ:
         if T:
             # == Model is finite horizon == #
             self.T = T
-            self.Rf = converter(Rf)
+            self.Rf = np.asarray(Rf, dtype='float')
             self.P = self.Rf
             self.d = 0
         else:
