@@ -64,7 +64,7 @@ jobs:
       run: coveralls --service=github --parallel
 
 
- coveralls-finish:
+  coveralls-finish:
     needs: tests
     runs-on: ubuntu-latest
     steps:
