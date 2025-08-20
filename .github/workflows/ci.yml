@@ -60,17 +60,21 @@ jobs:
         coverage run -m pytest quantecon
         coverage lcov
 
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
-      if: runner.os == 'Linux'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: coverage.lcov
+    - name: Upload coverage to Coveralls
+      run: coveralls --service=github --parallel
+
+
+ coveralls-finish:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finalize Coveralls parallel build
+        run: coveralls --finish
 
   publish:
 
     name: Publish to PyPi
-    needs: [tests]
+    needs: [tests, coveralls-finish]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
