@@ -66,7 +66,7 @@ jobs:
           auto-update-conda: true
           miniforge-version: latest
           environment-file: environment.yml
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.12
           auto-activate-base: false
           use-only-tar-bz2: true
           activate-environment: qe
