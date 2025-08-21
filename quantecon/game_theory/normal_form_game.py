@@ -125,9 +125,10 @@ Beware that in `payoff_array[h, k]`, `h` refers to the player's own
 action, while `k` refers to the opponent player's action.
 
 """
+
 import re
 import numbers
-from typing import List, Optional, Union, Tuple
+from typing import Sequence, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -137,7 +138,7 @@ from ..util import check_random_state, rng_integers
 
 
 # Mypy
-IntOrArrayT = Union[int, npt.ArrayLike]
+IntOrArrayT = int | npt.ArrayLike
 
 
 class Player:
@@ -170,13 +171,14 @@ class Player:
         Default tolerance value used in determining best responses.
 
     """
+
     def __init__(self, payoff_array: npt.ArrayLike):
-        self.payoff_array: np.ndarray = np.asarray(payoff_array, order='C')
+        self.payoff_array: np.ndarray = np.asarray(payoff_array, order="C")
 
         if self.payoff_array.ndim == 0:
-            raise ValueError('payoff_array must be an array_like')
+            raise ValueError("payoff_array must be an array_like")
         if np.prod(self.payoff_array.shape) == 0:
-            raise ValueError('every player must have at least one action')
+            raise ValueError("every player must have at least one action")
 
         self.num_opponents: int = self.payoff_array.ndim - 1
         self.num_actions: int = self.payoff_array.shape[0]
@@ -187,18 +189,18 @@ class Player:
     def __repr__(self) -> str:
         # From numpy.matrix.__repr__
         # Print also dtype, except for int64, float64
-        s = repr(self.payoff_array).replace('array', 'Player')
+        s = repr(self.payoff_array).replace("array", "Player")
         l = s.splitlines()
         for i in range(1, len(l)):
             if l[i]:
-                l[i] = ' ' + l[i]
-        return '\n'.join(l)
+                l[i] = " " + l[i]
+        return "\n".join(l)
 
     def __str__(self) -> str:
         N = self.num_opponents + 1
-        s = 'Player in a {N}-player normal form game'.format(N=N)
-        s += ' with payoff array:\n'
-        s += np.array2string(self.payoff_array, separator=', ')
+        s = "Player in a {N}-player normal form game".format(N=N)
+        s += " with payoff array:\n"
+        s += np.array2string(self.payoff_array, separator=", ")
         return s
 
     def delete_action(self, action: IntOrArrayT, player_idx: int = 0) -> "Player":
@@ -256,7 +258,10 @@ class Player:
             profile of the opponents' actions.
 
         """
-        def reduce_last_player(payoff_array: np.ndarray, action: IntOrArrayT) -> np.ndarray:
+
+        def reduce_last_player(
+            payoff_array: np.ndarray, action: IntOrArrayT
+        ) -> np.ndarray:
             """
             Given `payoff_array` with ndim=M, return the payoff array
             with ndim=M-1 fixing the last player's action to be `action`.
@@ -268,13 +273,11 @@ class Player:
                 return payoff_array.dot(action)
 
         if self.num_opponents == 1:
-            payoff_vector = \
-                reduce_last_player(self.payoff_array, opponents_actions)
+            payoff_vector = reduce_last_player(self.payoff_array, opponents_actions)
         elif self.num_opponents >= 2:
             payoff_vector = self.payoff_array
             for i in reversed(range(self.num_opponents)):
-                payoff_vector = \
-                    reduce_last_player(payoff_vector, opponents_actions[i])
+                payoff_vector = reduce_last_player(payoff_vector, opponents_actions[i])
         else:  # Trivial case with self.num_opponents == 0
             payoff_vector = self.payoff_array
 
@@ -284,7 +287,7 @@ class Player:
         self,
         own_action: IntOrArrayT,
         opponents_actions: IntOrArrayT,
-        tol: Optional[float] = None,
+        tol: float | None = None,
     ) -> bool:
         """
         Return True if `own_action` is a best response to
@@ -323,10 +326,10 @@ class Player:
     def best_response(
         self,
         opponents_actions: IntOrArrayT,
-        tie_breaking: str = 'smallest',
-        payoff_perturbation: Optional[np.ndarray] = None,
-        tol: Optional[float] = None,
-        random_state: Optional[Union[int, np.random.RandomState]] = None,
+        tie_breaking: str = "smallest",
+        payoff_perturbation: np.ndarray | None = None,
+        tol: float | None = None,
+        random_state: int | np.random.RandomState | None = None,
     ) -> IntOrArrayT:
         """
         Return the best response action(s) to `opponents_actions`.
@@ -384,14 +387,12 @@ class Player:
             except TypeError:  # type mismatch
                 payoff_vector = payoff_vector + payoff_perturbation
 
-        best_responses = \
-            np.where(payoff_vector >= payoff_vector.max() - tol)[0]
+        best_responses = np.where(payoff_vector >= payoff_vector.max() - tol)[0]
 
-        if tie_breaking == 'smallest':
+        if tie_breaking == "smallest":
             return best_responses[0]
-        elif tie_breaking == 'random':
-            return self.random_choice(best_responses,
-                                      random_state=random_state)
+        elif tie_breaking == "random":
+            return self.random_choice(best_responses, random_state=random_state)
         elif tie_breaking is False:
             return best_responses
         else:
@@ -400,8 +401,8 @@ class Player:
 
     def random_choice(
         self,
-        actions: Optional[npt.ArrayLike] = None,
-        random_state: Optional[Union[int, np.random.RandomState]] = None,
+        actions: npt.ArrayLike | None = None,
+        random_state: int | np.random.RandomState | None = None,
     ) -> int:
         """
         Return a pure action chosen randomly from `actions`.
@@ -445,8 +446,8 @@ class Player:
     def is_dominated(
         self,
         action: int,
-        tol: Optional[float] = None,
-        method: Optional[str] = None,
+        tol: float | None = None,
+        method: str | None = None,
     ) -> bool:
         """
         Determine whether `action` is strictly dominated by some mixed
@@ -492,24 +493,27 @@ class Player:
 
         if method is None:
             from ..optimize.minmax import minmax
+
             v, _, _ = minmax(D)
             return v > tol
         else:
             from scipy.optimize import linprog
+
             m, n = D.shape
-            A_ub = np.empty((n, m+1))
+            A_ub = np.empty((n, m + 1))
             A_ub[:, :m] = -D.T
             A_ub[:, -1] = 1  # Slack variable
             b_ub = np.zeros(n)
-            A_eq = np.empty((1, m+1))
+            A_eq = np.empty((1, m + 1))
             A_eq[:, :m] = 1  # Equality constraint
             A_eq[:, -1] = 0
             b_eq = np.ones(1)
-            c = np.zeros(m+1)
+            c = np.zeros(m + 1)
             c[-1] = -1
             try:
-                res = linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
-                              method=method)
+                res = linprog(
+                    c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method=method
+                )
             except ValueError:
                 raise ValueError("Unknown method '{0}'".format(method))
 
@@ -518,11 +522,12 @@ class Player:
             elif res.status == 2:  # infeasible
                 return False
             else:  # pragma: no cover
-                msg = 'scipy.optimize.linprog returned {0}'.format(res.status)
+                msg = "scipy.optimize.linprog returned {0}".format(res.status)
                 raise RuntimeError(msg)
 
     def dominated_actions(
-        self, tol: Optional[float] = None, method: Optional[str] = None) -> List[int]:
+        self, tol: float | None = None, method: str | None = None
+    ) -> list[int]:
         """
         Return a list of actions that are strictly dominated by some
         mixed actions.
@@ -591,9 +596,12 @@ class NormalFormGame:
         Tuple of the payoff arrays, one for each player.
 
     """
-    def __init__(self, data: npt.ArrayLike, dtype: Optional[np.dtype] = None):
+
+    def __init__(
+        self, data: npt.ArrayLike | Sequence[Player], dtype: np.dtype | None = None
+    ):
         # data represents an array_like of Players
-        if hasattr(data, '__getitem__') and isinstance(data[0], Player):
+        if hasattr(data, "__getitem__") and isinstance(data[0], Player):
             N = len(data)
 
             # Check that the shapes of the payoff arrays are consistent
@@ -602,18 +610,11 @@ class NormalFormGame:
             dtype_0 = data[0].payoff_array.dtype
             for i in range(1, N):
                 shape = data[i].payoff_array.shape
-                if not (
-                    len(shape) == N and
-                    shape == shape_0[i:] + shape_0[:i]
-                ):
-                    raise ValueError(
-                        'shapes of payoff arrays must be consistent'
-                    )
+                if not (len(shape) == N and shape == shape_0[i:] + shape_0[:i]):
+                    raise ValueError("shapes of payoff arrays must be consistent")
                 dtype = data[i].payoff_array.dtype
                 if dtype != dtype_0:
-                    raise ValueError(
-                        'dtypes of payoff arrays must coincide'
-                    )
+                    raise ValueError("dtypes of payoff arrays must coincide")
 
             self.players = tuple(data)
             self.dtype = dtype_0
@@ -634,8 +635,7 @@ class NormalFormGame:
                 # with payoff_arrays filled with zeros
                 # Payoff values set via __setitem__
                 self.players = tuple(
-                    Player(np.zeros(tuple(data[i:]) + tuple(data[:i]),
-                                    dtype=dtype))
+                    Player(np.zeros(tuple(data[i:]) + tuple(data[:i]), dtype=dtype))
                     for i in range(N)
                 )
                 self.dtype = self.players[0].payoff_array.dtype
@@ -645,8 +645,8 @@ class NormalFormGame:
                 # Number of actions must be >= 2
                 if data.shape[0] != data.shape[1]:
                     raise ValueError(
-                        'symmetric two-player game must be represented ' +
-                        'by a square matrix'
+                        "symmetric two-player game must be represented "
+                        + "by a square matrix"
                     )
                 N = 2
                 self.players = tuple(Player(data) for i in range(N))
@@ -659,96 +659,96 @@ class NormalFormGame:
                 N = data.ndim - 1
                 if data.shape[-1] != N:
                     raise ValueError(
-                        'size of innermost array must be equal to ' +
-                        'the number of players'
+                        "size of innermost array must be equal to "
+                        + "the number of players"
                     )
                 payoff_arrays = tuple(
-                    np.empty(data.shape[i:-1]+data.shape[:i], dtype=data.dtype)
+                    np.empty(data.shape[i:-1] + data.shape[:i], dtype=data.dtype)
                     for i in range(N)
                 )
                 for i, payoff_array in enumerate(payoff_arrays):
-                    payoff_array[:] = \
-                        data.take(i, axis=-1).transpose(
-                            (*range(i, N), *range(i))
-                        )
+                    payoff_array[:] = data.take(i, axis=-1).transpose(
+                        (*range(i, N), *range(i))
+                    )
                 self.players = tuple(
                     Player(payoff_array) for payoff_array in payoff_arrays
                 )
                 self.dtype = data.dtype
 
         self.N = N  # Number of players
-        self.nums_actions = tuple(
-            player.num_actions for player in self.players
-        )
-        self.payoff_arrays = tuple(
-            player.payoff_array for player in self.players
-        )
+        self.nums_actions = tuple(player.num_actions for player in self.players)
+        self.payoff_arrays = tuple(player.payoff_array for player in self.players)
 
     @property
     def payoff_profile_array(self) -> np.ndarray:
         N = self.N
         dtype = self.dtype
-        payoff_profile_array = \
-            np.empty(self.players[0].payoff_array.shape + (N,), dtype=dtype)
+        payoff_profile_array = np.empty(
+            self.players[0].payoff_array.shape + (N,), dtype=dtype
+        )
         for i, player in enumerate(self.players):
-            payoff_profile_array[..., i] = \
-                player.payoff_array.transpose((*range(N-i, N), *range(N-i)))
+            payoff_profile_array[..., i] = player.payoff_array.transpose(
+                (*range(N - i, N), *range(N - i))
+            )
         return payoff_profile_array
 
     def __repr__(self) -> str:
-        s = '<{nums_actions} {N}-player NormalFormGame of dtype {dtype}>'
-        return s.format(nums_actions=_nums_actions2string(self.nums_actions),
-                        N=self.N,
-                        dtype=self.dtype)
+        s = "<{nums_actions} {N}-player NormalFormGame of dtype {dtype}>"
+        return s.format(
+            nums_actions=_nums_actions2string(self.nums_actions),
+            N=self.N,
+            dtype=self.dtype,
+        )
 
     def __str__(self) -> str:
-        s = '{N}-player NormalFormGame with payoff profile array:\n'
+        s = "{N}-player NormalFormGame with payoff profile array:\n"
         s += _payoff_profile_array2string(self.payoff_profile_array)
         return s.format(N=self.N)
 
     def __getitem__(self, action_profile: IntOrArrayT) -> np.ndarray:
         if self.N == 1:  # Trivial game with 1 player
             if not isinstance(action_profile, numbers.Integral):
-                raise TypeError('index must be an integer')
+                raise TypeError("index must be an integer")
             return self.players[0].payoff_array[action_profile]
 
         # Non-trivial game with 2 or more players
         try:
             if len(action_profile) != self.N:
-                raise IndexError('index must be of length {0}'.format(self.N))
+                raise IndexError("index must be of length {0}".format(self.N))
         except TypeError:
-            raise TypeError('index must be a tuple')
+            raise TypeError("index must be a tuple")
 
         payoff_profile = np.empty(self.N, dtype=self.dtype)
         for i, player in enumerate(self.players):
-            payoff_profile[i] = \
-                player.payoff_array[
-                    tuple(action_profile[i:]) + tuple(action_profile[:i])
-                ]
+            payoff_profile[i] = player.payoff_array[
+                tuple(action_profile[i:]) + tuple(action_profile[:i])
+            ]
 
         return payoff_profile
 
-    def __setitem__(self, action_profile: IntOrArrayT, payoff_profile: npt.ArrayLike) -> None:
+    def __setitem__(
+        self, action_profile: IntOrArrayT, payoff_profile: npt.ArrayLike
+    ) -> None:
         if self.N == 1:  # Trivial game with 1 player
             if not isinstance(action_profile, numbers.Integral):
-                raise TypeError('index must be an integer')
+                raise TypeError("index must be an integer")
             self.players[0].payoff_array[action_profile] = payoff_profile
             return None
 
         # Non-trivial game with 2 or more players
         try:
             if len(action_profile) != self.N:
-                raise IndexError('index must be of length {0}'.format(self.N))
+                raise IndexError("index must be of length {0}".format(self.N))
         except TypeError:
-            raise TypeError('index must be a tuple')
+            raise TypeError("index must be a tuple")
 
         try:
             if len(payoff_profile) != self.N:
                 raise ValueError(
-                    'value must be an array_like of length {0}'.format(self.N)
+                    "value must be an array_like of length {0}".format(self.N)
                 )
         except TypeError:
-            raise TypeError('value must be a tuple')
+            raise TypeError("value must be a tuple")
 
         for i, player in enumerate(self.players):
             player.payoff_array[
@@ -808,12 +808,14 @@ class NormalFormGame:
             player_idx = player_idx + self.N
 
         players_new = tuple(
-            player.delete_action(action, player_idx-i)
+            player.delete_action(action, player_idx - i)
             for i, player in enumerate(self.players)
         )
         return NormalFormGame(players_new)
 
-    def is_nash(self, action_profile: npt.ArrayLike, tol: Optional[float] = None) -> bool:
+    def is_nash(
+        self, action_profile: npt.ArrayLike, tol: float | None = None
+    ) -> bool:
         """
         Return True if `action_profile` is a Nash equilibrium.
 
@@ -836,25 +838,22 @@ class NormalFormGame:
         """
         if self.N == 2:
             for i, player in enumerate(self.players):
-                own_action, opponent_action = \
-                    action_profile[i], action_profile[1-i]
-                if not player.is_best_response(own_action, opponent_action,
-                                               tol):
+                own_action, opponent_action = action_profile[i], action_profile[1 - i]
+                if not player.is_best_response(own_action, opponent_action, tol):
                     return False
 
         elif self.N >= 3:
             for i, player in enumerate(self.players):
                 own_action = action_profile[i]
-                opponents_actions = \
-                    tuple(action_profile[i+1:]) + tuple(action_profile[:i])
+                opponents_actions = tuple(action_profile[i + 1 :]) + tuple(
+                    action_profile[:i]
+                )
 
-                if not player.is_best_response(own_action, opponents_actions,
-                                               tol):
+                if not player.is_best_response(own_action, opponents_actions, tol):
                     return False
 
         else:  # Trivial case with self.N == 1
-            if not self.players[0].is_best_response(action_profile[0], None,
-                                                    tol):
+            if not self.players[0].is_best_response(action_profile[0], None, tol):
                 return False
 
         return True
@@ -862,31 +861,31 @@ class NormalFormGame:
 
 def _nums_actions2string(nums_actions: Tuple[int, ...]) -> str:
     if len(nums_actions) == 1:
-        s = '{0}-action'.format(nums_actions[0])
+        s = "{0}-action".format(nums_actions[0])
     else:
-        s = 'x'.join(map(str, nums_actions))
+        s = "x".join(map(str, nums_actions))
     return s
 
 
 def _payoff_profile_array2string(
-    payoff_profile_array: np.ndarray, class_name: Optional[str] = None
+    payoff_profile_array: np.ndarray, class_name: str | None = None
 ) -> str:
-    s = np.array2string(payoff_profile_array, separator=', ')
+    s = np.array2string(payoff_profile_array, separator=", ")
 
     # Remove one linebreak
-    s = re.sub(r'(\n+)', lambda x: x.group(0)[0:-1], s)
+    s = re.sub(r"(\n+)", lambda x: x.group(0)[0:-1], s)
 
     if class_name is not None:
-        prefix = class_name + '('
-        next_line_prefix = ' ' * len(prefix)
-        suffix = ')'
+        prefix = class_name + "("
+        next_line_prefix = " " * len(prefix)
+        suffix = ")"
         l = s.splitlines()
         l[0] = prefix + l[0]
         for i in range(1, len(l)):
             if l[i]:
                 l[i] = next_line_prefix + l[i]
         l[-1] += suffix
-        s = '\n'.join(l)
+        s = "\n".join(l)
 
     return s
 
@@ -915,6 +914,7 @@ def pure2mixed(num_actions: int, action: int) -> np.ndarray:
 
 
 # Numba jitted functions #
+
 
 @jit(nopython=True, cache=True)
 def best_response_2p(
