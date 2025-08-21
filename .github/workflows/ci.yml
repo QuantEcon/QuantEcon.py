@@ -18,12 +18,10 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.11, 3.12, 3.13]
-
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
     - name: Cache conda
       uses: actions/cache@v4
       env:
@@ -32,7 +30,6 @@ jobs:
         path: ~/conda_pkgs_dir
         key:
           ${{ runner.os }}-${{ matrix.python-version }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
-
     - uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
@@ -42,24 +39,20 @@ jobs:
         auto-activate-base: false
         use-only-tar-bz2: true
         activate-environment: qe
-
     - name: Conda info
       shell: bash -l {0}
       run: |
         conda info
         conda list
-
     - name: flake8 Tests
       shell: bash -l {0}
       run: |
         flake8 --select F401, F405, E231 quantecon
-
     - name: Run Tests (pytest)
       shell: bash -l {0}
       run: |
         coverage run -m pytest quantecon
         coverage lcov
-
     - name: Upload coverage to Coveralls
       run: coveralls --service=github --parallel
 
@@ -68,6 +61,15 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     steps:
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          miniforge-version: latest
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
+          use-only-tar-bz2: true
+          activate-environment: qe
       - name: Finalize Coveralls parallel build
         run: coveralls --finish
 
