@@ -170,7 +170,7 @@ class Player:
         Default tolerance value used in determining best responses.
 
     """
-    def __init__(self, payoff_array: np.ndarray):
+    def __init__(self, payoff_array: ArrayLike):
         self.payoff_array: np.ndarray = np.asarray(payoff_array, order='C')
 
         if self.payoff_array.ndim == 0:
