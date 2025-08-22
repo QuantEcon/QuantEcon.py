@@ -29,7 +29,11 @@ class __Timer__:
     def tic(self):
         """
         Save time for future use with `tac()` or `toc()`.
-
+        
+        Returns
+        -------
+        None
+            This function doesn't return a value.
         """
         t = time.time()
         self.start = t
@@ -173,6 +177,98 @@ class __Timer__:
 
 
 __timer__ = __Timer__()
+
+
+class Timer:
+    """
+    A context manager for timing code execution.
+    
+    This provides a modern context manager approach to timing, allowing
+    patterns like `with Timer():` instead of manual tic/toc calls.
+    
+    Parameters
+    ----------
+    message : str, optional(default="")
+        Custom message to display with timing results.
+    precision : int, optional(default=2)
+        Number of decimal places to display for seconds.
+    unit : str, optional(default="seconds") 
+        Unit to display timing in. Options: "seconds", "milliseconds", "microseconds"
+    silent : bool, optional(default=False)
+        If True, suppress printing of timing results.
+        
+    Attributes
+    ----------
+    elapsed : float
+        The elapsed time in seconds. Available after exiting the context.
+        
+    Examples
+    --------
+    Basic usage:
+    >>> with Timer():
+    ...     # some code
+    ...     pass
+    0.00 seconds elapsed
+    
+    With custom message and precision:
+    >>> with Timer("Computing results", precision=4):
+    ...     # some code  
+    ...     pass
+    Computing results: 0.0001 seconds elapsed
+    
+    Store elapsed time for comparison:
+    >>> timer = Timer(silent=True)
+    >>> with timer:
+    ...     # some code
+    ...     pass
+    >>> print(f"Method took {timer.elapsed:.6f} seconds")
+    Method took 0.000123 seconds
+    """
+    
+    def __init__(self, message="", precision=2, unit="seconds", silent=False):
+        self.message = message
+        self.precision = precision
+        self.unit = unit.lower()
+        self.silent = silent
+        self.elapsed = None
+        self._start_time = None
+        
+        # Validate unit
+        valid_units = ["seconds", "milliseconds", "microseconds"]
+        if self.unit not in valid_units:
+            raise ValueError(f"unit must be one of {valid_units}")
+    
+    def __enter__(self):
+        self._start_time = time.time()
+        return self
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end_time = time.time()
+        self.elapsed = end_time - self._start_time
+        
+        if not self.silent:
+            self._print_elapsed()
+            
+    def _print_elapsed(self):
+        """Print the elapsed time with appropriate formatting."""
+        # Convert to requested unit
+        if self.unit == "milliseconds":
+            elapsed_display = self.elapsed * 1000
+            unit_str = "ms"
+        elif self.unit == "microseconds":
+            elapsed_display = self.elapsed * 1000000
+            unit_str = "μs"
+        else:  # seconds
+            elapsed_display = self.elapsed
+            unit_str = "seconds"
+            
+        # Format the message
+        if self.message:
+            prefix = f"{self.message}: "
+        else:
+            prefix = ""
+            
+        print(f"{prefix}{elapsed_display:.{self.precision}f} {unit_str} elapsed")
 
 
 def tic():

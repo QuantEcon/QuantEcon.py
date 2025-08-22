@@ -24,11 +24,37 @@ __all__ = ['qnwcheb', 'qnwequi', 'qnwlege', 'qnwnorm', 'qnwlogn',
 
 @vectorize(nopython=True)
 def gammaln(x):
+    """
+    Natural logarithm of the gamma function.
+    
+    Parameters
+    ----------
+    x : float
+        Input value.
+        
+    Returns
+    -------
+    float
+        Natural logarithm of gamma(x).
+    """
     return math.lgamma(x)
 
 
 @vectorize(nopython=True)
 def fix(x):
+    """
+    Round towards zero.
+    
+    Parameters
+    ----------
+    x : float
+        Input value.
+        
+    Returns
+    -------
+    float
+        Rounded value towards zero.
+    """
     if x < 0:
         return math.ceil(x)
     else:
@@ -242,6 +268,9 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
     sig2 : array_like(float), optional(default=eye(d))
         A d x d array representing the variance-covariance matrix of the
         multivariate normal distribution.
+    
+    usesqrtm : bool, optional(default=False)
+        Whether to use matrix square root method for decomposition.
 
     Returns
     -------

@@ -61,6 +61,11 @@ class RepeatedGame:
                     Maximum number of iterations.
                 u_init : ndarray(float, ndim=1)
                     The initial guess of threat points.
+        
+        Returns
+        -------
+        ndarray(float, ndim=2)
+            Array containing the set of equilibrium payoff pairs.
 
         Notes
         -----
