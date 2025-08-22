@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - coverage
+  - coveralls
   - numpy
   - scipy
   - pandas
