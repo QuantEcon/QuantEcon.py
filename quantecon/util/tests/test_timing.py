@@ -147,3 +147,105 @@ class TestTimer:
         # Timer should still record elapsed time
         assert timer.elapsed is not None
         assert_allclose(timer.elapsed, self.sleep_time, atol=0.05, rtol=2)
+
+    def test_multiple_runs_basic(self):
+        """Test basic multiple runs functionality."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        timer = Timer(runs=3, silent=True)
+        timer.timeit(test_func)
+        
+        # Check that we have results
+        assert timer.elapsed is not None
+        assert isinstance(timer.elapsed, list)
+        assert len(timer.elapsed) == 3
+        assert timer.minimum is not None
+        assert timer.maximum is not None
+        assert timer.average is not None
+        
+        # Check timing accuracy
+        for run_time in timer.elapsed:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+        
+        # Check statistics
+        assert_allclose(timer.average, self.sleep_time, atol=0.05, rtol=2)
+        assert timer.minimum <= timer.average <= timer.maximum
+        
+    def test_multiple_runs_with_args(self):
+        """Test multiple runs with function arguments."""
+        def test_func_with_args(sleep_time, multiplier=1):
+            time.sleep(sleep_time * multiplier)
+        
+        timer = Timer(runs=2, silent=True)
+        timer.timeit(test_func_with_args, self.sleep_time, multiplier=2)
+        
+        expected_time = self.sleep_time * 2
+        assert len(timer.elapsed) == 2
+        for run_time in timer.elapsed:
+            assert_allclose(run_time, expected_time, atol=0.05, rtol=2)
+    
+    def test_multiple_runs_validation(self):
+        """Test validation for multiple runs mode."""
+        # Test invalid runs parameter
+        try:
+            Timer(runs=0)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "runs must be a positive integer" in str(e)
+        
+        try:
+            Timer(runs=-1)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "runs must be a positive integer" in str(e)
+        
+        try:
+            Timer(runs="invalid")
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "runs must be a positive integer" in str(e)
+    
+    def test_timeit_single_run_error(self):
+        """Test that timeit() raises error when runs=1."""
+        timer = Timer(runs=1, silent=True)
+        
+        def dummy_func():
+            pass
+        
+        try:
+            timer.timeit(dummy_func)
+            assert False, "Should have raised RuntimeError"
+        except RuntimeError as e:
+            assert "timeit() is only available when runs > 1" in str(e)
+    
+    def test_multiple_runs_different_units(self):
+        """Test multiple runs with different time units."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        # Test milliseconds
+        timer_ms = Timer(runs=2, unit="milliseconds", silent=True)
+        timer_ms.timeit(test_func)
+        
+        # Times should still be stored in seconds internally
+        for run_time in timer_ms.elapsed:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+        
+        # Test microseconds
+        timer_us = Timer(runs=2, unit="microseconds", silent=True)
+        timer_us.timeit(test_func)
+        
+        for run_time in timer_us.elapsed:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+    
+    def test_multiple_runs_message(self):
+        """Test multiple runs with custom message."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        timer = Timer(runs=2, message="Test operation", silent=True)
+        timer.timeit(test_func)
+        
+        assert len(timer.elapsed) == 2
+        assert timer.average is not None
