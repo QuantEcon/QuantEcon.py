@@ -54,13 +54,18 @@ jobs:
         coverage run -m pytest quantecon
         coverage lcov
     - name: Upload coverage to Coveralls
+      shell: bash -l {0}
       run: coveralls --service=github --parallel
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_PARALLEL: true
 
 
   coveralls-finish:
     needs: tests
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
       - uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
@@ -71,7 +76,10 @@ jobs:
           use-only-tar-bz2: true
           activate-environment: qe
       - name: Finalize Coveralls parallel build
+        shell: bash -l {0}
         run: coveralls --finish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
 
