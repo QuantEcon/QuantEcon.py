@@ -54,9 +54,9 @@ def var_quadratic_sum(A, C, H, beta, x0):
     x0 = np.atleast_1d(x0)
     # == Start computations == #
     Q = scipy.linalg.solve_discrete_lyapunov(np.sqrt(beta) * A.T, H)
-    cq = np.dot(np.dot(C.T, Q), C)
+    cq = C.T @ Q @ C
     v = np.trace(cq) * beta / (1 - beta)
-    q0 = np.dot(np.dot(x0.T, Q), x0) + v
+    q0 = (x0.T @ Q @ x0) + v
 
     return q0
 
