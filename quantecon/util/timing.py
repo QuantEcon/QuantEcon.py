@@ -6,7 +6,6 @@ import time
 import numpy as np
 
 
-
 class __Timer__:
     """Computes elapsed time, between tic, tac, and toc.
 
@@ -197,163 +196,58 @@ class Timer:
         Unit to display timing in. Options: "seconds", "milliseconds", "microseconds"
     silent : bool, optional(default=False)
         If True, suppress printing of timing results.
-    runs : int, optional(default=1)
-        Number of runs to execute. If > 1, enables multiple runs mode.
         
     Attributes
     ----------
-    elapsed : float or list
-        For single run (runs=1): elapsed time in seconds.
-        For multiple runs (runs>1): list of elapsed times for each run.
-    minimum : float
-        Minimum elapsed time (only available when runs > 1).
-    maximum : float  
-        Maximum elapsed time (only available when runs > 1).
-    average : float
-        Average elapsed time (only available when runs > 1).
+    elapsed : float
+        The elapsed time in seconds. Available after exiting the context.
         
     Examples
     --------
-    Basic usage (single run):
+    Basic usage:
     >>> with Timer():
     ...     # some code
     ...     pass
     0.00 seconds elapsed
     
-    Multiple runs with callable:
-    >>> def my_function():
-    ...     time.sleep(0.01)
-    >>> timer = Timer(runs=3, silent=True)
-    >>> timer.timeit(my_function)
-    >>> print(f"Average: {timer.average:.4f}s")
-    Average: 0.0101s
+    With custom message and precision:
+    >>> with Timer("Computing results", precision=4):
+    ...     # some code  
+    ...     pass
+    Computing results: 0.0001 seconds elapsed
     
-    Multiple runs with callable:
-    >>> def my_function():
-    ...     time.sleep(0.01)
-    >>> timer = Timer(runs=3)
-    >>> timer.timeit(my_function)
-    Run 1/3: 0.01 seconds
-    Run 2/3: 0.01 seconds  
-    Run 3/3: 0.01 seconds
-    Average: 0.01 seconds, Min: 0.01 seconds, Max: 0.01 seconds
+    Store elapsed time for comparison:
+    >>> timer = Timer(silent=True)
+    >>> with timer:
+    ...     # some code
+    ...     pass
+    >>> print(f"Method took {timer.elapsed:.6f} seconds")
+    Method took 0.000123 seconds
     """
     
-    def __init__(self, message="", precision=2, unit="seconds", silent=False, runs=1):
+    def __init__(self, message="", precision=2, unit="seconds", silent=False):
         self.message = message
         self.precision = precision
         self.unit = unit.lower()
         self.silent = silent
-        self.runs = runs
         self.elapsed = None
-        self.minimum = None
-        self.maximum = None
-        self.average = None
         self._start_time = None
         
         # Validate unit
         valid_units = ["seconds", "milliseconds", "microseconds"]
         if self.unit not in valid_units:
             raise ValueError(f"unit must be one of {valid_units}")
-        
-        # Validate runs
-        if not isinstance(runs, int) or runs < 1:
-            raise ValueError("runs must be a positive integer")
     
     def __enter__(self):
         self._start_time = time.time()
         return self
         
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.runs == 1:
-            # Single run mode - record elapsed time
-            end_time = time.time()
-            self.elapsed = end_time - self._start_time
-            
-            if not self.silent:
-                self._print_elapsed()
-        else:
-            # Multiple runs mode - context manager not supported, only timeit()
-            raise RuntimeError("Context manager usage is only supported for single runs (runs=1). For multiple runs, use the timeit() method.")
-    
-    def timeit(self, func, *args, **kwargs):
-        """
-        Execute a callable multiple times and collect timing statistics.
-        Only available when runs > 1.
-        
-        Parameters
-        ----------
-        func : callable
-            Function to execute multiple times
-        *args, **kwargs
-            Arguments to pass to func
-            
-        Returns
-        -------
-        None
-            Results are stored in elapsed, minimum, maximum, average attributes
-        """
-        if self.runs == 1:
-            raise RuntimeError("timeit() is only available when runs > 1. Use context manager for single runs.")
-        
-        run_times = []
-        for i in range(self.runs):
-            start_time = time.time()
-            func(*args, **kwargs)
-            end_time = time.time()
-            run_time = end_time - start_time
-            run_times.append(run_time)
-            
-            if not self.silent:
-                self._print_single_run(i + 1, run_time)
-        
-        # Store results
-        self.elapsed = run_times
-        self.minimum = min(run_times)
-        self.maximum = max(run_times)
-        self.average = sum(run_times) / len(run_times)
+        end_time = time.time()
+        self.elapsed = end_time - self._start_time
         
         if not self.silent:
-            self._print_multiple_runs_summary()
-
-    def _print_single_run(self, run_number, run_time):
-        """Print timing for a single run in multiple runs mode."""
-        # Convert to requested unit
-        if self.unit == "milliseconds":
-            elapsed_display = run_time * 1000
-            unit_str = "ms"
-        elif self.unit == "microseconds":
-            elapsed_display = run_time * 1000000
-            unit_str = "μs"
-        else:  # seconds
-            elapsed_display = run_time
-            unit_str = "seconds"
-            
-        print(f"Run {run_number}/{self.runs}: {elapsed_display:.{self.precision}f} {unit_str}")
-    
-    def _print_multiple_runs_summary(self):
-        """Print summary statistics for multiple runs."""
-        # Convert to requested unit
-        if self.unit == "milliseconds":
-            avg_display = self.average * 1000
-            min_display = self.minimum * 1000
-            max_display = self.maximum * 1000
-            unit_str = "ms"
-        elif self.unit == "microseconds":
-            avg_display = self.average * 1000000
-            min_display = self.minimum * 1000000
-            max_display = self.maximum * 1000000
-            unit_str = "μs"
-        else:  # seconds
-            avg_display = self.average
-            min_display = self.minimum
-            max_display = self.maximum
-            unit_str = "seconds"
-            
-        prefix = f"{self.message}: " if self.message else ""
-        print(f"{prefix}Average: {avg_display:.{self.precision}f} {unit_str}, "
-              f"Min: {min_display:.{self.precision}f} {unit_str}, "
-              f"Max: {max_display:.{self.precision}f} {unit_str}")
+            self._print_elapsed()
             
     def _print_elapsed(self):
         """Print the elapsed time with appropriate formatting."""
@@ -375,6 +269,148 @@ class Timer:
             prefix = ""
             
         print(f"{prefix}{elapsed_display:.{self.precision}f} {unit_str} elapsed")
+
+
+def timeit(func, runs=1, stats_only=False, **timer_kwargs):
+    """
+    Execute a function multiple times and collect timing statistics.
+    
+    This function provides a convenient way to time a function multiple times
+    and get summary statistics, using the Timer context manager internally.
+    
+    Parameters
+    ----------
+    func : callable
+        Function to execute multiple times. Function should take no arguments,
+        or be a partial function or lambda with arguments already bound.
+    runs : int, optional(default=1)
+        Number of runs to execute. Must be a positive integer.
+    stats_only : bool, optional(default=False)
+        If True, only display summary statistics. If False, display 
+        individual run times followed by summary statistics.
+    **timer_kwargs
+        Keyword arguments to pass to Timer (message, precision, unit, silent).
+        Note: silent parameter controls all output when stats_only=False.
+        
+    Returns
+    -------
+    dict
+        Dictionary containing timing results with keys:
+        - 'elapsed': list of elapsed times for each run
+        - 'average': average elapsed time
+        - 'minimum': minimum elapsed time  
+        - 'maximum': maximum elapsed time
+        
+    Examples
+    --------
+    Basic usage:
+    >>> def slow_function():
+    ...     time.sleep(0.01)
+    >>> timeit(slow_function, runs=3)
+    Run 1: 0.01 seconds
+    Run 2: 0.01 seconds
+    Run 3: 0.01 seconds
+    Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
+    
+    Summary only:
+    >>> timeit(slow_function, runs=3, stats_only=True) 
+    Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
+    
+    With custom Timer options:
+    >>> timeit(slow_function, runs=2, unit="milliseconds", precision=1)
+    Run 1: 10.1 ms
+    Run 2: 10.0 ms  
+    Average: 10.1 ms, Minimum: 10.0 ms, Maximum: 10.1 ms
+    
+    With function arguments using lambda:
+    >>> add_func = lambda: expensive_computation(5, 10)
+    >>> timeit(add_func, runs=2)
+    """
+    if not isinstance(runs, int) or runs < 1:
+        raise ValueError("runs must be a positive integer")
+    
+    if not callable(func):
+        raise ValueError("func must be callable")
+    
+    # Extract Timer parameters
+    timer_params = {
+        'message': timer_kwargs.pop('message', ''),
+        'precision': timer_kwargs.pop('precision', 2),
+        'unit': timer_kwargs.pop('unit', 'seconds'),
+        'silent': timer_kwargs.pop('silent', False)  # Explicit silent parameter
+    }
+    
+    # Warn about unused kwargs
+    if timer_kwargs:
+        raise ValueError(f"Unknown timer parameters: {list(timer_kwargs.keys())}")
+    
+    run_times = []
+    
+    # Execute the function multiple times
+    for i in range(runs):
+        # Always silence individual Timer output to avoid duplication with our run display
+        individual_timer_params = timer_params.copy()
+        individual_timer_params['silent'] = True
+            
+        with Timer(**individual_timer_params) as timer:
+            func()
+        run_times.append(timer.elapsed)
+        
+        # Print individual run times unless stats_only or silent
+        if not stats_only and not timer_params['silent']:
+            # Convert to requested unit for display
+            unit = timer_params['unit'].lower()
+            precision = timer_params['precision']
+            
+            if unit == "milliseconds":
+                elapsed_display = timer.elapsed * 1000
+                unit_str = "ms"
+            elif unit == "microseconds":
+                elapsed_display = timer.elapsed * 1000000
+                unit_str = "μs"
+            else:  # seconds
+                elapsed_display = timer.elapsed
+                unit_str = "seconds"
+                
+            print(f"Run {i + 1}: {elapsed_display:.{precision}f} {unit_str}")
+    
+    # Calculate statistics
+    average = sum(run_times) / len(run_times)
+    minimum = min(run_times)
+    maximum = max(run_times)
+    
+    # Print summary statistics unless completely silent
+    if not timer_params['silent']:
+        # Convert to requested unit for display
+        unit = timer_params['unit'].lower()
+        precision = timer_params['precision']
+        
+        if unit == "milliseconds":
+            avg_display = average * 1000
+            min_display = minimum * 1000
+            max_display = maximum * 1000
+            unit_str = "ms"
+        elif unit == "microseconds":
+            avg_display = average * 1000000
+            min_display = minimum * 1000000
+            max_display = maximum * 1000000
+            unit_str = "μs"
+        else:  # seconds
+            avg_display = average
+            min_display = minimum
+            max_display = maximum
+            unit_str = "seconds"
+            
+        print(f"Average: {avg_display:.{precision}f} {unit_str}, "
+              f"Minimum: {min_display:.{precision}f} {unit_str}, "
+              f"Maximum: {max_display:.{precision}f} {unit_str}")
+    
+    return {
+        'elapsed': run_times,
+        'average': average,
+        'minimum': minimum,
+        'maximum': maximum
+    }
 
 
 def tic():
