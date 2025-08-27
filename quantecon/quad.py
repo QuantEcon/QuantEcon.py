@@ -324,8 +324,8 @@ def qnwnorm(n, mu=None, sig2=None, usesqrtm=False):
         new_sig2 = la.cholesky(sig2)
 
     if d > 1:
-        nodes = nodes.dot(new_sig2) + mu  # Broadcast ok
-    else:  # nodes.dot(sig) will not be aligned in scalar case.
+        nodes = nodes @ new_sig2 + mu  # Broadcast ok
+    else:  # nodes @ new_sig2 will not be aligned in scalar case.
         nodes = nodes * new_sig2 + mu
 
     return nodes.squeeze(), weights
@@ -576,7 +576,7 @@ def quadrect(f, n, a, b, kind='lege', random_state=None, *args, **kwargs):
     else:
         nodes, weights = qnwequi(n, a, b, kind, random_state=random_state)
 
-    out = weights.dot(f(nodes, *args, **kwargs))
+    out = weights @ f(nodes, *args, **kwargs)
     return out
 
 

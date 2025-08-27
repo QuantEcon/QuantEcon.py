@@ -291,7 +291,7 @@ def _R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
             if (action_profile_payoff >= IC).all():
                 # check if payoff is inside the convex hull
                 extended_payoff[:2] = action_profile_payoff
-                if (np.dot(equations, extended_payoff) <= tol).all():
+                if (equations @ extended_payoff <= tol).all():
                     W_new[n_new_pt] = action_profile_payoff
                     n_new_pt += 1
                     continue
@@ -364,7 +364,7 @@ def _find_C(C, points, vertices, equations, extended_payoff, IC, tol):
 
     # check the case that IC is an interior point of the convex hull
     extended_payoff[:2] = IC
-    if (np.dot(equations, extended_payoff) <= tol).all():
+    if (equations @ extended_payoff <= tol).all():
         C[n, :] = IC
         n += 1
 
