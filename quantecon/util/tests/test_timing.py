@@ -249,3 +249,56 @@ class TestTimer:
         
         assert len(timer.elapsed) == 2
         assert timer.average is not None
+    
+    def test_time_run_context_manager(self):
+        """Test time_run() context manager for manual timing of multiple runs."""
+        timer = Timer(runs=3, silent=True)
+        
+        with timer:
+            for i in range(3):
+                with timer.time_run():
+                    time.sleep(self.sleep_time)
+        
+        # Check that we collected all runs
+        assert timer.elapsed is not None
+        assert isinstance(timer.elapsed, list) 
+        assert len(timer.elapsed) == 3
+        assert timer.minimum is not None
+        assert timer.maximum is not None
+        assert timer.average is not None
+        
+        # Check timing accuracy
+        for run_time in timer.elapsed:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+            
+        # Check statistics
+        assert_allclose(timer.average, self.sleep_time, atol=0.05, rtol=2)
+        assert timer.minimum <= timer.average <= timer.maximum
+    
+    def test_time_run_single_run_error(self):
+        """Test that time_run() raises error when runs=1."""
+        timer = Timer(runs=1, silent=True)
+        
+        try:
+            timer.time_run()
+            assert False, "Should have raised RuntimeError"
+        except RuntimeError as e:
+            assert "time_run() is only available when runs > 1" in str(e)
+    
+    def test_time_run_partial_runs(self):
+        """Test time_run() with partial completion of runs."""
+        timer = Timer(runs=5, silent=True)
+        
+        with timer:
+            # Only complete 3 out of 5 runs
+            for i in range(3):
+                with timer.time_run():
+                    time.sleep(self.sleep_time)
+        
+        # Should have recorded the 3 completed runs
+        assert len(timer._run_times) == 3
+        # But final statistics should not be set since not all runs completed
+        assert timer.elapsed is None
+        assert timer.minimum is None
+        assert timer.maximum is None
+        assert timer.average is None

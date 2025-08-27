@@ -6,6 +6,28 @@ import time
 import numpy as np
 
 
+class _RunTimer:
+    """Internal context manager for individual run timing."""
+    
+    def __init__(self, parent_timer):
+        self.parent = parent_timer
+        self._start_time = None
+    
+    def __enter__(self):
+        self._start_time = time.time()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end_time = time.time()
+        run_time = end_time - self._start_time
+        run_number = len(self.parent._run_times) + 1
+        
+        self.parent._run_times.append(run_time)
+        
+        if not self.parent.silent:
+            self.parent._print_single_run(run_number, run_time)
+
+
 class __Timer__:
     """Computes elapsed time, between tic, tac, and toc.
 
@@ -277,8 +299,16 @@ class Timer:
             
             if not self.silent:
                 self._print_elapsed()
-        # For multiple runs mode, __exit__ does nothing since timing 
-        # is handled in timeit() method
+        else:
+            # Multiple runs mode - print summary if runs were completed
+            if len(self._run_times) == self.runs:
+                self.elapsed = self._run_times.copy()
+                self.minimum = min(self._run_times)
+                self.maximum = max(self._run_times)
+                self.average = sum(self._run_times) / len(self._run_times)
+                
+                if not self.silent:
+                    self._print_multiple_runs_summary()
     
     def timeit(self, func, *args, **kwargs):
         """
@@ -319,6 +349,30 @@ class Timer:
         
         if not self.silent:
             self._print_multiple_runs_summary()
+    
+    def time_run(self):
+        """
+        Context manager for timing individual runs in multiple runs mode.
+        Only available when runs > 1.
+        
+        Returns
+        -------
+        _RunTimer
+            A context manager for timing a single run
+            
+        Examples
+        --------
+        >>> with Timer(runs=3, silent=True) as timer:
+        ...     for i in range(3):
+        ...         with timer.time_run():
+        ...             time.sleep(0.01)
+        >>> len(timer.elapsed)
+        3
+        """
+        if self.runs == 1:
+            raise RuntimeError("time_run() is only available when runs > 1. Use the Timer context manager directly for single runs.")
+        
+        return _RunTimer(self)
     
     def _print_single_run(self, run_number, run_time):
         """Print timing for a single run in multiple runs mode."""
