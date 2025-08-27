@@ -5,7 +5,7 @@ Tests for timing.py
 
 import time
 from numpy.testing import assert_allclose, assert_
-from quantecon.util import tic, tac, toc, loop_timer, Timer
+from quantecon.util import tic, tac, toc, loop_timer, Timer, timeit
 
 
 class TestTicTacToc:
@@ -147,3 +147,116 @@ class TestTimer:
         # Timer should still record elapsed time
         assert timer.elapsed is not None
         assert_allclose(timer.elapsed, self.sleep_time, atol=0.05, rtol=2)
+
+    def test_timeit_basic(self):
+        """Test basic timeit functionality."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        result = timeit(test_func, runs=3, silent=True)
+        
+        # Check that we have results
+        assert 'elapsed' in result
+        assert 'average' in result
+        assert 'minimum' in result  
+        assert 'maximum' in result
+        assert isinstance(result['elapsed'], list)
+        assert len(result['elapsed']) == 3
+        
+        # Check timing accuracy
+        for run_time in result['elapsed']:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+            
+        assert_allclose(result['average'], self.sleep_time, atol=0.05, rtol=2)
+        assert result['minimum'] <= result['average'] <= result['maximum']
+
+    def test_timeit_lambda_function(self):
+        """Test timeit with lambda functions for arguments."""
+        def test_func_with_args(sleep_time, multiplier=1):
+            time.sleep(sleep_time * multiplier)
+        
+        # Use lambda to bind arguments
+        func_with_args = lambda: test_func_with_args(self.sleep_time, 0.5)
+        result = timeit(func_with_args, runs=2, silent=True)
+        
+        # Check results
+        assert len(result['elapsed']) == 2
+        for run_time in result['elapsed']:
+            assert_allclose(run_time, self.sleep_time * 0.5, atol=0.05, rtol=2)
+
+    def test_timeit_validation(self):
+        """Test validation for timeit function."""
+        def test_func():
+            time.sleep(self.sleep_time)
+            
+        # Test invalid runs parameter
+        try:
+            timeit(test_func, runs=0)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "runs must be a positive integer" in str(e)
+            
+        try:
+            timeit(test_func, runs=-1)
+            assert False, "Should have raised ValueError"  
+        except ValueError as e:
+            assert "runs must be a positive integer" in str(e)
+            
+        # Test invalid function
+        try:
+            timeit("not a function", runs=1)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "func must be callable" in str(e)
+
+    def test_timeit_single_run(self):
+        """Test that timeit works with single run."""
+        def test_func():
+            time.sleep(self.sleep_time)
+            
+        result = timeit(test_func, runs=1, silent=True)
+        
+        assert len(result['elapsed']) == 1
+        assert result['average'] == result['elapsed'][0]
+        assert result['minimum'] == result['elapsed'][0]
+        assert result['maximum'] == result['elapsed'][0]
+
+    def test_timeit_different_units(self):
+        """Test timeit with different time units."""
+        def test_func():
+            time.sleep(self.sleep_time)
+
+        # Test milliseconds (silent mode to avoid output during tests)
+        result_ms = timeit(test_func, runs=2, unit="milliseconds", silent=True)
+        assert len(result_ms['elapsed']) == 2
+        
+        # Test microseconds
+        result_us = timeit(test_func, runs=2, unit="microseconds", silent=True) 
+        assert len(result_us['elapsed']) == 2
+        
+        # All results should be in seconds regardless of display unit
+        for run_time in result_ms['elapsed']:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+        for run_time in result_us['elapsed']:
+            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+
+    def test_timeit_stats_only(self):
+        """Test timeit with stats_only option."""
+        def test_func():
+            time.sleep(self.sleep_time)
+
+        # This test is mainly to ensure stats_only doesn't crash
+        result = timeit(test_func, runs=2, stats_only=True, silent=True)
+        assert len(result['elapsed']) == 2
+
+    def test_timeit_invalid_timer_kwargs(self):
+        """Test that invalid timer kwargs are rejected.""" 
+        def test_func():
+            time.sleep(self.sleep_time)
+            
+        try:
+            timeit(test_func, runs=1, invalid_param="test")
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "Unknown timer parameters" in str(e)
+

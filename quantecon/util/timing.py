@@ -271,6 +271,148 @@ class Timer:
         print(f"{prefix}{elapsed_display:.{self.precision}f} {unit_str} elapsed")
 
 
+def timeit(func, runs=1, stats_only=False, **timer_kwargs):
+    """
+    Execute a function multiple times and collect timing statistics.
+    
+    This function provides a convenient way to time a function multiple times
+    and get summary statistics, using the Timer context manager internally.
+    
+    Parameters
+    ----------
+    func : callable
+        Function to execute multiple times. Function should take no arguments,
+        or be a partial function or lambda with arguments already bound.
+    runs : int, optional(default=1)
+        Number of runs to execute. Must be a positive integer.
+    stats_only : bool, optional(default=False)
+        If True, only display summary statistics. If False, display 
+        individual run times followed by summary statistics.
+    **timer_kwargs
+        Keyword arguments to pass to Timer (message, precision, unit, silent).
+        Note: silent parameter controls all output when stats_only=False.
+        
+    Returns
+    -------
+    dict
+        Dictionary containing timing results with keys:
+        - 'elapsed': list of elapsed times for each run
+        - 'average': average elapsed time
+        - 'minimum': minimum elapsed time  
+        - 'maximum': maximum elapsed time
+        
+    Examples
+    --------
+    Basic usage:
+    >>> def slow_function():
+    ...     time.sleep(0.01)
+    >>> timeit(slow_function, runs=3)
+    Run 1: 0.01 seconds
+    Run 2: 0.01 seconds
+    Run 3: 0.01 seconds
+    Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
+    
+    Summary only:
+    >>> timeit(slow_function, runs=3, stats_only=True) 
+    Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
+    
+    With custom Timer options:
+    >>> timeit(slow_function, runs=2, unit="milliseconds", precision=1)
+    Run 1: 10.1 ms
+    Run 2: 10.0 ms  
+    Average: 10.1 ms, Minimum: 10.0 ms, Maximum: 10.1 ms
+    
+    With function arguments using lambda:
+    >>> add_func = lambda: expensive_computation(5, 10)
+    >>> timeit(add_func, runs=2)
+    """
+    if not isinstance(runs, int) or runs < 1:
+        raise ValueError("runs must be a positive integer")
+    
+    if not callable(func):
+        raise ValueError("func must be callable")
+    
+    # Extract Timer parameters
+    timer_params = {
+        'message': timer_kwargs.pop('message', ''),
+        'precision': timer_kwargs.pop('precision', 2),
+        'unit': timer_kwargs.pop('unit', 'seconds'),
+        'silent': timer_kwargs.pop('silent', False)  # Explicit silent parameter
+    }
+    
+    # Warn about unused kwargs
+    if timer_kwargs:
+        raise ValueError(f"Unknown timer parameters: {list(timer_kwargs.keys())}")
+    
+    run_times = []
+    
+    # Execute the function multiple times
+    for i in range(runs):
+        # Always silence individual Timer output to avoid duplication with our run display
+        individual_timer_params = timer_params.copy()
+        individual_timer_params['silent'] = True
+            
+        with Timer(**individual_timer_params) as timer:
+            func()
+        run_times.append(timer.elapsed)
+        
+        # Print individual run times unless stats_only or silent
+        if not stats_only and not timer_params['silent']:
+            # Convert to requested unit for display
+            unit = timer_params['unit'].lower()
+            precision = timer_params['precision']
+            
+            if unit == "milliseconds":
+                elapsed_display = timer.elapsed * 1000
+                unit_str = "ms"
+            elif unit == "microseconds":
+                elapsed_display = timer.elapsed * 1000000
+                unit_str = "μs"
+            else:  # seconds
+                elapsed_display = timer.elapsed
+                unit_str = "seconds"
+                
+            print(f"Run {i + 1}: {elapsed_display:.{precision}f} {unit_str}")
+    
+    # Calculate statistics
+    average = sum(run_times) / len(run_times)
+    minimum = min(run_times)
+    maximum = max(run_times)
+    
+    # Print summary statistics unless completely silent
+    if not timer_params['silent']:
+        # Convert to requested unit for display
+        unit = timer_params['unit'].lower()
+        precision = timer_params['precision']
+        
+        if unit == "milliseconds":
+            avg_display = average * 1000
+            min_display = minimum * 1000
+            max_display = maximum * 1000
+            unit_str = "ms"
+        elif unit == "microseconds":
+            avg_display = average * 1000000
+            min_display = minimum * 1000000
+            max_display = maximum * 1000000
+            unit_str = "μs"
+        else:  # seconds
+            avg_display = average
+            min_display = minimum
+            max_display = maximum
+            unit_str = "seconds"
+            
+        print(f"Average: {avg_display:.{precision}f} {unit_str}, "
+              f"Minimum: {min_display:.{precision}f} {unit_str}, "
+              f"Maximum: {max_display:.{precision}f} {unit_str}")
+    
+    return {
+        'elapsed': run_times,
+        'average': average,
+        'minimum': minimum,
+        'maximum': maximum
+    }
+
+
 def tic():
     return __timer__.tic()
 
