@@ -6,27 +6,6 @@ import time
 import numpy as np
 
 
-class _RunTimer:
-    """Internal context manager for individual run timing."""
-    
-    def __init__(self, parent_timer):
-        self.parent = parent_timer
-        self._start_time = None
-    
-    def __enter__(self):
-        self._start_time = time.time()
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        end_time = time.time()
-        run_time = end_time - self._start_time
-        run_number = len(self.parent._run_times) + 1
-        
-        self.parent._run_times.append(run_time)
-        
-        if not self.parent.silent:
-            self.parent._print_single_run(run_number, run_time)
-
 
 class __Timer__:
     """Computes elapsed time, between tic, tac, and toc.
@@ -249,11 +228,11 @@ class Timer:
     >>> print(f"Average: {timer.average:.4f}s")
     Average: 0.0101s
     
-    Multiple runs with context manager and manual timing:
-    >>> with Timer(runs=3) as timer:
-    ...     for i in range(3):
-    ...         with timer.time_run():
-    ...             time.sleep(0.01)
+    Multiple runs with callable:
+    >>> def my_function():
+    ...     time.sleep(0.01)
+    >>> timer = Timer(runs=3)
+    >>> timer.timeit(my_function)
     Run 1/3: 0.01 seconds
     Run 2/3: 0.01 seconds  
     Run 3/3: 0.01 seconds
@@ -271,7 +250,6 @@ class Timer:
         self.maximum = None
         self.average = None
         self._start_time = None
-        self._run_times = []
         
         # Validate unit
         valid_units = ["seconds", "milliseconds", "microseconds"]
@@ -283,13 +261,8 @@ class Timer:
             raise ValueError("runs must be a positive integer")
     
     def __enter__(self):
-        if self.runs == 1:
-            # Single run mode - start timing immediately
-            self._start_time = time.time()
-            return self
-        else:
-            # Multiple runs mode - don't start timing until timeit() is called
-            return self
+        self._start_time = time.time()
+        return self
         
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.runs == 1:
@@ -300,15 +273,8 @@ class Timer:
             if not self.silent:
                 self._print_elapsed()
         else:
-            # Multiple runs mode - print summary if runs were completed
-            if len(self._run_times) == self.runs:
-                self.elapsed = self._run_times.copy()
-                self.minimum = min(self._run_times)
-                self.maximum = max(self._run_times)
-                self.average = sum(self._run_times) / len(self._run_times)
-                
-                if not self.silent:
-                    self._print_multiple_runs_summary()
+            # Multiple runs mode - context manager not supported, only timeit()
+            raise RuntimeError("Context manager usage is only supported for single runs (runs=1). For multiple runs, use the timeit() method.")
     
     def timeit(self, func, *args, **kwargs):
         """
@@ -349,31 +315,7 @@ class Timer:
         
         if not self.silent:
             self._print_multiple_runs_summary()
-    
-    def time_run(self):
-        """
-        Context manager for timing individual runs in multiple runs mode.
-        Only available when runs > 1.
-        
-        Returns
-        -------
-        _RunTimer
-            A context manager for timing a single run
-            
-        Examples
-        --------
-        >>> with Timer(runs=3, silent=True) as timer:
-        ...     for i in range(3):
-        ...         with timer.time_run():
-        ...             time.sleep(0.01)
-        >>> len(timer.elapsed)
-        3
-        """
-        if self.runs == 1:
-            raise RuntimeError("time_run() is only available when runs > 1. Use the Timer context manager directly for single runs.")
-        
-        return _RunTimer(self)
-    
+
     def _print_single_run(self, run_number, run_time):
         """Print timing for a single run in multiple runs mode."""
         # Convert to requested unit
