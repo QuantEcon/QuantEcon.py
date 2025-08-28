@@ -153,7 +153,7 @@ class TestTimer:
         def test_func():
             time.sleep(self.sleep_time)
         
-        result = timeit(test_func, runs=3, silent=True)
+        result = timeit(test_func, runs=3, silent=True, results=True)
         
         # Check that we have results
         assert 'elapsed' in result
@@ -177,7 +177,7 @@ class TestTimer:
         
         # Use lambda to bind arguments
         func_with_args = lambda: test_func_with_args(self.sleep_time, 0.5)
-        result = timeit(func_with_args, runs=2, silent=True)
+        result = timeit(func_with_args, runs=2, silent=True, results=True)
         
         # Check results
         assert len(result['elapsed']) == 2
@@ -214,7 +214,7 @@ class TestTimer:
         def test_func():
             time.sleep(self.sleep_time)
             
-        result = timeit(test_func, runs=1, silent=True)
+        result = timeit(test_func, runs=1, silent=True, results=True)
         
         assert len(result['elapsed']) == 1
         assert result['average'] == result['elapsed'][0]
@@ -227,11 +227,11 @@ class TestTimer:
             time.sleep(self.sleep_time)
 
         # Test milliseconds (silent mode to avoid output during tests)
-        result_ms = timeit(test_func, runs=2, unit="milliseconds", silent=True)
+        result_ms = timeit(test_func, runs=2, unit="milliseconds", silent=True, results=True)
         assert len(result_ms['elapsed']) == 2
         
         # Test microseconds
-        result_us = timeit(test_func, runs=2, unit="microseconds", silent=True) 
+        result_us = timeit(test_func, runs=2, unit="microseconds", silent=True, results=True) 
         assert len(result_us['elapsed']) == 2
         
         # All results should be in seconds regardless of display unit
@@ -246,7 +246,7 @@ class TestTimer:
             time.sleep(self.sleep_time)
 
         # This test is mainly to ensure stats_only doesn't crash
-        result = timeit(test_func, runs=2, stats_only=True, silent=True)
+        result = timeit(test_func, runs=2, stats_only=True, silent=True, results=True)
         assert len(result['elapsed']) == 2
 
     def test_timeit_invalid_timer_kwargs(self):
@@ -259,4 +259,51 @@ class TestTimer:
             assert False, "Should have raised ValueError"
         except ValueError as e:
             assert "Unknown timer parameters" in str(e)
+
+    def test_timeit_verbose_parameter(self):
+        """Test verbose parameter controls output."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        # Test verbose=True (default) - this test can't easily verify output
+        # but at least checks it doesn't crash
+        result1 = timeit(test_func, runs=2, results=True)
+        assert result1 is not None
+        assert len(result1['elapsed']) == 2
+        
+        # Test verbose=False - should suppress output
+        result2 = timeit(test_func, runs=2, verbose=False, results=True)
+        assert result2 is not None
+        assert len(result2['elapsed']) == 2
+
+    def test_timeit_results_parameter(self):
+        """Test results parameter controls return value."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        # Test results=False (default) - should return None
+        result1 = timeit(test_func, runs=2, verbose=False)
+        assert result1 is None
+        
+        # Test results=True - should return timing data
+        result2 = timeit(test_func, runs=2, verbose=False, results=True)
+        assert result2 is not None
+        assert 'elapsed' in result2
+        assert len(result2['elapsed']) == 2
+
+    def test_timeit_backward_compatibility(self):
+        """Test that existing silent parameter still works."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        # Test that silent=True still suppresses output
+        result = timeit(test_func, runs=2, silent=True, results=True)
+        assert result is not None
+        assert len(result['elapsed']) == 2
+        
+        # Test interaction between verbose and silent
+        # silent=True should override verbose=True
+        result2 = timeit(test_func, runs=2, verbose=True, silent=True, results=True)
+        assert result2 is not None
+        assert len(result2['elapsed']) == 2
 

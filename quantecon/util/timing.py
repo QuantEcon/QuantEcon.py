@@ -271,7 +271,7 @@ class Timer:
         print(f"{prefix}{elapsed_display:.{self.precision}f} {unit_str} elapsed")
 
 
-def timeit(func, runs=1, stats_only=False, **timer_kwargs):
+def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_kwargs):
     """
     Execute a function multiple times and collect timing statistics.
     
@@ -288,18 +288,24 @@ def timeit(func, runs=1, stats_only=False, **timer_kwargs):
     stats_only : bool, optional(default=False)
         If True, only display summary statistics. If False, display 
         individual run times followed by summary statistics.
+    verbose : bool, optional(default=True)
+        If True, print nicely formatted timing output all at once at the end.
+        If False, suppress all output (overrides stats_only and silent).
+    results : bool, optional(default=False)
+        If True, return dictionary with timing results. If False, return None.
     **timer_kwargs
         Keyword arguments to pass to Timer (message, precision, unit, silent).
-        Note: silent parameter controls all output when stats_only=False.
+        Note: silent parameter is deprecated in favor of verbose parameter.
         
     Returns
     -------
-    dict
-        Dictionary containing timing results with keys:
+    dict or None
+        If results=True, returns dictionary containing timing results with keys:
         - 'elapsed': list of elapsed times for each run
         - 'average': average elapsed time
         - 'minimum': minimum elapsed time  
         - 'maximum': maximum elapsed time
+        If results=False, returns None.
         
     Examples
     --------
@@ -321,6 +327,13 @@ def timeit(func, runs=1, stats_only=False, **timer_kwargs):
     Run 1: 10.1 ms
     Run 2: 10.0 ms  
     Average: 10.1 ms, Minimum: 10.0 ms, Maximum: 10.1 ms
+    
+    Return results for further analysis:
+    >>> results = timeit(slow_function, runs=2, results=True)
+    >>> print(f"Average time: {results['average']:.4f} seconds")
+    
+    Quiet mode:
+    >>> timeit(slow_function, runs=2, verbose=False)  # No output
     
     With function arguments using lambda:
     >>> add_func = lambda: expensive_computation(5, 10)
@@ -344,7 +357,12 @@ def timeit(func, runs=1, stats_only=False, **timer_kwargs):
     if timer_kwargs:
         raise ValueError(f"Unknown timer parameters: {list(timer_kwargs.keys())}")
     
+    # Determine if we should show output
+    # verbose=False overrides everything, silent=True overrides for backward compatibility
+    show_output = verbose and not timer_params['silent']
+    
     run_times = []
+    output_lines = []  # Collect output lines for printing all at once
     
     # Execute the function multiple times
     for i in range(runs):
@@ -356,8 +374,8 @@ def timeit(func, runs=1, stats_only=False, **timer_kwargs):
             func()
         run_times.append(timer.elapsed)
         
-        # Print individual run times unless stats_only or silent
-        if not stats_only and not timer_params['silent']:
+        # Collect individual run output lines (but don't print yet)
+        if show_output and not stats_only:
             # Convert to requested unit for display
             unit = timer_params['unit'].lower()
             precision = timer_params['precision']
@@ -372,15 +390,15 @@ def timeit(func, runs=1, stats_only=False, **timer_kwargs):
                 elapsed_display = timer.elapsed
                 unit_str = "seconds"
                 
-            print(f"Run {i + 1}: {elapsed_display:.{precision}f} {unit_str}")
+            output_lines.append(f"Run {i + 1}: {elapsed_display:.{precision}f} {unit_str}")
     
     # Calculate statistics
     average = sum(run_times) / len(run_times)
     minimum = min(run_times)
     maximum = max(run_times)
     
-    # Print summary statistics unless completely silent
-    if not timer_params['silent']:
+    # Collect summary statistics output line (but don't print yet)
+    if show_output:
         # Convert to requested unit for display
         unit = timer_params['unit'].lower()
         precision = timer_params['precision']
@@ -401,16 +419,25 @@ def timeit(func, runs=1, stats_only=False, **timer_kwargs):
             max_display = maximum
             unit_str = "seconds"
             
-        print(f"Average: {avg_display:.{precision}f} {unit_str}, "
-              f"Minimum: {min_display:.{precision}f} {unit_str}, "
-              f"Maximum: {max_display:.{precision}f} {unit_str}")
+        summary_line = (f"Average: {avg_display:.{precision}f} {unit_str}, "
+                       f"Minimum: {min_display:.{precision}f} {unit_str}, "
+                       f"Maximum: {max_display:.{precision}f} {unit_str}")
+        output_lines.append(summary_line)
     
-    return {
-        'elapsed': run_times,
-        'average': average,
-        'minimum': minimum,
-        'maximum': maximum
-    }
+    # Print all output lines at once
+    if show_output and output_lines:
+        print('\n'.join(output_lines))
+    
+    # Return results only if requested
+    if results:
+        return {
+            'elapsed': run_times,
+            'average': average,
+            'minimum': minimum,
+            'maximum': maximum
+        }
+    else:
+        return None
 
 
 def tic():
