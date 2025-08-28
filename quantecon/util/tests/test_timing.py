@@ -64,7 +64,7 @@ class TestTimer:
 
     def test_basic_timer(self):
         """Test basic Timer context manager functionality."""
-        timer = Timer(silent=True)
+        timer = Timer(verbose=False)
         
         with timer:
             time.sleep(self.sleep_time)
@@ -75,7 +75,7 @@ class TestTimer:
         
     def test_timer_return_value(self):
         """Test that Timer returns self for variable assignment."""
-        with Timer(silent=True) as timer:
+        with Timer(verbose=False) as timer:
             time.sleep(self.sleep_time)
             
         assert timer.elapsed is not None
@@ -84,17 +84,17 @@ class TestTimer:
     def test_timer_units(self):
         """Test different time units."""
         # Test seconds (default)
-        with Timer(silent=True) as timer_sec:
+        with Timer(verbose=False) as timer_sec:
             time.sleep(self.sleep_time)
         expected_sec = self.sleep_time
         assert_allclose(timer_sec.elapsed, expected_sec, atol=0.05, rtol=2)
         
         # Timer always stores elapsed time in seconds regardless of display unit
-        with Timer(unit="milliseconds", silent=True) as timer_ms:
+        with Timer(unit="milliseconds", verbose=False) as timer_ms:
             time.sleep(self.sleep_time)
         assert_allclose(timer_ms.elapsed, expected_sec, atol=0.05, rtol=2)
         
-        with Timer(unit="microseconds", silent=True) as timer_us:
+        with Timer(unit="microseconds", verbose=False) as timer_us:
             time.sleep(self.sleep_time)
         assert_allclose(timer_us.elapsed, expected_sec, atol=0.05, rtol=2)
         
@@ -109,9 +109,9 @@ class TestTimer:
     def test_timer_precision(self):
         """Test that precision parameter is accepted (output format tested manually)."""
         # Just verify it doesn't crash with different precision values
-        with Timer(precision=0, silent=True) as timer0:
+        with Timer(precision=0, verbose=False) as timer0:
             time.sleep(self.sleep_time)
-        with Timer(precision=6, silent=True) as timer6:
+        with Timer(precision=6, verbose=False) as timer6:
             time.sleep(self.sleep_time)
             
         assert timer0.elapsed is not None
@@ -119,23 +119,23 @@ class TestTimer:
         
     def test_timer_message(self):
         """Test custom message parameter (output format tested manually)."""
-        with Timer(message="Test operation", silent=True) as timer:
+        with Timer(message="Test operation", verbose=False) as timer:
             time.sleep(self.sleep_time)
             
         assert timer.elapsed is not None
         
-    def test_timer_silent_mode(self):
-        """Test silent mode suppresses output."""
-        # This mainly tests that silent=True doesn't crash
+    def test_timer_verbose_mode(self):
+        """Test verbose mode controls output."""
+        # This mainly tests that verbose=False doesn't crash
         # Output suppression is hard to test automatically
-        with Timer(silent=True) as timer:
+        with Timer(verbose=False) as timer:
             time.sleep(self.sleep_time)
             
         assert timer.elapsed is not None
         
     def test_timer_exception_handling(self):
         """Test that Timer works correctly even when exceptions occur."""
-        timer = Timer(silent=True)
+        timer = Timer(verbose=False)
         
         try:
             with timer:
@@ -153,7 +153,7 @@ class TestTimer:
         def test_func():
             time.sleep(self.sleep_time)
         
-        result = timeit(test_func, runs=3, silent=True)
+        result = timeit(test_func, runs=3, verbose=False, results=True)
         
         # Check that we have results
         assert 'elapsed' in result
@@ -177,7 +177,7 @@ class TestTimer:
         
         # Use lambda to bind arguments
         func_with_args = lambda: test_func_with_args(self.sleep_time, 0.5)
-        result = timeit(func_with_args, runs=2, silent=True)
+        result = timeit(func_with_args, runs=2, verbose=False, results=True)
         
         # Check results
         assert len(result['elapsed']) == 2
@@ -214,7 +214,7 @@ class TestTimer:
         def test_func():
             time.sleep(self.sleep_time)
             
-        result = timeit(test_func, runs=1, silent=True)
+        result = timeit(test_func, runs=1, verbose=False, results=True)
         
         assert len(result['elapsed']) == 1
         assert result['average'] == result['elapsed'][0]
@@ -226,12 +226,12 @@ class TestTimer:
         def test_func():
             time.sleep(self.sleep_time)
 
-        # Test milliseconds (silent mode to avoid output during tests)
-        result_ms = timeit(test_func, runs=2, unit="milliseconds", silent=True)
+        # Test milliseconds (verbose=False to avoid output during tests)
+        result_ms = timeit(test_func, runs=2, unit="milliseconds", verbose=False, results=True)
         assert len(result_ms['elapsed']) == 2
         
         # Test microseconds
-        result_us = timeit(test_func, runs=2, unit="microseconds", silent=True) 
+        result_us = timeit(test_func, runs=2, unit="microseconds", verbose=False, results=True) 
         assert len(result_us['elapsed']) == 2
         
         # All results should be in seconds regardless of display unit
@@ -246,7 +246,7 @@ class TestTimer:
             time.sleep(self.sleep_time)
 
         # This test is mainly to ensure stats_only doesn't crash
-        result = timeit(test_func, runs=2, stats_only=True, silent=True)
+        result = timeit(test_func, runs=2, stats_only=True, verbose=False, results=True)
         assert len(result['elapsed']) == 2
 
     def test_timeit_invalid_timer_kwargs(self):
@@ -259,4 +259,35 @@ class TestTimer:
             assert False, "Should have raised ValueError"
         except ValueError as e:
             assert "Unknown timer parameters" in str(e)
+
+    def test_timeit_verbose_parameter(self):
+        """Test verbose parameter controls output."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        # Test verbose=True (default) - this test can't easily verify output
+        # but at least checks it doesn't crash
+        result1 = timeit(test_func, runs=2, results=True)
+        assert result1 is not None
+        assert len(result1['elapsed']) == 2
+        
+        # Test verbose=False - should suppress output
+        result2 = timeit(test_func, runs=2, verbose=False, results=True)
+        assert result2 is not None
+        assert len(result2['elapsed']) == 2
+
+    def test_timeit_results_parameter(self):
+        """Test results parameter controls return value."""
+        def test_func():
+            time.sleep(self.sleep_time)
+        
+        # Test results=False (default) - should return None
+        result1 = timeit(test_func, runs=2, verbose=False)
+        assert result1 is None
+        
+        # Test results=True - should return timing data
+        result2 = timeit(test_func, runs=2, verbose=False, results=True)
+        assert result2 is not None
+        assert 'elapsed' in result2
+        assert len(result2['elapsed']) == 2
 
