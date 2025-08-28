@@ -194,8 +194,8 @@ class Timer:
         Number of decimal places to display for seconds.
     unit : str, optional(default="seconds") 
         Unit to display timing in. Options: "seconds", "milliseconds", "microseconds"
-    silent : bool, optional(default=False)
-        If True, suppress printing of timing results.
+    verbose : bool, optional(default=True)
+        If True, print timing results. If False, suppress printing of timing results.
         
     Attributes
     ----------
@@ -217,7 +217,7 @@ class Timer:
     Computing results: 0.0001 seconds elapsed
     
     Store elapsed time for comparison:
-    >>> timer = Timer(silent=True)
+    >>> timer = Timer(verbose=False)
     >>> with timer:
     ...     # some code
     ...     pass
@@ -225,11 +225,11 @@ class Timer:
     Method took 0.000123 seconds
     """
     
-    def __init__(self, message="", precision=2, unit="seconds", silent=False):
+    def __init__(self, message="", precision=2, unit="seconds", verbose=True):
         self.message = message
         self.precision = precision
         self.unit = unit.lower()
-        self.silent = silent
+        self.verbose = verbose
         self.elapsed = None
         self._start_time = None
         
@@ -246,7 +246,7 @@ class Timer:
         end_time = time.time()
         self.elapsed = end_time - self._start_time
         
-        if not self.silent:
+        if self.verbose:
             self._print_elapsed()
             
     def _print_elapsed(self):
@@ -290,12 +290,11 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
         individual run times followed by summary statistics.
     verbose : bool, optional(default=True)
         If True, print nicely formatted timing output all at once at the end.
-        If False, suppress all output (overrides stats_only and silent).
+        If False, suppress all output.
     results : bool, optional(default=False)
         If True, return dictionary with timing results. If False, return None.
     **timer_kwargs
-        Keyword arguments to pass to Timer (message, precision, unit, silent).
-        Note: silent parameter is deprecated in favor of verbose parameter.
+        Keyword arguments to pass to Timer (message, precision, unit, verbose).
         
     Returns
     -------
@@ -350,7 +349,7 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
         'message': timer_kwargs.pop('message', ''),
         'precision': timer_kwargs.pop('precision', 2),
         'unit': timer_kwargs.pop('unit', 'seconds'),
-        'silent': timer_kwargs.pop('silent', False)  # Explicit silent parameter
+        'verbose': timer_kwargs.pop('verbose', True)  # Timer verbose parameter
     }
     
     # Warn about unused kwargs
@@ -358,8 +357,7 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
         raise ValueError(f"Unknown timer parameters: {list(timer_kwargs.keys())}")
     
     # Determine if we should show output
-    # verbose=False overrides everything, silent=True overrides for backward compatibility
-    show_output = verbose and not timer_params['silent']
+    show_output = verbose
     
     run_times = []
     output_lines = []  # Collect output lines for printing all at once
@@ -368,7 +366,7 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     for i in range(runs):
         # Always silence individual Timer output to avoid duplication with our run display
         individual_timer_params = timer_params.copy()
-        individual_timer_params['silent'] = True
+        individual_timer_params['verbose'] = False
             
         with Timer(**individual_timer_params) as timer:
             func()
