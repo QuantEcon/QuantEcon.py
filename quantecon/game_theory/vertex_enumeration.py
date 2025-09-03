@@ -42,6 +42,20 @@ def vertex_enumeration(g, qhull_options=None):
     list(tuple(ndarray(float, ndim=1)))
         List containing tuples of Nash equilibrium mixed actions.
 
+    Examples
+    --------
+    >>> from pprint import pprint
+    >>> np.set_printoptions(precision=4)  # Reduce the digits printed
+    >>> bimatrix = [[(3, 3), (3, 2)],
+    ...             [(2, 2), (5, 6)],
+    ...             [(0, 3), (6, 1)]]
+    >>> g = NormalFormGame(bimatrix)
+    >>> NEs = vertex_enumeration(g)
+    >>> pprint(NEs)
+    [(array([1., 0., 0.]), array([1., 0.])),
+     (array([0.    , 0.3333, 0.6667]), array([0.3333, 0.6667])),
+     (array([0.8, 0.2, 0. ]), array([0.6667, 0.3333]))]
+
     """
     return list(vertex_enumeration_gen(g, qhull_options=qhull_options))
 
@@ -63,6 +77,21 @@ def vertex_enumeration_gen(g, qhull_options=None):
     ------
     tuple(ndarray(float, ndim=1))
         Tuple of Nash equilibrium mixed actions.
+
+    Examples
+    --------
+    >>> np.set_printoptions(precision=4)  # Reduce the digits printed
+    >>> bimatrix = [[(3, 3), (3, 2)],
+    ...             [(2, 2), (5, 6)],
+    ...             [(0, 3), (6, 1)]]
+    >>> g = NormalFormGame(bimatrix)
+    >>> gen = vertex_enumeration_gen(g)
+    >>> for NE in gen:
+    ...     print(NE)
+    ...
+    (array([1., 0., 0.]), array([1., 0.]))
+    (array([0.    , 0.3333, 0.6667]), array([0.3333, 0.6667]))
+    (array([0.8, 0.2, 0. ]), array([0.6667, 0.3333]))
 
     """
     try:
