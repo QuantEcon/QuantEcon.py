@@ -18,6 +18,7 @@ from . import game_theory
 from . import quad
 from . import random
 from . import optimize
+from . import timings
 
 #-Objects-#
 from ._compute_fp import compute_fixed_point

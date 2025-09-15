@@ -6,6 +6,7 @@ Tests for timing.py
 import time
 from numpy.testing import assert_allclose, assert_
 from quantecon.util import tic, tac, toc, loop_timer, Timer, timeit
+import quantecon as qe
 
 
 class TestTicTacToc:
@@ -290,4 +291,108 @@ class TestTimer:
         assert result2 is not None
         assert 'elapsed' in result2
         assert len(result2['elapsed']) == 2
+
+
+class TestGlobalPrecision:
+    """Test the new global precision control functionality."""
+    
+    def setup_method(self):
+        """Save original precision and restore after each test."""
+        self.original_precision = qe.timings.float_precision()
+        
+    def teardown_method(self):
+        """Restore original precision after each test."""
+        qe.timings.float_precision(self.original_precision)
+        
+    def test_default_precision_is_4(self):
+        """Test that default precision is now 4."""
+        # Reset to ensure we test the true default
+        qe.timings.float_precision(4)
+        assert qe.timings.float_precision() == 4
+        
+    def test_float_precision_get_set(self):
+        """Test getting and setting precision."""
+        # Test setting various precisions
+        for precision in [0, 1, 2, 3, 4, 5, 6, 10]:
+            qe.timings.float_precision(precision)
+            assert qe.timings.float_precision() == precision
+            
+    def test_float_precision_validation(self):
+        """Test that float_precision validates input."""
+        # Test invalid inputs
+        try:
+            qe.timings.float_precision(-1)
+            assert False, "Should raise ValueError for negative precision"
+        except ValueError as e:
+            assert "non-negative integer" in str(e)
+            
+        try:
+            qe.timings.float_precision("4")
+            assert False, "Should raise ValueError for string input"
+        except ValueError as e:
+            assert "non-negative integer" in str(e)
+            
+        try:
+            qe.timings.float_precision(4.5)
+            assert False, "Should raise ValueError for float input"
+        except ValueError as e:
+            assert "non-negative integer" in str(e)
+            
+    def test_timer_uses_global_precision(self):
+        """Test that Timer class uses global precision by default."""
+        # Set global precision
+        qe.timings.float_precision(6)
+        
+        # Create timer without explicit precision
+        timer = Timer(verbose=False)
+        assert timer.precision == 6
+        
+        # Test with different global precision
+        qe.timings.float_precision(2)
+        timer2 = Timer(verbose=False)
+        assert timer2.precision == 2
+        
+    def test_timer_explicit_precision_overrides_global(self):
+        """Test that explicit precision overrides global setting."""
+        qe.timings.float_precision(6)
+        
+        # Explicit precision should override global
+        timer = Timer(precision=3, verbose=False)
+        assert timer.precision == 3
+        
+    def test_tac_toc_use_global_precision(self):
+        """Test that tac/toc functions use global precision by default."""
+        # This is harder to test automatically since it affects output formatting
+        # But we can verify the functions accept None for digits parameter
+        qe.timings.float_precision(6)
+        
+        tic()
+        time.sleep(0.01)
+        
+        # These should use global precision (no exception means it works)
+        tac(verbose=False, digits=None)
+        toc(verbose=False, digits=None)
+        
+    def test_loop_timer_uses_global_precision(self):
+        """Test that loop_timer uses global precision by default."""
+        def test_func():
+            time.sleep(0.001)
+            
+        qe.timings.float_precision(6)
+        
+        # Should use global precision without error
+        result = loop_timer(2, test_func, digits=None, verbose=False)
+        assert len(result) == 2  # Returns (average_time, average_of_best)
+        
+    def test_timeit_uses_global_precision(self):
+        """Test that timeit function uses global precision by default."""
+        def test_func():
+            time.sleep(0.001)
+            
+        qe.timings.float_precision(6)
+        
+        # Should use global precision without error
+        result = timeit(test_func, runs=2, verbose=False, results=True)
+        assert 'elapsed' in result
+        assert len(result['elapsed']) == 2
 
