@@ -31,7 +31,7 @@ import numpy as np
 from .normal_form_game import Player, NormalFormGame
 
 
-def str2num(s):
+def _str2num(s):
     """
     Convert string to appropriate numeric type.
     
@@ -145,7 +145,7 @@ class GAMReader:
 
         N = int(tokens.pop(0))
         nums_actions = tuple(int(tokens.pop(0)) for _ in range(N))
-        payoffs = np.array([str2num(s) for s in tokens])
+        payoffs = np.array([_str2num(s) for s in tokens])
 
         na = np.prod(nums_actions)
         payoffs2d = payoffs.reshape(N, na)
