@@ -2,6 +2,14 @@
 
 Future CHANGELOG entries will be documented under the [release notes on GitHub](https://github.com/QuantEcon/QuantEcon.py/releases)
 
+## Ver 0.10.2 (15th-Sept-2025)
+
+### Enhancement
+
+* ENH: Update default timing precision to 4 digits and add global precision control for Timer and timeit by @Copilot in https://github.com/QuantEcon/QuantEcon.py/pull/805
+
+**Full Changelog**: https://github.com/QuantEcon/QuantEcon.py/compare/v0.10.1...v0.10.2
+
 ## Ver 0.8.0 (13th-Feb-2025)
 
 See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.8.0)
