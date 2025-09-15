@@ -360,28 +360,27 @@ class TestGlobalPrecision:
         timer = Timer(precision=3, verbose=False)
         assert timer.precision == 3
         
-    def test_tac_toc_use_global_precision(self):
-        """Test that tac/toc functions use global precision by default."""
-        # This is harder to test automatically since it affects output formatting
-        # But we can verify the functions accept None for digits parameter
-        qe.timings.float_precision(6)
-        
+    def test_tac_toc_keep_original_defaults(self):
+        """Test that tac/toc functions maintain original default (digits=2)."""
+        # These functions are deprecated and should maintain original behavior
         tic()
         time.sleep(0.01)
         
-        # These should use global precision (no exception means it works)
-        tac(verbose=False, digits=None)
-        toc(verbose=False, digits=None)
+        # These should use digits=2 by default, not global precision
+        result_tac = tac(verbose=False)  # Uses default digits=2
+        result_toc = toc(verbose=False)  # Uses default digits=2
         
-    def test_loop_timer_uses_global_precision(self):
-        """Test that loop_timer uses global precision by default."""
+        # Just verify they work without error
+        assert result_tac > 0
+        assert result_toc > 0
+        
+    def test_loop_timer_keeps_original_default(self):
+        """Test that loop_timer maintains original default (digits=2)."""
         def test_func():
             time.sleep(0.001)
             
-        qe.timings.float_precision(6)
-        
-        # Should use global precision without error
-        result = loop_timer(2, test_func, digits=None, verbose=False)
+        # Should use digits=2 by default, not global precision
+        result = loop_timer(2, test_func, verbose=False)
         assert len(result) == 2  # Returns (average_time, average_of_best)
         
     def test_timeit_uses_global_precision(self):

@@ -40,7 +40,7 @@ class __Timer__:
         self.start = t
         self.last = t
 
-    def tac(self, verbose=True, digits=None):
+    def tac(self, verbose=True, digits=2):
         """
         Return and print elapsed time since last `tic()`, `tac()`, or
         `toc()`.
@@ -50,9 +50,8 @@ class __Timer__:
         verbose : bool, optional(default=True)
             If True, then prints time.
 
-        digits : scalar(int), optional(default=None)
-            Number of digits printed for time elapsed. If None, uses
-            the global default precision from quantecon.timings.
+        digits : scalar(int), optional(default=2)
+            Number of digits printed for time elapsed.
 
         Returns
         -------
@@ -62,9 +61,6 @@ class __Timer__:
         """
         if self.start is None:
             raise Exception("tac() without tic()")
-
-        if digits is None:
-            digits = get_default_precision()
 
         t = time.time()
         elapsed = t-self.last
@@ -78,7 +74,7 @@ class __Timer__:
 
         return elapsed
 
-    def toc(self, verbose=True, digits=None):
+    def toc(self, verbose=True, digits=2):
         """
         Return and print time elapsed since last `tic()`.
 
@@ -87,9 +83,8 @@ class __Timer__:
         verbose : bool, optional(default=True)
             If True, then prints time.
 
-        digits : scalar(int), optional(default=None)
-            Number of digits printed for time elapsed. If None, uses
-            the global default precision from quantecon.timings.
+        digits : scalar(int), optional(default=2)
+            Number of digits printed for time elapsed.
 
         Returns
         -------
@@ -99,9 +94,6 @@ class __Timer__:
         """
         if self.start is None:
             raise Exception("toc() without tic()")
-
-        if digits is None:
-            digits = get_default_precision()
 
         t = time.time()
         self.last = t
@@ -115,7 +107,7 @@ class __Timer__:
 
         return elapsed
 
-    def loop_timer(self, n, function, args=None, verbose=True, digits=None,
+    def loop_timer(self, n, function, args=None, verbose=True, digits=2,
                    best_of=3):
         """
         Return and print the total and average time elapsed for n runs
@@ -135,9 +127,8 @@ class __Timer__:
         verbose : bool, optional(default=True)
             If True, then prints average time.
 
-        digits : scalar(int), optional(default=None)
-            Number of digits printed for time elapsed. If None, uses
-            the global default precision from quantecon.timings.
+        digits : scalar(int), optional(default=2)
+            Number of digits printed for time elapsed.
 
         best_of : scalar(int), optional(default=3)
             Average time over best_of runs.
@@ -151,9 +142,6 @@ class __Timer__:
             Average of best_of times for n runs of function.
 
         """
-        if digits is None:
-            digits = get_default_precision()
-
         tic()
         all_times = np.empty(n)
         for run in range(n):
@@ -456,15 +444,15 @@ def tic():
     return __timer__.tic()
 
 
-def tac(verbose=True, digits=None):
+def tac(verbose=True, digits=2):
     return __timer__.tac(verbose, digits)
 
 
-def toc(verbose=True, digits=None):
+def toc(verbose=True, digits=2):
     return __timer__.toc(verbose, digits)
 
 
-def loop_timer(n, function, args=None, verbose=True, digits=None, best_of=3):
+def loop_timer(n, function, args=None, verbose=True, digits=2, best_of=3):
     return __timer__.loop_timer(n, function, args, verbose, digits, best_of)
 
 
