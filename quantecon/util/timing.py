@@ -4,6 +4,7 @@ Provides Matlab-like tic, tac and toc functions.
 """
 import time
 import numpy as np
+from ..timings.timings import get_default_precision
 
 
 class __Timer__:
@@ -190,8 +191,9 @@ class Timer:
     ----------
     message : str, optional(default="")
         Custom message to display with timing results.
-    precision : int, optional(default=2)
-        Number of decimal places to display for seconds.
+    precision : int, optional(default=None)
+        Number of decimal places to display for seconds. If None, uses
+        the global default precision from quantecon.timings.
     unit : str, optional(default="seconds") 
         Unit to display timing in. Options: "seconds", "milliseconds", "microseconds"
     verbose : bool, optional(default=True)
@@ -208,13 +210,13 @@ class Timer:
     >>> with Timer():
     ...     # some code
     ...     pass
-    0.00 seconds elapsed
+    0.0000 seconds elapsed
     
     With custom message and precision:
-    >>> with Timer("Computing results", precision=4):
+    >>> with Timer("Computing results", precision=6):
     ...     # some code  
     ...     pass
-    Computing results: 0.0001 seconds elapsed
+    Computing results: 0.000001 seconds elapsed
     
     Store elapsed time for comparison:
     >>> timer = Timer(verbose=False)
@@ -225,9 +227,9 @@ class Timer:
     Method took 0.000123 seconds
     """
     
-    def __init__(self, message="", precision=2, unit="seconds", verbose=True):
+    def __init__(self, message="", precision=None, unit="seconds", verbose=True):
         self.message = message
-        self.precision = precision
+        self.precision = precision if precision is not None else get_default_precision()
         self.unit = unit.lower()
         self.verbose = verbose
         self.elapsed = None
@@ -347,7 +349,7 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     # Extract Timer parameters
     timer_params = {
         'message': timer_kwargs.pop('message', ''),
-        'precision': timer_kwargs.pop('precision', 2),
+        'precision': timer_kwargs.pop('precision', None),  # None will use global default
         'unit': timer_kwargs.pop('unit', 'seconds'),
         'verbose': timer_kwargs.pop('verbose', True)  # Timer verbose parameter
     }
@@ -376,7 +378,7 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
         if show_output and not stats_only:
             # Convert to requested unit for display
             unit = timer_params['unit'].lower()
-            precision = timer_params['precision']
+            precision = timer_params['precision'] if timer_params['precision'] is not None else get_default_precision()
             
             if unit == "milliseconds":
                 elapsed_display = timer.elapsed * 1000
@@ -399,7 +401,7 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     if show_output:
         # Convert to requested unit for display
         unit = timer_params['unit'].lower()
-        precision = timer_params['precision']
+        precision = timer_params['precision'] if timer_params['precision'] is not None else get_default_precision()
         
         if unit == "milliseconds":
             avg_display = average * 1000
