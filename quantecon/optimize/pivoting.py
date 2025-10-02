@@ -58,7 +58,7 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
     """
     Perform the minimum ratio test, without tie breaking, for the
     candidate rows in `argmins[:num_candidates]`. Return the number
-    `num_argmins` of the rows minimizing the ratio and store thier
+    `num_argmins` of the rows minimizing the ratio and store their
     indices in `argmins[:num_argmins]`.
 
     Parameters
