@@ -118,7 +118,7 @@ def shorrocks_index(A):
     if m != n:
         raise ValueError('A must be a square matrix')
 
-    diag_sum = np.diag(A).sum()
+    diag_sum = np.trace(A)
 
     return (m - diag_sum) / (m - 1)
 
