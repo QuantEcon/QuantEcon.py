@@ -3,13 +3,14 @@ channels:
   - conda-forge
   - defaults
   - numba
+  - numba/label/dev
 dependencies:
   - coverage
   - coveralls
   - numpy>=2
   - scipy
   - pandas
-  - numba>=0.62
+  - numba=0.63.0b1
   - sympy
   - ipython
   - flake8
