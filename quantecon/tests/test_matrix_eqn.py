@@ -34,5 +34,5 @@ def test_solve_discrete_lyapunov_complex():
 
     X = qme.solve_discrete_lyapunov(A, B)
 
-    assert_allclose(np.dot(np.dot(A, X), A.conj().transpose()) - X, -B,
+    assert_allclose(A @ X @ A.conj().transpose() - X, -B,
                     atol=1e-15)
