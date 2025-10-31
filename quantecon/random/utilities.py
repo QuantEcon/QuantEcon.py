@@ -200,9 +200,7 @@ def draw(cdf, size=None):
     """
     if isinstance(size, int):
         rs = np.random.random(size)
-        out = np.empty(size, dtype=np.int_)
-        for i in range(size):
-            out[i] = searchsorted(cdf, rs[i])
+        out = np.searchsorted(cdf, rs, side='right')
         return out
     else:
         r = np.random.random()
