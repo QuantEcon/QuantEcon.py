@@ -4,29 +4,27 @@ Array Utilities
 
 Array
 -----
-searchsorted (deprecated - use np.searchsorted with side='right' instead)
+searchsorted
 
 """
 
 import warnings
-import numpy as np
+from numba import jit, objmode
 
 # ----------------- #
 # -ARRAY UTILITIES- #
 # ----------------- #
 
+@jit(nopython=True)
 def searchsorted(a, v):
     """
-    .. deprecated:: 0.10.2
-        `searchsorted` is deprecated and will be removed in a future version.
-        Use `np.searchsorted(a, v, side='right')` instead.
+    Custom version of np.searchsorted. Return the largest index `i` such
+    that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `v[n-1] <=
+    v`, return `n`, where `n = len(a)`.
 
-    Return the largest index `i` such that `a[i-1] <= v < a[i]` (for
-    `i = 0`, `v < a[0]`); if `a[n-1] <= v`, return `n`, where `n =
-    len(a)`.
+    .. deprecated::
 
-    This function is now a thin wrapper around `np.searchsorted(a, v,
-    side='right')` and emits a deprecation warning when called.
+        Deprecated, use `np.searchsorted(a, v, side='right')` instead.
 
     Parameters
     ----------
@@ -44,10 +42,8 @@ def searchsorted(a, v):
 
     Notes
     -----
-    This routine was originally jit-compiled when Numba did not support
-    the `side` keyword argument for `np.searchsorted`. Now that Numba
-    supports this feature, this function is deprecated in favor of using
-    `np.searchsorted(a, v, side='right')` directly.
+    This routine is jit-complied if the module Numba is vailable; if
+    not, it is an alias of np.searchsorted(a, v, side='right').
 
     Examples
     --------
@@ -60,10 +56,20 @@ def searchsorted(a, v):
     3
 
     """
-    warnings.warn(
-        "searchsorted is deprecated and will be removed in a future version. "
-        "Use np.searchsorted(a, v, side='right') instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
-    return np.searchsorted(a, v, side='right')
+    with objmode():
+        warnings.warn(
+            "`searchsorted(a, v)` is deprecated. "
+            "Use `np.searchsorted(a, v, side='right')` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+    lo = -1
+    hi = len(a)
+    while(lo < hi-1):
+        m = (lo + hi) // 2
+        if v < a[m]:
+            hi = m
+        else:
+            lo = m
+    return hi

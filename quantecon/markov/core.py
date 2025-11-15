@@ -663,7 +663,7 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
             k = np.searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
-                             random_values[i, t], side='right')
+                                random_values[i, t], side='right')
             out[i, t+1] = indices[indptr[out[i, t]]+k]
 
 
