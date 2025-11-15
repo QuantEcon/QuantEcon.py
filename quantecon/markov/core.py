@@ -87,7 +87,7 @@ from numba import jit
 
 from .gth_solve import gth_solve
 from .._graph_tools import DiGraph
-from ..util import searchsorted, check_random_state, rng_integers
+from ..util import check_random_state, rng_integers
 
 
 class MarkovChain:
@@ -618,7 +618,7 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
     for i in range(num_reps):
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            out[i, t+1] = searchsorted(P_cdfs[out[i, t]], random_values[i, t])
+            out[i, t+1] = np.searchsorted(P_cdfs[out[i, t]], random_values[i, t], side='right')
 
 
 @jit(nopython=True)
@@ -662,8 +662,8 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
     for i in range(num_reps):
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            k = searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
-                             random_values[i, t])
+            k = np.searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
+                                random_values[i, t], side='right')
             out[i, t+1] = indices[indptr[out[i, t]]+k]
 
 
@@ -719,7 +719,7 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     else:
         cdf0 = np.cumsum(init)
         u_0 = random_state.random()
-        X_0 = searchsorted(cdf0, u_0)
+        X_0 = np.searchsorted(cdf0, u_0, side='right')
 
     mc = MarkovChain(P)
     return mc.simulate(ts_length=sample_size, init=X_0,
