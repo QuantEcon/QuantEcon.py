@@ -39,6 +39,9 @@ from collections.abc import Sequence, Mapping, Iterable
 # from typing import TypeAlias, Self
 from numpy.typing import NDArray
 
+from numba import jit, types
+from numba.typed import Dict as NumbaDict
+
 from .normal_form_game import NormalFormGame, Player, _nums_actions2string
 
 
@@ -151,7 +154,7 @@ class PolymatrixGame:
     nums_actions : tuple(int)
         The number of actions available to each player.
 
-    polymatrix : dict[tuple(int), ndarray(float, ndim=2)]
+    polymatrix : numba.typed.Dict[tuple(int), ndarray(float, ndim=2)]
         Maps each pair of player numbers to a matrix.
 
     """
@@ -209,7 +212,10 @@ class PolymatrixGame:
             for p2 in range(self.N)
             if p1 != p2
         ]
-        self.polymatrix: dict[tuple[int, int], NDArray] = {}
+        self.polymatrix: Mapping[tuple[int, int], NDArray] = NumbaDict.empty(
+            key_type=types.UniTuple(types.int_, 2),
+            value_type=types.float64[:, :],
+        )
         for (p1, p2) in matchups:
             rows = self.nums_actions[p1]
             cols = self.nums_actions[p2]
@@ -250,13 +256,19 @@ class PolymatrixGame:
         Self
             The Polymatrix Game.
         """
-        polymatrix_builder = {
-            (p1, p2): np.full(
-                (nf.nums_actions[p1], nf.nums_actions[p2]), -np.inf)
-            for p1 in range(nf.N)
-            for p2 in range(nf.N)
-            if p1 != p2
-        }
+        polymatrix_builder = NumbaDict.empty(
+            key_type=types.UniTuple(types.int_, 2),
+            value_type=types.float64[:, :],
+        )
+        for p1 in range(nf.N):
+            for p2 in range(nf.N):
+                if p1 == p2:
+                    continue
+                rows = nf.nums_actions[p1]
+                cols = nf.nums_actions[p2]
+                polymatrix_builder[(p1, p2)] = np.full(
+                    (rows, cols), -np.inf, dtype=np.float64
+                )
         for p1 in range(nf.N):
             for a1 in range(nf.nums_actions[p1]):
                 payoffs = hh_payoff_player(
@@ -314,6 +326,20 @@ class PolymatrixGame:
         tuple[float, float]
             Tuple of minimum and maximum.
         """
-        min_p = min([np.min(M) for M in self.polymatrix.values()])
-        max_p = max([np.max(M) for M in self.polymatrix.values()])
-        return (min_p, max_p)
+        return _min_max(self.polymatrix)
+
+
+@jit(nopython=True, cache=True)
+def _min_max(polymatrix):
+    min_ = max_ = next(iter(polymatrix.values()))[0, 0]
+    for a in polymatrix.values():
+        m, n = a.shape
+        for i in range(m):
+            for j in range(n):
+                x = a[i, j]
+                if x < min_:
+                    min_ = x
+                elif x > max_:
+                    max_ = x
+
+    return min_, max_
