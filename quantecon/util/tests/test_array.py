@@ -8,9 +8,11 @@ searchsorted
 """
 import numpy as np
 from numpy.testing import assert_
+import pytest
 from quantecon.util import searchsorted
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_searchsorted():
     a = np.array([0.2, 0.4, 1.0])
     assert_(searchsorted(a, 0.1) == 0)
@@ -28,3 +30,9 @@ def test_searchsorted():
     a = np.ones(2)
     for (v, i) in zip([0, 1, 2], [0, 2, 2]):
         assert_(searchsorted(a, v) == i)
+
+
+def test_warns():
+    a = np.array([0.2, 0.4, 1.0])
+    with pytest.warns(DeprecationWarning):
+        searchsorted(a, 0.5)

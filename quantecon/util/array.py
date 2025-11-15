@@ -8,7 +8,9 @@ searchsorted
 
 """
 
-from numba import jit
+import warnings
+import numpy as np
+from numba import jit, objmode
 
 # ----------------- #
 # -ARRAY UTILITIES- #
@@ -20,6 +22,10 @@ def searchsorted(a, v):
     Custom version of np.searchsorted. Return the largest index `i` such
     that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `v[n-1] <=
     v`, return `n`, where `n = len(a)`.
+
+    .. deprecated::
+
+        Deprecated, use `np.searchsorted(a, v, side='right')` instead.
 
     Parameters
     ----------
@@ -51,6 +57,14 @@ def searchsorted(a, v):
     3
 
     """
+    with objmode():
+        warnings.warn(
+            "`searchsorted(a, v)` is deprecated. "
+            "Use `np.searchsorted(a, v, side='right')` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
     lo = -1
     hi = len(a)
     while(lo < hi-1):
