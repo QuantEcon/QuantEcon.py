@@ -10,7 +10,7 @@ dependencies:
   - numpy>=2
   - scipy
   - pandas
-  - numba=0.63.0b1
+  - numba>=0.63
   - sympy
   - ipython
   - flake8
