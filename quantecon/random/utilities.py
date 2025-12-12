@@ -6,7 +6,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 import numpy as np
 from numba import guvectorize, types
 from numba.extending import overload
-from ..util import check_random_state, searchsorted
+from ..util import check_random_state
 
 
 # Generating Arrays and Vectors #
@@ -204,7 +204,7 @@ def draw(cdf, size=None):
         return out
     else:
         r = np.random.random()
-        return searchsorted(cdf, r)
+        return np.searchsorted(cdf, r, side='right')
 
 
 # Overload for the `draw` function
@@ -215,10 +215,10 @@ def ol_draw(cdf, size=None):
             rs = np.random.random(size)
             out = np.empty(size, dtype=np.int_)
             for i in range(size):
-                out[i] = searchsorted(cdf, rs[i])
+                out[i] = np.searchsorted(cdf, rs[i], side='right')
             return out
     else:
         def draw_impl(cdf, size=None):
             r = np.random.random()
-            return searchsorted(cdf, r)
+            return np.searchsorted(cdf, r, side='right')
     return draw_impl
