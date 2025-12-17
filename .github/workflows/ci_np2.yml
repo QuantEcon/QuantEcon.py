@@ -12,7 +12,7 @@ jobs:
       max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
