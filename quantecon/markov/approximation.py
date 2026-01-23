@@ -168,7 +168,7 @@ def rouwenhorst(n, rho, sigma, mu=0.):
 
 
 def tauchen(n, rho, sigma, mu=0., n_std=3):
-    """
+    r"""
     Computes a Markov chain associated with a discretized version of
     the linear Gaussian AR(1) process
 
@@ -263,7 +263,7 @@ def std_norm_cdf(x):
     return 0.5 * erfc(-x / sqrt(2))
 
 
-@njit(cache=True, parallel=True)
+@njit(parallel=True)
 def _fill_tauchen(x, P, n, rho, sigma, half_step):
     for i in prange(n):
         P[i, 0] = std_norm_cdf((x[0] - rho * x[i] + half_step) / sigma)
