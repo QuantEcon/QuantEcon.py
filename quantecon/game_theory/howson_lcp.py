@@ -38,7 +38,7 @@ def polym_lcp_solver(
         starting_player_actions: Optional[Sequence[int]] = None,
         max_iter: int = -1,
         full_output: bool = False,
-) -> Union[tuple[NDArray], NashResult]:
+) -> Union[tuple[NDArray, ...], tuple[tuple[NDArray, ...]] NashResult]:
     """
     Finds a Nash Equilbrium of a Polymatrix Game.
 
