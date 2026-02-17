@@ -66,12 +66,15 @@ def polym_lcp_solver(
 
     Returns
     -------
-    tuple(ndarray(float, ndim=1)) or NashResult
+    tuple(ndarray(float, ndim=1))
         The mixed actions at termination, a Nash Equilibrium if
-        not stopped early by reaching `max_iter`. If `full_output`,
-        then the number of iterations, whether it has converged,
-        and the initial conditions of the algorithm are included
-        in the returned `NashResult` alongside the actions.
+        not stopped early by reaching `max_iter`.
+
+    NashResult
+        Object containing information about the computation, the number
+        of iterations, whether it has converged, and the initial
+        conditions of the algorithm. Returned only when `full_output` is
+        True.
 
     References
     ----------
