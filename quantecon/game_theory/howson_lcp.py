@@ -71,7 +71,7 @@ def polym_lcp_solver(
         not stopped early by reaching `max_iter`.
 
     NashResult
-        Object containing information about the computation, the number
+        Object containing information about the computation: the number
         of iterations, whether it has converged, and the initial
         conditions of the algorithm. Returned only when `full_output` is
         True.
