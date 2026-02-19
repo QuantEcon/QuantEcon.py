@@ -38,7 +38,7 @@ def polym_lcp_solver(
         starting_player_actions: Optional[Sequence[int]] = None,
         max_iter: int = -1,
         full_output: bool = False,
-) -> Union[tuple[NDArray], NashResult]:
+) -> Union[tuple[NDArray, ...], tuple[tuple[NDArray, ...], NashResult]]:
     """
     Finds a Nash Equilbrium of a Polymatrix Game.
 
@@ -66,12 +66,15 @@ def polym_lcp_solver(
 
     Returns
     -------
-    tuple(ndarray(float, ndim=1)) or NashResult
-        The mixed actions at termination, a Nash Equilibrium if
-        not stopped early by reaching `max_iter`. If `full_output`,
-        then the number of iterations, whether it has converged,
-        and the initial conditions of the algorithm are included
-        in the returned `NashResult` alongside the actions.
+    NE : tuple(ndarray(float, ndim=1))
+        Tuple of computed Nash equilibrium mixed actions. A Nash
+        Equilibrium if not stopped early by reaching `max_iter`.
+
+    res : NashResult
+        Object containing information about the computation: the number
+        of iterations, whether it has converged, and the initial
+        conditions of the algorithm. Returned only when `full_output`
+        is True. See `NashResult` for details.
 
     References
     ----------
