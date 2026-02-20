@@ -27,6 +27,8 @@ a 3-player Minimum Effort Game
   [[-19., -19.,   1.],   [ -8.,  -8.,   2.],   [  3.,   3.,   3.]]]]
 
 """
+import io
+import sys
 import numbers
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
@@ -326,17 +328,27 @@ class GAMWriter:
 
     @staticmethod
     def _dump(g):
-        s = str(g.N) + '\n'
-        s += ' '.join(map(str, g.nums_actions)) + '\n\n'
+        p = GAMPayoffVector.from_nfg(g)
 
-        for i, player in enumerate(g.players):
-            payoffs = np.array2string(
-                player.payoff_array.transpose(
-                    (*range(g.N-i, g.N), *range(g.N-i))
-                ).ravel(order='F'))[1:-1]
-            s += ' '.join(payoffs.split()) + ' '
+        buf = io.StringIO()
 
-        return s.rstrip()
+        buf.write(str(p.N))
+        buf.write('\n')
+        buf.write(' '.join(map(str, p.nums_actions)))
+        buf.write('\n\n')
+
+        payoffs_str = np.array2string(
+            p.payoffs,
+            separator=' ',
+            threshold=sys.maxsize,  # no truncation '...'
+            # suppress_small helps avoid scientific notation for small |x|;
+            # large |x| values may still print with e+...
+            suppress_small=True
+        )[1:-1]  # strip brackets
+
+        buf.write(' '.join(payoffs_str.split()))
+
+        return buf.getvalue().rstrip()
 
 
 def from_gam(filename: str) -> NormalFormGame:
