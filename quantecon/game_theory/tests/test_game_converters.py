@@ -104,7 +104,7 @@ def test_invalid_inputs():
     assert_raises(ValueError, GAMPayoffVector, (2, 2), np.zeros(7))
 
 
-# TestGAMWriter #
+# GAMWriter/to_gam #
 
 class TestGAMWriter:
     def setup_method(self):
@@ -157,3 +157,27 @@ class TestGAMWriter:
         assert_string_equal(s_actual, self.s_desired + '\n')
 
         os.remove(temp_path)
+
+
+def test_gam_writer_many_actions():
+    n0, n1 = 40, 60
+    p0 = Player(np.arange(n0 * n1).reshape(n0, n1))
+    p1 = Player((np.arange(n1 * n0) + 10_000).reshape(n1, n0))
+    g = NormalFormGame((p0, p1))
+
+    s = to_gam(g)
+
+    # NumPy summary marker should never appear
+    assert_('...' not in s)
+
+    # Token count matches N * prod(nums_actions)
+    tokens = s.split()
+    N = int(tokens[0])
+    nums_actions = tuple(int(x) for x in tokens[1:1+N])
+    payoff_tokens = tokens[1+N:]
+
+    assert_(N == 2)
+    assert_(nums_actions == (n0, n1))
+
+    expected = N * np.prod(nums_actions)
+    assert_(len(payoff_tokens) == expected)
