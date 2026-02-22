@@ -267,22 +267,39 @@ class GAMReader:
     @staticmethod
     def _parse(string):
         tokens = string.split()
+        if not tokens:
+            raise ValueError('empty .gam input')
+        pos = 0
 
-        N = int(tokens.pop(0))
-        nums_actions = tuple(int(tokens.pop(0)) for _ in range(N))
-        payoffs = np.array([_str2num(s) for s in tokens])
+        # N
+        tok = tokens[pos]
+        try:
+            N = int(tok)
+        except ValueError as err:
+            raise ValueError(f'invalid N token: {tok!r}') from err
+        pos += 1
 
-        na = np.prod(nums_actions)
-        payoffs2d = payoffs.reshape(N, na)
-        players = [
-            Player(
-                payoffs2d[i, :].reshape(nums_actions, order='F').transpose(
-                    (*range(i, N), *range(i))
-                )
-            ) for i in range(N)
-        ]
+        if N <= 0:
+            raise ValueError('N must be a positive integer')
 
-        return NormalFormGame(players)
+        # nums_actions
+        if len(tokens) < pos + N:
+            got = max(0, len(tokens) - pos)
+            raise ValueError(
+                f'incomplete header: expected {N} action counts, got {got}'
+            )
+
+        try:
+            nums_actions = tuple(int(tok) for tok in tokens[pos:pos+N])
+        except ValueError as err:
+            raise ValueError('invalid action count token in header') from err
+        pos += N
+
+        # payoffs
+        payoffs = np.array([_str2num(tok) for tok in tokens[pos:]])
+
+        p = GAMPayoffVector(nums_actions, payoffs)
+        return p.to_nfg()
 
 
 class GAMWriter:
@@ -374,6 +391,14 @@ def from_gam(filename: str) -> NormalFormGame:
 
     """
     return GAMReader.from_file(filename)
+
+
+def from_gam_string(string):
+    return GAMReader.from_string(string)
+
+
+def from_gam_url(url):
+    return GAMReader.from_url(url)
 
 
 def to_gam(g, file_path=None):
