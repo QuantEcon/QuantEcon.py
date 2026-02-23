@@ -42,15 +42,13 @@ def lorenz_curve(y):
 
     """
 
-    n = len(y)
+    n = y.shape[0]
     y = np.sort(y)
-    s = np.zeros(n + 1)
-    s[1:] = np.cumsum(y)
-    cum_people = np.zeros(n + 1)
-    cum_income = np.zeros(n + 1)
-    for i in range(1, n + 1):
-        cum_people[i] = i / n
-        cum_income[i] = s[i] / s[n]
+    _zero = np.zeros(1)
+    s = np.concatenate((_zero, np.cumsum(y)))
+    _cum_p = np.arange(1, n + 1) / n
+    cum_income = s / s[n]
+    cum_people = np.concatenate((_zero, _cum_p))
     return cum_people, cum_income
 
 
@@ -76,11 +74,12 @@ def gini_coefficient(y):
     https://en.wikipedia.org/wiki/Gini_coefficient
     """
     n = len(y)
-    i_sum = np.zeros(n)
+    i_sum = 0
+    t_sum = 0
     for i in prange(n):
-        for j in range(n):
-            i_sum[i] += abs(y[i] - y[j])
-    return np.sum(i_sum) / (2 * n * np.sum(y))
+        i_sum += np.sum(np.abs(y[i] - y))
+        t_sum += y[i]
+    return i_sum / (2 * n * t_sum)
 
 
 def shorrocks_index(A):
@@ -152,4 +151,3 @@ def rank_size(data, c=1.0):
     rank_data = np.arange(len(w)) + 1
     size_data = w
     return rank_data, size_data
-
