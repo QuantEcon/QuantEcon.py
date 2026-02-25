@@ -2,14 +2,17 @@
 Tests for game_theory/game_converters.py
 
 """
+import io
 import os
 from tempfile import NamedTemporaryFile
+from unittest.mock import patch
 import numpy as np
 from numpy.testing import (
     assert_, assert_array_equal, assert_string_equal, assert_raises
 )
 from quantecon.game_theory import (
-    Player, NormalFormGame, random_game, GAMWriter, to_gam
+    Player, NormalFormGame, random_game,
+    GAMWriter, to_gam, from_gam_string, from_gam_url
 )
 from quantecon.game_theory.game_converters import GAMPayoffVector
 
@@ -158,6 +161,11 @@ class TestGAMWriter:
 
         os.remove(temp_path)
 
+    def test_from_gam_string(self):
+        g2 = from_gam_string(self.s_desired)
+        assert_array_equal(g2.payoff_profile_array,
+                           self.g.payoff_profile_array)
+
 
 def test_gam_writer_many_actions():
     n0, n1 = 40, 60
@@ -181,3 +189,45 @@ def test_gam_writer_many_actions():
 
     expected = N * np.prod(nums_actions)
     assert_(len(payoff_tokens) == expected)
+
+
+# GAMReader/from_gam #
+
+def test_from_gam_string():
+    s = """\
+2
+3 2
+
+3 2 0 3 5 6 3 2 3 2 6 1"""
+
+    g = from_gam_string(s)
+
+    expected = NormalFormGame([
+        [(3, 3), (3, 2)],
+        [(2, 2), (5, 6)],
+        [(0, 3), (6, 1)],
+    ])
+
+    assert_array_equal(g.payoff_profile_array, expected.payoff_profile_array)
+
+
+class _FakeResponse(io.BytesIO):
+    def __enter__(self): return self
+    def __exit__(self, exc_type, exc, tb): self.close()
+
+
+def test_from_gam_url():
+    s = """\
+2
+3 2
+
+3 2 0 3 5 6 3 2 3 2 6 1"""
+
+    def fake_urlopen(url):
+        return _FakeResponse(s.encode("utf-8"))
+
+    with patch("urllib.request.urlopen", fake_urlopen):
+        g_url = from_gam_url("http://example.com/game.gam")
+
+    g_str = from_gam_string(s)
+    assert_array_equal(g_url.payoff_profile_array, g_str.payoff_profile_array)
