@@ -264,7 +264,7 @@ class GAMWriter:
     @classmethod
     def to_file(cls, g, file_path):
         """
-        Write `g` to a file in GameTracer .gam` format.
+        Write `g` to a file in GameTracer .gam format.
 
         """
         with open(file_path, 'w') as f:
@@ -273,7 +273,7 @@ class GAMWriter:
     @classmethod
     def to_string(cls, g):
         """
-        Return the GameTracer ``.gam`` string representation of `g`.
+        Return the GameTracer .gam string representation of `g`.
 
         """
         return cls._dump(g)
