@@ -11,8 +11,7 @@ from numpy.testing import (
     assert_, assert_array_equal, assert_string_equal, assert_raises
 )
 from quantecon.game_theory import (
-    Player, NormalFormGame, random_game,
-    GAMWriter, to_gam, from_gam_string, from_gam_url
+    Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url
 )
 from quantecon.game_theory.game_converters import GAMPayoffVector
 
