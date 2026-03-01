@@ -1,16 +1,19 @@
 """
-Functions for converting between ways of storing games.
+Utilities for converting between representations of games.
+
+Currently supports reading and writing the GameTracer `.gam` text format
+[1]_.
 
 Examples
 --------
-
-Create a QuantEcon NormalFormGame from a .gam file storing
-a 3-player Minimum Effort Game
+Create a QuantEcon NormalFormGame from a .gam file storing a 3-player
+Minimum Effort Game:
 
 >>> import os
 >>> import quantecon.game_theory as gt
 >>> filepath = os.path.dirname(gt.__file__)
->>> filepath += "/tests/game_files/minimum_effort_game.gam"
+>>> filepath = os.path.join(filepath, 'tests', 'game_files',
+...                         'minimum_effort_game.gam')
 >>> nfg = gt.from_gam(filepath)
 >>> print(nfg)
 3-player NormalFormGame with payoff profile array:
@@ -25,6 +28,11 @@ a 3-player Minimum Effort Game
  [[[-19.,   1.,   1.],   [-19.,   1.,  -9.],   [-19.,   1., -19.]],
   [[-19.,  -9.,   1.],   [ -8.,   2.,   2.],   [ -8.,   2.,  -8.]],
   [[-19., -19.,   1.],   [ -8.,  -8.,   2.],   [  3.,   3.,   3.]]]]
+
+References
+----------
+.. [1] Ben Blum, Daphne Koller, Christian Shelton, "Game Theory:
+   GameTracer," http://dags.stanford.edu/Games/gametracer.html
 
 """
 import io
@@ -169,6 +177,7 @@ def _str2num(s):
     -------
     int or float
         Integer if no decimal point, otherwise float.
+
     """
     if '.' in s:
         return float(s)
@@ -177,45 +186,13 @@ def _str2num(s):
 
 class GAMReader:
     """
-    Reader object that converts a game in GameTracer .gam format into
-    a NormalFormGame.
+    Parser for the GameTracer .gam format.
 
     """
     @classmethod
     def from_file(cls, file_path):
         """
         Read from a .gam format file.
-
-        Parameters
-        ----------
-        file_path : str
-            Path to .gam file.
-
-        Returns
-        -------
-        NormalFormGame
-
-        Examples
-        --------
-        Save a .gam format string in a temporary file:
-
-        >>> import tempfile
-        >>> fname = tempfile.mkstemp()[1]
-        >>> with open(fname, mode='w') as f:
-        ...       f.write(\"\"\"\\
-        ... 2
-        ... 3 2
-        ...
-        ... 3 2 0 3 5 6 3 2 3 2 6 1\"\"\")
-
-        Read the file:
-
-        >>> g = GAMReader.from_file(fname)
-        >>> print(g)
-        2-player NormalFormGame with payoff profile array:
-        [[[3, 3],  [3, 2]],
-         [[2, 2],  [5, 6]],
-         [[0, 3],  [6, 1]]]
 
         """
         with open(file_path, 'r') as f:
@@ -237,29 +214,6 @@ class GAMReader:
     def from_string(cls, string):
         """
         Read from a .gam format string.
-
-        Parameters
-        ----------
-        string : str
-            String in .gam format.
-
-        Returns
-        -------
-        NormalFormGame
-
-        Examples
-        --------
-        >>> string = \"\"\"\\
-        ... 2
-        ... 3 2
-        ...
-        ... 3 2 0 3 5 6 3 2 3 2 6 1\"\"\"
-        >>> g = GAMReader.from_string(string)
-        >>> print(g)
-        2-player NormalFormGame with payoff profile array:
-        [[[3, 3],  [3, 2]],
-         [[2, 2],  [5, 6]],
-         [[0, 3],  [6, 1]]]
 
         """
         return cls._parse(string)
@@ -304,22 +258,13 @@ class GAMReader:
 
 class GAMWriter:
     """
-    Writer object that converts a NormalFormgame into a game in
-    GameTracer .gam format.
+    Serializer for the GameTracer .gam format.
 
     """
     @classmethod
     def to_file(cls, g, file_path):
         """
-        Save the GameTracer .gam format string representation of the
-        NormalFormGame `g` to a file.
-
-        Parameters
-        ----------
-        g : NormalFormGame
-
-        file_path : str
-            Path to the file to write to.
+        Write `g` to a file in GameTracer .gam` format.
 
         """
         with open(file_path, 'w') as f:
@@ -328,17 +273,7 @@ class GAMWriter:
     @classmethod
     def to_string(cls, g):
         """
-        Return a GameTracer .gam format string representing the
-        NormalFormGame `g`.
-
-        Parameters
-        ----------
-        g : NormalFormGame
-
-        Returns
-        -------
-        str
-            String representation in .gam format.
+        Return the GameTracer ``.gam`` string representation of `g`.
 
         """
         return cls._dump(g)
@@ -370,34 +305,91 @@ class GAMWriter:
 
 def from_gam(filename: str) -> NormalFormGame:
     """
-    Makes a QuantEcon Normal Form Game from a .gam file.
-
-    Gam files are described by GameTracer [1]_.
+    Read a GameTracer .gam file and return a NormalFormGame.
 
     Parameters
     ----------
     filename : str
-        path to .gam file.
+        Path to .gam file.
 
     Returns
     -------
     NormalFormGame
-        The QuantEcon Normal Form Game described by the .gam file.
+        The game described by the .gam file.
 
-    References
-    ----------
-    .. [1] Bem Blum, Daphne Kohler, Christian Shelton
-       http://dags.stanford.edu/Games/gametracer.html
+    Examples
+    --------
+    Save a .gam format string in a temporary file:
+
+    >>> import tempfile
+    >>> fname = tempfile.mkstemp()[1]
+    >>> with open(fname, mode='w') as f:
+    ...       _ = f.write(\"\"\"\\
+    ... 2
+    ... 3 2
+    ...
+    ... 3 2 0 3 5 6 3 2 3 2 6 1\"\"\")
+
+    Read the file:
+
+    >>> g = from_gam(fname)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[3, 3],  [3, 2]],
+     [[2, 2],  [5, 6]],
+     [[0, 3],  [6, 1]]]
 
     """
     return GAMReader.from_file(filename)
 
 
 def from_gam_string(string):
+    """
+    Read a .gam format string and return a NormalFormGame.
+
+    Parameters
+    ----------
+    string : str
+        String in .gam format.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .gam string.
+
+    Examples
+    --------
+    >>> string = \"\"\"\\
+    ... 2
+    ... 3 2
+    ...
+    ... 3 2 0 3 5 6 3 2 3 2 6 1\"\"\"
+    >>> g = from_gam_string(string)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[3, 3],  [3, 2]],
+     [[2, 2],  [5, 6]],
+     [[0, 3],  [6, 1]]]
+
+    """
     return GAMReader.from_string(string)
 
 
 def from_gam_url(url):
+    """
+    Read a GameTracer .gam file from a URL and return a NormalFormGame.
+
+    Parameters
+    ----------
+    url : str
+        String containing a URL of the .gam file.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .gam file.
+
+    """
     return GAMReader.from_url(url)
 
 
@@ -412,6 +404,10 @@ def to_gam(g, file_path=None):
     file_path : str, optional(default=None)
         Path to the file to write to. If None, the result is returned as
         a string.
+
+    Returns
+    -------
+    None or str
 
     """
     if file_path is None:
