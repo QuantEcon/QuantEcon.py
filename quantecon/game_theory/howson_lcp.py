@@ -86,6 +86,9 @@ def polym_lcp_solver(
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
     positive_cost_maker = polymg.range_of_payoffs()[1] + LOW_AVOIDER
+
+    eye_N = np.eye(polymg.N)
+    
     # Construct the LCP like Howson:
     M = np.vstack([
         np.hstack([
@@ -96,13 +99,13 @@ def polym_lcp_solver(
             for p2 in range(polymg.N)
         ] + [
             -np.outer(np.ones(
-                polymg.nums_actions[player]), np.eye(polymg.N)[player])
+                polymg.nums_actions[player]), eye_N[player])
         ])
         for player in range(polymg.N)
     ] + [
         np.hstack([
             np.hstack([
-                np.outer(np.eye(polymg.N)[player], np.ones(
+                np.outer(eye_N[player], np.ones(
                     polymg.nums_actions[player]))
                 for player in range(polymg.N)
             ]
