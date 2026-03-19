@@ -88,7 +88,7 @@ def polym_lcp_solver(
     positive_cost_maker = polymg.range_of_payoffs()[1] + LOW_AVOIDER
 
     eye_N = np.eye(polymg.N)
-    
+
     # Construct the LCP like Howson:
     M = np.vstack([
         np.hstack([
