@@ -3,7 +3,7 @@
 Import the main names to top level.
 """
 
-__version__ = '0.11.1'
+__version__ = '0.11.2'
 
 try:
     import numba
