@@ -30,7 +30,7 @@ jobs:
         path: ~/conda_pkgs_dir
         key:
           ${{ runner.os }}-${{ matrix.python-version }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: conda-incubator/setup-miniconda@v4
       with:
         auto-update-conda: true
         miniforge-version: latest
