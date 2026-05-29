@@ -177,6 +177,14 @@ class DiscreteDP:
 
     a_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the actions.
+    
+    state_values : array_like(optional), length n
+        Values associated with the states. Defaults to None, in which case the
+        state values are the indices 0, ..., n-1.
+    
+    action_values : array_like(optional), length m
+        Values associated with the actions. Defaults to None, in which case the
+        action values are the indices 0, ..., m-1.
 
     Attributes
     ----------
@@ -194,6 +202,15 @@ class DiscreteDP:
 
     max_iter : scalar(int), default=250
         Default value for the maximum number of iterations.
+    
+    num_actions : scalar(int)
+        Number of actions.
+
+    state_values : array_like, length n
+        Values associated with the states.
+
+    action_values : array_like, length m
+        Values associated with the actions.
 
     Notes
     -----
@@ -296,7 +313,8 @@ class DiscreteDP:
     4
 
     """
-    def __init__(self, R, Q, beta, s_indices=None, a_indices=None):
+    def __init__(self, R, Q, beta, s_indices=None, a_indices=None,
+                 state_values=None, action_values=None):
         self._sa_pair = False
         self._sparse = False
 
@@ -341,6 +359,7 @@ class DiscreteDP:
 
             self.s_indices = np.asarray(s_indices)
             self.a_indices = np.asarray(a_indices)
+            self.num_actions = self.a_indices.max() + 1
 
             if _has_sorted_sa_indices(self.s_indices, self.a_indices):
                 a_indptr = np.empty(self.num_states+1, dtype=int)
@@ -391,6 +410,7 @@ class DiscreteDP:
             if self.R.ndim != 2:
                 raise ValueError(msg_dimension)
             n, m = self.R.shape
+            self.num_actions = m
 
             if self.Q.shape != (n, m, n):
                 raise ValueError(msg_shape)
@@ -433,6 +453,26 @@ class DiscreteDP:
 
         self.epsilon = 1e-3
         self.max_iter = 250
+        # State/action labels: for mapping purposes only, not used in numerical computations
+        if state_values is None:
+            self.state_values = None
+        else:
+            state_values = np.asarray(state_values)
+            if state_values.shape[0] != self.num_states:
+                raise ValueError(
+                    'state_values must be an array_like of length num_states'
+                )
+            self.state_values = state_values
+
+        if action_values is None:
+            self.action_values = None
+        else:
+            action_values = np.asarray(action_values)
+            if action_values.shape[0] != self.num_actions:
+                raise ValueError(
+                    'action_values must be an array_like of length num_actions'
+                )
+            self.action_values = action_values
 
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
