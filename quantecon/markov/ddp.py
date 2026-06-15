@@ -177,6 +177,10 @@ class DiscreteDP:
 
     a_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the actions.
+    
+    state_values : array_like(optional), length n
+        Values associated with the states. Defaults to None, in which case the
+        state values are the indices 0, ..., n-1.
 
     Attributes
     ----------
@@ -194,6 +198,9 @@ class DiscreteDP:
 
     max_iter : scalar(int), default=250
         Default value for the maximum number of iterations.
+
+    state_values : array_like, length n
+        Values associated with the states.
 
     Notes
     -----
@@ -296,7 +303,8 @@ class DiscreteDP:
     4
 
     """
-    def __init__(self, R, Q, beta, s_indices=None, a_indices=None):
+    def __init__(self, R, Q, beta, s_indices=None, a_indices=None,
+                 state_values=None):
         self._sa_pair = False
         self._sparse = False
 
@@ -433,6 +441,16 @@ class DiscreteDP:
 
         self.epsilon = 1e-3
         self.max_iter = 250
+        # State/action labels: for mapping purposes only, not used in numerical computations
+        if state_values is None:
+            self.state_values = None
+        else:
+            state_values = np.asarray(state_values)
+            if state_values.shape[0] != self.num_states:
+                raise ValueError(
+                    'state_values must be an array_like of length num_states'
+                )
+            self.state_values = state_values
 
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
@@ -961,7 +979,7 @@ class DiscreteDP:
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)
-        return MarkovChain(Q_sigma)
+        return MarkovChain(Q_sigma, state_values=self.state_values)
 
 
 class DPSolveResult(dict):

@@ -3,6 +3,7 @@ Tests for markov/ddp.py
 
 """
 import numpy as np
+import pytest
 import scipy.sparse as sparse
 from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
                            assert_)
@@ -338,3 +339,27 @@ def test_ddp_to_sa_and_to_product():
 
             for k in ["v", "sigma", "num_iter"]:
                 assert_allclose(sol1[k], sol2[k])
+
+def test_ddp_state_action_values():
+    # Construct a simple Markov decision process for testing
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.array([[[0.5, 0.5], [0.5, 0.5]], [[0.5, 0.5], [0.5, 0.5]]])
+    beta = 0.95
+    
+    # Test 1: Pass valid labels and check mappings
+    sv = np.array(['state1', 'state2'])
+    av = np.array(['action1', 'action2'])
+    ddp = DiscreteDP(R, Q, beta, state_values=sv, action_values=av)
+    
+    assert np.array_equal(ddp.state_values, sv)
+    assert np.array_equal(ddp.action_values, av)
+    
+    # Test 2: Pass state_values with incorrect length, expect ValueError
+    sv_wrong = np.array(['state1'])
+    with pytest.raises(ValueError):
+        DiscreteDP(R, Q, beta, state_values=sv_wrong)
+        
+    # Test 3: Pass action_values with incorrect length, expect ValueError
+    av_wrong = np.array(['action1'])
+    with pytest.raises(ValueError):
+        DiscreteDP(R, Q, beta, action_values=av_wrong)
