@@ -84,3 +84,71 @@ class TestKalman:
 
         assert_allclose(kf.Sigma, new_sigma, rtol=1e-4, atol=1e-2)
         assert_allclose(kf.x_hat, new_xhat, rtol=1e-4, atol=1e-2)
+
+
+class TestKalmanStationaryCoefficients:
+
+    def setup_method(self):
+        self.A = np.array([[.95, 0], [0., .95]])
+        self.C = np.eye(2) * np.sqrt(0.5)
+        self.G = np.eye(2) * .5
+        self.H = np.eye(2) * np.sqrt(0.2)
+        ss = LinearStateSpace(self.A, self.C, self.G, self.H)
+        self.kf = Kalman(ss)
+        self.methods = ['doubling', 'qz']
+
+    @staticmethod
+    def _expected_stationary_coefficients(kf, j, coeff_type):
+        """Reference implementation for stationary_coefficients."""
+        A, G = kf.ss.A, kf.ss.G
+        K_infinity = kf.K_infinity
+        coeffs = []
+        if coeff_type == 'ma':
+            coeffs.append(np.identity(kf.ss.k))
+            P_mat = A
+            P = np.identity(kf.ss.n)
+        elif coeff_type == 'var':
+            coeffs.append(G @ K_infinity)
+            P_mat = A - (K_infinity @ G)
+            P = np.copy(P_mat)
+        else:
+            raise ValueError("Unknown coefficient type")
+        for i in range(1, j + 1):
+            coeffs.append((G @ P) @ K_infinity)
+            P = P @ P_mat
+        return coeffs
+
+    @staticmethod
+    def _assert_coeff_lists_equal(actual, expected):
+        assert len(actual) == len(expected)
+        for a, e in zip(actual, expected):
+            assert a.shape == e.shape
+            assert_allclose(a, e, rtol=1e-10, atol=1e-10)
+
+    def test_stationary_coefficients_ma(self):
+        kf = self.kf
+        for method in self.methods:
+            kf.stationary_values(method=method)
+            for j in (0, 1, 3):
+                actual = kf.stationary_coefficients(j, coeff_type='ma')
+                expected = self._expected_stationary_coefficients(kf, j, 'ma')
+                self._assert_coeff_lists_equal(actual, expected)
+
+    def test_stationary_coefficients_var(self):
+        kf = self.kf
+        for method in self.methods:
+            kf.stationary_values(method=method)
+            for j in (0, 1, 3):
+                actual = kf.stationary_coefficients(j, coeff_type='var')
+                expected = self._expected_stationary_coefficients(kf, j, 'var')
+                self._assert_coeff_lists_equal(actual, expected)
+
+    def test_stationary_coefficients_invalid_type(self):
+        kf = self.kf
+        kf.stationary_values()
+        try:
+            kf.stationary_coefficients(1, coeff_type='invalid')
+        except ValueError as e:
+            assert str(e) == "Unknown coefficient type"
+        else:
+            raise AssertionError("Expected ValueError was not raised")
