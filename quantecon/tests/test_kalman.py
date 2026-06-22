@@ -7,6 +7,105 @@ import pytest
 from numpy.testing import assert_allclose
 from quantecon import LinearStateSpace
 from quantecon import Kalman
+from quantecon import solve_discrete_riccati
+
+
+RICCATI_METHODS = ['doubling', 'qz']
+
+
+def _symmetric_kalman():
+    """Simple diagonal 2D model used in the original Kalman tests."""
+    A = np.array([[.95, 0], [0., .95]])
+    C = np.eye(2) * np.sqrt(0.5)
+    G = np.eye(2) * .5
+    H = np.eye(2) * np.sqrt(0.2)
+    return Kalman(LinearStateSpace(A, C, G, H))
+
+
+def _knowing_forecasts_of_others_kalman():
+    """
+    Pooling-equilibrium state space from the QuantEcon lecture
+    "Knowing the Forecasts of Others":
+    https://python-advanced.quantecon.org/knowing_forecasts_of_others.html
+
+    The lecture sets H=None (no observation noise). Kalman.stationary_values
+    requires H, so a negligible diagonal H is added for numerical use only.
+    """
+    beta, rho, b = 0.9, 0.8, 1.5
+    sigma_v, sigma_e = 0.5, 0.6
+
+    poly = np.array([1, -(1 + beta + b) / beta, 1 / beta])
+    roots_poly = np.roots(poly)
+    lambda_tilde, lambda_ = roots_poly.min(), roots_poly.max()
+
+    p = solve_discrete_riccati_scalar(rho, sigma_v, sigma_e)
+    kappa = rho * p / (p + sigma_e ** 2)
+    kappa_prod = kappa * sigma_e ** 2 / p
+
+    A = np.array([
+        [0., 0., 0., 0., 0., 0.],
+        [kappa / (lambda_ - rho), lambda_tilde, -kappa_prod / (lambda_ - rho),
+         0., rho / (lambda_ - rho), 0.],
+        [-kappa, 0., kappa_prod, 0., 0., 1.],
+        [b * kappa / (lambda_ - rho), b * lambda_tilde,
+         -b * kappa_prod / (lambda_ - rho), 0., b * rho / (lambda_ - rho) + rho, 1.],
+        [0., 0., 0., 0., rho, 1.],
+        [0., 0., 0., 0., 0., 0.],
+    ])
+    C = np.array([
+        [sigma_e, 0.],
+        [0., 0.],
+        [0., 0.],
+        [sigma_e, 0.],
+        [0., 0.],
+        [0., sigma_v],
+    ])
+    G = np.array([
+        [0., 0., 0., 1., 0., 0.],
+        [1., 0., 0., 0., 1., 0.],
+        [1., 0., 0., 0., 0., 0.],
+    ])
+    H = np.eye(G.shape[0]) * 1e-8
+
+    return Kalman(LinearStateSpace(A, C, G, H))
+
+
+def solve_discrete_riccati_scalar(rho, sigma_v, sigma_e):
+    """Stationary variance p from the lecture's scalar Riccati equation."""
+    return solve_discrete_riccati(
+        np.array([[rho]]),
+        np.array([[1.]]),
+        np.array([[sigma_v ** 2]]),
+        np.array([[sigma_e ** 2]]),
+        np.zeros((1, 1)),
+    ).item()
+
+
+def _expected_stationary_coefficients(kf, j, coeff_type):
+    """Closed-form reference using matrix powers."""
+    A, G = kf.ss.A, kf.ss.G
+    K = kf.K_infinity
+    if coeff_type == 'ma':
+        coeffs = [np.identity(kf.ss.k)]
+        coeffs.extend(
+            G @ np.linalg.matrix_power(A, i) @ K for i in range(j)
+        )
+    elif coeff_type == 'var':
+        phi = A - K @ G
+        coeffs = [G @ K]
+        coeffs.extend(
+            G @ np.linalg.matrix_power(phi, i) @ K for i in range(1, j + 1)
+        )
+    else:
+        raise ValueError("Unknown coefficient type")
+    return coeffs
+
+
+def _assert_coeff_lists_equal(actual, expected):
+    assert len(actual) == len(expected)
+    for a, e in zip(actual, expected):
+        assert a.shape == e.shape
+        assert_allclose(a, e, rtol=1e-10, atol=1e-10)
 
 
 class TestKalman:
@@ -25,7 +124,7 @@ class TestKalman:
 
         self.kf = Kalman(ss)
 
-        self.methods = ['doubling', 'qz']
+        self.methods = RICCATI_METHODS
 
 
     def teardown_method(self):
@@ -90,40 +189,8 @@ class TestKalman:
 class TestKalmanStationaryCoefficients:
 
     def setup_method(self):
-        self.A = np.array([[.95, 0], [0., .95]])
-        self.C = np.eye(2) * np.sqrt(0.5)
-        self.G = np.eye(2) * .5
-        self.H = np.eye(2) * np.sqrt(0.2)
-        ss = LinearStateSpace(self.A, self.C, self.G, self.H)
-        self.kf = Kalman(ss)
-        self.methods = ['doubling', 'qz']
-
-    @staticmethod
-    def _expected_stationary_coefficients(kf, j, coeff_type):
-        """Closed-form reference using matrix powers."""
-        A, G = kf.ss.A, kf.ss.G
-        K = kf.K_infinity
-        if coeff_type == 'ma':
-            coeffs = [np.identity(kf.ss.k)]
-            coeffs.extend(
-                G @ np.linalg.matrix_power(A, i) @ K for i in range(j)
-            )
-        elif coeff_type == 'var':
-            phi = A - K @ G
-            coeffs = [G @ K]
-            coeffs.extend(
-                G @ np.linalg.matrix_power(phi, i) @ K for i in range(1, j + 1)
-            )
-        else:
-            raise ValueError("Unknown coefficient type")
-        return coeffs
-
-    @staticmethod
-    def _assert_coeff_lists_equal(actual, expected):
-        assert len(actual) == len(expected)
-        for a, e in zip(actual, expected):
-            assert a.shape == e.shape
-            assert_allclose(a, e, rtol=1e-10, atol=1e-10)
+        self.kf = _symmetric_kalman()
+        self.methods = RICCATI_METHODS
 
     def test_stationary_coefficients_ma(self):
         kf = self.kf
@@ -131,8 +198,8 @@ class TestKalmanStationaryCoefficients:
             kf.stationary_values(method=method)
             for j in (0, 1, 3):
                 actual = kf.stationary_coefficients(j, coeff_type='ma')
-                expected = self._expected_stationary_coefficients(kf, j, 'ma')
-                self._assert_coeff_lists_equal(actual, expected)
+                expected = _expected_stationary_coefficients(kf, j, 'ma')
+                _assert_coeff_lists_equal(actual, expected)
 
     def test_stationary_coefficients_var(self):
         kf = self.kf
@@ -140,11 +207,43 @@ class TestKalmanStationaryCoefficients:
             kf.stationary_values(method=method)
             for j in (0, 1, 3):
                 actual = kf.stationary_coefficients(j, coeff_type='var')
-                expected = self._expected_stationary_coefficients(kf, j, 'var')
-                self._assert_coeff_lists_equal(actual, expected)
+                expected = _expected_stationary_coefficients(kf, j, 'var')
+                _assert_coeff_lists_equal(actual, expected)
 
     def test_stationary_coefficients_invalid_type(self):
         kf = self.kf
         kf.stationary_values()
         with pytest.raises(ValueError, match="Unknown coefficient type"):
             kf.stationary_coefficients(1, coeff_type='invalid')
+
+
+class TestKalmanStationaryCoefficientsKnowingForecasts:
+
+    def setup_method(self):
+        self.kf = _knowing_forecasts_of_others_kalman()
+        self.methods = RICCATI_METHODS
+
+    def test_stationary_coefficients_ma(self):
+        kf = self.kf
+        for method in self.methods:
+            kf.stationary_values(method=method)
+            for j in (0, 1, 3):
+                actual = kf.stationary_coefficients(j, coeff_type='ma')
+                expected = _expected_stationary_coefficients(kf, j, 'ma')
+                _assert_coeff_lists_equal(actual, expected)
+
+    def test_stationary_coefficients_var(self):
+        kf = self.kf
+        for method in self.methods:
+            kf.stationary_values(method=method)
+            for j in (0, 1, 3):
+                actual = kf.stationary_coefficients(j, coeff_type='var')
+                expected = _expected_stationary_coefficients(kf, j, 'var')
+                _assert_coeff_lists_equal(actual, expected)
+
+    def test_coefficients_are_not_diagonal(self):
+        """Sanity check: lecture matrices produce non-trivial coefficients."""
+        kf = self.kf
+        kf.stationary_values()
+        psi_1 = kf.stationary_coefficients(1, coeff_type='ma')[1]
+        assert not np.allclose(psi_1, np.diag(np.diag(psi_1)))
