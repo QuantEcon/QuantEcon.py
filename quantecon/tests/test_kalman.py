@@ -7,7 +7,6 @@ import pytest
 from numpy.testing import assert_allclose
 from quantecon import LinearStateSpace
 from quantecon import Kalman
-from quantecon import solve_discrete_riccati
 
 
 RICCATI_METHODS = ['doubling', 'qz']
@@ -38,18 +37,26 @@ def _two_noisy_signals_kalman(rho=0.8, sigma_v=0.5, sigma_e=0.6):
     return Kalman(LinearStateSpace(A, C, G, H))
 
 
+def _lecture_two_signal_posterior_variance(rho, sigma_v, sigma_e):
+    """
+    Solve lecture eq. (37.26) for p.
+
+    The Riccati equation reduces to
+    2 p^2 + p (sigma_e^2 - 2 sigma_v^2 - rho^2 sigma_e^2) - sigma_v^2 sigma_e^2 = 0.
+    """
+    a = 2.0
+    b = sigma_e ** 2 - 2 * sigma_v ** 2 - rho ** 2 * sigma_e ** 2
+    c = -sigma_v ** 2 * sigma_e ** 2
+    discriminant = b ** 2 - 4 * a * c
+    return (-b + np.sqrt(discriminant)) / (2 * a)
+
+
 def _lecture_two_signal_kalman_gain(rho, sigma_v, sigma_e):
     """
     Stationary Kalman gain from lecture eqs. (37.25)-(37.26), independent of
     Kalman.stationary_values.
     """
-    p = solve_discrete_riccati(
-        np.array([[rho]]),
-        np.array([[np.sqrt(2.)]]),
-        np.array([[sigma_v ** 2]]),
-        np.array([[sigma_e ** 2]]),
-        np.zeros((1, 1)),
-    ).item()
+    p = _lecture_two_signal_posterior_variance(rho, sigma_v, sigma_e)
     kappa = rho * p / (2 * p + sigma_e ** 2)
     return np.array([[kappa, kappa]])
 
