@@ -29,7 +29,9 @@ def _knowing_forecasts_of_others_kalman():
     https://python-advanced.quantecon.org/knowing_forecasts_of_others.html
 
     The lecture sets H=None (no observation noise). Kalman.stationary_values
-    requires H, so a negligible diagonal H is added for numerical use only.
+    requires H, so a small diagonal H is added for numerical use only.
+    Use 1e-4 rather than smaller values to avoid singular-matrix errors in
+    scipy.linalg.inv on some platforms (e.g. Python 3.14 on CI).
     """
     beta, rho, b = 0.9, 0.8, 1.5
     sigma_v, sigma_e = 0.5, 0.6
@@ -65,7 +67,7 @@ def _knowing_forecasts_of_others_kalman():
         [1., 0., 0., 0., 1., 0.],
         [1., 0., 0., 0., 0., 0.],
     ])
-    H = np.eye(G.shape[0]) * 1e-8
+    H = np.eye(G.shape[0]) * 1e-4
 
     return Kalman(LinearStateSpace(A, C, G, H))
 
