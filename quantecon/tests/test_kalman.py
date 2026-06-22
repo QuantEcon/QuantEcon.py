@@ -3,6 +3,7 @@ Tests for the kalman.py
 
 """
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
 from quantecon import LinearStateSpace
 from quantecon import Kalman
@@ -99,23 +100,22 @@ class TestKalmanStationaryCoefficients:
 
     @staticmethod
     def _expected_stationary_coefficients(kf, j, coeff_type):
-        """Reference implementation for stationary_coefficients."""
+        """Closed-form reference using matrix powers."""
         A, G = kf.ss.A, kf.ss.G
-        K_infinity = kf.K_infinity
-        coeffs = []
+        K = kf.K_infinity
         if coeff_type == 'ma':
-            coeffs.append(np.identity(kf.ss.k))
-            P_mat = A
-            P = np.identity(kf.ss.n)
+            coeffs = [np.identity(kf.ss.k)]
+            coeffs.extend(
+                G @ np.linalg.matrix_power(A, i) @ K for i in range(j)
+            )
         elif coeff_type == 'var':
-            coeffs.append(G @ K_infinity)
-            P_mat = A - (K_infinity @ G)
-            P = np.copy(P_mat)
+            phi = A - K @ G
+            coeffs = [G @ K]
+            coeffs.extend(
+                G @ np.linalg.matrix_power(phi, i) @ K for i in range(1, j + 1)
+            )
         else:
             raise ValueError("Unknown coefficient type")
-        for i in range(1, j + 1):
-            coeffs.append((G @ P) @ K_infinity)
-            P = P @ P_mat
         return coeffs
 
     @staticmethod
@@ -146,9 +146,5 @@ class TestKalmanStationaryCoefficients:
     def test_stationary_coefficients_invalid_type(self):
         kf = self.kf
         kf.stationary_values()
-        try:
+        with pytest.raises(ValueError, match="Unknown coefficient type"):
             kf.stationary_coefficients(1, coeff_type='invalid')
-        except ValueError as e:
-            assert str(e) == "Unknown coefficient type"
-        else:
-            raise AssertionError("Expected ValueError was not raised")
