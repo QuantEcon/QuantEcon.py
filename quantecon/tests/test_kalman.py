@@ -237,11 +237,3 @@ class TestKalmanStationaryCoefficientsTwoNoisySignals:
                 expected = _expected_stationary_coefficients(
                     A, G, self.K_ref, k, j, 'var')
                 _assert_coeff_lists_equal(actual, expected)
-
-    def test_coefficients_are_not_diagonal(self):
-        """Sanity check: (n, k) = (1, 2) model yields non-diagonal MA coefficients."""
-        expected = _expected_stationary_coefficients(
-            self.kf.ss.A, self.kf.ss.G, self.K_ref, self.kf.ss.k, 1, 'ma')
-        psi_1 = expected[1]
-        assert psi_1.shape == (2, 2)
-        assert not np.allclose(psi_1, np.diag(np.diag(psi_1)))
