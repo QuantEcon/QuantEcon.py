@@ -214,7 +214,10 @@ def test_solve_fixed_trajectory():
     for integrator, numeric_solution in results.items():
         ti = numeric_solution[:, 0]
         analytic_solution = solow_analytic_solution(ti, k0, *valid_params)
-        np.testing.assert_allclose(numeric_solution, analytic_solution)
+        # rtol relaxed from the 1e-7 default to tolerate platform-specific
+        # floating-point differences near steady state (e.g. Windows CI)
+        np.testing.assert_allclose(numeric_solution, analytic_solution,
+                                   rtol=1e-6)
 
 
 def test_solve_variable_trajectory():
@@ -231,7 +234,8 @@ def test_solve_variable_trajectory():
         analytic_solution = solow_analytic_solution(ti, k0, *valid_params)
 
         # test accuracy of solution
-        np.testing.assert_allclose(numeric_solution, analytic_solution)
+        np.testing.assert_allclose(numeric_solution, analytic_solution,
+                                   rtol=1e-6)
 
         # test termination condition
         diff = numeric_solution[-1, 1] - solow_steady_state(*valid_params)
@@ -256,7 +260,10 @@ def test_interpolation():
         interp_solution = model.interpolate(numeric_solution, ti, k=3, ext=2)
 
         analytic_solution = solow_analytic_solution(ti, k0, *valid_params)
-        np.testing.assert_allclose(interp_solution, analytic_solution)
+        # rtol relaxed from the 1e-7 default to tolerate platform-specific
+        # floating-point differences near steady state (e.g. Windows CI)
+        np.testing.assert_allclose(interp_solution, analytic_solution,
+                                   rtol=1e-6)
 
 
 def test_compute_residual():
