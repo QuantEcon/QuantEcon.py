@@ -86,11 +86,11 @@ class TestLQNash:
         f1, f2, p1, p2 = nnash(a, b1, b2, r1, r2, q1, q2, s1, s2, w1, w2, m1,
                                m2)
 
-        aaa = a - b1.dot(f1) - b2.dot(f2)
+        aaa = a - b1 @ f1 - b2 @ f2
         aa = aaa[:2, :2]
         tf = np.eye(2)-aa
         tfi = np.linalg.inv(tf)
-        xbar = tfi.dot(aaa[:2, 2])
+        xbar = tfi @ aaa[:2, 2]
 
         # Define answers from matlab. TODO: this is ghetto
         f1_ml = np.array([
