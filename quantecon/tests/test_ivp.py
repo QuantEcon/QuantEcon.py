@@ -233,7 +233,9 @@ def test_solve_variable_trajectory():
         ti = numeric_solution[:, 0]
         analytic_solution = solow_analytic_solution(ti, k0, *valid_params)
 
-        # test accuracy of solution
+        # test accuracy of solution; rtol relaxed from the 1e-7 default to
+        # tolerate platform-specific floating-point differences near steady
+        # state (e.g. Windows CI)
         np.testing.assert_allclose(numeric_solution, analytic_solution,
                                    rtol=1e-6)
 
