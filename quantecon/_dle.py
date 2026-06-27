@@ -211,13 +211,17 @@ class DLE(object):
         self.R1_Price = np.empty((ts_length + 1, 1))
         self.R2_Price = np.empty((ts_length + 1, 1))
         self.R5_Price = np.empty((ts_length + 1, 1))
+        # Each price expression evaluates to a size-1 array (``self.beta`` is a
+        # (1, 1) array and ``e1`` is a row vector). Extract the scalar with
+        # ``.item()`` before assigning: NumPy >= 2.4 raises instead of silently
+        # converting an ``ndim > 0`` array to a scalar on assignment. See #839.
         for i in range(ts_length + 1):
-            self.R1_Price[i, 0] = self.beta * e1 @ self.Mc @ np.linalg.matrix_power(
-                self.A0, 1) @ xp[:, i] / (e1 @ self.Mc @ xp[:, i])
-            self.R2_Price[i, 0] = self.beta**2 * (e1 @ self.Mc @
-                np.linalg.matrix_power(self.A0, 2) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])
-            self.R5_Price[i, 0] = self.beta**5 * (e1 @ self.Mc @
-                np.linalg.matrix_power(self.A0, 5) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])
+            self.R1_Price[i, 0] = (self.beta * e1 @ self.Mc @ np.linalg.matrix_power(
+                self.A0, 1) @ xp[:, i] / (e1 @ self.Mc @ xp[:, i])).item()
+            self.R2_Price[i, 0] = (self.beta**2 * (e1 @ self.Mc @
+                np.linalg.matrix_power(self.A0, 2) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])).item()
+            self.R5_Price[i, 0] = (self.beta**5 * (e1 @ self.Mc @
+                np.linalg.matrix_power(self.A0, 5) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])).item()
 
         # === Gross rates of return on 1-period risk-free bonds === #
         self.R1_Gross = 1 / self.R1_Price
@@ -239,12 +243,14 @@ class DLE(object):
             self.Pay_Price = np.empty((ts_length + 1, 1))
             self.Pay_Gross = np.empty((ts_length + 1, 1))
             self.Pay_Gross[0, 0] = np.nan
+            # As above, coerce each size-1 result to a scalar with ``.item()``
+            # so assignment works under NumPy >= 2.4. See #839.
             for i in range(ts_length + 1):
-                self.Pay_Price[i, 0] = (xp[:, i].T @ self.Q @
-                    xp[:, i] + self.q) / (e1 @ self.Mc @ xp[:, i])
+                self.Pay_Price[i, 0] = ((xp[:, i].T @ self.Q @
+                    xp[:, i] + self.q) / (e1 @ self.Mc @ xp[:, i])).item()
             for i in range(ts_length):
-                self.Pay_Gross[i + 1, 0] = self.Pay_Price[i + 1,
-                                                          0] / (self.Pay_Price[i, 0] - Pay @ xp[:, i])
+                self.Pay_Gross[i + 1, 0] = (self.Pay_Price[i + 1,
+                    0] / (self.Pay_Price[i, 0] - Pay @ xp[:, i])).item()
         return
 
     def irf(self, ts_length=100, shock=None):
