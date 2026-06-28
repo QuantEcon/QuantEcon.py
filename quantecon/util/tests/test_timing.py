@@ -4,9 +4,48 @@ Tests for timing.py
 """
 
 import time
-from numpy.testing import assert_allclose, assert_
+from numpy.testing import assert_
 from quantecon.util import tic, tac, toc, loop_timer, Timer, timeit
 import quantecon as qe
+
+
+# ``time.sleep(t)`` only guarantees the process is suspended for *at least*
+# ``t`` seconds -- a busy or descheduled CI runner can make the measured time
+# arbitrarily larger. The timing tests below therefore assert only a lower
+# bound (that the timing utilities do not under-report the elapsed time) rather
+# than an upper bound on wall-clock duration, which is inherently flaky on
+# shared CI runners. See the discussion in GH #845.
+TIMING_LOWER_BOUND = 0.9
+
+
+def assert_at_least(measured, expected):
+    """Assert ``measured`` seconds is not meaningfully below ``expected``."""
+    lower_bound = expected * TIMING_LOWER_BOUND
+    assert measured >= lower_bound, (
+        f"measured {measured:.4f}s is below the lower bound {lower_bound:.4f}s "
+        f"({TIMING_LOWER_BOUND:g} * expected {expected:.4f}s)")
+
+
+# Above this multiple of the expected sleep, a measurement can only be a unit
+# bug (``elapsed`` stored in ms/µs is ~1000x/1e6x larger), not scheduler
+# overshoot (a few x at most), so the ceiling separates the two without flaking.
+TIMING_UNIT_CEILING = 100
+
+
+def assert_in_seconds(measured, expected):
+    """Assert ``measured`` is in seconds (~``expected``), not a larger unit.
+
+    Lower bound: the timer did not under-report. Upper bound: a ceiling no real
+    ``expected``-second sleep can reach, but which a unit leak into
+    ``Timer.elapsed`` (ms/µs) always trips -- the invariant the unit tests
+    guard.
+    """
+    lower_bound = expected * TIMING_LOWER_BOUND
+    upper_bound = expected * TIMING_UNIT_CEILING
+    assert lower_bound <= measured < upper_bound, (
+        f"measured {measured:.4f}s is outside the seconds range "
+        f"[{lower_bound:.4f}, {upper_bound:.4f}) around expected {expected:.4f}s "
+        f"(did the display unit leak into elapsed?)")
 
 
 class TestTicTacToc:
@@ -27,12 +66,9 @@ class TestTicTacToc:
         time.sleep(self.h)
         tm3 = toc()
 
-        rtol = 2
-        atol = 0.05
-
         for actual, desired in zip([tm1, tm2, tm3],
                                    [self.h, self.h, self.h*3]):
-            assert_allclose(actual, desired, atol=atol, rtol=rtol)
+            assert_at_least(actual, desired)
 
     def test_loop(self):
 
@@ -47,13 +83,10 @@ class TestTicTacToc:
         test_two_arg = \
             loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
 
-        rtol = 2
-        atol = 0.05
-
         for tm in test_one_arg:
-            assert_allclose(tm, self.h, atol=atol, rtol=rtol)
+            assert_at_least(tm, self.h)
         for tm in test_two_arg:
-            assert_allclose(tm, self.h, atol=atol, rtol=rtol)
+            assert_at_least(tm, self.h)
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
             assert_(average_time >= average_of_best)
@@ -72,7 +105,7 @@ class TestTimer:
             
         # Check that elapsed time was recorded
         assert timer.elapsed is not None
-        assert_allclose(timer.elapsed, self.sleep_time, atol=0.05, rtol=2)
+        assert_at_least(timer.elapsed, self.sleep_time)
         
     def test_timer_return_value(self):
         """Test that Timer returns self for variable assignment."""
@@ -80,7 +113,7 @@ class TestTimer:
             time.sleep(self.sleep_time)
             
         assert timer.elapsed is not None
-        assert_allclose(timer.elapsed, self.sleep_time, atol=0.05, rtol=2)
+        assert_at_least(timer.elapsed, self.sleep_time)
         
     def test_timer_units(self):
         """Test different time units."""
@@ -88,16 +121,16 @@ class TestTimer:
         with Timer(verbose=False) as timer_sec:
             time.sleep(self.sleep_time)
         expected_sec = self.sleep_time
-        assert_allclose(timer_sec.elapsed, expected_sec, atol=0.05, rtol=2)
+        assert_in_seconds(timer_sec.elapsed, expected_sec)
         
         # Timer always stores elapsed time in seconds regardless of display unit
         with Timer(unit="milliseconds", verbose=False) as timer_ms:
             time.sleep(self.sleep_time)
-        assert_allclose(timer_ms.elapsed, expected_sec, atol=0.05, rtol=2)
+        assert_in_seconds(timer_ms.elapsed, expected_sec)
         
         with Timer(unit="microseconds", verbose=False) as timer_us:
             time.sleep(self.sleep_time)
-        assert_allclose(timer_us.elapsed, expected_sec, atol=0.05, rtol=2)
+        assert_in_seconds(timer_us.elapsed, expected_sec)
         
     def test_invalid_unit(self):
         """Test that invalid units raise ValueError."""
@@ -147,7 +180,7 @@ class TestTimer:
             
         # Timer should still record elapsed time
         assert timer.elapsed is not None
-        assert_allclose(timer.elapsed, self.sleep_time, atol=0.05, rtol=2)
+        assert_at_least(timer.elapsed, self.sleep_time)
 
     def test_timeit_basic(self):
         """Test basic timeit functionality."""
@@ -166,9 +199,9 @@ class TestTimer:
         
         # Check timing accuracy
         for run_time in result['elapsed']:
-            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+            assert_at_least(run_time, self.sleep_time)
             
-        assert_allclose(result['average'], self.sleep_time, atol=0.05, rtol=2)
+        assert_at_least(result['average'], self.sleep_time)
         assert result['minimum'] <= result['average'] <= result['maximum']
 
     def test_timeit_lambda_function(self):
@@ -183,7 +216,7 @@ class TestTimer:
         # Check results
         assert len(result['elapsed']) == 2
         for run_time in result['elapsed']:
-            assert_allclose(run_time, self.sleep_time * 0.5, atol=0.05, rtol=2)
+            assert_at_least(run_time, self.sleep_time * 0.5)
 
     def test_timeit_validation(self):
         """Test validation for timeit function."""
@@ -237,9 +270,9 @@ class TestTimer:
         
         # All results should be in seconds regardless of display unit
         for run_time in result_ms['elapsed']:
-            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+            assert_in_seconds(run_time, self.sleep_time)
         for run_time in result_us['elapsed']:
-            assert_allclose(run_time, self.sleep_time, atol=0.05, rtol=2)
+            assert_in_seconds(run_time, self.sleep_time)
 
     def test_timeit_stats_only(self):
         """Test timeit with stats_only option."""
