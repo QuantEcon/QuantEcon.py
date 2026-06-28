@@ -15,6 +15,9 @@ jobs:
   tests:
     runs-on: ${{ matrix.os }}
     strategy:
+      # Don't let one job's failure (e.g. a flaky timing test or a transient
+      # coverage-upload error) cancel the rest of the matrix.
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         python-version: [3.12, 3.13, 3.14]
@@ -55,7 +58,13 @@ jobs:
         coverage lcov
     - name: Coveralls
       uses: coverallsapp/github-action@master
-      if: runner.os == 'Linux'
+      # Upload coverage from a single Linux job only. When several jobs report
+      # to the same Coveralls build without parallel coordination, whichever
+      # job finishes after the build is closed gets a 422 ("Build is already
+      # closed") and fails. ``continue-on-error`` additionally keeps a Coveralls
+      # outage from blocking a merge.
+      if: runner.os == 'Linux' && matrix.python-version == '3.13'
+      continue-on-error: true
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: coverage.lcov
