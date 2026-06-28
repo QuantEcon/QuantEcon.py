@@ -20,8 +20,10 @@ TIMING_LOWER_BOUND = 0.9
 
 def assert_at_least(measured, expected):
     """Assert ``measured`` seconds is not meaningfully below ``expected``."""
-    assert measured >= expected * TIMING_LOWER_BOUND, (
-        f"measured {measured}s is well below the expected ~{expected}s sleep")
+    lower_bound = expected * TIMING_LOWER_BOUND
+    assert measured >= lower_bound, (
+        f"measured {measured:.4f}s is below the lower bound {lower_bound:.4f}s "
+        f"({TIMING_LOWER_BOUND:g} * expected {expected:.4f}s)")
 
 
 class TestTicTacToc:
