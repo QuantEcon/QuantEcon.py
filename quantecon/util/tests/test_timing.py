@@ -26,6 +26,28 @@ def assert_at_least(measured, expected):
         f"({TIMING_LOWER_BOUND:g} * expected {expected:.4f}s)")
 
 
+# Above this multiple of the expected sleep, a measurement can only be a unit
+# bug (``elapsed`` stored in ms/µs is ~1000x/1e6x larger), not scheduler
+# overshoot (a few x at most), so the ceiling separates the two without flaking.
+TIMING_UNIT_CEILING = 100
+
+
+def assert_in_seconds(measured, expected):
+    """Assert ``measured`` is in seconds (~``expected``), not a larger unit.
+
+    Lower bound: the timer did not under-report. Upper bound: a ceiling no real
+    ``expected``-second sleep can reach, but which a unit leak into
+    ``Timer.elapsed`` (ms/µs) always trips -- the invariant the unit tests
+    guard.
+    """
+    lower_bound = expected * TIMING_LOWER_BOUND
+    upper_bound = expected * TIMING_UNIT_CEILING
+    assert lower_bound <= measured < upper_bound, (
+        f"measured {measured:.4f}s is outside the seconds range "
+        f"[{lower_bound:.4f}, {upper_bound:.4f}) around expected {expected:.4f}s "
+        f"(did the display unit leak into elapsed?)")
+
+
 class TestTicTacToc:
     def setup_method(self):
         self.h = 0.1
@@ -99,16 +121,16 @@ class TestTimer:
         with Timer(verbose=False) as timer_sec:
             time.sleep(self.sleep_time)
         expected_sec = self.sleep_time
-        assert_at_least(timer_sec.elapsed, expected_sec)
+        assert_in_seconds(timer_sec.elapsed, expected_sec)
         
         # Timer always stores elapsed time in seconds regardless of display unit
         with Timer(unit="milliseconds", verbose=False) as timer_ms:
             time.sleep(self.sleep_time)
-        assert_at_least(timer_ms.elapsed, expected_sec)
+        assert_in_seconds(timer_ms.elapsed, expected_sec)
         
         with Timer(unit="microseconds", verbose=False) as timer_us:
             time.sleep(self.sleep_time)
-        assert_at_least(timer_us.elapsed, expected_sec)
+        assert_in_seconds(timer_us.elapsed, expected_sec)
         
     def test_invalid_unit(self):
         """Test that invalid units raise ValueError."""
@@ -248,9 +270,9 @@ class TestTimer:
         
         # All results should be in seconds regardless of display unit
         for run_time in result_ms['elapsed']:
-            assert_at_least(run_time, self.sleep_time)
+            assert_in_seconds(run_time, self.sleep_time)
         for run_time in result_us['elapsed']:
-            assert_at_least(run_time, self.sleep_time)
+            assert_in_seconds(run_time, self.sleep_time)
 
     def test_timeit_stats_only(self):
         """Test timeit with stats_only option."""
