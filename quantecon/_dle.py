@@ -218,15 +218,19 @@ class DLE(object):
         A0_2 = np.linalg.matrix_power(self.A0, 2)
         A0_5 = np.linalg.matrix_power(self.A0, 5)
         # Each price expression evaluates to a size-1 array (``self.beta`` is a
-        # (1, 1) array and ``eMc`` is a row vector). Extract the scalar with
-        # ``.item()`` before assigning: NumPy >= 2.4 raises instead of silently
-        # converting an ``ndim > 0`` array to a scalar on assignment. See #839.
+        # (1, 1) array and ``eMc`` is a row vector). Coerce the size-1 result to
+        # a scalar with ``.item()`` *after* dividing, so assignment works under
+        # NumPy >= 2.4 (which raises instead of silently converting an
+        # ``ndim > 0`` array to a scalar on assignment). Keeping the division
+        # inside NumPy preserves the pre-2.4 behaviour when ``denom == 0`` (an
+        # ``inf``/``nan`` with a warning, rather than a ``ZeroDivisionError``).
+        # See #839.
         for i in range(ts_length + 1):
             xi = xp[:, i]
-            denom = (eMc @ xi).item()
-            self.R1_Price[i, 0] = (self.beta * eMc @ A0_1 @ xi).item() / denom
-            self.R2_Price[i, 0] = (self.beta**2 * (eMc @ A0_2 @ xi)).item() / denom
-            self.R5_Price[i, 0] = (self.beta**5 * (eMc @ A0_5 @ xi)).item() / denom
+            denom = eMc @ xi
+            self.R1_Price[i, 0] = (self.beta * eMc @ A0_1 @ xi / denom).item()
+            self.R2_Price[i, 0] = (self.beta**2 * (eMc @ A0_2 @ xi) / denom).item()
+            self.R5_Price[i, 0] = (self.beta**5 * (eMc @ A0_5 @ xi) / denom).item()
 
         # === Gross rates of return on 1-period risk-free bonds === #
         self.R1_Gross = 1 / self.R1_Price
