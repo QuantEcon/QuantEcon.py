@@ -15,14 +15,11 @@ jobs:
   tests:
     runs-on: ${{ matrix.os }}
     strategy:
-      # Don't let one job's failure (e.g. a flaky timing test or a transient
-      # coverage-upload error) cancel the rest of the matrix.
+      # one failing job shouldn't cancel the rest of the matrix
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        # Quote the versions so they are unambiguously strings: bare YAML
-        # numbers are brittle (e.g. 3.10 would parse as 3.1) and make the
-        # ``matrix.python-version == '3.13'`` gate below unreliable.
+        # quoted as strings (bare 3.10 would parse as float 3.1)
         python-version: ["3.12", "3.13", "3.14"]
     steps:
     - uses: actions/checkout@v7
@@ -60,14 +57,9 @@ jobs:
         coverage run -m pytest quantecon
         coverage lcov
     - name: Coveralls
-      # Pin to a major release tag (matching the other actions in this file)
-      # rather than @master, for reproducibility and supply-chain safety.
       uses: coverallsapp/github-action@v2
-      # Upload coverage from a single Linux job only. When several jobs report
-      # to the same Coveralls build without parallel coordination, whichever
-      # job finishes after the build is closed gets a 422 ("Build is already
-      # closed") and fails. ``continue-on-error`` additionally keeps a Coveralls
-      # outage from blocking a merge.
+      # upload from one Linux job only (avoids the Coveralls parallel-build 422
+      # race); continue-on-error so an upload hiccup can't fail CI
       if: runner.os == 'Linux' && matrix.python-version == '3.13'
       continue-on-error: true
       with:
