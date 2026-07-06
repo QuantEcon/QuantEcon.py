@@ -189,7 +189,10 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
         u_old = np.copy(u)
         _update_u(u, W_new[:n_new_pt])
 
-        # check convergence
+        # check convergence; u is updated only by assignment from payoff
+        # values in _update_u, so exact comparison is appropriate, and
+        # stopping while u is still moving by sub-tol amounts can leave
+        # near-duplicate vertices in the hull
         if n_new_pt == n_old_pt and np.array_equal(u, u_old):
             if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
                 break
