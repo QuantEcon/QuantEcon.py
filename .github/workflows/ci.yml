@@ -64,7 +64,9 @@ jobs:
       continue-on-error: true
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: coverage.lcov
+        # `file` (not the deprecated `path-to-lcov`) is the v2 input
+        file: coverage.lcov
+        format: lcov
 
   publish:
 
