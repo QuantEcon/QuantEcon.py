@@ -26,19 +26,20 @@ def assert_at_least(measured, expected):
         f"({TIMING_LOWER_BOUND:g} * expected {expected:.4f}s)")
 
 
-# Above this multiple of the expected sleep, a measurement can only be a unit
-# bug (``elapsed`` stored in ms/µs is ~1000x/1e6x larger), not scheduler
-# overshoot (a few x at most), so the ceiling separates the two without flaking.
+# A measurement above this multiple of the expected sleep is far more likely a
+# unit bug (``elapsed`` stored in ms/µs is ~1000x/1e6x larger) than scheduler
+# overshoot, which is unbounded in theory but a few x at most under normal CI
+# scheduling. The ceiling separates the two with negligible flake risk.
 TIMING_UNIT_CEILING = 100
 
 
 def assert_in_seconds(measured, expected):
     """Assert ``measured`` is in seconds (~``expected``), not a larger unit.
 
-    Lower bound: the timer did not under-report. Upper bound: a ceiling no real
-    ``expected``-second sleep can reach, but which a unit leak into
-    ``Timer.elapsed`` (ms/µs) always trips -- the invariant the unit tests
-    guard.
+    Lower bound: the timer did not under-report. Upper bound: a ceiling not
+    expected to be reached by an ``expected``-second sleep under normal CI
+    scheduling, but which a unit leak into ``Timer.elapsed`` (ms/µs) always
+    trips -- the invariant the unit tests guard.
     """
     lower_bound = expected * TIMING_LOWER_BOUND
     upper_bound = expected * TIMING_UNIT_CEILING
