@@ -136,18 +136,22 @@ def _vertex_enumeration_gen(labelings_bits_tup, equations_tup, trans_recips):
     m, n = equations_tup[0].shape[1] - 1, equations_tup[1].shape[1] - 1
     num_vertices0, num_vertices1 = \
         equations_tup[0].shape[0], equations_tup[1].shape[0]
-    ZERO_LABELING0_BITS = (np.uint64(1) << np.uint64(m)) - np.uint64(1)
     COMPLETE_LABELING_BITS = (np.uint64(1) << np.uint64(m+n)) - np.uint64(1)
+    ZERO_LABELING1_BITS = \
+        ((np.uint64(1) << np.uint64(n)) - np.uint64(1)) << np.uint64(m)
 
     labelings_bits_dict1 = Dict.empty(key_type=types.uint64,
                                       value_type=types.intp)
     for j in range(num_vertices1):
         labelings_bits_dict1[labelings_bits_tup[1][j]] = j
 
+    try:
+        del labelings_bits_dict1[ZERO_LABELING1_BITS]
+    except Exception:
+        pass
+
     for i in range(num_vertices0):
         bits0 = labelings_bits_tup[0][i]
-        if bits0 == ZERO_LABELING0_BITS:
-            continue
         complement0 = bits0 ^ COMPLETE_LABELING_BITS
         try:
             j = labelings_bits_dict1[complement0]

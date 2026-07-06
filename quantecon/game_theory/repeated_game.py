@@ -60,7 +60,9 @@ class RepeatedGame:
                 max_iter : scalar(int)
                     Maximum number of iterations.
                 u_init : ndarray(float, ndim=1)
-                    The initial guess of threat points.
+                    The initial guess of threat points. By default, the
+                    minimum payoff of each player is used. A supplied
+                    guess is clipped from below by the minimum payoffs.
         
         Returns
         -------
@@ -88,7 +90,7 @@ class RepeatedGame:
 
 
 def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
-                                        u_init=np.zeros(2)):
+                                        u_init=None):
     """
     Using 'abreu_sannikov' algorithm to compute the set of payoff pairs
     of all pure-strategy subgame-perfect equilibria with public randomization
@@ -106,8 +108,11 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
     max_iter : scalar(int), optional(default=500)
         Maximum number of iterations.
 
-    u_init : ndarray(float, ndim=1), optional(default=np.zeros(2))
-        The initial guess of threat points.
+    u_init : ndarray(float, ndim=1), optional
+        The initial guess of threat points. It must not exceed the
+        threat points of the equilibrium payoff set. By default, the
+        minimum payoff of each player is used. A supplied guess is
+        clipped from below by the minimum payoffs.
 
     Returns
     -------
@@ -142,8 +147,14 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
     # count the new points generated in each iteration
     n_new_pt = 0
 
-    # copy the threat points
-    u = np.copy(u_init)
+    # initial threat points: the minimum payoffs by default; a supplied
+    # guess is clipped from below by the minimum payoffs
+    payoff_mins = np.array([sg.payoff_arrays[0].min(),
+                            sg.payoff_arrays[1].min()], dtype=float)
+    if u_init is None:
+        u = payoff_mins
+    else:
+        u = np.maximum(np.asarray(u_init, dtype=float), payoff_mins)
 
     # initialization
     payoff_pts = \
@@ -163,17 +174,28 @@ def _equilibrium_payoffs_abreu_sannikov(rpg, tol=1e-12, max_iter=500,
                hull.equations, u, IC, action_profile_payoff,
                extended_payoff, new_pts, W_new)
 
+        if n_new_pt == 0:
+            msg = ("no incentive-compatible payoff vector found; the game "
+                   "may have no pure-action subgame perfect equilibrium "
+                   "for this value of delta")
+            raise ValueError(msg)
+
         n_iter += 1
         if n_iter >= max_iter:
             break
 
-        # check convergence
-        if n_new_pt == n_old_pt:
+        # update threat points; done before the convergence check, since
+        # the set has not converged while the threat points are moving
+        u_old = np.copy(u)
+        _update_u(u, W_new[:n_new_pt])
+
+        # check convergence; u is updated only by assignment from payoff
+        # values in _update_u, so exact comparison is appropriate, and
+        # stopping while u is still moving by sub-tol amounts can leave
+        # near-duplicate vertices in the hull
+        if n_new_pt == n_old_pt and np.array_equal(u, u_old):
             if np.linalg.norm(W_new[:n_new_pt] - W_old[:n_new_pt]) < tol:
                 break
-
-        # update threat points
-        _update_u(u, W_new[:n_new_pt])
 
     hull = ConvexHull(W_new[:n_new_pt])
 

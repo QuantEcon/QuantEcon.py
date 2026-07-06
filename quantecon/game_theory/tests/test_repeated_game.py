@@ -3,6 +3,7 @@ Tests for repeated_game.py
 
 """
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
 from quantecon.game_theory import NormalFormGame, RepeatedGame
 
@@ -47,3 +48,25 @@ class TestAS():
                 hull = rpg.equilibrium_payoffs(method=method,
                                                options={'u_init': d['u']})
                 assert_allclose(hull.points[hull.vertices], d['vertices'])
+
+    def test_abreu_sannikov_default_u_init(self):
+        for d in self.game_dicts:
+            rpg = RepeatedGame(d['sg'], d['delta'])
+            hull = rpg.equilibrium_payoffs()
+            assert_allclose(hull.points[hull.vertices], d['vertices'])
+
+    def test_abreu_sannikov_low_u_init(self):
+        # A u_init below the threat points must not stop the iteration
+        # before the first threat point update
+        for d in self.game_dicts:
+            rpg = RepeatedGame(d['sg'], d['delta'])
+            hull = rpg.equilibrium_payoffs(options={'u_init': np.zeros(2)})
+            assert_allclose(hull.points[hull.vertices], d['vertices'])
+
+    def test_abreu_sannikov_no_pure_action_spe(self):
+        # Game with no pure-action subgame perfect equilibrium at low delta
+        bimatrix = [[(1, -1), (-1, 2)],
+                    [(-2, 2), (1, 0)]]
+        rpg = RepeatedGame(NormalFormGame(bimatrix), 0.05)
+        with pytest.raises(ValueError):
+            rpg.equilibrium_payoffs()
