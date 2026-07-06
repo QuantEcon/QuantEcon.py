@@ -15,9 +15,12 @@ jobs:
   tests:
     runs-on: ${{ matrix.os }}
     strategy:
+      # one failing job shouldn't cancel the rest of the matrix
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: [3.12, 3.13, 3.14]
+        # quoted as strings (bare 3.10 would parse as float 3.1)
+        python-version: ["3.12", "3.13", "3.14"]
     steps:
     - uses: actions/checkout@v7
       with:
@@ -54,11 +57,16 @@ jobs:
         coverage run -m pytest quantecon
         coverage lcov
     - name: Coveralls
-      uses: coverallsapp/github-action@master
-      if: runner.os == 'Linux'
+      uses: coverallsapp/github-action@v2
+      # upload from one Linux job only (avoids the Coveralls parallel-build 422
+      # race); continue-on-error so an upload hiccup can't fail CI
+      if: runner.os == 'Linux' && matrix.python-version == '3.13'
+      continue-on-error: true
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: coverage.lcov
+        # `file` (not the deprecated `path-to-lcov`) is the v2 input
+        file: coverage.lcov
+        format: lcov
 
   publish:
 
