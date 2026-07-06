@@ -179,9 +179,9 @@ class TestDiscreteVar:
             [0.00000000e+00, 4.70588235e-01, 3.08823529e-01, 0.00000000e+00, 
             1.76470588e-01, 4.41176471e-02]]
 
-        self.A, self.C, self.S_out, self.P_out, self.S_out_orderF,\
+        self.A, self.C, self.S_out, self.P_out, self.S_out_orderF, \
         self.P_out_orderF, self.P_out_non_square \
-            = map(np.array,(self.A, self.C, self.S_out, self.P_out, 
+            = map(np.array, (self.A, self.C, self.S_out, self.P_out,
                                 self.S_out_orderF, self.P_out_orderF, 
                                 self.P_out_non_square))
 

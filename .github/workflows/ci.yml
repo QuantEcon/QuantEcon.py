@@ -50,7 +50,7 @@ jobs:
     - name: flake8 Tests
       shell: bash -l {0}
       run: |
-        flake8 --select F401, F405, E231 quantecon
+        flake8 --select=F401,F405,E231 quantecon
     - name: Run Tests (pytest)
       shell: bash -l {0}
       run: |
