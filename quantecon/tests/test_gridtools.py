@@ -173,7 +173,7 @@ class TestCartesianNearestIndex:
         self.nodes = [list(range(nums[0])), np.linspace(0, 1, nums[1])]
         self.orders = ['C', 'F']
         self.prod_dict = \
-            {order:cartesian(self.nodes, order=order) for order in self.orders}
+            {order: cartesian(self.nodes, order=order) for order in self.orders}
 
     def linear_search(self, x, order='C'):
         x = np.asarray(x)

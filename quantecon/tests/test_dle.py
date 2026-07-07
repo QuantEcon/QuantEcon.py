@@ -109,3 +109,39 @@ class TestDLE:
         for item in solutions.keys():
             assert_allclose(self.dle.__dict__[
                             item], solutions[item], atol=ATOL)
+
+    def test_compute_sequence(self):
+        # Regression test for GH #839: the asset-price terms evaluate to
+        # size-1 arrays, and assigning them into the scalar price slots used to
+        # rely on NumPy implicitly converting an ``ndim > 0`` array to a scalar.
+        # NumPy >= 2.4 raises instead, so ``compute_sequence`` must coerce the
+        # values with ``.item()``.
+        x0 = np.array([[5], [150], [1], [0], [0]])
+        ts_length = 10
+        self.dle.compute_sequence(x0, ts_length=ts_length)
+
+        for name in ('R1_Price', 'R2_Price', 'R5_Price'):
+            price = self.dle.__dict__[name]
+            assert price.shape == (ts_length + 1, 1)
+            assert np.all(np.isfinite(price))
+
+        beta = 1 / 1.05
+        # At t=0 the J-period risk-free prices reduce to the closed form beta**J
+        assert_allclose(self.dle.R1_Price[0, 0], beta, atol=ATOL)
+        assert_allclose(self.dle.R2_Price[0, 0], beta ** 2, atol=ATOL)
+        assert_allclose(self.dle.R5_Price[0, 0], beta ** 5, atol=ATOL)
+
+    def test_compute_sequence_with_pay(self):
+        # The ``Pay`` branch of compute_sequence has the same size-1 assignment
+        # pattern as the risk-free price terms (GH #839); make sure it runs and
+        # populates the Pay_Price / Pay_Gross paths with finite values.
+        x0 = np.array([[5], [150], [1], [0], [0]])
+        ts_length = 10
+        Pay = np.array([[1., 0., 0., 0., 0.]])
+        self.dle.compute_sequence(x0, ts_length=ts_length, Pay=Pay)
+
+        assert self.dle.Pay_Price.shape == (ts_length + 1, 1)
+        assert self.dle.Pay_Gross.shape == (ts_length + 1, 1)
+        assert np.all(np.isfinite(self.dle.Pay_Price))
+        # Pay_Gross[0, 0] is intentionally set to nan; the rest must be finite
+        assert np.all(np.isfinite(self.dle.Pay_Gross[1:]))
