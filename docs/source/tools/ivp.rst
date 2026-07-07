@@ -1,7 +1,7 @@
 ivp
 ===
 
-.. automodule:: quantecon.ivp
+.. automodule:: quantecon._ivp
     :members:
     :undoc-members:
     :show-inheritance:
