@@ -355,7 +355,9 @@ class DiscreteDP:
             # the sorted path below
             if (self.s_indices < 0).any() or \
                     (self.s_indices >= self.num_states).any():
-                raise ValueError('s_indices must be in [0, num_states)')
+                raise ValueError(
+                    f's_indices must be in [0, {self.num_states})'
+                )
             if (self.a_indices < 0).any():
                 raise ValueError('a_indices must be nonnegative')
 
