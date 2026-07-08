@@ -1,7 +1,10 @@
 matrix_eqn
 ==========
 
-.. automodule:: quantecon._matrix_eqn
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: quantecon
+
+.. autofunction:: solve_discrete_lyapunov
+
+.. autofunction:: solve_discrete_riccati
+
+.. autofunction:: solve_discrete_riccati_system

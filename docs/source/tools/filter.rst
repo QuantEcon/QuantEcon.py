@@ -1,7 +1,6 @@
 filter
 ======
 
-.. automodule:: quantecon._filter
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: quantecon
+
+.. autofunction:: hamilton_filter

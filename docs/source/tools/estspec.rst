@@ -1,7 +1,10 @@
 estspec
 =======
 
-.. automodule:: quantecon._estspec
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: quantecon
+
+.. autofunction:: smooth
+
+.. autofunction:: periodogram
+
+.. autofunction:: ar_periodogram

@@ -1,7 +1,6 @@
 compute_fp
 ==========
 
-.. automodule:: quantecon._compute_fp
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: quantecon
+
+.. autofunction:: compute_fixed_point
