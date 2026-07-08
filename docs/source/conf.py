@@ -14,31 +14,7 @@
 
 import sys
 import os
-import pip
 from datetime import datetime
-
-try:
-    from mock import Mock as MagicMock
-except ImportError:
-    def install(package):
-        pip.main(['install', package])
-
-    install('mock')
-    from mock import Mock as MagicMock
-
-# ------------------------------------------------------------------- #
-# MOCK MODULES
-# ------------------------------------------------------------------- #
-# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-# if on_rtd:
-#     class Mock(MagicMock):
-#         @classmethod
-#         def __getattr__(cls, name):
-#             return Mock()
-
-#     MOCK_MODULES = ['pandas', 'statsmodels', 'numba']
-#     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -60,7 +36,7 @@ sys.path.extend([
 ## numpydoc settings
 
 numpydoc_class_members_toctree = False
-numydoc_show_class_members= True
+numpydoc_show_class_members = True
 
 # -- General configuration ------------------------------------------------
 
@@ -317,4 +293,4 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}

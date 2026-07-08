@@ -1,7 +1,12 @@
 inequality
 ==========
 
-.. automodule:: quantecon.inequality
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: quantecon
+
+.. autofunction:: lorenz_curve
+
+.. autofunction:: gini_coefficient
+
+.. autofunction:: shorrocks_index
+
+.. autofunction:: rank_size
