@@ -427,6 +427,17 @@ class DiscreteDP:
             self.s_indices, self.a_indices = None, None
             self.num_sa_pairs = (self.R > -np.inf).sum()
 
+            # 2-dimensional view of Q, of shape (n*m, n), so that Q @ v in
+            # bellman_operator is computed with a single gemv call instead
+            # of a batched matmul over n stacked matrices (a view is only
+            # possible when Q is C-contiguous; otherwise fall back)
+            if self.Q.flags.c_contiguous:
+                self._Q_2d = self.Q.reshape(n*m, n)
+            else:
+                self._Q_2d = None
+
+            self._s_arange = np.arange(n)  # cached for indexing by state
+
             # Define state-wise maximization
             def s_wise_max(vals, out=None, out_argmax=None):
                 """
@@ -443,7 +454,7 @@ class DiscreteDP:
                     vals.max(axis=1, out=out)
                 else:
                     vals.argmax(axis=1, out=out_argmax)
-                    out[:] = vals[np.arange(self.num_states), out_argmax]
+                    out[:] = vals[self._s_arange, out_argmax]
                 return out
 
             self.s_wise_max = s_wise_max
@@ -585,8 +596,8 @@ class DiscreteDP:
                           out=sigma_indices)
             R_sigma, Q_sigma = self.R[sigma_indices], self.Q[sigma_indices]
         else:
-            R_sigma = self.R[np.arange(self.num_states), sigma]
-            Q_sigma = self.Q[np.arange(self.num_states), sigma]
+            R_sigma = self.R[self._s_arange, sigma]
+            Q_sigma = self.Q[self._s_arange, sigma]
 
         return R_sigma, Q_sigma
 
@@ -613,7 +624,13 @@ class DiscreteDP:
             Updated value function vector, of length n.
 
         """
-        vals = self.R + self.beta * (self.Q @ v)  # Shape: (L,) or (n, m)
+        if self._sa_pair or self._Q_2d is None:
+            Qv = self.Q @ v
+        else:
+            # a single gemv over the 2-d view of Q, instead of a batched
+            # matmul over n stacked (m, n) matrices
+            Qv = (self._Q_2d @ v).reshape(self.R.shape)
+        vals = self.R + self.beta * Qv  # Shape: (L,) or (n, m)
 
         if Tv is None:
             Tv = np.empty(self.num_states)

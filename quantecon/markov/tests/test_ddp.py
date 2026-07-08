@@ -349,6 +349,27 @@ def test_operator_iteration_num_iter():
                                    max_iter=2) == 2)
 
 
+def test_ddp_non_c_contiguous_Q():
+    # A non-C-contiguous Q must fall back to the batched-matmul path in
+    # bellman_operator and give the same results
+    n, m = 3, 2
+    R = np.array([[0., 1.], [1., 0.], [0., 1.]])
+    Q = np.empty((n, m, n))
+    Q[:] = 1/n
+    beta = 0.95
+
+    ddp_c = DiscreteDP(R, Q, beta)
+    ddp_f = DiscreteDP(R, np.asfortranarray(Q), beta)
+    assert_(ddp_c._Q_2d is not None)
+    assert_(ddp_f._Q_2d is None)
+
+    for method in ['vi', 'pi', 'mpi']:
+        res_c = ddp_c.solve(method=method)
+        res_f = ddp_f.solve(method=method)
+        assert_array_equal(res_f.sigma, res_c.sigma)
+        assert_allclose(res_f.v, res_c.v)
+
+
 def test_ddp_beta_1_not_implemented_error():
     n, m = 3, 2
     R = np.array([[0, 1], [1, 0], [0, 1]])
