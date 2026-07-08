@@ -296,6 +296,30 @@ def test_ddp_duplicate_sa_pair_error():
     )
 
 
+def test_ddp_out_of_range_indices_error():
+    # State index 2 out of range for num_states == 2: on the sorted path
+    # the pair would previously be silently reattributed to state 1
+    R = [1.0, 2.0]
+    Q = [(1.0, 0.0), (0.0, 1.0)]
+    Q_sparse = sparse.csr_matrix(Q)
+    beta = 0.95
+
+    # Sorted indices
+    s_indices, a_indices = [0, 2], [0, 0]
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+    assert_raises(
+        ValueError, DiscreteDP, R, Q_sparse, beta, s_indices, a_indices
+    )
+
+    # Unsorted indices
+    s_indices, a_indices = [2, 0], [0, 0]
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+
+    # Negative indices
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, [-1, 0], [0, 0])
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, [0, 1], [0, -1])
+
+
 def test_ddp_nonpositive_max_iter_error():
     n, m = 2, 2
     R = [[0, 1], [1, 0]]
@@ -304,7 +328,9 @@ def test_ddp_nonpositive_max_iter_error():
     ddp = DiscreteDP(R, Q, beta)
 
     for method in ['vi', 'pi', 'mpi', 'lp']:
-        assert_raises(ValueError, ddp.solve, method=method, max_iter=0)
+        for max_iter in [0, -1]:
+            assert_raises(ValueError, ddp.solve, method=method,
+                          max_iter=max_iter)
 
 
 def test_operator_iteration_num_iter():

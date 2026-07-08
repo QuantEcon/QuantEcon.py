@@ -350,6 +350,15 @@ class DiscreteDP:
             self.s_indices = np.asarray(s_indices)
             self.a_indices = np.asarray(a_indices)
 
+            # Validate the index ranges here: out-of-range state indices
+            # would otherwise be silently reattributed to other states on
+            # the sorted path below
+            if (self.s_indices < 0).any() or \
+                    (self.s_indices >= self.num_states).any():
+                raise ValueError('s_indices must be in [0, num_states)')
+            if (self.a_indices < 0).any():
+                raise ValueError('a_indices must be nonnegative')
+
             if _has_sorted_sa_indices(self.s_indices, self.a_indices):
                 a_indptr = np.empty(self.num_states+1, dtype=int)
                 _generate_a_indptr(self.num_states, self.s_indices,
