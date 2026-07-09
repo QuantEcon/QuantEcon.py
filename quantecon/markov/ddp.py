@@ -427,15 +427,6 @@ class DiscreteDP:
             self.s_indices, self.a_indices = None, None
             self.num_sa_pairs = (self.R > -np.inf).sum()
 
-            # 2-dimensional view of Q, of shape (n*m, n), so that Q @ v in
-            # bellman_operator is computed with a single gemv call instead
-            # of a batched matmul over n stacked matrices (a view is only
-            # possible when Q is C-contiguous; otherwise fall back)
-            if self.Q.flags.c_contiguous:
-                self._Q_2d = self.Q.reshape(n*m, n)
-            else:
-                self._Q_2d = None
-
             self._s_arange = np.arange(n)  # cached for indexing by state
 
             # Define state-wise maximization
@@ -624,12 +615,15 @@ class DiscreteDP:
             Updated value function vector, of length n.
 
         """
-        if self._sa_pair or self._Q_2d is None:
-            Qv = self.Q @ v
+        if not self._sa_pair and self.Q.flags.c_contiguous:
+            # a single gemv over a 2-d view of Q (a view, since Q is
+            # C-contiguous), instead of a batched matmul over n stacked
+            # (m, n) matrices; the view is taken per call, so that a
+            # rebound self.Q is picked up
+            n, m = self.R.shape
+            Qv = (self.Q.reshape(n*m, n) @ v).reshape(n, m)
         else:
-            # a single gemv over the 2-d view of Q, instead of a batched
-            # matmul over n stacked (m, n) matrices
-            Qv = (self._Q_2d @ v).reshape(self.R.shape)
+            Qv = self.Q @ v
         vals = self.R + self.beta * Qv  # Shape: (L,) or (n, m)
 
         if Tv is None:
