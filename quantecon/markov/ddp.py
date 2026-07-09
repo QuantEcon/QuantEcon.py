@@ -394,27 +394,6 @@ class DiscreteDP:
                         _s_indices[j] = i
                 self.s_indices = _s_indices
 
-            # Define state-wise maximization
-            def s_wise_max(vals, out=None, out_argmax=None):
-                """
-                Return the vector max_a vals(s, a), where vals is represented
-                by a 1-dimensional ndarray of shape (self.num_sa_pairs,).
-                out and out_argmax must be of length self.num_states; dtype of
-                out_argmax must be int.
-
-                """
-                if out is None:
-                    out = np.empty(self.num_states)
-                if out_argmax is None:
-                    _s_wise_max(self.a_indices, self.a_indptr, vals,
-                                out_max=out)
-                else:
-                    _s_wise_max_argmax(self.a_indices, self.a_indptr, vals,
-                                       out_max=out, out_argmax=out_argmax)
-                return out
-
-            self.s_wise_max = s_wise_max
-
         else:  # Not self._sa_pair
             if self.R.ndim != 2:
                 raise ValueError(msg_dimension)
@@ -428,27 +407,6 @@ class DiscreteDP:
             self.num_sa_pairs = (self.R > -np.inf).sum()
 
             self._s_arange = np.arange(n)  # cached for indexing by state
-
-            # Define state-wise maximization
-            def s_wise_max(vals, out=None, out_argmax=None):
-                """
-                Return the vector max_a vals(s, a), where vals is represented
-                by a 2-dimensional ndarray of shape (n, m). Stored in out,
-                which must be of length self.num_states.
-                out and out_argmax must be of length self.num_states; dtype of
-                out_argmax must be int.
-
-                """
-                if out is None:
-                    out = np.empty(self.num_states)
-                if out_argmax is None:
-                    vals.max(axis=1, out=out)
-                else:
-                    vals.argmax(axis=1, out=out_argmax)
-                    out[:] = vals[self._s_arange, out_argmax]
-                return out
-
-            self.s_wise_max = s_wise_max
 
         # Check that for every state, at least one action is feasible
         self._check_action_feasibility()
@@ -495,6 +453,36 @@ class DiscreteDP:
                 'for every state the reward must be finite for some action: '
                 'violated for state {s}'.format(s=s)
             )
+
+    def s_wise_max(self, vals, out=None, out_argmax=None):
+        """
+        Return the vector max_a vals(s, a), where vals is represented by
+        a 1-dimensional ndarray of shape (self.num_sa_pairs,) for the
+        state-action pair formulation, and by a 2-dimensional ndarray of
+        shape (n, m) for the product formulation. Stored in out, which
+        must be of length self.num_states; dtype of out_argmax must be
+        int.
+
+        Note: an ordinary method (not a closure set in __init__), so
+        that DiscreteDP instances are picklable.
+
+        """
+        if out is None:
+            out = np.empty(self.num_states)
+        if self._sa_pair:
+            if out_argmax is None:
+                _s_wise_max(self.a_indices, self.a_indptr, vals,
+                            out_max=out)
+            else:
+                _s_wise_max_argmax(self.a_indices, self.a_indptr, vals,
+                                   out_max=out, out_argmax=out_argmax)
+        else:
+            if out_argmax is None:
+                vals.max(axis=1, out=out)
+            else:
+                vals.argmax(axis=1, out=out_argmax)
+                out[:] = vals[self._s_arange, out_argmax]
+        return out
 
     def to_sa_pair_form(self, sparse=True):
         """

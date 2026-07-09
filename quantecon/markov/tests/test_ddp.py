@@ -2,6 +2,8 @@
 Tests for markov/ddp.py
 
 """
+import pickle
+
 import numpy as np
 import scipy.sparse as sparse
 from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
@@ -393,6 +395,28 @@ def test_ddp_Q_rebinding():
     ddp.Q = Q2
     assert_allclose(ddp.bellman_operator(v),
                     DiscreteDP(R, Q2, beta).bellman_operator(v))
+
+
+def test_ddp_picklable():
+    # DiscreteDP instances must be picklable (e.g. for multiprocessing);
+    # s_wise_max used to be a closure set in __init__, which broke this
+    n, m = 2, 2
+    R = [[5, 10], [-1, -np.inf]]
+    Q = np.empty((n, m, n))
+    Q[0, 0, :] = 0.5, 0.5
+    Q[0, 1, :] = 0, 1
+    Q[1, :, :] = 0, 1
+    beta = 0.95
+
+    ddp0 = DiscreteDP(R, Q, beta)
+    ddps = [ddp0, ddp0.to_sa_pair_form(), ddp0.to_sa_pair_form(sparse=False)]
+
+    for ddp in ddps:
+        ddp2 = pickle.loads(pickle.dumps(ddp))
+        res = ddp.solve(method='pi')
+        res2 = ddp2.solve(method='pi')
+        assert_allclose(res2.v, res.v)
+        assert_array_equal(res2.sigma, res.sigma)
 
 
 def test_ddp_beta_1_not_implemented_error():
