@@ -463,9 +463,6 @@ class DiscreteDP:
         must be of length self.num_states; dtype of out_argmax must be
         int.
 
-        Note: an ordinary method (not a closure set in __init__), so
-        that DiscreteDP instances are picklable.
-
         """
         if out is None:
             out = np.empty(self.num_states)
