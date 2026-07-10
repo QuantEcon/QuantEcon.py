@@ -349,6 +349,52 @@ def test_operator_iteration_num_iter():
                                    max_iter=2) == 2)
 
 
+def test_ddp_non_c_contiguous_Q():
+    # A non-C-contiguous Q must fall back to the batched-matmul path in
+    # bellman_operator and give the same results as the gemv path
+    n, m = 20, 5
+    rs = np.random.RandomState(12345)
+    R = rs.random_sample((n, m))
+    Q = rs.random_sample((n, m, n))
+    Q /= Q.sum(axis=2, keepdims=True)
+    beta = 0.95
+
+    ddp_c = DiscreteDP(R, Q, beta)
+    ddp_f = DiscreteDP(R, np.asfortranarray(Q), beta)
+    assert_(ddp_c.Q.flags.c_contiguous)
+    assert_(not ddp_f.Q.flags.c_contiguous)
+
+    # Direct comparison of the Bellman operator and the greedy policy
+    v = rs.random_sample(n)
+    sigma_c = np.empty(n, dtype=int)
+    sigma_f = np.empty(n, dtype=int)
+    Tv_c = ddp_c.bellman_operator(v, sigma=sigma_c)
+    Tv_f = ddp_f.bellman_operator(v, sigma=sigma_f)
+    assert_allclose(Tv_f, Tv_c)
+    assert_array_equal(sigma_f, sigma_c)
+
+    for method in ['vi', 'pi', 'mpi']:
+        res_c = ddp_c.solve(method=method)
+        res_f = ddp_f.solve(method=method)
+        assert_array_equal(res_f.sigma, res_c.sigma)
+        assert_allclose(res_f.v, res_c.v)
+
+
+def test_ddp_Q_rebinding():
+    # bellman_operator must reflect a rebound ddp.Q (no stale cache)
+    n, m = 3, 2
+    R = np.arange(n*m, dtype=float).reshape(n, m)
+    Q1 = np.tile([[0.2, 0.3, 0.5], [0.6, 0.3, 0.1]], (n, 1, 1))
+    Q2 = np.tile([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], (n, 1, 1))
+    beta = 0.9
+    v = np.array([1., 2., 3.])
+
+    ddp = DiscreteDP(R, Q1, beta)
+    ddp.Q = Q2
+    assert_allclose(ddp.bellman_operator(v),
+                    DiscreteDP(R, Q2, beta).bellman_operator(v))
+
+
 def test_ddp_beta_1_not_implemented_error():
     n, m = 3, 2
     R = np.array([[0, 1], [1, 0], [0, 1]])
