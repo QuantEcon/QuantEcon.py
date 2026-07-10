@@ -401,14 +401,30 @@ def test_simulate_clamp_maps_to_last_state():
     X = mc.simulate_indices(2, init=0, random_state=seed)
     assert_equal(X[1], 2)
 
+    # Dense, row 0 deficient with a trailing zero: overflow -> state 1,
+    # not the zero-probability state 2
+    P = np.array([[0.5, 0.5 - 1e-5, 0.],
+                  [0., 0., 1.],
+                  [1., 0., 0.]])
+    mc = MarkovChain(P)
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 1)
+
     # Sparse, row 0 deficient with support {0, 1}: overflow -> state 1,
     # the last state of positive probability (pre-fix, indices[2] was
     # read, i.e. the first index of row 1, giving the in-range but
     # wrong state 2)
-    P = np.array([[0.5, 0.5 - 1e-5, 0.],
-                  [0., 0., 1.],
-                  [1., 0., 0.]])
     mc = MarkovChain(sparse.csr_matrix(P))
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 1)
+
+    # Sparse, row 0 deficient with an explicitly stored zero at the
+    # end: overflow -> state 1, not the stored zero-probability state 2
+    data = np.array([0.5, 0.5 - 1e-5, 0., 1., 1.])
+    indices = np.array([0, 1, 2, 2, 0])
+    indptr = np.array([0, 3, 4, 5])
+    P_csr = sparse.csr_matrix((data, indices, indptr), shape=(3, 3))
+    mc = MarkovChain(P_csr)
     X = mc.simulate_indices(2, init=0, random_state=seed)
     assert_equal(X[1], 1)
 
@@ -450,6 +466,13 @@ def test_mc_sample_path_deficient_init_distribution():
     seed = 91519  # RandomState(seed).random() > 1 - 1e-5
     X = mc_sample_path(P, init=init, sample_size=10, random_state=seed)
     assert_equal(X[0], 1)
+
+
+def test_mc_sample_path_invalid_init_distribution():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    for init in [[0., 0.], [0.5, 0.6], [-0.5, 1.5], [0.5, 0.25, 0.25],
+                 [[1., 0.], [0., 1.]]]:
+        assert_raises(ValueError, mc_sample_path, P, init=init)
 
 
 def test_mc_sample_path():
