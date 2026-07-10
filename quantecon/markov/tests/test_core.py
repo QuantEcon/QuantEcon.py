@@ -384,6 +384,35 @@ def test_simulate_deficient_row_sums():
         assert_array_less(X.max(), mc.n)
 
 
+def test_simulate_clamp_maps_to_last_state():
+    """
+    A random draw exceeding the last CDF value must map to the last
+    state with positive transition probability — not, for the CSR
+    kernel, the next row's first index, which is in range and thus
+    not caught by test_simulate_deficient_row_sums.
+    """
+    seed = 91519  # first draw of RandomState(seed) > 1 - 1e-5
+
+    # Dense, row 0 deficient with full support: overflow -> last state
+    P = np.array([[0.5, 0.3, 0.2 - 1e-5],
+                  [0., 0., 1.],
+                  [1., 0., 0.]])
+    mc = MarkovChain(P)
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 2)
+
+    # Sparse, row 0 deficient with support {0, 1}: overflow -> state 1,
+    # the last state of positive probability (pre-fix, indices[2] was
+    # read, i.e. the first index of row 1, giving the in-range but
+    # wrong state 2)
+    P = np.array([[0.5, 0.5 - 1e-5, 0.],
+                  [0., 0., 1.],
+                  [1., 0., 0.]])
+    mc = MarkovChain(sparse.csr_matrix(P))
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 1)
+
+
 def test_simulate_indices_negative_init():
     """init=-k must behave as init=n-k, for sparse matrices as well."""
     n = 5

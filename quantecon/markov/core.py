@@ -463,7 +463,9 @@ class MarkovChain:
 
         init : int or array_like(int, ndim=1), optional
             Initial state(s). If None, the initial state is randomly
-            drawn.
+            drawn. Negative values count from the end, as with Python
+            indexing; the returned paths contain the equivalent
+            nonnegative indices.
 
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
@@ -516,8 +518,10 @@ class MarkovChain:
                     'init must be int, array_like of ints, or None'
                 )
 
-        # Map negative indices into {0, ..., n-1}; the sparse kernel does
-        # not support wraparound indexing
+        # Map negative indices into {0, ..., n-1}: the sparse kernel does
+        # not support wraparound indexing, and, intentionally, the
+        # returned paths then contain nonnegative indices only (a path
+        # with init=-k starts with n-k, not -k)
         init_states = np.where(init_states < 0, init_states + self.n,
                                init_states)
 
