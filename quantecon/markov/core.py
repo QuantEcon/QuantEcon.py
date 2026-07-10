@@ -223,7 +223,7 @@ class MarkovChain:
             return msg.format(self.P, self._stationary_dists)
 
     def __str__(self):
-        return str(self.__repr__)
+        return self.__repr__()
 
     @property
     def state_values(self):
@@ -516,6 +516,11 @@ class MarkovChain:
                     'init must be int, array_like of ints, or None'
                 )
 
+        # Map negative indices into {0, ..., n-1}; the sparse kernel does
+        # not support wraparound indexing
+        init_states = np.where(init_states < 0, init_states + self.n,
+                               init_states)
+
         # === set up array to store output === #
         X = np.empty((k, ts_length), dtype=int)
 
@@ -614,11 +619,16 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
 
     """
     num_reps, ts_length = out.shape
+    n = P_cdfs.shape[0]
 
     for i in range(num_reps):
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            out[i, t+1] = np.searchsorted(P_cdfs[out[i, t]], random_values[i, t], side='right')
+            k = np.searchsorted(P_cdfs[out[i, t]], random_values[i, t],
+                                side='right')
+            # Guard against rounding: if the last CDF value is less than
+            # 1 and the random value exceeds it, k equals n
+            out[i, t+1] = min(k, n - 1)
 
 
 @jit(nopython=True)
@@ -662,9 +672,12 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
     for i in range(num_reps):
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            k = np.searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
-                                random_values[i, t], side='right')
-            out[i, t+1] = indices[indptr[out[i, t]]+k]
+            lo, hi = indptr[out[i, t]], indptr[out[i, t]+1]
+            k = np.searchsorted(P_cdfs1d[lo:hi], random_values[i, t],
+                                side='right')
+            # Guard against rounding: if the last CDF value in the row is
+            # less than 1 and the random value exceeds it, k equals hi-lo
+            out[i, t+1] = indices[min(lo+k, hi-1)]
 
 
 def mc_compute_stationary(P):
@@ -719,7 +732,9 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
     else:
         cdf0 = np.cumsum(init)
         u_0 = random_state.random()
-        X_0 = np.searchsorted(cdf0, u_0, side='right')
+        # Guard against rounding as in _generate_sample_paths: clamp in
+        # case u_0 exceeds the last CDF value
+        X_0 = min(np.searchsorted(cdf0, u_0, side='right'), len(cdf0) - 1)
 
     mc = MarkovChain(P)
     return mc.simulate(ts_length=sample_size, init=X_0,
