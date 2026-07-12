@@ -35,13 +35,15 @@ def _pivoting(tableau, pivot_col, pivot_row):
     """
     nrows, ncols = tableau.shape
 
-    r = 1 / tableau[pivot_row, pivot_col]
+    pivot_elt = tableau[pivot_row, pivot_col]
     # Copy of the normalized pivot row: reading it from `tableau` inside
     # the update loop would create a potential-aliasing hazard with the
-    # row being updated, preventing the loop from being vectorized
+    # row being updated, preventing the loop from being vectorized.
+    # Normalized by direct division, not reciprocal multiplication, which
+    # can overflow (e.g. for subnormal pivots) where division stays finite
     pivot_row_buf = np.empty(ncols, dtype=tableau.dtype)
     for j in range(ncols):
-        v = tableau[pivot_row, j] * r
+        v = tableau[pivot_row, j] / pivot_elt
         pivot_row_buf[j] = v
         tableau[pivot_row, j] = v
 
