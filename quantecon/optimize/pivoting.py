@@ -36,8 +36,16 @@ def _pivoting(tableau, pivot_col, pivot_row):
     nrows, ncols = tableau.shape
 
     pivot_elt = tableau[pivot_row, pivot_col]
+    # Copy of the normalized pivot row: reading it from `tableau` inside
+    # the update loop would create a potential-aliasing hazard with the
+    # row being updated, preventing the loop from being vectorized.
+    # Normalized by direct division, not reciprocal multiplication, which
+    # can overflow (e.g. for subnormal pivots) where division stays finite
+    pivot_row_buf = np.empty(ncols, dtype=tableau.dtype)
     for j in range(ncols):
-        tableau[pivot_row, j] /= pivot_elt
+        v = tableau[pivot_row, j] / pivot_elt
+        pivot_row_buf[j] = v
+        tableau[pivot_row, j] = v
 
     for i in range(nrows):
         if i == pivot_row:
@@ -46,7 +54,12 @@ def _pivoting(tableau, pivot_col, pivot_row):
         if multiplier == 0:
             continue
         for j in range(ncols):
-            tableau[i, j] -= tableau[pivot_row, j] * multiplier
+            tableau[i, j] -= pivot_row_buf[j] * multiplier
+
+    # Eliminate possible floating-point residue
+    for i in range(nrows):
+        tableau[i, pivot_col] = 0
+    tableau[pivot_row, pivot_col] = 1
 
     return tableau
 
