@@ -223,7 +223,7 @@ class MarkovChain:
             return msg.format(self.P, self._stationary_dists)
 
     def __str__(self):
-        return str(self.__repr__)
+        return self.__repr__()
 
     @property
     def state_values(self):
@@ -463,7 +463,9 @@ class MarkovChain:
 
         init : int or array_like(int, ndim=1), optional
             Initial state(s). If None, the initial state is randomly
-            drawn.
+            drawn. Negative values count from the end, as with Python
+            indexing; the returned paths contain the equivalent
+            nonnegative indices.
 
         num_reps : scalar(int), optional(default=None)
             Number of repetitions of simulation.
@@ -515,6 +517,13 @@ class MarkovChain:
                 raise ValueError(
                     'init must be int, array_like of ints, or None'
                 )
+
+        # Map negative indices into {0, ..., n-1}: the sparse kernel does
+        # not support wraparound indexing, and, intentionally, the
+        # returned paths then contain nonnegative indices only (a path
+        # with init=-k starts with n-k, not -k)
+        init_states = np.where(init_states < 0, init_states + self.n,
+                               init_states)
 
         # === set up array to store output === #
         X = np.empty((k, ts_length), dtype=int)
@@ -614,11 +623,20 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
 
     """
     num_reps, ts_length = out.shape
+    n = P_cdfs.shape[0]
 
     for i in range(num_reps):
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            out[i, t+1] = np.searchsorted(P_cdfs[out[i, t]], random_values[i, t], side='right')
+            k = np.searchsorted(P_cdfs[out[i, t]], random_values[i, t],
+                                side='right')
+            if k == n:
+                # random value beyond the last CDF value due to rounding:
+                # fall back to the last state with positive probability,
+                # i.e., the first position attaining the final CDF value
+                k = np.searchsorted(P_cdfs[out[i, t]],
+                                    P_cdfs[out[i, t], n-1], side='left')
+            out[i, t+1] = k
 
 
 @jit(nopython=True)
@@ -662,9 +680,17 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
     for i in range(num_reps):
         out[i, 0] = init_states[i]
         for t in range(ts_length-1):
-            k = np.searchsorted(P_cdfs1d[indptr[out[i, t]]:indptr[out[i, t]+1]],
-                                random_values[i, t], side='right')
-            out[i, t+1] = indices[indptr[out[i, t]]+k]
+            lo, hi = indptr[out[i, t]], indptr[out[i, t]+1]
+            k = np.searchsorted(P_cdfs1d[lo:hi], random_values[i, t],
+                                side='right')
+            if k == hi - lo:
+                # random value beyond the last CDF value due to rounding:
+                # fall back to the last state with positive probability
+                # (explicitly stored zeros do not increase the CDF), i.e.,
+                # the first position attaining the final CDF value
+                k = np.searchsorted(P_cdfs1d[lo:hi], P_cdfs1d[hi-1],
+                                    side='left')
+            out[i, t+1] = indices[lo+k]
 
 
 def mc_compute_stationary(P):
@@ -713,14 +739,26 @@ def mc_sample_path(P, init=0, sample_size=1000, random_state=None):
 
     """
     random_state = check_random_state(random_state)
+    mc = MarkovChain(P)
 
     if isinstance(init, numbers.Integral):
         X_0 = init
     else:
+        init = np.asarray(init)
+        if init.ndim != 1 or init.shape[0] != mc.n:
+            raise ValueError('init must be an int or a 1-dim array of '
+                             'length n')
+        if (init < 0).any() or not np.allclose(init.sum(), 1):
+            raise ValueError('init must be a probability distribution '
+                             '(nonnegative, summing to 1)')
         cdf0 = np.cumsum(init)
         u_0 = random_state.random()
         X_0 = np.searchsorted(cdf0, u_0, side='right')
+        if X_0 == mc.n:
+            # u_0 beyond the last CDF value due to rounding: fall back to
+            # the last state with positive probability, as in
+            # _generate_sample_paths
+            X_0 = np.searchsorted(cdf0, cdf0[-1], side='left')
 
-    mc = MarkovChain(P)
     return mc.simulate(ts_length=sample_size, init=X_0,
                        random_state=random_state)

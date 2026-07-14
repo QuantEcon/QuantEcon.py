@@ -368,6 +368,113 @@ def test_simulate_issue591():
     assert_array_less(max_state_in_seq, num_states)
 
 
+def test_simulate_deficient_row_sums():
+    """
+    Rows summing to slightly less than 1 pass the `allclose` validation;
+    simulate must nevertheless never emit an out-of-range state index.
+    https://github.com/QuantEcon/QuantEcon.py/issues/591
+    """
+    P = np.array([[0.5, 0.5 - 1e-5], [0.5, 0.5 - 1e-5]])
+    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+
+    ts_length = 1_000_000
+    for mc in mcs:
+        X = mc.simulate_indices(ts_length, init=0, random_state=0)
+        assert_(X.min() >= 0)
+        assert_array_less(X.max(), mc.n)
+
+
+def test_simulate_clamp_maps_to_last_state():
+    """
+    A random draw exceeding the last CDF value must map to the last
+    state with positive transition probability — not, for the CSR
+    kernel, the next row's first index, which is in range and thus
+    not caught by test_simulate_deficient_row_sums.
+    """
+    seed = 91519  # first draw of RandomState(seed) > 1 - 1e-5
+
+    # Dense, row 0 deficient with full support: overflow -> last state
+    P = np.array([[0.5, 0.3, 0.2 - 1e-5],
+                  [0., 0., 1.],
+                  [1., 0., 0.]])
+    mc = MarkovChain(P)
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 2)
+
+    # Dense, row 0 deficient with a trailing zero: overflow -> state 1,
+    # not the zero-probability state 2
+    P = np.array([[0.5, 0.5 - 1e-5, 0.],
+                  [0., 0., 1.],
+                  [1., 0., 0.]])
+    mc = MarkovChain(P)
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 1)
+
+    # Sparse, row 0 deficient with support {0, 1}: overflow -> state 1,
+    # the last state of positive probability (pre-fix, indices[2] was
+    # read, i.e. the first index of row 1, giving the in-range but
+    # wrong state 2)
+    mc = MarkovChain(sparse.csr_matrix(P))
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 1)
+
+    # Sparse, row 0 deficient with an explicitly stored zero at the
+    # end: overflow -> state 1, not the stored zero-probability state 2
+    data = np.array([0.5, 0.5 - 1e-5, 0., 1., 1.])
+    indices = np.array([0, 1, 2, 2, 0])
+    indptr = np.array([0, 3, 4, 5])
+    P_csr = sparse.csr_matrix((data, indices, indptr), shape=(3, 3))
+    mc = MarkovChain(P_csr)
+    X = mc.simulate_indices(2, init=0, random_state=seed)
+    assert_equal(X[1], 1)
+
+
+def test_simulate_indices_negative_init():
+    """init=-k must behave as init=n-k, for sparse matrices as well."""
+    n = 5
+    P = np.zeros((n, n))
+    for i in range(n):
+        P[i, (i+1) % n] = 1.
+    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+
+    ts_length = 10
+    for mc in mcs:
+        for init in [-1, -n]:
+            assert_array_equal(
+                mc.simulate_indices(ts_length, init=init, random_state=0),
+                mc.simulate_indices(ts_length, init=init+n, random_state=0)
+            )
+        assert_array_equal(
+            mc.simulate_indices(ts_length, init=[0, -1], random_state=0),
+            mc.simulate_indices(ts_length, init=[0, n-1], random_state=0)
+        )
+
+
+def test_str():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+    assert_equal(str(mc), mc.__repr__())
+
+
+def test_mc_sample_path_deficient_init_distribution():
+    """
+    The initial state drawn from an initial distribution whose cumsum
+    falls slightly short of 1 must be in the state space.
+    """
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    init = [0.5, 0.5 - 1e-5]
+    seed = 91519  # RandomState(seed).random() > 1 - 1e-5
+    X = mc_sample_path(P, init=init, sample_size=10, random_state=seed)
+    assert_equal(X[0], 1)
+
+
+def test_mc_sample_path_invalid_init_distribution():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    for init in [[0., 0.], [0.5, 0.6], [-0.5, 1.5], [0.5, 0.25, 0.25],
+                 [[1., 0.], [0., 1.]]]:
+        assert_raises(ValueError, mc_sample_path, P, init=init)
+
+
 def test_mc_sample_path():
     P = [[0.4, 0.6], [0.2, 0.8]]
     Ps = [P, sparse.csr_matrix(P)]

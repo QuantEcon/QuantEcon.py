@@ -1,7 +1,9 @@
 lae
 ===
 
-.. automodule:: quantecon.lae
+.. currentmodule:: quantecon
+
+.. autoclass:: LAE
     :members:
     :undoc-members:
     :show-inheritance:
