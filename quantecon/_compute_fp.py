@@ -357,7 +357,7 @@ def _square_sum(a):  # pragma: no cover
     pass
 
 
-@overload(_square_sum, jit_options={'cache':True})
+@overload(_square_sum, jit_options={'cache': True})
 def _square_sum_ol(a):
     if isinstance(a, types.Number):
         return lambda a: a**2

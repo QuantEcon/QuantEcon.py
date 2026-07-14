@@ -21,7 +21,7 @@ def _numba_linalg_solve(a, b):  # pragma: no cover
     pass
 
 
-@overload(_numba_linalg_solve, jit_options={'cache':True})
+@overload(_numba_linalg_solve, jit_options={'cache': True})
 def _numba_linalg_solve_ol(a, b):
     """
     Solve the linear equation ax = b directly calling a Numba internal

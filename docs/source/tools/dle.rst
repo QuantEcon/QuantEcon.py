@@ -1,7 +1,9 @@
 dle
 ===
 
-.. automodule:: quantecon.dle
+.. currentmodule:: quantecon
+
+.. autoclass:: DLE
     :members:
     :undoc-members:
     :show-inheritance:
