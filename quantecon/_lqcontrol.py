@@ -121,9 +121,6 @@ class LQ:
 
         self.beta = beta
 
-        if beta >= 1.0:
-            raise ValueError("Discount factor beta cannot be greater than 1.")
-
         if C is None:
             # == If C not given, then model is deterministic. Set C=0. == #
             self.j = 1
@@ -458,7 +455,7 @@ class LQMarkov:
 
         self.beta = beta
 
-        if beta >= 1.0:
+        if beta > 1.0:
             raise ValueError("Discount factor beta cannot be greater than 1.")
 
         self.Π = np.asarray(Π, dtype='float')
