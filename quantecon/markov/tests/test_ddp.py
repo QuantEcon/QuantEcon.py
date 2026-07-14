@@ -3,7 +3,6 @@ Tests for markov/ddp.py
 
 """
 import numpy as np
-import pytest
 import scipy.sparse as sparse
 from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
                            assert_)
@@ -293,6 +292,7 @@ def test_ddp_to_sa_and_to_product():
     Q[0, 0, 0] = 0
     Q[0, 0, 1] = 2/n
     beta = 0.95
+    state_values = np.array(['state0', 'state1', 'state2'])
 
     sparse_R = np.array([0, 1, 1, 0, 1])
     _Q = np.full((5, 3), 1/3)
@@ -300,7 +300,7 @@ def test_ddp_to_sa_and_to_product():
     _Q[0, 1] = 2/n
     sparse_Q = sparse.coo_matrix(_Q)
 
-    ddp = DiscreteDP(R, Q, beta)
+    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
     ddp_sa = ddp.to_sa_pair_form()
     ddp_sa2 = ddp_sa.to_sa_pair_form()
     ddp_sa3 = ddp.to_sa_pair_form(sparse=False)
@@ -314,6 +314,7 @@ def test_ddp_to_sa_and_to_product():
         # allcose doesn't work on sparse
         np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15
         assert_allclose(ddp_s.beta, beta)
+        assert_array_equal(ddp_s.state_values, state_values)
 
     # these two will have probability 0 in state 2, action 0 b/c
     # of the infeasiability in R
@@ -326,11 +327,13 @@ def test_ddp_to_sa_and_to_product():
         assert_allclose(ddp_f.R, ddp.R)
         assert_allclose(ddp_f.Q, funky_Q)
         assert_allclose(ddp_f.beta, ddp.beta)
+        assert_array_equal(ddp_f.state_values, state_values)
 
     # this one is just the original one.
     assert_allclose(ddp4.R, ddp.R)
     assert_allclose(ddp4.Q, ddp.Q)
     assert_allclose(ddp4.beta, ddp.beta)
+    assert_array_equal(ddp4.state_values, state_values)
 
     for method in ["pi", "vi", "mpi"]:
         sol1 = ddp.solve(method=method)
@@ -340,26 +343,58 @@ def test_ddp_to_sa_and_to_product():
             for k in ["v", "sigma", "num_iter"]:
                 assert_allclose(sol1[k], sol2[k])
 
-def test_ddp_state_action_values():
-    # Construct a simple Markov decision process for testing
+
+def test_ddp_state_values():
     R = np.array([[1, 2], [3, 4]])
-    Q = np.array([[[0.5, 0.5], [0.5, 0.5]], [[0.5, 0.5], [0.5, 0.5]]])
+    Q = np.full((2, 2, 2), 0.5)
     beta = 0.95
-    
-    # Test 1: Pass valid labels and check mappings
-    sv = np.array(['state1', 'state2'])
-    av = np.array(['action1', 'action2'])
-    ddp = DiscreteDP(R, Q, beta, state_values=sv, action_values=av)
-    
-    assert np.array_equal(ddp.state_values, sv)
-    assert np.array_equal(ddp.action_values, av)
-    
-    # Test 2: Pass state_values with incorrect length, expect ValueError
-    sv_wrong = np.array(['state1'])
-    with pytest.raises(ValueError):
-        DiscreteDP(R, Q, beta, state_values=sv_wrong)
-        
-    # Test 3: Pass action_values with incorrect length, expect ValueError
-    av_wrong = np.array(['action1'])
-    with pytest.raises(ValueError):
-        DiscreteDP(R, Q, beta, action_values=av_wrong)
+    state_values = np.array(['state1', 'state2'])
+
+    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
+
+    assert_array_equal(ddp.state_values, state_values)
+
+
+def test_ddp_controlled_mc_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = np.array(['state1', 'state2'])
+    sigma = np.array([0, 1])
+
+    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
+    mc = ddp.controlled_mc(sigma)
+
+    assert_array_equal(mc.state_values, state_values)
+
+
+def test_ddp_state_values_wrong_length():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+
+    assert_raises(
+        ValueError, DiscreteDP, R, Q, beta,
+        state_values=np.array(['state1'])
+    )
+
+
+def test_ddp_scalar_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+
+    assert_raises(
+        ValueError, DiscreteDP, R, Q, beta, state_values='state1'
+    )
+
+
+def test_ddp_object_dtype_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = np.array(['state1', 2], dtype=object)
+
+    assert_raises(
+        ValueError, DiscreteDP, R, Q, beta, state_values=state_values
+    )

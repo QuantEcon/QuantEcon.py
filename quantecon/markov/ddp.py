@@ -177,10 +177,11 @@ class DiscreteDP:
 
     a_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the actions.
-    
-    state_values : array_like(optional), length n
-        Values associated with the states. Defaults to None, in which case the
-        state values are the indices 0, ..., n-1.
+
+    state_values : array_like, optional(default=None)
+        Array_like of length num_states containing the values associated with
+        the states, which must be homogeneous in type. If None, the values
+        default to integers 0 through num_states-1.
 
     Attributes
     ----------
@@ -199,8 +200,8 @@ class DiscreteDP:
     max_iter : scalar(int), default=250
         Default value for the maximum number of iterations.
 
-    state_values : array_like, length n
-        Values associated with the states.
+    state_values : array_like or None
+        Array of state values if set, None otherwise.
 
     Notes
     -----
@@ -441,14 +442,19 @@ class DiscreteDP:
 
         self.epsilon = 1e-3
         self.max_iter = 250
-        # State/action labels: for mapping purposes only, not used in numerical computations
+        # State labels are for mapping only, not numerical computations
         if state_values is None:
             self.state_values = None
         else:
             state_values = np.asarray(state_values)
-            if state_values.shape[0] != self.num_states:
+            if (state_values.ndim < 1 or
+                    state_values.shape[0] != self.num_states):
                 raise ValueError(
                     'state_values must be an array_like of length num_states'
+                )
+            if np.issubdtype(state_values.dtype, np.object_):
+                raise ValueError(
+                    'data in state_values must be homogeneous in type'
                 )
             self.state_values = state_values
 
@@ -519,7 +525,10 @@ class DiscreteDP:
                 QL = sp.csr_matrix(self.Q[s_ind, a_ind])
             else:
                 QL = self.Q[s_ind, a_ind]
-            return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
+            return DiscreteDP(
+                RL, QL, self.beta, s_ind, a_ind,
+                state_values=self.state_values
+            )
 
     def to_product_form(self):
         """
@@ -550,7 +559,9 @@ class DiscreteDP:
                               self.Q.toarray(), Q)
             else:
                 _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
-            return DiscreteDP(R, Q, self.beta)
+            return DiscreteDP(
+                R, Q, self.beta, state_values=self.state_values
+            )
         else:
             return self
 
