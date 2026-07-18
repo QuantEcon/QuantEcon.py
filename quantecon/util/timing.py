@@ -26,8 +26,8 @@ def _warn_timer_deprecated(old_name, replacement):
 
     """
     warnings.warn(
-        f"`{old_name}` is deprecated and will be removed in a future release "
-        f"(targeting v0.12.0). Use {replacement} instead.",
+        f"`{old_name}` is deprecated and will be removed in v1.0. "
+        f"Use {replacement} instead.",
         DeprecationWarning,
         stacklevel=3,
     )
