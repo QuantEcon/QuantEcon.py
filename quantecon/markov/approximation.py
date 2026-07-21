@@ -14,7 +14,7 @@ from ..util import check_random_state
 import warnings
 import numpy as np
 import numbers
-from numba import njit
+from numba import prange, njit
 
 
 def rouwenhorst(n, rho, sigma, mu=0.):
@@ -263,12 +263,11 @@ def std_norm_cdf(x):
     return 0.5 * erfc(-x / sqrt(2))
 
 
-@njit
+@njit(parallel=True)
 def _fill_tauchen(x, P, n, rho, sigma, half_step):
-    for i in range(n):
+    for i in prange(n):
         P[i, 0] = std_norm_cdf((x[0] - rho * x[i] + half_step) / sigma)
-        P[i, n - 1] = 1 - \
-            std_norm_cdf((x[n - 1] - rho * x[i] - half_step) / sigma)
+        P[i, n - 1] = 1.0 - std_norm_cdf((x[n - 1] - rho * x[i] - half_step) / sigma)
         for j in range(1, n - 1):
             z = x[j] - rho * x[i]
             P[i, j] = (std_norm_cdf((z + half_step) / sigma) -
