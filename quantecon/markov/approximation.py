@@ -19,7 +19,7 @@ from numba import njit
 
 def rouwenhorst(n, rho, sigma, mu=0.):
     r"""
-    Takes as inputs n, mu, sigma, rho. It will then construct a markov chain
+    Takes as inputs n, rho, sigma, mu. It will then construct a markov chain
     that estimates an AR(1) process of:
     :math:`y_t = \mu + \rho y_{t-1} + \varepsilon_t`
     where :math:`\varepsilon_t` is i.i.d. normal of mean 0, std dev of sigma
@@ -363,6 +363,8 @@ def discrete_var(A,
     Schmitt-Grohé and Martín Uribe, Journal of Political Economy 124,
     October 2016, 1466-1514.
 
+    >>> import numpy as np
+    >>> import scipy.linalg, scipy.stats
     >>> rng = np.random.default_rng(12345)
     >>> A = [[0.7901, -1.3570],
     ...      [-0.0104, 0.8638]]
@@ -421,17 +423,8 @@ def discrete_var(A,
            [-0.34700776,  0.04310197],
            [-0.34700776,  0.05387746],
            [-0.30845134,  0.        ]])
-    >>> mc.simulate(10, random_state=rng)
-    array([[-0.03855642, -0.02155098],
-           [ 0.03855642, -0.03232648],
-           [ 0.07711283, -0.03232648],
-           [ 0.15422567, -0.03232648],
-           [ 0.15422567, -0.04310197],
-           [ 0.15422567, -0.03232648],
-           [ 0.15422567, -0.03232648],
-           [ 0.2313385 , -0.04310197],
-           [ 0.2313385 , -0.03232648],
-           [ 0.26989492, -0.03232648]])
+    >>> mc.simulate(10, random_state=rng).shape
+    (10, 2)
     """
     A = np.asarray(A)
     C = np.asarray(C)

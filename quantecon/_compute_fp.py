@@ -73,7 +73,7 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
         A callable object (e.g., function) that acts on v
     v : object
         An object such that T(v) is defined; modified in place if
-        `method='iteration' and `v` is an array
+        `method='iteration'` and `v` is an array
     error_tol : scalar(float), optional(default=1e-3)
         Error tolerance
     max_iter : scalar(int), optional(default=50)

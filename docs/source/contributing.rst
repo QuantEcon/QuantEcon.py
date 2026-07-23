@@ -83,5 +83,6 @@ the pull request checks.
 Further questions
 -----------------
 
-We encourage you to reach out to the `QuantEcon team <https://quantecon.org/team>`_ on the
-`Discourse forum <https://discourse.quantecon.org/>`_ if you have any further questions.
+We encourage you to reach out to the `QuantEcon team <https://quantecon.org/team>`_ or open an issue on
+the `project issue tracker <https://github.com/QuantEcon/QuantEcon.py/issues>`_ if you have any further
+questions.

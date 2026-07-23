@@ -35,16 +35,28 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     
     Parameters
     ----------
-    file_list   list or dict
-                A list of files to specify a collection of filenames	
-                A dict of dir : list(files) to specify a directory
-    repo        str, optional(default=REPO)
-    raw 		str, optional(default=RAW)
-    			This is here in case github changes access to their raw files through web links
-    branch      str, optional(default=BRANCH)
-    folder      str, optional(default=FOLDER)
-    overwrite   bool, optional(default=False)
-    verbose     bool, optional(default=True)
+    files : list or dict
+        A list of files to specify a collection of filenames, or a dict of
+        dir : list(files) to specify a directory
+    repo : str, optional(default=REPO)
+        The Github repository to fetch the files from
+    raw : str, optional(default=RAW)
+        This is here in case github changes access to their raw files through
+        web links
+    branch : str, optional(default=BRANCH)
+        The branch of the repository to fetch the files from
+    folder : str, optional(default=FOLDER)
+        The folder in the repository that contains the requested files
+    overwrite : bool, optional(default=False)
+        If True, overwrite a local copy of the file if one is present
+    verbose : bool, optional(default=True)
+        If True, then print a status message for each requested file
+
+    Returns
+    -------
+    status : list of bool
+        One entry per requested file: True if the file was downloaded, and
+        False if a local copy was found and the download was skipped
 
     Examples
     --------
@@ -62,7 +74,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
 
     A folder location can be added using ``folder=``
 
-    >>> status = fetch_nb_dependencies("test.csv", report="https://<github_address>", folder="data")
+    >>> status = fetch_nb_dependencies(["test.csv"], repo="https://<github_address>", folder="data")
 
     You can also specify a specific branch using ``branch=`` keyword argument. 
 

@@ -9,10 +9,10 @@ Always reference these instructions first and fallback to search or bash command
 ### Environment Setup (REQUIRED)
 - **ALWAYS use conda environment**: `conda env create -f environment.yml` 
   - Takes 3-5 minutes to complete. NEVER CANCEL. Set timeout to 10+ minutes.
-  - Creates environment named 'qe' with Python 3.13 and all dependencies
+  - Creates environment named 'qe' with all project dependencies. Note: environment.yml does not pin a Python version, so conda resolves one automatically. To match CI (3.12/3.13/3.14), either add `- python=3.13` to environment.yml, or run `conda create -n qe python=3.13` followed by `conda env update -n qe -f environment.yml`.
 - **Activate environment**: `eval "$(conda shell.bash hook)" && conda activate qe`
-- **Development install**: `flit install` 
-  - Installs package in development mode for testing changes
+- **Development install**: `flit install --symlink` 
+  - Installs the package in editable mode so source changes are picked up immediately
   - Takes < 30 seconds
 
 ### Build and Test Workflow
@@ -21,7 +21,7 @@ Always reference these instructions first and fallback to search or bash command
   - Note: Repository has some existing style violations - this is expected
 - **Full test suite**: `coverage run -m pytest quantecon`
   - Takes 5 minutes 11 seconds. NEVER CANCEL. Set timeout to 15+ minutes.
-  - Runs 536 tests across all modules
+  - Runs the full test suite across all modules (~600 tests)
   - All tests should pass with 2 warnings (expected)
 - **Quick smoke test**: `python -c "import quantecon as qe; print('Version:', qe.__version__)"`
 - **Package build**: `flit build`
@@ -54,12 +54,12 @@ print('DiscreteDP test successful, policy:', result.sigma)
   - `game_theory/` - Game theory algorithms and utilities  
   - `optimize/` - Optimization algorithms
   - `random/` - Random number generation utilities
-  - `tests/` - Main test suite (536 tests total)
+  - `tests/` - Main test suite
 
 ### Configuration Files
 - `pyproject.toml` - Main project configuration using flit build system
 - `environment.yml` - Conda environment specification with all dependencies
-- `.github/workflows/ci.yml` - CI pipeline (tests on Python 3.11, 3.12, 3.13)
+- `.github/workflows/ci.yml` - CI pipeline (tests on Python 3.12, 3.13, 3.14)
 - `pytest.ini` - Test configuration including slow test markers
 
 ### Dependencies
@@ -86,10 +86,9 @@ Core runtime dependencies (auto-installed in conda env):
 ### Making Code Changes
 1. Ensure conda environment is active: `conda activate qe`
 2. Make your changes to files in `quantecon/`
-3. Run development install: `flit install`
-4. Test imports: `python -c "import quantecon as qe; print('Import OK')"`
-5. Run relevant tests: `pytest quantecon/tests/test_[relevant_module].py`
-6. Run linting: `flake8 --select F401,F405,E231 quantecon`
+3. Test imports: `python -c "import quantecon as qe; print('Import OK')"`
+4. Run relevant tests: `pytest quantecon/tests/test_[relevant_module].py`
+5. Run linting: `flake8 --select F401,F405,E231 quantecon`
 
 ### Adding New Features
 1. Add code to appropriate module in `quantecon/`
@@ -108,7 +107,7 @@ Core runtime dependencies (auto-installed in conda env):
 
 ### CI/CD Pipeline
 - GitHub Actions runs tests on Windows, Ubuntu, and macOS
-- Tests Python 3.11, 3.12, and 3.13
+- Tests Python 3.12, 3.13, and 3.14
 - Includes flake8 linting and coverage reporting
 - Publishing to PyPI is automated on git tags
 
@@ -140,7 +139,7 @@ conda env create -f environment.yml
 eval "$(conda shell.bash hook)" && conda activate qe
 
 # Development workflow
-flit install                                    # Install in development mode
+flit install --symlink                          # Editable install for development
 python -c "import quantecon as qe; print(qe.__version__)"  # Test import
 pytest quantecon/tests/test_[module].py        # Test specific module
 flake8 --select F401,F405,E231 quantecon       # Lint code

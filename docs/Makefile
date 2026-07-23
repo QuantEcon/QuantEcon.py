@@ -60,8 +60,12 @@ srcclean:
 	rm -f source/game_theory.rst
 	rm -rf source/markov
 	rm -f source/markov.rst
+	rm -rf source/optimize
+	rm -f source/optimize.rst
 	rm -rf source/random
 	rm -f source/random.rst
+	rm -rf source/timings
+	rm -f source/timings.rst
 	rm -rf source/util
 	rm -f source/util.rst
 

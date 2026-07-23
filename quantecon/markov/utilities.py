@@ -30,6 +30,7 @@ def sa_indices(num_states, num_actions):
 
     Examples
     --------
+    >>> import quantecon as qe
     >>> s_indices, a_indices = qe.markov.sa_indices(4, 3)
     >>> s_indices
     array([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3])

@@ -10,11 +10,11 @@ def ddp_linprog_simplex(R, Q, beta, a_indices, a_indptr, sigma,
                         max_iter=10**6, piv_options=PivOptions(),
                         tableau=None, basis=None, v=None):
     r"""
-    Numba jit complied function to solve a discrete dynamic program via
+    Numba jit compiled function to solve a discrete dynamic program via
     linear programming, using `optimize.linprog_simplex` routines. The
     problem has to be represented in state-action pair form with 1-dim
-    reward ndarray `R` of shape (n,), 2-dim transition probability
-    ndarray `Q` of shapce (L, n), and disount factor `beta`, where n is
+    reward ndarray `R` of shape (L,), 2-dim transition probability
+    ndarray `Q` of shape (L, n), and discount factor `beta`, where n is
     the number of states and L is the number of feasible state-action
     pairs.
 
@@ -52,7 +52,7 @@ def ddp_linprog_simplex(R, Q, beta, a_indices, a_indptr, sigma,
     Parameters
     ----------
     R : ndarray(float, ndim=1)
-        Reward ndarray, of shape (n,).
+        Reward ndarray, of shape (L,).
 
     Q : ndarray(float, ndim=2)
         Transition probability ndarray, of shape (L, n).
@@ -143,7 +143,7 @@ def _initialize_tableau(R, Q, beta, a_indptr, tableau):
     Parameters
     ----------
     R : ndarray(float, ndim=1)
-        Reward ndarray, of shape (n,).
+        Reward ndarray, of shape (L,).
 
     Q : ndarray(float, ndim=2)
         Transition probability ndarray, of shape (L, n).

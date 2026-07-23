@@ -145,6 +145,8 @@ def cartesian_nearest_index(x, nodes, order='C'):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> import quantecon as qe
     >>> nodes = (np.arange(3), np.arange(2))
     >>> prod = qe.cartesian(nodes)
     >>> print(prod)
@@ -159,7 +161,7 @@ def cartesian_nearest_index(x, nodes, order='C'):
     the point (0.6, 0.4) is `prod[2]`:
 
     >>> x = (0.6, 0.4)
-    >>> qe.cartesian_nearest_index(x, nodes)  # Pass `nodes`, not `prod`
+    >>> int(qe.cartesian_nearest_index(x, nodes))  # Pass `nodes`, not `prod`
     2
 
     The closest to (-0.1, 1.2) and (2, 0) are `prod[1]` and `prod[4]`,
@@ -200,7 +202,7 @@ def cartesian_nearest_index(x, nodes, order='C'):
 @njit(cache=True)
 def _cartesian_nearest_indices(X, nodes, order='C'):
     """
-    The main body of `cartesian_nearest_index`, jit-complied by Numba.
+    The main body of `cartesian_nearest_index`, jit-compiled by Numba.
     Note that `X` must be a 2-dim ndarray, and a Python list is not
     accepted for `nodes`.
 
@@ -313,21 +315,21 @@ def simplex_grid(m, n):
            [4, 0, 0]])
 
     >>> simplex_grid(3, 4) / 4
-    array([[ 0.  ,  0.  ,  1.  ],
-           [ 0.  ,  0.25,  0.75],
-           [ 0.  ,  0.5 ,  0.5 ],
-           [ 0.  ,  0.75,  0.25],
-           [ 0.  ,  1.  ,  0.  ],
-           [ 0.25,  0.  ,  0.75],
-           [ 0.25,  0.25,  0.5 ],
-           [ 0.25,  0.5 ,  0.25],
-           [ 0.25,  0.75,  0.  ],
-           [ 0.5 ,  0.  ,  0.5 ],
-           [ 0.5 ,  0.25,  0.25],
-           [ 0.5 ,  0.5 ,  0.  ],
-           [ 0.75,  0.  ,  0.25],
-           [ 0.75,  0.25,  0.  ],
-           [ 1.  ,  0.  ,  0.  ]])
+    array([[0.  , 0.  , 1.  ],
+           [0.  , 0.25, 0.75],
+           [0.  , 0.5 , 0.5 ],
+           [0.  , 0.75, 0.25],
+           [0.  , 1.  , 0.  ],
+           [0.25, 0.  , 0.75],
+           [0.25, 0.25, 0.5 ],
+           [0.25, 0.5 , 0.25],
+           [0.25, 0.75, 0.  ],
+           [0.5 , 0.  , 0.5 ],
+           [0.5 , 0.25, 0.25],
+           [0.5 , 0.5 , 0.  ],
+           [0.75, 0.  , 0.25],
+           [0.75, 0.25, 0.  ],
+           [1.  , 0.  , 0.  ]])
 
     References
     ----------
@@ -375,7 +377,7 @@ def simplex_index(x, m, n):
     ----------
     x : array_like(int, ndim=1)
         Integer point in the simplex, i.e., an array of m nonnegative
-        itegers that sum to n.
+        integers that sum to n.
 
     m : scalar(int)
         Dimension of each point. Must be a positive integer.

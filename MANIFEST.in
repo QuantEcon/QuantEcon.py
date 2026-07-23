@@ -1,3 +1,0 @@
-include README.md	
-include LICENSE.txt
-recursive-include quantecon/tests/data *

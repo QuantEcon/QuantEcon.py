@@ -14,11 +14,11 @@ See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11
 
 See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.2)
 
-## Ver 0.11.1 (4th-March-2026)
+## Ver 0.11.1 (6th-March-2026)
 
 See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.1)
 
-## Ver 0.11.0
+## Ver 0.11.0 (23rd-February-2026)
 
 See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.0)
 
@@ -358,5 +358,5 @@ Contributors: [oyamad](https://github.com/oyamad), [QBatista](https://github.com
 
 ### Ver. 0.3
 
-1. Removes ``quantecon/models`` subpackage and the collection of code examples. Code has been migrated to the [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) repository.
-2. Adds a utility for fetching notebook dependencies from [QuantEcon.applications](https://github.com/QuantEcon/QuantEcon.applications) to support community contributed notebooks.
+1. Removes ``quantecon/models`` subpackage and the collection of code examples. Code has been migrated to the QuantEcon.applications (now removed) repository.
+2. Adds a utility for fetching notebook dependencies from QuantEcon.applications (now removed) to support community contributed notebooks.
