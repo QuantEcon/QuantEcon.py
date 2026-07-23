@@ -30,6 +30,7 @@ def float_precision(precision=None):
     >>> import quantecon as qe
     >>> current = qe.timings.float_precision()
     >>> print(f"Current precision: {current}")
+    Current precision: 4
     
     Set new precision:
     >>> qe.timings.float_precision(6)

@@ -47,12 +47,12 @@ class DLE(object):
 
     Parameters
     ----------
-    Information : tuple
+    information : tuple
         Information is a tuple containing the matrices A_{22}, C_2, U_b, and U_d
-    Technology : tuple
+    technology : tuple
         Technology is a tuple containing the matrices \Phi_c, \Phi_g, \Phi_i, \Gamma,
         \Delta_k, and \Theta_k
-    Preferences : tuple
+    preferences : tuple
         Preferences is a tuple containing the scalar \beta and the
         matrices \Lambda, \Pi, \Delta_h, and \Theta_h
 
@@ -161,7 +161,7 @@ class DLE(object):
 
         Parameters
         ----------
-        nnc : array_like(float)
+        nnc : scalar(int), optional(default=2)
             nnc is the location of the constant in the state vector x_t
 
         """
@@ -272,7 +272,7 @@ class DLE(object):
         ts_length : scalar(int)
             Number of periods to calculate IRF
 
-        Shock : array_like(float)
+        shock : array_like(float), optional(default=None)
             Vector of shocks to calculate IRF to. Default is first element of w
 
         """

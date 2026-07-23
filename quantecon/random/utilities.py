@@ -41,9 +41,10 @@ def probvec(m, k, random_state=None, parallel=True):
 
     Examples
     --------
+    >>> import quantecon as qe
     >>> qe.random.probvec(2, 3, random_state=1234)
-    array([[ 0.19151945,  0.43058932,  0.37789123],
-           [ 0.43772774,  0.34763084,  0.21464142]])
+    array([[0.19151945, 0.43058932, 0.37789123],
+           [0.43772774, 0.34763084, 0.21464142]])
 
     """
     if k == 1:
@@ -67,7 +68,7 @@ def _probvec(r, out):  # pragma: no cover
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
-    To be complied as a ufunc by guvectorize of Numba. The inputs must
+    To be compiled as a ufunc by guvectorize of Numba. The inputs must
     have the same shape except the last axis; the length of the last
     axis of `r` must be that of `out` minus 1, i.e., if out.shape[-1] is
     k, then r.shape[-1] must be k-1.
@@ -128,6 +129,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     Examples
     --------
+    >>> import quantecon as qe
     >>> qe.random.sample_without_replacement(5, 3, random_state=1234)
     array([0, 2, 1])
     >>> qe.random.sample_without_replacement(5, 3, num_trials=4,
@@ -155,7 +157,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 @guvectorize(['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True)
 def _sample_without_replacement(n, r, out):
     """
-    Main body of `sample_without_replacement`. To be complied as a ufunc
+    Main body of `sample_without_replacement`. To be compiled as a ufunc
     by guvectorize of Numba.
 
     """
@@ -173,7 +175,9 @@ def _sample_without_replacement(n, r, out):
 def draw(cdf, size=None):
     """
     Generate a random sample according to the cumulative distribution
-    given by `cdf`. Jit-complied by Numba in nopython mode.
+    given by `cdf`. Pure Python implementation; a Numba nopython-mode
+    implementation is registered via `numba.extending.overload`, so
+    calls from within jitted functions are compiled.
 
     Parameters
     ----------
@@ -191,11 +195,14 @@ def draw(cdf, size=None):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> import quantecon as qe
     >>> cdf = np.cumsum([0.4, 0.6])
-    >>> qe.random.draw(cdf)
-    1
+    >>> np.random.seed(1234)
+    >>> int(qe.random.draw(cdf))
+    0
     >>> qe.random.draw(cdf, 10)
-    array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
+    array([1, 1, 1, 1, 0, 0, 1, 1, 1, 0])
 
     """
     if isinstance(size, int):

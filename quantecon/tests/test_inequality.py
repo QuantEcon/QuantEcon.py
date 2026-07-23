@@ -73,7 +73,7 @@ def test_shorrocks_index():
     Test Shorrocks mobility index function against the example used in 'Wealth
     distribution and social mobility in the US: A quantitative approach'
     (Benhabib, Bisin, Luo, 2017).''
-    https://www.econ.nyu.edu/user/bisina/RevisionAugust.pdf
+    https://www.aeaweb.org/articles?id=10.1257/aer.20151684
     """
 
     # Construct the mobility matrix from Benhabib et al.

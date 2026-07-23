@@ -38,7 +38,7 @@ You can check the version by running
     
     print(qe.__version__)
 
-If your version is below what's available on `PyPI <https://pypi.python.org/pypi/quantecon>`_ then it is time to upgrade. 
+If your version is below what's available on `PyPI <https://pypi.org/project/quantecon>`_ then it is time to upgrade. 
 
 This can be done by running
 
@@ -65,7 +65,7 @@ Once you have downloaded the source files then the package can be installed by r
     cd QuantEcon.py
     pip install .
 
-(To learn the basics about setting up Git see `this link <https://docs.github.com/en/get-started/getting-started-with-git/set-up-git>`_).
+(To learn the basics about setting up Git see `this link <https://docs.github.com/en/get-started/git-basics/set-up-git>`_).
 
 Examples and Sample Code
 ------------------------

@@ -296,7 +296,12 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     results : bool, optional(default=False)
         If True, return dictionary with timing results. If False, return None.
     **timer_kwargs
-        Keyword arguments to pass to Timer (message, precision, unit, verbose).
+        Additional keyword arguments controlling output formatting:
+        `precision` (int) and `unit` (str). A `message` argument is
+        accepted for signature compatibility with `Timer` but is not shown
+        in `timeit` output. `verbose` is a parameter of `timeit` itself
+        (see above) and is not forwarded; the internal `Timer` instances
+        are always silenced.
         
     Returns
     -------
@@ -313,14 +318,14 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     Basic usage:
     >>> def slow_function():
     ...     time.sleep(0.01)
-    >>> timeit(slow_function, runs=3)
+    >>> timeit(slow_function, runs=3, precision=2)
     Run 1: 0.01 seconds
     Run 2: 0.01 seconds
     Run 3: 0.01 seconds
     Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
     
     Summary only:
-    >>> timeit(slow_function, runs=3, stats_only=True) 
+    >>> timeit(slow_function, runs=3, stats_only=True, precision=2)
     Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
     
     With custom Timer options:
@@ -330,13 +335,17 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     Average: 10.1 ms, Minimum: 10.0 ms, Maximum: 10.1 ms
     
     Return results for further analysis:
-    >>> results = timeit(slow_function, runs=2, results=True)
+    >>> results = timeit(slow_function, runs=2, results=True, verbose=False)
     >>> print(f"Average time: {results['average']:.4f} seconds")
+    Average time: 0.0120 seconds
     
     Quiet mode:
     >>> timeit(slow_function, runs=2, verbose=False)  # No output
     
     With function arguments using lambda:
+    >>> def expensive_computation(a, b):
+    ...     time.sleep(0.01)
+    ...     return a + b
     >>> add_func = lambda: expensive_computation(5, 10)
     >>> timeit(add_func, runs=2)
     """

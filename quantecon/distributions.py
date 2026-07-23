@@ -79,18 +79,9 @@ class BetaBinomial:
 
         where :math:`B` is the beta function.
 
-        Parameters
-        ----------
-        n : scalar(int)
-            First parameter to the Beta-binomial distribution
-        a : scalar(float)
-            Second parameter to the Beta-binomial distribution
-        b : scalar(float)
-            Third parameter to the Beta-binomial distribution
-
         Returns
         -------
-        probs: array_like(float)
+        probs : array_like(float)
             Vector of probabilities over k
 
         """

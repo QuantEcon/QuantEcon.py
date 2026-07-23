@@ -52,6 +52,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     --------
     Consider the following game from von Stengel [3]_:
 
+    >>> from quantecon.game_theory import NormalFormGame
     >>> np.set_printoptions(precision=4)  # Reduce the digits printed
     >>> bimatrix = [[(3, 3), (3, 2)],
     ...             [(2, 2), (5, 6)],
@@ -63,7 +64,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     pivot:
 
     >>> lemke_howson(g, init_pivot=1)
-    (array([ 0.    ,  0.3333,  0.6667]), array([ 0.3333,  0.6667]))
+    (array([0.    , 0.3333, 0.6667]), array([0.3333, 0.6667]))
     >>> g.is_nash(_)
     True
 
@@ -188,6 +189,18 @@ def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
         Value for capping. If set equal to `max_iter`, then the routine
         is equivalent to the standard Lemke-Howson algorithm.
 
+    Returns
+    -------
+    converged : bool
+        Whether the pivoting terminated before `max_iter` was reached.
+
+    num_iter : scalar(int)
+        Total number of pivoting steps performed across the capped
+        executions.
+
+    init_pivot_used : scalar(int)
+        Initial pivot used in the final execution.
+
     """
     m, n = tableaux[1].shape[0], tableaux[0].shape[0]
     init_pivot_curr = init_pivot
@@ -277,12 +290,12 @@ def _initialize_tableaux(payoff_matrices, tableaux, bases):
     >>> bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
     >>> tableaux, bases = _initialize_tableaux((A, B), tableaux, bases)
     >>> tableaux[0]
-    array([[ 3.,  2.,  3.,  1.,  0.,  1.],
-           [ 2.,  6.,  1.,  0.,  1.,  1.]])
+    array([[3., 2., 3., 1., 0., 1.],
+           [2., 6., 1., 0., 1., 1.]])
     >>> tableaux[1]
-    array([[ 1.,  0.,  0.,  4.,  4.,  1.],
-           [ 0.,  1.,  0.,  3.,  6.,  1.],
-           [ 0.,  0.,  1.,  1.,  7.,  1.]])
+    array([[1., 0., 0., 4., 4., 1.],
+           [0., 1., 0., 3., 6., 1.],
+           [0., 0., 1., 1., 7., 1.]])
     >>> bases
     (array([3, 4]), array([0, 1, 2]))
 

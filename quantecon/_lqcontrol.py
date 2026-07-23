@@ -91,7 +91,7 @@ class LQ:
         T is the number of periods in a finite horizon problem.
     Rf : array_like(float), optional(default=None)
         Rf is the final (in a finite horizon model) payoff(or cost)
-        matrix that corresponds with the control variable u and is n x
+        matrix that corresponds with the state variable x and is n x
         n.  Should be symmetric and non-negative definite
 
     Attributes
