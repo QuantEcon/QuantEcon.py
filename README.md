@@ -8,7 +8,7 @@ A high performance, open source Python code library for economics
   results = aiyagari_ddp.solve(method='policy_iteration')
 ```
 
-[![Build Status](https://github.com/QuantEcon/QuantEcon.py/actions/workflows/ci.yml/badge.svg)](https://github.com/QuantEcon/QuantEcon.py/actions?query=workflow%3Abuild)
+[![Build Status](https://github.com/QuantEcon/QuantEcon.py/actions/workflows/ci.yml/badge.svg)](https://github.com/QuantEcon/QuantEcon.py/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/QuantEcon/QuantEcon.py/badge.svg)](https://coveralls.io/r/QuantEcon/QuantEcon.py)
 [![Documentation (stable)](https://img.shields.io/badge/docs-stable-blue.svg)](https://quanteconpy.readthedocs.io/en/stable/)
 [![Documentation (latest)](https://img.shields.io/badge/docs-latest-blue.svg)](https://quanteconpy.readthedocs.io/en/latest/)
@@ -41,15 +41,15 @@ You can check the version by running
 print(qe.__version__)
 ```
 
-If your version is below what’s available on [PyPI](https://pypi.python.org/pypi/quantecon/) then it is time to upgrade. This can be done by running
+If your version is below what’s available on [PyPI](https://pypi.org/project/quantecon/) then it is time to upgrade. This can be done by running
 
     pip install --upgrade quantecon
 
 ## Examples and Sample Code
 
-Many examples of QuantEcon.py in action can be found at [Quantitative Economics](https://lectures.quantecon.org/). See also the
+Many examples of QuantEcon.py in action can be found at [Quantitative Economics](https://quantecon.org/lectures/). See also the
 
-*   [Documentation](https://quanteconpy.readthedocs.org/en/latest/)
+*   [Documentation](https://quanteconpy.readthedocs.io/en/latest/)
 *   [Notebook gallery](https://github.com/QuantEcon/notebook-gallery)
 
 QuantEcon.py is supported financially by the [Alfred P. Sloan Foundation](http://www.sloan.org/) and is part of the [QuantEcon organization](https://quantecon.org).
@@ -62,10 +62,10 @@ An alternative is to download the sourcecode of the `quantecon` package and in
 
 Once you have downloaded the source files then the package can be installed by running
 
-    pip install flit
-    flit install
+    cd QuantEcon.py
+    pip install .
 
-(To learn the basics about setting up Git see [this link](https://help.github.com/articles/set-up-git/).)
+(To learn the basics about setting up Git see [this link](https://docs.github.com/en/get-started/git-basics/set-up-git).)
 
 ## Citation
 
@@ -76,13 +76,14 @@ A BibTeX entry for LaTeX users is
 ```bibtex
 @article{10.21105/joss.05585,
 author = {Batista, Quentin and Coleman, Chase and Furusawa, Yuya and Hu, Shu and Lunagariya, Smit and Lyon, Spencer and McKay, Matthew and Oyama, Daisuke and Sargent, Thomas J. and Shi, Zejin and Stachurski, John and Winant, Pablo and Watkins, Natasha and Yang, Ziyue and Zhang, Hengcheng},
-doi = {10.5281/zenodo.10345102},
+doi = {10.21105/joss.05585},
 title = {QuantEcon.py: A community based Python library for quantitative economics},
 year = {2024},
 journal = {Journal of Open Source Software},
 volume = {9},
 number = {93},
-pages = {5585}
+pages = {5585},
+url = {https://joss.theoj.org/papers/10.21105/joss.05585}
 }
 ```
 

@@ -16,13 +16,13 @@ class FictitiousPlay:
         `NormalFormGame` or an array. See `NormalFormGame`.
 
     gain : scalar(float), optional(default=None)
-        The gain of fictitous play model. If gain is None, the model becomes a
+        The gain of fictitious play model. If gain is None, the model becomes a
         decreasing gain model. If gain is a scalar, the model becomes a
         constant gain model.
 
     Attributes
     ----------
-    g : NomalFormGame
+    g : NormalFormGame
         The game played in the model.
 
     N : scalar(int)
@@ -174,14 +174,14 @@ class StochasticFictitiousPlay(FictitiousPlay):
     distribution : scipy.stats object
         The distribution of payoff shocks, which is a `scipy.stats` object.
 
-    gain : scalar(scalar), optional(default=None)
+    gain : scalar(float), optional(default=None)
         The gain of fictitious play model. If gain is None, the model becomes a
         decreasing gain model. If gain is a scalar, the model becomes a
         constant gain model.
 
     Attributes
     ----------
-    See attributes of `FictitousPlay`.
+    See attributes of `FictitiousPlay`.
 
     """
     def __init__(self, data, distribution, gain=None):

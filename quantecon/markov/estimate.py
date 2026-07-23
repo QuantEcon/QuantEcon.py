@@ -65,12 +65,16 @@ def fit_discrete_mc(X, grids, order='C'):
     Parameters
     ----------
 
-    X: array_like(ndim=2)
+    X : array_like(ndim=2)
         Time-series such that the t-th row is :math:`x_t`.
         It should be of the shape T x n, where n is the number of dimensions.
 
-    grids: array_like(array_like(ndim=1))
+    grids : array_like(array_like(ndim=1))
         Array of `n` sorted arrays. Set of grid points in each dimension
+
+    order : str, optional(default='C')
+        ('C' or 'F') order in which the states in the cartesian grid are
+        enumerated.
 
     Examples
     --------
@@ -90,7 +94,7 @@ def fit_discrete_mc(X, grids, order='C'):
     Returns
     -------
 
-    mc: MarkovChain
+    mc : MarkovChain
         An instance of the MarkovChain class constructed after discretization
         onto the grid.
     """

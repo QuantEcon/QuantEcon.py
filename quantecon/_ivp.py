@@ -5,11 +5,11 @@ Base class for solving initial value problems (IVPs) of the form:
 
     \frac{dy}{dt} = f(t,y),\ y(t_0) = y_0
 
-using finite difference methods. The `quantecon.ivp` class uses various
+using finite difference methods. The `quantecon.IVP` class uses various
 integrators from the `scipy.integrate.ode` module to perform the
 integration (i.e., solve the ODE) and parametric B-spline interpolation
 from `scipy.interpolate` to approximate the value of the solution
-between grid points. The `quantecon.ivp` module also provides a method
+between grid points. The `quantecon.IVP` class also provides a method
 for computing the residual of the solution which can be used for
 assessing the overall accuracy of the approximated solution.
 
@@ -158,7 +158,7 @@ class IVP(integrate.ode):
             user must also specify a stopping tolerance, `tol`.
         tol : float, optional (default=None)
             Stopping tolerance for the integration. Only required if `g` is
-            also specifed.
+            also specified.
         integrator : str, optional(default='dopri5')
             Must be one of 'vode', 'lsoda', 'dopri5', or 'dop853'
         step : bool, optional(default=False)
@@ -174,7 +174,7 @@ class IVP(integrate.ode):
 
         Returns
         -------
-        solution: ndarray (float)
+        solution : ndarray (float)
             Simulated solution trajectory.
 
         """
@@ -208,14 +208,14 @@ class IVP(integrate.ode):
         der : int, optional(default=0)
             The order of derivative of the spline to compute (must be less
             than or equal to `k`).
-        ext : int, optional(default=2) Controls the value of returned elements
-            for outside the original knot sequence provided by traj. For
-            extrapolation, set `ext=0`; `ext=1` returns zero; `ext=2` raises a
-            `ValueError`.
+        ext : int, optional(default=2)
+            Controls the value of returned elements for outside the
+            original knot sequence provided by traj. For extrapolation, set
+            `ext=0`; `ext=1` returns zero; `ext=2` raises a `ValueError`.
 
         Returns
         -------
-        interp_traj: ndarray (float)
+        interp_traj : ndarray (float)
             The interpolated trajectory.
 
         """

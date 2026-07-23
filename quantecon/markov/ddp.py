@@ -756,7 +756,10 @@ class DiscreteDP:
 
         max_iter : scalar(int), optional(default=None)
             Maximum number of iterations. If None, the value stored in
-            the attribute `max_iter` is used.
+            the attribute `max_iter` is used, except for
+            `method='linear_programming'`, where the attribute
+            `max_iter` times the number of states is used (the iteration
+            count there refers to simplex pivoting steps).
 
         k : scalar(int), optional(default=20)
             Number of iterations for partial policy evaluation in
@@ -937,6 +940,12 @@ class DiscreteDP:
         return res
 
     def linprog_simplex(self, v_init=None, max_iter=None):
+        """
+        Solve the optimization problem by linear programming. See the
+        `solve` method. Not implemented for the sparse formulation; if
+        `max_iter` is None, `self.max_iter * self.num_states` is used.
+
+        """
         if self.beta == 1:
             raise NotImplementedError(self._error_msg_no_discounting)
 
@@ -1017,6 +1026,10 @@ class DPSolveResult(dict):
 
     max_iter : int
         Maximum number of iterations
+
+    k : int
+        Number of iterations for partial policy evaluation (modified
+        policy iteration only)
 
     """
     # This is sourced from sicpy.optimize.OptimizeResult.

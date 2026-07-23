@@ -36,9 +36,11 @@ def lorenz_curve(y):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon import lorenz_curve
     >>> a_val, n = 3, 10_000
     >>> y = np.random.pareto(a_val, size=n)
-    >>> f_vals, l_vals = lorenz(y)
+    >>> f_vals, l_vals = lorenz_curve(y)
 
     """
 

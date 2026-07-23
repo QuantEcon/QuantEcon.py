@@ -68,6 +68,35 @@ jobs:
         file: coverage.lcov
         format: lcov
 
+  docs:
+
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        # mirrors the Read the Docs build (see .readthedocs.yaml)
+        python-version: "3.14"
+    - name: Install dependencies
+      run: |
+        pip install -r docs/rtd-requirements.txt
+        pip install .
+    - name: Check generated sources are up to date
+      # Read the Docs builds the *committed* .rst files and never runs
+      # qe_apidoc.py, so regenerating here would pass green while RTD
+      # served stale pages. Fail if the committed sources have drifted.
+      working-directory: docs
+      run: python qe_apidoc.py
+    - name: Fail on docs/source drift
+      run: |
+        git diff --exit-code -- docs/source \
+          || { echo "::error::docs/source is stale -- run 'cd docs && python qe_apidoc.py' and commit the result"; exit 1; }
+    - name: Build HTML
+      working-directory: docs
+      run: sphinx-build -b html --keep-going source build/html
+
   publish:
 
     name: Publish to PyPi
