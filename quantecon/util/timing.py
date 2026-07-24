@@ -1,14 +1,43 @@
 """
 Provides Matlab-like tic, tac and toc functions.
 
+.. deprecated:: 0.12.0
+    The Matlab-like ``tic``, ``tac``, ``toc`` and ``loop_timer`` functions
+    are deprecated and will be removed in a future release. Use the
+    :class:`Timer` context manager or the :func:`timeit` function instead.
+
 """
 import time
+import warnings
 import numpy as np
 from ..timings.timings import get_default_precision
 
 
+def _warn_timer_deprecated(old_name, replacement):
+    """
+    Emit a ``DeprecationWarning`` for the legacy Matlab-like timers.
+
+    Parameters
+    ----------
+    old_name : str
+        Name of the deprecated function (e.g. ``"tic"``).
+    replacement : str
+        Human-readable description of the recommended replacement.
+
+    """
+    warnings.warn(
+        f"`{old_name}` is deprecated and will be removed in v1.0. "
+        f"Use {replacement} instead.",
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
+
 class __Timer__:
     """Computes elapsed time, between tic, tac, and toc.
+
+    .. deprecated:: 0.12.0
+        Use the :class:`Timer` context manager or :func:`timeit` instead.
 
     Methods
     -------
@@ -30,7 +59,10 @@ class __Timer__:
     def tic(self):
         """
         Save time for future use with `tac()` or `toc()`.
-        
+
+        .. deprecated:: 0.12.0
+            Use the :class:`Timer` context manager instead.
+
         Returns
         -------
         None
@@ -44,6 +76,9 @@ class __Timer__:
         """
         Return and print elapsed time since last `tic()`, `tac()`, or
         `toc()`.
+
+        .. deprecated:: 0.12.0
+            Use the :class:`Timer` context manager instead.
 
         Parameters
         ----------
@@ -77,6 +112,9 @@ class __Timer__:
     def toc(self, verbose=True, digits=2):
         """
         Return and print time elapsed since last `tic()`.
+
+        .. deprecated:: 0.12.0
+            Use the :class:`Timer` context manager instead.
 
         Parameters
         ----------
@@ -113,6 +151,9 @@ class __Timer__:
         Return and print the total and average time elapsed for n runs
         of function.
 
+        .. deprecated:: 0.12.0
+            Use the :func:`timeit` function instead.
+
         Parameters
         ----------
         n : scalar(int)
@@ -142,7 +183,7 @@ class __Timer__:
             Average of best_of times for n runs of function.
 
         """
-        tic()
+        self.tic()
         all_times = np.empty(n)
         for run in range(n):
             if hasattr(args, '__iter__'):
@@ -151,9 +192,9 @@ class __Timer__:
                 function()
             else:
                 function(args)
-            all_times[run] = tac(verbose=False, digits=digits)
+            all_times[run] = self.tac(verbose=False, digits=digits)
 
-        elapsed = toc(verbose=False, digits=digits)
+        elapsed = self.toc(verbose=False, digits=digits)
 
         m, s = divmod(elapsed, 60)
         h, m = divmod(m, 60)
@@ -441,18 +482,22 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
 
 
 def tic():
+    _warn_timer_deprecated("tic", "the `Timer` context manager")
     return __timer__.tic()
 
 
 def tac(verbose=True, digits=2):
+    _warn_timer_deprecated("tac", "the `Timer` context manager")
     return __timer__.tac(verbose, digits)
 
 
 def toc(verbose=True, digits=2):
+    _warn_timer_deprecated("toc", "the `Timer` context manager")
     return __timer__.toc(verbose, digits)
 
 
 def loop_timer(n, function, args=None, verbose=True, digits=2, best_of=3):
+    _warn_timer_deprecated("loop_timer", "the `timeit` function")
     return __timer__.loop_timer(n, function, args, verbose, digits, best_of)
 
 
