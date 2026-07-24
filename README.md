@@ -13,6 +13,7 @@ A high performance, open source Python code library for economics
 [![Documentation (stable)](https://img.shields.io/badge/docs-stable-blue.svg)](https://quanteconpy.readthedocs.io/en/stable/)
 [![Documentation (latest)](https://img.shields.io/badge/docs-latest-blue.svg)](https://quanteconpy.readthedocs.io/en/latest/)
 [![PyPI Version](https://img.shields.io/pypi/v/quantecon.svg)](https://pypi.org/project/quantecon/)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/quantecon)](https://anaconda.org/conda-forge/quantecon)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/quantecon.svg)](https://pypi.org/project/quantecon/)
 
 ## Installation
