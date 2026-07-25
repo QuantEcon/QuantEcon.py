@@ -42,17 +42,20 @@ def random_markov_chain(n, k=None, sparse=False, random_state=None):
 
     Examples
     --------
+    >>> import numpy as np
     >>> import quantecon as qe
-    >>> mc = qe.markov.random_markov_chain(3, random_state=1234)
+    >>> rng = np.random.default_rng(1234)
+    >>> mc = qe.markov.random_markov_chain(3, random_state=rng)
     >>> mc.P
-    array([[0.19151945, 0.43058932, 0.37789123],
-           [0.43772774, 0.34763084, 0.21464142],
-           [0.27259261, 0.5073832 , 0.22002419]])
-    >>> mc = qe.markov.random_markov_chain(3, k=2, random_state=1234)
+    array([[0.38019574, 0.59650403, 0.02330023],
+           [0.26169242, 0.66155381, 0.07675377],
+           [0.11809123, 0.20100583, 0.68090294]])
+    >>> rng = np.random.default_rng(1234)
+    >>> mc = qe.markov.random_markov_chain(3, k=2, random_state=rng)
     >>> mc.P
-    array([[0.19151945, 0.80848055, 0.        ],
-           [0.        , 0.62210877, 0.37789123],
-           [0.56227226, 0.        , 0.43772774]])
+    array([[0.97669977, 0.        , 0.02330023],
+           [0.38019574, 0.        , 0.61980426],
+           [0.92324623, 0.07675377, 0.        ]])
 
     """
     P = random_stochastic_matrix(n, k, sparse, format='csr',

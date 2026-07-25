@@ -41,10 +41,12 @@ def probvec(m, k, random_state=None, parallel=True):
 
     Examples
     --------
+    >>> import numpy as np
     >>> import quantecon as qe
-    >>> qe.random.probvec(2, 3, random_state=1234)
-    array([[0.19151945, 0.43058932, 0.37789123],
-           [0.43772774, 0.34763084, 0.21464142]])
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.probvec(2, 3, random_state=rng)
+    array([[0.38019574, 0.59650403, 0.02330023],
+           [0.26169242, 0.66155381, 0.07675377]])
 
     """
     if k == 1:
@@ -129,15 +131,18 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     Examples
     --------
+    >>> import numpy as np
     >>> import quantecon as qe
-    >>> qe.random.sample_without_replacement(5, 3, random_state=1234)
-    array([0, 2, 1])
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.sample_without_replacement(5, 3, random_state=rng)
+    array([4, 1, 2])
+    >>> rng = np.random.default_rng(1234)
     >>> qe.random.sample_without_replacement(5, 3, num_trials=4,
-    ...                                      random_state=1234)
-    array([[0, 2, 1],
-           [3, 4, 0],
-           [1, 3, 2],
-           [4, 1, 3]])
+    ...                                      random_state=rng)
+    array([[4, 1, 2],
+           [1, 4, 0],
+           [1, 4, 2],
+           [1, 4, 3]])
 
     """
     if n <= 0:
@@ -193,16 +198,23 @@ def draw(cdf, size=None):
     -------
     scalar(int) or ndarray(int, ndim=1)
 
+    Notes
+    -----
+    Unlike the other functions in this module, `draw` draws from NumPy's
+    global random state and takes no `random_state` argument, so its
+    output cannot be made reproducible by passing a generator. The
+    example below therefore checks properties of the sample rather than
+    matching exact values.
+
     Examples
     --------
     >>> import numpy as np
     >>> import quantecon as qe
     >>> cdf = np.cumsum([0.4, 0.6])
-    >>> np.random.seed(1234)
-    >>> int(qe.random.draw(cdf))
-    0
-    >>> qe.random.draw(cdf, 10)
-    array([1, 1, 1, 1, 0, 0, 1, 1, 1, 0])
+    >>> qe.random.draw(cdf) in (0, 1)
+    True
+    >>> qe.random.draw(cdf, 10).shape
+    (10,)
 
     """
     if isinstance(size, int):
