@@ -1,16 +1,13 @@
 Installation
 ============
 
-Before installing `quantecon` we recommend you install the `Anaconda <https://www.anaconda.com/download/>`_ Python distribution, 
-which includes a full suite of scientific python tools.
-
-Next you can install quantecon by opening a terminal prompt and typing
+Install ``quantecon`` from PyPI by opening a terminal and typing
 
 .. code:: bash
 
     pip install quantecon
 
-and using `conda-forge` by typing
+Alternatively, install the ``conda-forge`` package by typing
 
 .. code:: bash
 

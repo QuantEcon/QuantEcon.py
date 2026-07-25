@@ -80,6 +80,15 @@ The rendered pages are written to ``docs/build/html``. Once you open a pull requ
 documentation is also built automatically by `Read the Docs <https://readthedocs.org>`_ and linked from
 the pull request checks.
 
+Prepare a release
+-----------------
+
+Before tagging a release:
+
+* Update ``__version__`` in ``quantecon/__init__.py``.
+* Update ``version`` and ``date-released`` in ``CITATION.cff`` to match the release.
+* Run ``cffconvert --validate`` to validate the citation metadata.
+
 Further questions
 -----------------
 
