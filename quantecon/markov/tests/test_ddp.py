@@ -465,8 +465,8 @@ def test_ddp_to_sa_and_to_product():
     # make sure conversion worked
     for ddp_s in [ddp_sa, ddp_sa2, ddp_sa3]:
         assert_allclose(ddp_s.R, sparse_R)
-        # allcose doesn't work on sparse
-        np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15
+        # allclose doesn't work on sparse
+        assert np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15
         assert_allclose(ddp_s.beta, beta)
 
     # these two will have probability 0 in state 2, action 0 b/c
