@@ -92,7 +92,9 @@ class TestLQNash:
         tfi = np.linalg.inv(tf)
         xbar = tfi.dot(aaa[:2, 2])
 
-        # Define answers from matlab. TODO: this is ghetto
+        # Define answers from matlab. TODO: hardcoding these
+        # expected values is a fragile way to pin down the outputs
+        
         f1_ml = np.array([
                [0.243666582208565,   0.027236062661951, -6.827882928738190],
                [0.392370733875639,   0.139696450885998, -37.734107291009138]
