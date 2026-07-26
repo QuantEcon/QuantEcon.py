@@ -206,8 +206,8 @@ def random_discrete_dp(num_states, num_actions, beta=None,
         s_indices, a_indices = sa_indices(num_states, num_actions)
     else:
         s_indices, a_indices = None, None
-        R.shape = (num_states, num_actions)
-        Q.shape = (num_states, num_actions, num_states)
+        R = R.reshape(num_states, num_actions)
+        Q = Q.reshape(num_states, num_actions, num_states)
 
     ddp = DiscreteDP(R, Q, beta, s_indices, a_indices)
     return ddp
