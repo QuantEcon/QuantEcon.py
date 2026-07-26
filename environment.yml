@@ -7,7 +7,8 @@ dependencies:
   - numpy
   - scipy
   - pandas
-  - numba
+  # >=0.62: JIT coverage (NUMBA_JIT_COVERAGE) respects .coveragerc from 0.62 on
+  - numba>=0.62
   - sympy
   - ipython
   - flake8
