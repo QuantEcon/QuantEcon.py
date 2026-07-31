@@ -206,18 +206,21 @@ class Timer:
         
     Examples
     --------
+    The timing values shown below are illustrative only; actual values
+    vary with machine and load.
+
     Basic usage:
     >>> with Timer():
     ...     # some code
     ...     pass
     0.0000 seconds elapsed
-    
+
     With custom message and precision:
     >>> with Timer("Computing results", precision=6):
-    ...     # some code  
+    ...     # some code
     ...     pass
     Computing results: 0.000001 seconds elapsed
-    
+
     Store elapsed time for comparison:
     >>> timer = Timer(verbose=False)
     >>> with timer:
@@ -315,7 +318,11 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
         
     Examples
     --------
+    The timing values shown below are illustrative only; actual values
+    vary with machine and load.
+
     Basic usage:
+    >>> import time
     >>> def slow_function():
     ...     time.sleep(0.01)
     >>> timeit(slow_function, runs=3, precision=2)
@@ -323,31 +330,34 @@ def timeit(func, runs=1, stats_only=False, verbose=True, results=False, **timer_
     Run 2: 0.01 seconds
     Run 3: 0.01 seconds
     Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
-    
+
     Summary only:
     >>> timeit(slow_function, runs=3, stats_only=True, precision=2)
     Average: 0.01 seconds, Minimum: 0.01 seconds, Maximum: 0.01 seconds
-    
+
     With custom Timer options:
     >>> timeit(slow_function, runs=2, unit="milliseconds", precision=1)
     Run 1: 10.1 ms
-    Run 2: 10.0 ms  
+    Run 2: 10.0 ms
     Average: 10.1 ms, Minimum: 10.0 ms, Maximum: 10.1 ms
-    
+
     Return results for further analysis:
     >>> results = timeit(slow_function, runs=2, results=True, verbose=False)
     >>> print(f"Average time: {results['average']:.4f} seconds")
-    Average time: 0.0120 seconds
-    
+    Average time: 0.0103 seconds
+
     Quiet mode:
     >>> timeit(slow_function, runs=2, verbose=False)  # No output
-    
+
     With function arguments using lambda:
     >>> def expensive_computation(a, b):
     ...     time.sleep(0.01)
     ...     return a + b
     >>> add_func = lambda: expensive_computation(5, 10)
     >>> timeit(add_func, runs=2)
+    Run 1: 0.0103 seconds
+    Run 2: 0.0102 seconds
+    Average: 0.0103 seconds, Minimum: 0.0102 seconds, Maximum: 0.0103 seconds
     """
     if not isinstance(runs, int) or runs < 1:
         raise ValueError("runs must be a positive integer")
