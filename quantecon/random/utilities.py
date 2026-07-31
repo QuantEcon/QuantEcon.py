@@ -200,21 +200,22 @@ def draw(cdf, size=None):
 
     Notes
     -----
-    Unlike the other functions in this module, `draw` draws from NumPy's
-    global random state and takes no `random_state` argument, so its
-    output cannot be made reproducible by passing a generator. The
-    example below therefore checks properties of the sample rather than
-    matching exact values.
+    `draw` takes no `random_state` argument. Called from Python it draws
+    from NumPy's legacy global random state, so `np.random.seed` makes it
+    reproducible. Called from within a jitted function it draws from
+    Numba's own internal random state, which is independent of NumPy's and
+    must be seeded by calling `np.random.seed` inside the jitted function.
 
     Examples
     --------
     >>> import numpy as np
     >>> import quantecon as qe
     >>> cdf = np.cumsum([0.4, 0.6])
-    >>> qe.random.draw(cdf) in (0, 1)
-    True
-    >>> qe.random.draw(cdf, 10).shape
-    (10,)
+    >>> np.random.seed(1234)
+    >>> qe.random.draw(cdf, 10)
+    array([0, 1, 1, 1, 1, 0, 0, 1, 1, 1])
+    >>> int(qe.random.draw(cdf))
+    0
 
     """
     if isinstance(size, int):
