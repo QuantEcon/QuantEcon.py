@@ -5,6 +5,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 
 import numpy as np
 from numba import guvectorize, types
+from numba.core.errors import TypingError
 from numba.extending import overload
 from ..util import check_random_state
 
@@ -170,7 +171,7 @@ def _sample_without_replacement(n, r, out):
 
 
 # Pure python implementation that will run if the JIT compiler is disabled
-def draw(cdf, size=None):
+def draw(cdf, size=None, random_state=None):
     """
     Generate a random sample according to the cumulative distribution
     given by `cdf`. Jit-complied by Numba in nopython mode.
@@ -185,40 +186,156 @@ def draw(cdf, size=None):
         `size` independent draws is returned; otherwise, a single draw
         is returned as a scalar.
 
+    random_state : int or np.random.RandomState/Generator, optional
+        Random seed (integer) or np.random.RandomState or Generator
+        instance to set the initial state of the random number generator
+        for reproducibility. If None, the global random state described
+        in Notes is used. Called from within a jit-compiled function,
+        only a Generator or None is accepted.
+
     Returns
     -------
     scalar(int) or ndarray(int, ndim=1)
 
+    Notes
+    -----
+    An `np.random.Generator` is the only value of `random_state` that
+    behaves identically on both paths: called from Python and called
+    from within a jit-compiled function it consumes the same generator
+    and returns the same draws. Pass one whenever the call site may be
+    jit-compiled.
+
+    Numba's nopython mode can neither construct a generator nor
+    represent `np.random.RandomState`, so an integer seed and a
+    `RandomState` are accepted only on the pure Python path; supplying
+    either from within a jit-compiled function raises a compile-time
+    `numba.TypingError`. Note also that a `Generator` and a
+    `RandomState` seeded with the same integer produce different
+    streams, so ``draw(cdf, n, 1234)`` and
+    ``draw(cdf, n, np.random.default_rng(1234))`` are each reproducible
+    but are not equal to each other.
+
+    If `random_state` is None the draws come from a global random state
+    that depends on the call site: NumPy's legacy global random state
+    from Python, seeded by `np.random.seed`, and Numba's own internal
+    random state from within a jit-compiled function, seeded by calling
+    `np.random.seed` inside the jit-compiled function. Both are Mersenne
+    Twister and give the same stream for the same seed, but they advance
+    independently, so seeding one has no effect on the other.
+
+    A single `Generator` must not be shared across the iterations of a
+    `numba.prange` loop. Its state is updated in place, so concurrent
+    iterations race and can consume the same underlying random number;
+    the draws are then neither reproducible nor independent. Give each
+    iteration its own generator, spawned with `Generator.spawn` outside
+    the jit-compiled function -- `spawn` itself cannot be called in
+    nopython mode.
+
     Examples
     --------
+    >>> import numpy as np
+    >>> import quantecon as qe
     >>> cdf = np.cumsum([0.4, 0.6])
-    >>> qe.random.draw(cdf)
-    1
-    >>> qe.random.draw(cdf, 10)
-    array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
+    >>> qe.random.draw(cdf, 10, random_state=1234)
+    array([0, 1, 1, 1, 1, 0, 0, 1, 1, 1])
+    >>> int(qe.random.draw(cdf, random_state=1234))
+    0
+
+    A `Generator` gives the same draws from Python and from within a
+    jit-compiled function:
+
+    >>> from numba import njit
+    >>> @njit
+    ... def draw_jitted(cdf, size, random_state):
+    ...     return qe.random.draw(cdf, size, random_state)
+    >>> qe.random.draw(cdf, 5, np.random.default_rng(1234))
+    array([1, 0, 1, 0, 0])
+    >>> draw_jitted(cdf, 5, np.random.default_rng(1234))
+    array([1, 0, 1, 0, 0])
 
     """
+    random_state = check_random_state(random_state)
     if isinstance(size, int):
-        rs = np.random.random(size)
+        rs = random_state.random(size)
         out = np.searchsorted(cdf, rs, side='right')
         return out
     else:
-        r = np.random.random()
+        r = random_state.random()
         return np.searchsorted(cdf, r, side='right')
 
 
+def _is_no_random_state(numba_type):
+    """
+    Return True if `numba_type`, as seen from inside the `draw`
+    overload, means that `random_state` was not supplied.
+
+    Numba spells "no value" in more than one way depending on the call
+    site, and each must be recognised: an omitted argument, as in
+    ``draw(cdf, 10)``, arrives as the *Python* object `None`, while an
+    explicit `None`, as in ``draw(cdf, 10, None)``, and a `None` default
+    forwarded by a jit-compiled caller both arrive as
+    `numba.types.none`. `numba.types.Omitted` is not currently observed
+    in an `@overload` body but is handled for the benefit of other Numba
+    typing templates.
+
+    """
+    return (numba_type is None or
+            isinstance(numba_type, types.NoneType) or
+            (isinstance(numba_type, types.Omitted) and
+             numba_type.value is None))
+
+
 # Overload for the `draw` function
+#
+# The implementations below must return the same values as the pure
+# Python body above: the same random numbers drawn in the same order,
+# and the same `searchsorted` result. The sized branches keep the
+# hand-written loop rather than the array `np.searchsorted` used in the
+# Python body -- Numba supports both and they agree exactly, but the
+# loop is measurably faster. `TestDraw.test_python_jitted_agree` is what
+# holds the two paths together.
 @overload(draw)
-def ol_draw(cdf, size=None):
-    if isinstance(size, types.Integer):
-        def draw_impl(cdf, size=None):
-            rs = np.random.random(size)
-            out = np.empty(size, dtype=np.int_)
-            for i in range(size):
-                out[i] = np.searchsorted(cdf, rs[i], side='right')
-            return out
+def ol_draw(cdf, size=None, random_state=None):
+    if isinstance(random_state, types.NumPyRandomGeneratorType):
+        if isinstance(size, types.Integer):
+            def draw_impl(cdf, size=None, random_state=None):
+                rs = random_state.random(size)
+                out = np.empty(size, dtype=np.int_)
+                for i in range(size):
+                    out[i] = np.searchsorted(cdf, rs[i], side='right')
+                return out
+        else:
+            def draw_impl(cdf, size=None, random_state=None):
+                r = random_state.random()
+                return np.searchsorted(cdf, r, side='right')
+    elif _is_no_random_state(random_state):
+        if isinstance(size, types.Integer):
+            def draw_impl(cdf, size=None, random_state=None):
+                rs = np.random.random(size)
+                out = np.empty(size, dtype=np.int_)
+                for i in range(size):
+                    out[i] = np.searchsorted(cdf, rs[i], side='right')
+                return out
+        else:
+            def draw_impl(cdf, size=None, random_state=None):
+                r = np.random.random()
+                return np.searchsorted(cdf, r, side='right')
     else:
-        def draw_impl(cdf, size=None):
-            r = np.random.random()
-            return np.searchsorted(cdf, r, side='right')
+        if (isinstance(random_state, types.Optional) and
+                isinstance(random_state.type,
+                           types.NumPyRandomGeneratorType)):
+            hint = ('Numba could not prove that `random_state` is a '
+                    'Generator rather than None at this call site; hoist '
+                    'the None case out of the branch that reaches `draw`.')
+        else:
+            hint = ('Integer seeds and np.random.RandomState are accepted '
+                    'only on the pure Python path, because nopython mode '
+                    'cannot construct a generator. Build one outside the '
+                    'jit-compiled function with np.random.default_rng(seed) '
+                    'and pass that in.')
+        raise TypingError(
+            'quantecon.random.draw: `random_state` must be None or an '
+            'np.random.Generator when `draw` is called from a jit-compiled '
+            f'function; got {random_state}. {hint}'
+        )
     return draw_impl
