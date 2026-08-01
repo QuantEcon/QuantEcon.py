@@ -246,7 +246,11 @@ def draw(cdf, size=None, rng=None):
     """
     if rng is None:
         rng = np.random
-    if isinstance(size, int):
+    integer_size = (
+        isinstance(size, (int, np.integer))
+        and not isinstance(size, (bool, np.bool_))
+    )
+    if integer_size:
         rs = rng.random(size)
         out = np.searchsorted(cdf, rs, side='right')
         return out
@@ -287,8 +291,9 @@ def _is_no_rng(numba_type):
 # holds the two paths together.
 @overload(draw)
 def ol_draw(cdf, size=None, rng=None):
+    is_integer_size = isinstance(size, types.Integer) and not isinstance(size, types.Boolean)
     if isinstance(rng, types.NumPyRandomGeneratorType):
-        if isinstance(size, types.Integer):
+        if is_integer_size:
             def draw_impl(cdf, size=None, rng=None):
                 rs = rng.random(size)
                 out = np.empty(size, dtype=np.int_)
@@ -300,7 +305,7 @@ def ol_draw(cdf, size=None, rng=None):
                 r = rng.random()
                 return np.searchsorted(cdf, r, side='right')
     elif _is_no_rng(rng):
-        if isinstance(size, types.Integer):
+        if is_integer_size:
             def draw_impl(cdf, size=None, rng=None):
                 rs = np.random.random(size)
                 out = np.empty(size, dtype=np.int_)
