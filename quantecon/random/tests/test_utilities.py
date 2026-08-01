@@ -90,6 +90,17 @@ class TestDraw:
             out = func(self.cdf, size)
             assert_(out.shape == (size,))
 
+    def test_numpy_integer_size_returns_array(self):
+        size = np.int64(10)
+        for func in self.draw_funcs:
+            out = func(self.cdf, size)
+            assert_(out.shape == (size,))
+
+    def test_bool_size_is_treated_as_scalar(self):
+        for func in self.draw_funcs:
+            out = func(self.cdf, True)
+            assert_(isinstance(out, numbers.Integral))
+
     def test_return_values(self):
         for func in self.draw_funcs:
             out = func(self.cdf)
