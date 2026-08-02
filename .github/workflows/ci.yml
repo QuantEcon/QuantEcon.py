@@ -50,11 +50,18 @@ jobs:
     - name: flake8 Tests
       shell: bash -l {0}
       run: |
-        flake8 --select=F401,F405,E231 quantecon
+        flake8 --select=F401,F405,E231 quantecon conftest.py
     - name: Run Tests (pytest)
       shell: bash -l {0}
       run: |
         pytest quantecon
+    - name: Run docstring examples (doctest)
+      # one platform is enough to stop examples drifting, and float
+      # reprs are the platform-sensitive part of doctest output
+      if: runner.os == 'Linux'
+      shell: bash -l {0}
+      run: |
+        pytest --doctest-modules quantecon --ignore-glob='*/tests/*'
 
   coverage:
     name: Coverage
