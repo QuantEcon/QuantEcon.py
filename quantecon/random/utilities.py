@@ -214,8 +214,8 @@ def draw(cdf, size=None):
     >>> np.random.seed(1234)
     >>> qe.random.draw(cdf, 10)
     array([0, 1, 1, 1, 1, 0, 0, 1, 1, 1])
-    >>> int(qe.random.draw(cdf))
-    0
+    >>> qe.random.draw(cdf)
+    np.int64(0)
 
     """
     if isinstance(size, int):

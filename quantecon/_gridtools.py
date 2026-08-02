@@ -161,8 +161,8 @@ def cartesian_nearest_index(x, nodes, order='C'):
     the point (0.6, 0.4) is `prod[2]`:
 
     >>> x = (0.6, 0.4)
-    >>> int(qe.cartesian_nearest_index(x, nodes))  # Pass `nodes`, not `prod`
-    2
+    >>> qe.cartesian_nearest_index(x, nodes)  # Pass `nodes`, not `prod`
+    np.int64(2)
 
     The closest to (-0.1, 1.2) and (2, 0) are `prod[1]` and `prod[4]`,
     respectively:

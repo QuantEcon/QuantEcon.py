@@ -323,8 +323,8 @@ def _ints_arr_to_bits(ints_arr, out):
     Examples
     --------
     >>> ints_arr = np.array([0, 1, 2], dtype=np.int32)
-    >>> int(_ints_arr_to_bits(ints_arr))
-    7
+    >>> _ints_arr_to_bits(ints_arr)
+    np.uint64(7)
     >>> ints_arr2d = np.array([[0, 1, 2], [3, 0, 1]], dtype=np.int32)
     >>> _ints_arr_to_bits(ints_arr2d)
     array([ 7, 11], dtype=uint64)

@@ -107,8 +107,8 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     >>> w = M @ res.z + q
     >>> w
     array([0., 4., 2.])
-    >>> float(res.z @ w)
-    0.0
+    >>> res.z @ w
+    np.float64(0.0)
 
     References
     ----------
