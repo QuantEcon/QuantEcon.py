@@ -198,7 +198,11 @@ def draw(cdf, size=None):
     array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
 
     """
-    if isinstance(size, int):
+    integer_size = (
+        isinstance(size, (int, np.integer))
+        and not isinstance(size, (bool, np.bool_))
+    )
+    if integer_size:
         rs = np.random.random(size)
         out = np.searchsorted(cdf, rs, side='right')
         return out
@@ -210,7 +214,7 @@ def draw(cdf, size=None):
 # Overload for the `draw` function
 @overload(draw)
 def ol_draw(cdf, size=None):
-    if isinstance(size, types.Integer):
+    if isinstance(size, types.Integer) and not isinstance(size, types.Boolean):
         def draw_impl(cdf, size=None):
             rs = np.random.random(size)
             out = np.empty(size, dtype=np.int_)
