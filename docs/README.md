@@ -14,13 +14,13 @@ pip install -r rtd-requirements.txt
 
 In order to generate the documentation, follow these steps:
 
-1. Install the `quantecon` python library locally. Do to this enter the commands below:
+1. Install the `quantecon` python library locally. To do this enter the commands below:
 ```
 cd ..
 pip install .
 cd docs
 ```
-2. From this directory, execute the local file `qe_apidoc.py` (for an explanation of what the file does, see the module level docstring in the file)
+2. (Optional -- `make html` in the next step runs this automatically.) From this directory, execute the local file `qe_apidoc.py` (for an explanation of what the file does, see the module level docstring in the file)
 ```
 python qe_apidoc.py
 ```

@@ -72,7 +72,7 @@ def test_shorrocks_index():
     """
     Test Shorrocks mobility index function against the example used in 'Wealth
     distribution and social mobility in the US: A quantitative approach'
-    (Benhabib, Bisin, Luo, 2017).''
+    (Benhabib, Bisin, Luo, 2019).
     https://www.aeaweb.org/articles?id=10.1257/aer.20151684
     """
 

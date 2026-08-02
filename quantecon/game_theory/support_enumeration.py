@@ -37,6 +37,7 @@ def support_enumeration(g):
 
     Examples
     --------
+    >>> import numpy as np
     >>> from pprint import pprint
     >>> from quantecon.game_theory import (NormalFormGame,
     ...                                    support_enumeration)
@@ -71,6 +72,7 @@ def support_enumeration_gen(g):
 
     Examples
     --------
+    >>> import numpy as np
     >>> from quantecon.game_theory import (NormalFormGame,
     ...                                    support_enumeration_gen)
     >>> np.set_printoptions(precision=4)  # Reduce the digits printed

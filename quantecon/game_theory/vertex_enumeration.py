@@ -44,6 +44,7 @@ def vertex_enumeration(g, qhull_options=None):
 
     Examples
     --------
+    >>> import numpy as np
     >>> from pprint import pprint
     >>> from quantecon.game_theory import (NormalFormGame,
     ...                                    vertex_enumeration)
@@ -82,6 +83,7 @@ def vertex_enumeration_gen(g, qhull_options=None):
 
     Examples
     --------
+    >>> import numpy as np
     >>> from quantecon.game_theory import (NormalFormGame,
     ...                                    vertex_enumeration_gen)
     >>> np.set_printoptions(precision=4)  # Reduce the digits printed
