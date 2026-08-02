@@ -108,7 +108,7 @@ class StationaryDistNonnegative(AddDescription):
 
 class StationaryDistLeftEigenVec(AddDescription):
     def __call__(self, A, x):
-        assert_allclose(np.dot(x, A), x, atol=TOL)
+        assert_allclose(x @ A, x, atol=TOL)
 
 
 class StationaryDistEqualToKnown(AddDescription):
