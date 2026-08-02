@@ -143,6 +143,20 @@ class PolymatrixGame:
     player number `a` is the row player
     and player number `b` is the column player.
 
+    Parameters
+    ----------
+    polymatrix : dict[tuple(int), array_like(float, ndim=2)]
+        Maps each pair of player numbers to a matrix. The numbers of
+        players and actions can be inferred from this if `nums_actions`
+        is left None; this inference uses the number of actions each
+        player has against the next player. Actions with unspecified
+        payoff are given payoff of `-np.inf`.
+
+    nums_actions : tuple(int), optional(default=None)
+        If desired, `nums_actions` can be set so that unspecified
+        matchups in the polymatrix will be filled with matrices of 0s
+        (while unspecified actions give payoff of `-np.inf`).
+
     Attributes
     ----------
     N : scalar(int)
@@ -177,23 +191,6 @@ class PolymatrixGame:
             ],
             nums_actions: Iterable[int] = None
     ) -> None:
-        """_summary_
-
-        Parameters
-        ----------
-        polymatrix : Mapping[ tuple[int, int], Sequence[Sequence[float]] ]
-            Polymatrix. Numbers of players and actions can be
-            inferred from this if `nums_actions` is left None.
-            This inferrence uses the number of actions they have
-            against the next player.
-            Actions with unspecified payoff are given
-            payoff of `-np.inf`.
-        nums_actions : Iterable[int], optional
-            If desired, nums_actions can be set so that unspecified
-            matchups in the polymatrix will be filled with matrices
-            of 0s (while unspecified actions give payoff
-            of `-np.inf`).
-        """
         if nums_actions is None:
             self.N = (isqrt(4*len(polymatrix)+1) + 1) // 2
             self.nums_actions = tuple(
