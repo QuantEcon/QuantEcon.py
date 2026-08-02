@@ -125,12 +125,25 @@ jobs:
       working-directory: docs
       run: python qe_apidoc.py
     - name: Fail on docs/source drift
+      # Check for modified tracked files AND untracked new files: a
+      # newly added module makes qe_apidoc.py emit a new .rst, which
+      # `git diff` alone would miss.
       run: |
         git diff --exit-code -- docs/source \
           || { echo "::error::docs/source is stale -- run 'cd docs && python qe_apidoc.py' and commit the result"; exit 1; }
+        untracked=$(git ls-files --others --exclude-standard docs/source)
+        if [ -n "$untracked" ]; then
+          echo "::error::qe_apidoc.py generated new uncommitted pages: $untracked -- run 'cd docs && python qe_apidoc.py' and commit the result"
+          exit 1
+        fi
     - name: Build HTML
       working-directory: docs
-      run: sphinx-build -b html --keep-going source build/html
+      run: sphinx-build -b html source build/html
+    - name: Upload built docs
+      uses: actions/upload-artifact@v4
+      with:
+        name: docs-html
+        path: docs/build/html
 
   publish:
 

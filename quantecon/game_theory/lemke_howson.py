@@ -52,7 +52,8 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     --------
     Consider the following game from von Stengel [3]_:
 
-    >>> from quantecon.game_theory import NormalFormGame
+    >>> import numpy as np
+    >>> from quantecon.game_theory import NormalFormGame, lemke_howson
     >>> np.set_printoptions(precision=4)  # Reduce the digits printed
     >>> bimatrix = [[(3, 3), (3, 2)],
     ...             [(2, 2), (5, 6)],
@@ -361,6 +362,7 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
 
     Examples
     --------
+    >>> import numpy as np
     >>> np.set_printoptions(precision=4)  # Reduce the digits printed
     >>> A = np.array([[3, 3], [2, 5], [0, 6]])
     >>> B = np.array([[3, 2, 3], [2, 6, 1]])

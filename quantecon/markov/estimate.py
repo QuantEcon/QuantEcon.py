@@ -76,9 +76,18 @@ def fit_discrete_mc(X, grids, order='C'):
         ('C' or 'F') order in which the states in the cartesian grid are
         enumerated.
 
+    Returns
+    -------
+
+    mc : MarkovChain
+        An instance of the MarkovChain class constructed after discretization
+        onto the grid.
+
     Examples
     --------
 
+    >>> import numpy as np
+    >>> from quantecon.markov import fit_discrete_mc
     >>> grids = (np.arange(3), np.arange(2))
     >>> X = [(-0.1, 1.2), (2, 0), (0.6, 0.4), (1.0, 0.1)]
     >>> mc = fit_discrete_mc(X, grids)
@@ -90,13 +99,6 @@ def fit_discrete_mc(X, grids, order='C'):
     array([[0., 0., 1.],
            [0., 1., 0.],
            [0., 1., 0.]])
-
-    Returns
-    -------
-
-    mc : MarkovChain
-        An instance of the MarkovChain class constructed after discretization
-        onto the grid.
     """
     X_indices = cartesian_nearest_index(X, grids, order=order)
     mc = estimate_mc(X_indices)

@@ -269,7 +269,7 @@ class DLE(object):
         Parameters
         ----------
 
-        ts_length : scalar(int)
+        ts_length : scalar(int), optional(default=100)
             Number of periods to calculate IRF
 
         shock : array_like(float), optional(default=None)

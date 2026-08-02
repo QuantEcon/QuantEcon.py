@@ -141,6 +141,8 @@ def blotto_game(h, t, rho, mu=0, random_state=None):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon.game_theory import blotto_game
     >>> rng = np.random.default_rng(1234)
     >>> g = blotto_game(2, 3, 0.5, random_state=rng)
     >>> g.players[0]
@@ -238,6 +240,8 @@ def ranking_game(n, steps=10, random_state=None):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon.game_theory import ranking_game
     >>> rng = np.random.default_rng(1234)
     >>> g = ranking_game(5, random_state=rng)
     >>> g.players[0]
@@ -330,6 +334,7 @@ def sgc_game(k):
 
     Examples
     --------
+    >>> from quantecon.game_theory import sgc_game
     >>> g = sgc_game(2)
     >>> g.players[0]
     Player([[0.75, 0.5 , 1.  , 0.5 , 0.5 , 0.5 , 0.5 ],
@@ -435,6 +440,8 @@ def tournament_game(n, k, random_state=None):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon.game_theory import tournament_game
     >>> rng = np.random.default_rng(1234)
     >>> g = tournament_game(5, 2, random_state=rng)
     >>> g.players[0]
@@ -563,6 +570,8 @@ def unit_vector_game(n, avoid_pure_nash=False, random_state=None):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon.game_theory import unit_vector_game
     >>> rng = np.random.default_rng(1234)
     >>> g = unit_vector_game(4, random_state=rng)
     >>> g.players[0]
