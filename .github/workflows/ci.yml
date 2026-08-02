@@ -55,6 +55,13 @@ jobs:
       shell: bash -l {0}
       run: |
         pytest quantecon
+    - name: Run docstring examples (doctest)
+      # one platform is enough to stop examples drifting, and keeping
+      # this off Windows avoids path-separator issues with --ignore-glob
+      if: runner.os == 'Linux'
+      shell: bash -l {0}
+      run: |
+        pytest --doctest-modules quantecon --ignore-glob='*/tests/*'
 
   coverage:
     name: Coverage
