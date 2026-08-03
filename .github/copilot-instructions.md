@@ -20,9 +20,8 @@ Always reference these instructions first and fallback to search or bash command
   - Takes < 30 seconds
   - Note: Repository has some existing style violations - this is expected
 - **Full test suite**: `coverage run -m pytest quantecon`
-  - Takes 5 minutes 11 seconds. NEVER CANCEL. Set timeout to 15+ minutes.
-  - Runs 536 tests across all modules
-  - All tests should pass with 2 warnings (expected)
+  - Runs 600+ tests and takes several minutes. NEVER CANCEL. Set timeout to 15+ minutes.
+  - All tests should pass; investigate any unexpected warnings.
 - **Quick smoke test**: `python -c "import quantecon as qe; print('Version:', qe.__version__)"`
 - **Package build**: `flit build`
   - Creates wheel and source distributions in dist/
@@ -54,7 +53,7 @@ print('DiscreteDP test successful, policy:', result.sigma)
   - `game_theory/` - Game theory algorithms and utilities  
   - `optimize/` - Optimization algorithms
   - `random/` - Random number generation utilities
-  - `tests/` - Main test suite (536 tests total)
+  - `tests/` - Main test suite (600+ tests total)
 
 ### Configuration Files
 - `pyproject.toml` - Main project configuration using flit build system
@@ -74,7 +73,7 @@ Core runtime dependencies (auto-installed in conda env):
 
 **CRITICAL TIMING INFORMATION:**
 - **Conda environment creation**: 3-5 minutes (timeout: 10+ minutes)
-- **Full test suite**: 5 minutes 11 seconds (timeout: 15+ minutes) 
+- **Full test suite**: several minutes (timeout: 15+ minutes)
 - **Package build**: < 30 seconds (timeout: 2 minutes)
 - **Development install**: < 30 seconds (timeout: 2 minutes)
 - **Linting**: < 30 seconds (timeout: 2 minutes)

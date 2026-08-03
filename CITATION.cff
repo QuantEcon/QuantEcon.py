@@ -1,4 +1,6 @@
 cff-version: "1.2.0"
+version: "0.11.4"
+date-released: 2026-07-15
 authors:
 - family-names: Batista
   given-names: Quentin

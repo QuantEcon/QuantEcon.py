@@ -18,13 +18,11 @@ A high performance, open source Python code library for economics
 
 ## Installation
 
-Before installing `quantecon` we recommend you install the [Anaconda](https://www.anaconda.com/download/) Python distribution, which includes a full suite of scientific python tools.
-
-Next you can install quantecon by opening a terminal prompt and typing
+Install `quantecon` from PyPI by opening a terminal and typing
 
     pip install quantecon
 
-or using conda-forge by typing
+Alternatively, install the conda-forge package by typing
 
     conda install -c conda-forge quantecon
 
