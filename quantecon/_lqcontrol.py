@@ -455,6 +455,9 @@ class LQMarkov:
 
         self.beta = beta
 
+        if beta > 1.0:
+            raise ValueError("Discount factor beta cannot be greater than 1.")
+
         self.Π = np.asarray(Π, dtype='float')
 
         self.Ps = None
