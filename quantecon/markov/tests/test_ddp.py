@@ -509,6 +509,17 @@ def test_ddp_state_values():
 
     assert_array_equal(ddp.state_values, state_values)
 
+    ddp = DiscreteDP(R, Q, beta)
+    assert_(ddp.state_values is None)
+
+    new_state_values = ['new_state1', 'new_state2']
+    ddp.state_values = new_state_values
+    assert_(isinstance(ddp.state_values, np.ndarray))
+    assert_array_equal(ddp.state_values, new_state_values)
+
+    ddp.state_values = None
+    assert_(ddp.state_values is None)
+
 
 def test_ddp_controlled_mc_state_values():
     R = np.array([[1, 2], [3, 4]])
@@ -527,21 +538,31 @@ def test_ddp_state_values_wrong_length():
     R = np.array([[1, 2], [3, 4]])
     Q = np.full((2, 2, 2), 0.5)
     beta = 0.95
+    state_values = np.array(['state1'])
+    msg = 'state_values must be an array_like of length n'
 
-    assert_raises(
-        ValueError, DiscreteDP, R, Q, beta,
-        state_values=np.array(['state1'])
-    )
+    with assert_raises(ValueError) as exc_info:
+        DiscreteDP(R, Q, beta, state_values=state_values)
+    assert_(str(exc_info.exception) == msg)
+
+    ddp = DiscreteDP(R, Q, beta)
+    with assert_raises(ValueError) as exc_info:
+        ddp.state_values = state_values
+    assert_(str(exc_info.exception) == msg)
 
 
 def test_ddp_scalar_state_values():
     R = np.array([[1, 2], [3, 4]])
     Q = np.full((2, 2, 2), 0.5)
     beta = 0.95
+    state_values = 'state1'
 
     assert_raises(
-        ValueError, DiscreteDP, R, Q, beta, state_values='state1'
+        ValueError, DiscreteDP, R, Q, beta, state_values=state_values
     )
+
+    ddp = DiscreteDP(R, Q, beta)
+    assert_raises(ValueError, setattr, ddp, 'state_values', state_values)
 
 
 def test_ddp_object_dtype_state_values():
@@ -549,7 +570,13 @@ def test_ddp_object_dtype_state_values():
     Q = np.full((2, 2, 2), 0.5)
     beta = 0.95
     state_values = np.array(['state1', 2], dtype=object)
+    msg = 'data in state_values must be homogeneous in type'
 
-    assert_raises(
-        ValueError, DiscreteDP, R, Q, beta, state_values=state_values
-    )
+    with assert_raises(ValueError) as exc_info:
+        DiscreteDP(R, Q, beta, state_values=state_values)
+    assert_(str(exc_info.exception) == msg)
+
+    ddp = DiscreteDP(R, Q, beta)
+    with assert_raises(ValueError) as exc_info:
+        ddp.state_values = state_values
+    assert_(str(exc_info.exception) == msg)

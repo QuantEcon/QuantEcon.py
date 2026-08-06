@@ -422,21 +422,8 @@ class DiscreteDP:
 
         self.epsilon = 1e-3
         self.max_iter = 250
-        # State labels are for mapping only, not numerical computations
-        if state_values is None:
-            self.state_values = None
-        else:
-            state_values = np.asarray(state_values)
-            if (state_values.ndim < 1 or
-                    state_values.shape[0] != self.num_states):
-                raise ValueError(
-                    'state_values must be an array_like of length num_states'
-                )
-            if np.issubdtype(state_values.dtype, np.object_):
-                raise ValueError(
-                    'data in state_values must be homogeneous in type'
-                )
-            self.state_values = state_values
+        # Call the setter method
+        self.state_values = state_values
 
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
@@ -446,6 +433,34 @@ class DiscreteDP:
         else:
             self._lineq_solve = np.linalg.solve
             self._I = np.identity(self.num_states)
+
+    @property
+    def state_values(self):
+        return self._state_values
+
+    @state_values.setter
+    def state_values(self, values):
+        """
+        Set state values of the DiscreteDP.
+
+        Parameters
+        ----------
+        values : array_like or None
+            Array of state values with length n, or None to unset.
+        """
+        if values is None:
+            self._state_values = None
+        else:
+            values = np.asarray(values)
+            if (values.ndim < 1) or (values.shape[0] != self.num_states):
+                raise ValueError(
+                    'state_values must be an array_like of length n'
+                )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in state_values must be homogeneous in type'
+                )
+            self._state_values = values
 
     def _check_action_feasibility(self):
         """
