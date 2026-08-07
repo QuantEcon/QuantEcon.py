@@ -461,7 +461,7 @@ class Player:
         if D.shape[0] == 0:  # num_actions == 1
             return False
         if self.num_opponents >= 2:
-            D.shape = (D.shape[0], np.prod(D.shape[1:]))
+            D = D.reshape(D.shape[0], np.prod(D.shape[1:]))
 
         if method is None:
             from ..optimize.minmax import minmax

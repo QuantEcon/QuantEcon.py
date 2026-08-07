@@ -54,13 +54,48 @@ jobs:
     - name: Run Tests (pytest)
       shell: bash -l {0}
       run: |
+        pytest quantecon
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Cache conda
+      uses: actions/cache@v6
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key:
+          ${{ runner.os }}-3.13-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+    - uses: conda-incubator/setup-miniconda@v4
+      with:
+        auto-update-conda: true
+        miniforge-version: latest
+        environment-file: environment.yml
+        python-version: "3.13"
+        auto-activate-base: false
+        use-only-tar-bz2: true
+        activate-environment: qe
+    - name: Run Tests with coverage
+      shell: bash -l {0}
+      env:
+        # Numba emits coverage for JIT functions at compile time (lowering),
+        # which cache=True functions skip when loaded from a warm on-disk
+        # cache. Enable JIT coverage and point the cache at a throwaway dir
+        # so every jitted function is compiled -- and thus reported -- here.
+        # Requires numba >= 0.62 (coverage respects .coveragerc from there on).
+        NUMBA_JIT_COVERAGE: "1"
+        NUMBA_CACHE_DIR: ${{ runner.temp }}/numba_cache
+      run: |
         coverage run -m pytest quantecon
         coverage lcov
     - name: Coveralls
       uses: coverallsapp/github-action@v2
-      # upload from one Linux job only (avoids the Coveralls parallel-build 422
-      # race); continue-on-error so an upload hiccup can't fail CI
-      if: runner.os == 'Linux' && matrix.python-version == '3.13'
+      # continue-on-error so an upload hiccup can't fail CI
       continue-on-error: true
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +113,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.x"
       - name: Install flit
