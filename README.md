@@ -89,4 +89,4 @@ pages = {5585}
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=quantecon/quantecon.py&type=Date)](https://star-history.com/#quantecon/quantecon.py&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=quantecon/quantecon.py&type=Date)](https://star-history.dera.page/#quantecon/quantecon.py&type=Date&legend=top-left)
