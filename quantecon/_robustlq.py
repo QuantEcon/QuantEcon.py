@@ -242,8 +242,8 @@ class RBLQ:
 
         """
         # == Simplify names == #
-        A, B, C, Q, R = self.A, self.B, self.C, self.Q, self.R
-        beta, theta = self.beta, self.theta
+        A, B, C = self.A, self.B, self.C
+        theta = self.theta
         # == Set up loop == #
         P = np.zeros((self.n, self.n)) if P_init is None else P_init
         iterate, e = 0, tol + 1
@@ -381,7 +381,7 @@ class RBLQ:
 
         """
         # == Simplify names == #
-        Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+        A, B, C = self.A, self.B, self.C
         beta, theta = self.beta, self.theta
 
         # == Solve for policies and costs using agent 2's problem == #

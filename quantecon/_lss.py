@@ -391,7 +391,7 @@ class LinearStateSpace:
             The coefficients for y
         """
         # Pull out matrices
-        A, C, G, H = self.A, self.C, self.G, self.H
+        A, C, G = self.A, self.C, self.G
         Apower = np.copy(A)
 
         # Create room for coefficients
