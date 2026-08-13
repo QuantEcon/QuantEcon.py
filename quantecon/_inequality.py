@@ -3,8 +3,13 @@ Implements inequality and segregation measures such as Gini, Lorenz Curve
 
 """
 
+import sys
+
 import numpy as np
 from numba import njit, prange
+
+
+PARALLELIZE = sys.platform != "emscripten"
 
 
 @njit
@@ -54,7 +59,7 @@ def lorenz_curve(y):
     return cum_people, cum_income
 
 
-@njit(parallel=True)
+@njit(parallel=PARALLELIZE)
 def gini_coefficient(y):
     r"""
     Implements the Gini inequality index
@@ -152,4 +157,3 @@ def rank_size(data, c=1.0):
     rank_data = np.arange(len(w)) + 1
     size_data = w
     return rank_data, size_data
-
