@@ -915,8 +915,9 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
     Returns
     -------
     scalar(int)
-        Best response action; -1 if there is no action that satisfies
-        the tolerance condition, which occurs only if `tol` < 0.
+        Best response action. -1 indicates an error condition: no
+        action satisfies the tolerance condition, which occurs only
+        if `tol` < 0.
 
     """
     n, m = payoff_matrix.shape
