@@ -122,7 +122,7 @@ class TestKalman:
             # recursive equations and compare
             kal_recursion = A @ sig_inf @ G.T @ mat_inv
             sig_recursion = (A @ sig_inf @ A.T -
-                                kal_recursion @ G @ sig_inf @ A.T + Q)
+                             kal_recursion @ G @ sig_inf @ A.T + Q)
 
             assert_allclose(kal_gain, kal_recursion, rtol=1e-4, atol=1e-2)
             assert_allclose(sig_inf, sig_recursion, rtol=1e-4, atol=1e-2)
@@ -155,8 +155,7 @@ class TestKalman:
 
         mat_inv = np.linalg.inv(G @ curr_sigma @ G.T + R)
         curr_k = A @ curr_sigma @ G.T @ mat_inv
-        new_sigma = (A @ curr_sigma @ A.T -
-                    curr_k @ G @ curr_sigma @ A.T + Q)
+        new_sigma = A @ curr_sigma @ A.T - curr_k @ G @ curr_sigma @ A.T + Q
 
         new_xhat = A @ curr_x + curr_k @ (y_observed - G @ curr_x)
 

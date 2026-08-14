@@ -47,6 +47,8 @@ class TestLQControl:
         u_0 = (-2*lq_scalar.A*lq_scalar.B*lq_scalar.beta*lq_scalar.Rf) / \
             (2*lq_scalar.Q+lq_scalar.beta*lq_scalar.Rf*2*lq_scalar.B**2) \
             * x0
+        # C is (1, 1) and w_seq[0, -1] is 0-d, so this term is * not @:
+        # @ rejects 0-d operands, while np.dot (and *) multiply.
         x_1 = lq_scalar.A * x0 + lq_scalar.B * u_0 + \
             lq_scalar.C * w_seq[0, -1]
 
