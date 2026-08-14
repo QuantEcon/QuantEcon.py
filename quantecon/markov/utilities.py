@@ -137,10 +137,12 @@ def _generate_a_indptr(num_states, s_indices, out):
         Length must be num_states+1.
 
     """
+    L = len(s_indices)
     idx = 0
     out[0] = 0
     for s in range(num_states-1):
-        while(s_indices[idx] == s):
+        # bound idx: the last states may have no state-action pair
+        while idx < L and s_indices[idx] == s:
             idx += 1
         out[s+1] = idx
-    out[num_states] = len(s_indices)
+    out[num_states] = L

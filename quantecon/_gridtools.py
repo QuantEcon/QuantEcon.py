@@ -254,7 +254,7 @@ def _cartesian_index(indices, nums_grids):
     n = len(indices)
     idx = 0
     de_cumprod = 1
-    for i in range(1,n+1):
+    for i in range(1, n+1):
         idx += de_cumprod * indices[n-i]
         de_cumprod *= nums_grids[n-i]
     return idx

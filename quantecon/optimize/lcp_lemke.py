@@ -47,7 +47,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
         positive. If None, default to vector of ones.
 
     max_iter : int, optional(default=10**6)
-        Maximum number of iteration to perform.
+        Maximum number of iterations to perform.
 
     piv_options : PivOptions, optional
         PivOptions namedtuple to set the following tolerance values:
@@ -60,7 +60,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
                 Pivot tolerance (default={TOL_PIV}).
 
             tol_ratio_diff : float
-                Tolerance used in the the lexicographic pivoting
+                Tolerance used in the lexicographic pivoting
                 (default={TOL_RATIO_DIFF}).
 
     tableau : ndarray(float, ndim=2), optional
@@ -204,8 +204,8 @@ def _initialize_tableau(M, q, d, tableau, basis):
         q = w - M z - d z0
 
     where the variables are ordered as (w, z, z0). Thus,
-    `tableaus[:, :n]` stores I, `tableaus[:, n:2*n]` stores -M,
-    `tableaus[:, 2*n]` stores -d, and `tableaus[:, -1]` stores q, while
+    `tableau[:, :n]` stores I, `tableau[:, n:2*n]` stores -M,
+    `tableau[:, 2*n]` stores -d, and `tableau[:, -1]` stores q, while
     `basis` stores 0, ..., n-1 (variables w).
 
     Parameters

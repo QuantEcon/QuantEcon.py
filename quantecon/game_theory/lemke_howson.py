@@ -31,7 +31,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
         Maximum number of pivoting steps.
 
     capping : scalar(int), optional(default=None)
-        If supplied, the routine is executed with the heuristics
+        If supplied, the routine is executed with the heuristic
         proposed by Codenotti et al. [1]_; see Notes below for details.
 
     full_output : bool, optional(default=False)
@@ -81,7 +81,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
       thus is subject to numerical instability.
 
     * If `capping` is set to a positive integer, the routine is executed
-      with the heuristics proposed by [1]_:
+      with the heuristic proposed by [1]_:
 
       * For k = `init_pivot`, `init_pivot` + 1, ..., `init_pivot` +
         (m+n-2), (modulo m+n), the Lemke-Howson algorithm is executed
@@ -93,8 +93,8 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
         `init_pivot` + (m+n-1) (modulo m+n) as the initial pivot, with a
         limit `max_iter` on the total number of pivoting steps.
 
-      Accoding to the simulation results for *uniformly random games*,
-      for medium- to large-size games this heuristics outperforms the
+      According to the simulation results for *uniformly random games*,
+      for medium- to large-size games this heuristic outperforms the
       basic Lemke-Howson algorithm with a fixed initial pivot, where
       [1]_ suggests that `capping` be set to 10.
 
@@ -124,8 +124,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
     nums_actions = g.nums_actions
     total_num = sum(nums_actions)
 
-    msg = '`init_pivot` must be an integer k' + \
-          'such that 0 <= k < {0}'.format(total_num)
+    msg = f'`init_pivot` must be an integer k such that 0 <= k < {total_num}'
 
     if not isinstance(init_pivot, numbers.Integral):
         raise TypeError(msg)
@@ -162,7 +161,7 @@ def lemke_howson(g, init_pivot=0, max_iter=10**6, capping=None,
 def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
                           max_iter, capping):
     """
-    Execute the Lemke-Howson algorithm with the heuristics proposed by
+    Execute the Lemke-Howson algorithm with the heuristic proposed by
     Codenotti et al.
 
     Parameters
@@ -320,7 +319,7 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     """
     Main body of the Lemke-Howson algorithm implementation.
 
-    Perform the complementary pivoting. Modify `tablaux` and `bases` in
+    Perform the complementary pivoting. Modify `tableaux` and `bases` in
     place.
 
     Parameters

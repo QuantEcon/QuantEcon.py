@@ -2,6 +2,8 @@
 Tests for markov/ddp.py
 
 """
+import pickle
+
 import numpy as np
 import scipy.sparse as sparse
 from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
@@ -253,7 +255,7 @@ def test_ddp_negative_inf_error():
     )
 
 
-def test_ddp_no_feasibile_action_error():
+def test_ddp_no_feasible_action_error():
     # No action is feasible at state 1
     s_indices = [0, 0, 2, 2]
     a_indices = [0, 1, 0, 1]
@@ -262,6 +264,159 @@ def test_ddp_no_feasibile_action_error():
     beta = 0.95
 
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+
+
+def test_ddp_no_feasible_action_error_trailing_state():
+    # No action is feasible at state 2, the last state
+    R = [1, 0, 0, 1]
+    Q = [(1/3, 1/3, 1/3) for i in range(4)]
+    beta = 0.95
+
+    # Sorted indices
+    s_indices = [0, 0, 1, 1]
+    a_indices = [0, 1, 0, 1]
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+
+    # Unsorted indices
+    s_indices = [1, 0, 1, 0]
+    a_indices = [0, 0, 1, 1]
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+
+
+def test_ddp_duplicate_sa_pair_error():
+    # State-action pair (1, 0) is duplicated
+    s_indices = [1, 1, 0, 0]
+    a_indices = [0, 0, 0, 1]
+    R = [1., 2., 3., 4.]
+    Q = [(0.5, 0.5), (1., 0.), (0.25, 0.75), (0.6, 0.4)]
+    Q_sparse = sparse.csr_matrix(Q)
+    beta = 0.95
+
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+    assert_raises(
+        ValueError, DiscreteDP, R, Q_sparse, beta, s_indices, a_indices
+    )
+
+
+def test_ddp_out_of_range_indices_error():
+    # State index 2 out of range for num_states == 2: on the sorted path
+    # the pair would previously be silently reattributed to state 1
+    R = [1.0, 2.0]
+    Q = [(1.0, 0.0), (0.0, 1.0)]
+    Q_sparse = sparse.csr_matrix(Q)
+    beta = 0.95
+
+    # Sorted indices
+    s_indices, a_indices = [0, 2], [0, 0]
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+    assert_raises(
+        ValueError, DiscreteDP, R, Q_sparse, beta, s_indices, a_indices
+    )
+
+    # Unsorted indices
+    s_indices, a_indices = [2, 0], [0, 0]
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
+
+    # Negative indices
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, [-1, 0], [0, 0])
+    assert_raises(ValueError, DiscreteDP, R, Q, beta, [0, 1], [0, -1])
+
+
+def test_ddp_nonpositive_max_iter_error():
+    n, m = 2, 2
+    R = [[0, 1], [1, 0]]
+    Q = np.full((n, m, n), 1/n)
+    beta = 0.95
+    ddp = DiscreteDP(R, Q, beta)
+
+    for method in ['vi', 'pi', 'mpi', 'lp']:
+        for max_iter in [0, -1]:
+            assert_raises(ValueError, ddp.solve, method=method,
+                          max_iter=max_iter)
+
+
+def test_operator_iteration_num_iter():
+    # The return value must be the number of iterations performed,
+    # in particular 0 (not a tuple) when max_iter <= 0
+    n, m = 2, 2
+    R = [[0, 1], [1, 0]]
+    Q = np.full((n, m, n), 1/n)
+    beta = 0.95
+    ddp = DiscreteDP(R, Q, beta)
+
+    v = np.zeros(n)
+    assert_(ddp.operator_iteration(T=ddp.bellman_operator, v=v,
+                                   max_iter=0) == 0)
+    assert_(ddp.operator_iteration(T=ddp.bellman_operator, v=v,
+                                   max_iter=2) == 2)
+
+
+def test_ddp_non_c_contiguous_Q():
+    # A non-C-contiguous Q must fall back to the batched-matmul path in
+    # bellman_operator and give the same results as the gemv path
+    n, m = 20, 5
+    rs = np.random.RandomState(12345)
+    R = rs.random_sample((n, m))
+    Q = rs.random_sample((n, m, n))
+    Q /= Q.sum(axis=2, keepdims=True)
+    beta = 0.95
+
+    ddp_c = DiscreteDP(R, Q, beta)
+    ddp_f = DiscreteDP(R, np.asfortranarray(Q), beta)
+    assert_(ddp_c.Q.flags.c_contiguous)
+    assert_(not ddp_f.Q.flags.c_contiguous)
+
+    # Direct comparison of the Bellman operator and the greedy policy
+    v = rs.random_sample(n)
+    sigma_c = np.empty(n, dtype=int)
+    sigma_f = np.empty(n, dtype=int)
+    Tv_c = ddp_c.bellman_operator(v, sigma=sigma_c)
+    Tv_f = ddp_f.bellman_operator(v, sigma=sigma_f)
+    assert_allclose(Tv_f, Tv_c)
+    assert_array_equal(sigma_f, sigma_c)
+
+    for method in ['vi', 'pi', 'mpi']:
+        res_c = ddp_c.solve(method=method)
+        res_f = ddp_f.solve(method=method)
+        assert_array_equal(res_f.sigma, res_c.sigma)
+        assert_allclose(res_f.v, res_c.v)
+
+
+def test_ddp_Q_rebinding():
+    # bellman_operator must reflect a rebound ddp.Q (no stale cache)
+    n, m = 3, 2
+    R = np.arange(n*m, dtype=float).reshape(n, m)
+    Q1 = np.tile([[0.2, 0.3, 0.5], [0.6, 0.3, 0.1]], (n, 1, 1))
+    Q2 = np.tile([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]], (n, 1, 1))
+    beta = 0.9
+    v = np.array([1., 2., 3.])
+
+    ddp = DiscreteDP(R, Q1, beta)
+    ddp.Q = Q2
+    assert_allclose(ddp.bellman_operator(v),
+                    DiscreteDP(R, Q2, beta).bellman_operator(v))
+
+
+def test_ddp_picklable():
+    # DiscreteDP instances must be picklable (e.g. for multiprocessing);
+    # s_wise_max used to be a closure set in __init__, which broke this
+    n, m = 2, 2
+    R = [[5, 10], [-1, -np.inf]]
+    Q = np.empty((n, m, n))
+    Q[0, 0, :] = 0.5, 0.5
+    Q[0, 1, :] = 0, 1
+    Q[1, :, :] = 0, 1
+    beta = 0.95
+
+    ddp0 = DiscreteDP(R, Q, beta)
+    ddps = [ddp0, ddp0.to_sa_pair_form(), ddp0.to_sa_pair_form(sparse=False)]
+
+    for ddp in ddps:
+        ddp2 = pickle.loads(pickle.dumps(ddp))
+        res = ddp.solve(method='pi')
+        res2 = ddp2.solve(method='pi')
+        assert_allclose(res2.v, res.v)
+        assert_array_equal(res2.sigma, res.sigma)
 
 
 def test_ddp_beta_1_not_implemented_error():
@@ -292,6 +447,7 @@ def test_ddp_to_sa_and_to_product():
     Q[0, 0, 0] = 0
     Q[0, 0, 1] = 2/n
     beta = 0.95
+    state_values = np.array(['state0', 'state1', 'state2'])
 
     sparse_R = np.array([0, 1, 1, 0, 1])
     _Q = np.full((5, 3), 1/3)
@@ -299,7 +455,7 @@ def test_ddp_to_sa_and_to_product():
     _Q[0, 1] = 2/n
     sparse_Q = sparse.coo_matrix(_Q)
 
-    ddp = DiscreteDP(R, Q, beta)
+    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
     ddp_sa = ddp.to_sa_pair_form()
     ddp_sa2 = ddp_sa.to_sa_pair_form()
     ddp_sa3 = ddp.to_sa_pair_form(sparse=False)
@@ -310,9 +466,10 @@ def test_ddp_to_sa_and_to_product():
     # make sure conversion worked
     for ddp_s in [ddp_sa, ddp_sa2, ddp_sa3]:
         assert_allclose(ddp_s.R, sparse_R)
-        # allcose doesn't work on sparse
-        np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15
+        # allclose doesn't work on sparse
+        assert_(np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15)
         assert_allclose(ddp_s.beta, beta)
+        assert_array_equal(ddp_s.state_values, state_values)
 
     # these two will have probability 0 in state 2, action 0 b/c
     # of the infeasiability in R
@@ -325,11 +482,13 @@ def test_ddp_to_sa_and_to_product():
         assert_allclose(ddp_f.R, ddp.R)
         assert_allclose(ddp_f.Q, funky_Q)
         assert_allclose(ddp_f.beta, ddp.beta)
+        assert_array_equal(ddp_f.state_values, state_values)
 
     # this one is just the original one.
     assert_allclose(ddp4.R, ddp.R)
     assert_allclose(ddp4.Q, ddp.Q)
     assert_allclose(ddp4.beta, ddp.beta)
+    assert_array_equal(ddp4.state_values, state_values)
 
     for method in ["pi", "vi", "mpi"]:
         sol1 = ddp.solve(method=method)
@@ -338,3 +497,86 @@ def test_ddp_to_sa_and_to_product():
 
             for k in ["v", "sigma", "num_iter"]:
                 assert_allclose(sol1[k], sol2[k])
+
+
+def test_ddp_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = np.array(['state1', 'state2'])
+
+    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
+
+    assert_array_equal(ddp.state_values, state_values)
+
+    ddp = DiscreteDP(R, Q, beta)
+    assert_(ddp.state_values is None)
+
+    new_state_values = ['new_state1', 'new_state2']
+    ddp.state_values = new_state_values
+    assert_(isinstance(ddp.state_values, np.ndarray))
+    assert_array_equal(ddp.state_values, new_state_values)
+
+    ddp.state_values = None
+    assert_(ddp.state_values is None)
+
+
+def test_ddp_controlled_mc_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = np.array(['state1', 'state2'])
+    sigma = np.array([0, 1])
+
+    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
+    mc = ddp.controlled_mc(sigma)
+
+    assert_array_equal(mc.state_values, state_values)
+
+
+def test_ddp_state_values_wrong_length():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = np.array(['state1'])
+    msg = 'state_values must be an array_like of length n'
+
+    with assert_raises(ValueError) as exc_info:
+        DiscreteDP(R, Q, beta, state_values=state_values)
+    assert_(str(exc_info.exception) == msg)
+
+    ddp = DiscreteDP(R, Q, beta)
+    with assert_raises(ValueError) as exc_info:
+        ddp.state_values = state_values
+    assert_(str(exc_info.exception) == msg)
+
+
+def test_ddp_scalar_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = 'state1'
+
+    assert_raises(
+        ValueError, DiscreteDP, R, Q, beta, state_values=state_values
+    )
+
+    ddp = DiscreteDP(R, Q, beta)
+    assert_raises(ValueError, setattr, ddp, 'state_values', state_values)
+
+
+def test_ddp_object_dtype_state_values():
+    R = np.array([[1, 2], [3, 4]])
+    Q = np.full((2, 2, 2), 0.5)
+    beta = 0.95
+    state_values = np.array(['state1', 2], dtype=object)
+    msg = 'data in state_values must be homogeneous in type'
+
+    with assert_raises(ValueError) as exc_info:
+        DiscreteDP(R, Q, beta, state_values=state_values)
+    assert_(str(exc_info.exception) == msg)
+
+    ddp = DiscreteDP(R, Q, beta)
+    with assert_raises(ValueError) as exc_info:
+        ddp.state_values = state_values
+    assert_(str(exc_info.exception) == msg)

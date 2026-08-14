@@ -211,13 +211,26 @@ class DLE(object):
         self.R1_Price = np.empty((ts_length + 1, 1))
         self.R2_Price = np.empty((ts_length + 1, 1))
         self.R5_Price = np.empty((ts_length + 1, 1))
+        # Hoist the loop-invariant terms out of the loop: ``e1 @ self.Mc`` and
+        # the matrix powers of ``self.A0`` do not depend on ``i``.
+        eMc = e1 @ self.Mc
+        A0_1 = np.linalg.matrix_power(self.A0, 1)
+        A0_2 = np.linalg.matrix_power(self.A0, 2)
+        A0_5 = np.linalg.matrix_power(self.A0, 5)
+        # Each price expression evaluates to a size-1 array (``self.beta`` is a
+        # (1, 1) array and ``eMc`` is a row vector). Coerce the size-1 result to
+        # a scalar with ``.item()`` *after* dividing, so assignment works under
+        # NumPy >= 2.4 (which raises instead of silently converting an
+        # ``ndim > 0`` array to a scalar on assignment). Keeping the division
+        # inside NumPy preserves the pre-2.4 behaviour when ``denom == 0`` (an
+        # ``inf``/``nan`` with a warning, rather than a ``ZeroDivisionError``).
+        # See #839.
         for i in range(ts_length + 1):
-            self.R1_Price[i, 0] = self.beta * e1 @ self.Mc @ np.linalg.matrix_power(
-                self.A0, 1) @ xp[:, i] / (e1 @ self.Mc @ xp[:, i])
-            self.R2_Price[i, 0] = self.beta**2 * (e1 @ self.Mc @
-                np.linalg.matrix_power(self.A0, 2) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])
-            self.R5_Price[i, 0] = self.beta**5 * (e1 @ self.Mc @
-                np.linalg.matrix_power(self.A0, 5) @ xp[:, i]) / (e1 @ self.Mc @ xp[:, i])
+            xi = xp[:, i]
+            denom = eMc @ xi
+            self.R1_Price[i, 0] = (self.beta * eMc @ A0_1 @ xi / denom).item()
+            self.R2_Price[i, 0] = (self.beta**2 * (eMc @ A0_2 @ xi) / denom).item()
+            self.R5_Price[i, 0] = (self.beta**5 * (eMc @ A0_5 @ xi) / denom).item()
 
         # === Gross rates of return on 1-period risk-free bonds === #
         self.R1_Gross = 1 / self.R1_Price
@@ -239,12 +252,14 @@ class DLE(object):
             self.Pay_Price = np.empty((ts_length + 1, 1))
             self.Pay_Gross = np.empty((ts_length + 1, 1))
             self.Pay_Gross[0, 0] = np.nan
+            # As above, coerce each size-1 result to a scalar with ``.item()``
+            # so assignment works under NumPy >= 2.4. See #839.
             for i in range(ts_length + 1):
-                self.Pay_Price[i, 0] = (xp[:, i].T @ self.Q @
-                    xp[:, i] + self.q) / (e1 @ self.Mc @ xp[:, i])
+                self.Pay_Price[i, 0] = ((xp[:, i].T @ self.Q @
+                    xp[:, i] + self.q) / (e1 @ self.Mc @ xp[:, i])).item()
             for i in range(ts_length):
-                self.Pay_Gross[i + 1, 0] = self.Pay_Price[i + 1,
-                                                          0] / (self.Pay_Price[i, 0] - Pay @ xp[:, i])
+                self.Pay_Gross[i + 1, 0] = (self.Pay_Price[i + 1,
+                    0] / (self.Pay_Price[i, 0] - Pay @ xp[:, i])).item()
         return
 
     def irf(self, ts_length=100, shock=None):

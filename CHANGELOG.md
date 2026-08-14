@@ -2,6 +2,50 @@
 
 Future CHANGELOG entries will be documented under the [release notes on GitHub](https://github.com/QuantEcon/QuantEcon.py/releases)
 
+## Ver 0.11.4 (14th-July-2026)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.4)
+
+## Ver 0.11.3 (8th-July-2026)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.3)
+
+## Ver 0.11.2 (6th-April-2026)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.2)
+
+## Ver 0.11.1 (4th-March-2026)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.1)
+
+## Ver 0.11.0
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.0)
+
+## Ver 0.10.2 (16th-Sept-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.10.2)
+
+## Ver 0.10.1 (28th-Aug-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.10.1)
+
+## Ver 0.10.0 (27th-Aug-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.10.0)
+
+## Ver 0.9.0 (27th-Aug-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.9.0)
+
+## Ver 0.8.2 (14th-Aug-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.8.2)
+
+## Ver 0.8.1 (14th-Aug-2025)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.8.1)
+
 ## Ver 0.8.0 (13th-Feb-2025)
 
 See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.8.0)

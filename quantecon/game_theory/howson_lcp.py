@@ -38,7 +38,7 @@ def polym_lcp_solver(
         starting_player_actions: Optional[Sequence[int]] = None,
         max_iter: int = -1,
         full_output: bool = False,
-) -> Union[tuple[NDArray], NashResult]:
+) -> Union[tuple[NDArray, ...], tuple[tuple[NDArray, ...], NashResult]]:
     """
     Finds a Nash Equilbrium of a Polymatrix Game.
 
@@ -66,12 +66,15 @@ def polym_lcp_solver(
 
     Returns
     -------
-    tuple(ndarray(float, ndim=1)) or NashResult
-        The mixed actions at termination, a Nash Equilibrium if
-        not stopped early by reaching `max_iter`. If `full_output`,
-        then the number of iterations, whether it has converged,
-        and the initial conditions of the algorithm are included
-        in the returned `NashResult` alongside the actions.
+    NE : tuple(ndarray(float, ndim=1))
+        Tuple of computed Nash equilibrium mixed actions. A Nash
+        Equilibrium if not stopped early by reaching `max_iter`.
+
+    res : NashResult
+        Object containing information about the computation: the number
+        of iterations, whether it has converged, and the initial
+        conditions of the algorithm. Returned only when `full_output`
+        is True. See `NashResult` for details.
 
     References
     ----------
@@ -83,6 +86,9 @@ def polym_lcp_solver(
     LOW_AVOIDER = 2.0
     # makes all of the costs greater than 0
     positive_cost_maker = polymg.range_of_payoffs()[1] + LOW_AVOIDER
+
+    eye_N = np.eye(polymg.N)
+
     # Construct the LCP like Howson:
     M = np.vstack([
         np.hstack([
@@ -93,13 +99,13 @@ def polym_lcp_solver(
             for p2 in range(polymg.N)
         ] + [
             -np.outer(np.ones(
-                polymg.nums_actions[player]), np.eye(polymg.N)[player])
+                polymg.nums_actions[player]), eye_N[player])
         ])
         for player in range(polymg.N)
     ] + [
         np.hstack([
             np.hstack([
-                np.outer(np.eye(polymg.N)[player], np.ones(
+                np.outer(eye_N[player], np.ones(
                     polymg.nums_actions[player]))
                 for player in range(polymg.N)
             ]

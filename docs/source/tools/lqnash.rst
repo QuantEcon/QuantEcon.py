@@ -1,7 +1,6 @@
 lqnash
 ======
 
-.. automodule:: quantecon.lqnash
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: quantecon
+
+.. autofunction:: nnash

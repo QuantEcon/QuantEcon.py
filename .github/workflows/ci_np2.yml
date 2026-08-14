@@ -1,9 +1,10 @@
-name: conda-build (NumPy v2)
+name: conda-build (numba rc/latest)
 
 on:
   push:
+    branches: [ main ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ main ]
 
 jobs:
   tests:
@@ -12,12 +13,12 @@ jobs:
       max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v5
-    - uses: conda-incubator/setup-miniconda@v3
+    - uses: actions/checkout@v7
+    - uses: conda-incubator/setup-miniconda@v4
       with:
         auto-update-conda: true
         environment-file: environment_np2.yml
-        python-version: '3.13'
+        python-version: '3.14'
     - name: Conda info
       shell: bash -l {0}
       run: |

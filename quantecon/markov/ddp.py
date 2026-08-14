@@ -127,7 +127,7 @@ class DiscreteDP:
 
     There are two ways to represent the data for instantiating a
     `DiscreteDP` object. Let n, m, and L denote the numbers of states,
-    actions, and feasbile state-action pairs, respectively.
+    actions, and feasible state-action pairs, respectively.
 
     1. `DiscreteDP(R, Q, beta)`
 
@@ -178,6 +178,11 @@ class DiscreteDP:
     a_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the actions.
 
+    state_values : array_like, optional(default=None)
+        Array_like of length num_states containing the values associated with
+        the states, which must be homogeneous in type. If None, the values
+        default to integers 0 through num_states-1.
+
     Attributes
     ----------
     R, Q, beta : see Parameters.
@@ -194,6 +199,9 @@ class DiscreteDP:
 
     max_iter : scalar(int), default=250
         Default value for the maximum number of iterations.
+
+    state_values : array_like or None
+        Array of state values if set, None otherwise.
 
     Notes
     -----
@@ -296,7 +304,16 @@ class DiscreteDP:
     4
 
     """
-    def __init__(self, R, Q, beta, s_indices=None, a_indices=None):
+    def __init__(self, R, Q, beta, s_indices=None, a_indices=None,
+                 state_values=None):
+        if not (0 <= beta <= 1):
+            raise ValueError('beta must be in [0, 1]')
+        if beta == 1:
+            msg = 'infinite horizon solution methods are disabled with beta=1'
+            warnings.warn(msg)
+            self._error_msg_no_discounting = 'method invalid for beta=1'
+        self.beta = beta
+
         self._sa_pair = False
         self._sparse = False
 
@@ -342,6 +359,17 @@ class DiscreteDP:
             self.s_indices = np.asarray(s_indices)
             self.a_indices = np.asarray(a_indices)
 
+            # Validate the index ranges here: out-of-range state indices
+            # would otherwise be silently reattributed to other states on
+            # the sorted path below
+            if (self.s_indices < 0).any() or \
+                    (self.s_indices >= self.num_states).any():
+                raise ValueError(
+                    f's_indices must be in [0, {self.num_states})'
+                )
+            if (self.a_indices < 0).any():
+                raise ValueError('a_indices must be nonnegative')
+
             if _has_sorted_sa_indices(self.s_indices, self.a_indices):
                 a_indptr = np.empty(self.num_states+1, dtype=int)
                 _generate_a_indptr(self.num_states, self.s_indices,
@@ -349,9 +377,18 @@ class DiscreteDP:
                 self.a_indptr = a_indptr
             else:
                 # Sort indices and elements of R and Q
+                # (shape supplied explicitly, so that a_indptr has length
+                # num_states+1 even when the last states have no action)
                 sa_ptrs = sp.coo_matrix(
-                    (np.arange(self.num_sa_pairs), (s_indices, a_indices))
+                    (np.arange(self.num_sa_pairs),
+                     (self.s_indices, self.a_indices)),
+                    shape=(self.num_states, self.a_indices.max()+1)
                 ).tocsr()
+                if sa_ptrs.nnz < self.num_sa_pairs:
+                    # Duplicate entries have been summed on the conversion
+                    # to CSR, in which case the pointers would silently
+                    # pick up wrong elements of R and Q
+                    raise ValueError('duplicate state-action pair found')
                 sa_ptrs.sort_indices()
                 self.a_indices = sa_ptrs.indices
                 self.a_indptr = sa_ptrs.indptr
@@ -366,27 +403,6 @@ class DiscreteDP:
                         _s_indices[j] = i
                 self.s_indices = _s_indices
 
-            # Define state-wise maximization
-            def s_wise_max(vals, out=None, out_argmax=None):
-                """
-                Return the vector max_a vals(s, a), where vals is represented
-                by a 1-dimensional ndarray of shape (self.num_sa_pairs,).
-                out and out_argmax must be of length self.num_states; dtype of
-                out_argmax must be int.
-
-                """
-                if out is None:
-                    out = np.empty(self.num_states)
-                if out_argmax is None:
-                    _s_wise_max(self.a_indices, self.a_indptr, vals,
-                                out_max=out)
-                else:
-                    _s_wise_max_argmax(self.a_indices, self.a_indptr, vals,
-                                       out_max=out, out_argmax=out_argmax)
-                return out
-
-            self.s_wise_max = s_wise_max
-
         else:  # Not self._sa_pair
             if self.R.ndim != 2:
                 raise ValueError(msg_dimension)
@@ -399,40 +415,15 @@ class DiscreteDP:
             self.s_indices, self.a_indices = None, None
             self.num_sa_pairs = (self.R > -np.inf).sum()
 
-            # Define state-wise maximization
-            def s_wise_max(vals, out=None, out_argmax=None):
-                """
-                Return the vector max_a vals(s, a), where vals is represented
-                by a 2-dimensional ndarray of shape (n, m). Stored in out,
-                which must be of length self.num_states.
-                out and out_argmax must be of length self.num_states; dtype of
-                out_argmax must be int.
-
-                """
-                if out is None:
-                    out = np.empty(self.num_states)
-                if out_argmax is None:
-                    vals.max(axis=1, out=out)
-                else:
-                    vals.argmax(axis=1, out=out_argmax)
-                    out[:] = vals[np.arange(self.num_states), out_argmax]
-                return out
-
-            self.s_wise_max = s_wise_max
+            self._s_arange = np.arange(n)  # cached for indexing by state
 
         # Check that for every state, at least one action is feasible
         self._check_action_feasibility()
 
-        if not (0 <= beta <= 1):
-            raise ValueError('beta must be in [0, 1]')
-        if beta == 1:
-            msg = 'infinite horizon solution methods are disabled with beta=1'
-            warnings.warn(msg)
-            self._error_msg_no_discounting = 'method invalid for beta=1'
-        self.beta = beta
-
         self.epsilon = 1e-3
         self.max_iter = 250
+        # Call the setter method
+        self.state_values = state_values
 
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
@@ -443,6 +434,34 @@ class DiscreteDP:
             self._lineq_solve = np.linalg.solve
             self._I = np.identity(self.num_states)
 
+    @property
+    def state_values(self):
+        return self._state_values
+
+    @state_values.setter
+    def state_values(self, values):
+        """
+        Set state values of the DiscreteDP.
+
+        Parameters
+        ----------
+        values : array_like or None
+            Array of state values with length n, or None to unset.
+        """
+        if values is None:
+            self._state_values = None
+        else:
+            values = np.asarray(values)
+            if (values.ndim < 1) or (values.shape[0] != self.num_states):
+                raise ValueError(
+                    'state_values must be an array_like of length n'
+                )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in state_values must be homogeneous in type'
+                )
+            self._state_values = values
+
     def _check_action_feasibility(self):
         """
         Check that for every state, reward is finite for some action,
@@ -450,6 +469,20 @@ class DiscreteDP:
         some action available.
 
         """
+        if self._sa_pair:
+            # Check that for every state there is at least one action
+            # available; checked first, since for a state with no action
+            # s_wise_max leaves the corresponding entry of R_max
+            # uninitialized
+            diff = np.diff(self.a_indptr)
+            if (diff == 0).any():
+                # First state index such that no action is available
+                s = np.where(diff == 0)[0][0]
+                raise ValueError(
+                    'for every state at least one action must be available: '
+                    'violated for state {s}'.format(s=s)
+                )
+
         # Check that for every state, reward is finite for some action
         R_max = self.s_wise_max(self.R)
         if (R_max == -np.inf).any():
@@ -460,16 +493,32 @@ class DiscreteDP:
                 'violated for state {s}'.format(s=s)
             )
 
+    def s_wise_max(self, vals, out=None, out_argmax=None):
+        """
+        Return the vector max_a vals(s, a), where vals is represented by
+        a 1-dimensional ndarray of shape (self.num_sa_pairs,) for the
+        state-action pair formulation, and by a 2-dimensional ndarray of
+        shape (n, m) for the product formulation. Stored in out, which
+        must be of length self.num_states; dtype of out_argmax must be
+        int.
+
+        """
+        if out is None:
+            out = np.empty(self.num_states)
         if self._sa_pair:
-            # Check that for every state there is at least one action available
-            diff = np.diff(self.a_indptr)
-            if (diff == 0).any():
-                # First state index such that no action is available
-                s = np.where(diff == 0)[0][0]
-                raise ValueError(
-                    'for every state at least one action must be available: '
-                    'violated for state {s}'.format(s=s)
-                )
+            if out_argmax is None:
+                _s_wise_max(self.a_indices, self.a_indptr, vals,
+                            out_max=out)
+            else:
+                _s_wise_max_argmax(self.a_indices, self.a_indptr, vals,
+                                   out_max=out, out_argmax=out_argmax)
+        else:
+            if out_argmax is None:
+                vals.max(axis=1, out=out)
+            else:
+                vals.argmax(axis=1, out=out_argmax)
+                out[:] = vals[self._s_arange, out_argmax]
+        return out
 
     def to_sa_pair_form(self, sparse=True):
         """
@@ -484,7 +533,7 @@ class DiscreteDP:
         Returns
         -------
         ddp_sa : DiscreteDP
-            The correspnoding DiscreteDP instance in SA-pair form
+            The corresponding DiscreteDP instance in SA-pair form
 
         Notes
         -----
@@ -501,7 +550,10 @@ class DiscreteDP:
                 QL = sp.csr_matrix(self.Q[s_ind, a_ind])
             else:
                 QL = self.Q[s_ind, a_ind]
-            return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
+            return DiscreteDP(
+                RL, QL, self.beta, s_ind, a_ind,
+                state_values=self.state_values
+            )
 
     def to_product_form(self):
         """
@@ -513,7 +565,7 @@ class DiscreteDP:
         Returns
         -------
         ddp_sa : DiscreteDP
-            The correspnoding DiscreteDP instance in product form
+            The corresponding DiscreteDP instance in product form
 
         Notes
         -----
@@ -532,7 +584,9 @@ class DiscreteDP:
                               self.Q.toarray(), Q)
             else:
                 _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
-            return DiscreteDP(R, Q, self.beta)
+            return DiscreteDP(
+                R, Q, self.beta, state_values=self.state_values
+            )
         else:
             return self
 
@@ -562,8 +616,8 @@ class DiscreteDP:
                           out=sigma_indices)
             R_sigma, Q_sigma = self.R[sigma_indices], self.Q[sigma_indices]
         else:
-            R_sigma = self.R[np.arange(self.num_states), sigma]
-            Q_sigma = self.Q[np.arange(self.num_states), sigma]
+            R_sigma = self.R[self._s_arange, sigma]
+            Q_sigma = self.Q[self._s_arange, sigma]
 
         return R_sigma, Q_sigma
 
@@ -590,7 +644,16 @@ class DiscreteDP:
             Updated value function vector, of length n.
 
         """
-        vals = self.R + self.beta * (self.Q @ v)  # Shape: (L,) or (n, m)
+        if not self._sa_pair and self.Q.flags.c_contiguous:
+            # a single gemv over a 2-d view of Q (a view, since Q is
+            # C-contiguous), instead of a batched matmul over n stacked
+            # (m, n) matrices; the view is taken per call, so that a
+            # rebound self.Q is picked up
+            n, m = self.R.shape
+            Qv = (self.Q.reshape(n*m, n) @ v).reshape(n, m)
+        else:
+            Qv = self.Q @ v
+        vals = self.R + self.beta * Qv  # Shape: (L,) or (n, m)
 
         if Tv is None:
             Tv = np.empty(self.num_states)
@@ -699,7 +762,7 @@ class DiscreteDP:
         """
         # May be replaced with quantecon.compute_fixed_point
         if max_iter <= 0:
-            return v, 0
+            return 0
 
         for i in range(max_iter):
             new_v = T(v, *args, **kwargs)
@@ -719,7 +782,7 @@ class DiscreteDP:
 
         Parameters
         ----------
-        method : str, optinal(default='policy_iteration')
+        method : str, optional(default='policy_iteration')
             Solution method, str in {'value_iteration', 'vi',
             'policy_iteration', 'pi', 'modified_policy_iteration',
             'mpi', 'linear_programming', 'lp'}.
@@ -746,7 +809,7 @@ class DiscreteDP:
         Returns
         -------
         res : DPSolveResult
-            Optimization result represetned as a DPSolveResult. See
+            Optimization result represented as a DPSolveResult. See
             `DPSolveResult` for details.
 
         """
@@ -781,6 +844,8 @@ class DiscreteDP:
 
         if max_iter is None:
             max_iter = self.max_iter
+        if max_iter < 1:
+            raise ValueError('max_iter must be a positive integer')
         if epsilon is None:
             epsilon = self.epsilon
 
@@ -824,6 +889,8 @@ class DiscreteDP:
 
         if max_iter is None:
             max_iter = self.max_iter
+        if max_iter < 1:
+            raise ValueError('max_iter must be a positive integer')
 
         # What for initial condition?
         if v_init is None:
@@ -864,6 +931,8 @@ class DiscreteDP:
 
         if max_iter is None:
             max_iter = self.max_iter
+        if max_iter < 1:
+            raise ValueError('max_iter must be a positive integer')
         if epsilon is None:
             epsilon = self.epsilon
 
@@ -920,6 +989,8 @@ class DiscreteDP:
 
         if max_iter is None:
             max_iter = self.max_iter * self.num_states
+        if max_iter < 1:
+            raise ValueError('max_iter must be a positive integer')
 
         # What for initial condition?
         if v_init is None:
@@ -961,7 +1032,7 @@ class DiscreteDP:
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)
-        return MarkovChain(Q_sigma)
+        return MarkovChain(Q_sigma, state_values=self.state_values)
 
 
 class DPSolveResult(dict):
