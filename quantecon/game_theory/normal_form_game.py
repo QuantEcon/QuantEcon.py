@@ -909,13 +909,15 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
         Opponent's mixed action. Its length must be equal to
         `payoff_matrix.shape[1]`.
 
-    tol : scalar(float), optional(default=None)
-        Tolerance level used in determining best responses.
+    tol : scalar(float), optional(default=1e-8)
+        Tolerance level used in determining best responses. Must be
+        nonnegative.
 
     Returns
     -------
     scalar(int)
-        Best response action.
+        Best response action; -1 if there is no action that satisfies
+        the tolerance condition, which occurs only if `tol` < 0.
 
     """
     n, m = payoff_matrix.shape
@@ -932,3 +934,5 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
     for a in range(n):
         if payoff_vector[a] >= payoff_max - tol:
             return a
+
+    return -1  # Unreachable unless tol < 0
