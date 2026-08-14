@@ -1,5 +1,5 @@
 """
-Tests for util/random.py
+Tests for random/utilities.py
 
 Functions
 ---------
@@ -77,13 +77,13 @@ def draw_jitted(cdf, size=None):
 
 
 @njit
-def draw_jitted_rs(cdf, size, random_state):
-    return draw(cdf, size, random_state)
+def draw_jitted_rng(cdf, size, rng):
+    return draw(cdf, size, rng)
 
 
 @njit
-def draw_jitted_rs_kw(cdf, random_state):
-    return draw(cdf, random_state=random_state)
+def draw_jitted_rng_kw(cdf, rng):
+    return draw(cdf, rng=rng)
 
 
 @njit
@@ -92,9 +92,9 @@ def draw_jitted_explicit_none(cdf, size):
 
 
 @njit
-def draw_jitted_fwd(cdf, size=None, random_state=None):
+def draw_jitted_fwd(cdf, size=None, rng=None):
     # Forwards its own defaults, which reach the overload as types.none
-    return draw(cdf, size, random_state)
+    return draw(cdf, size, rng)
 
 
 @njit
@@ -104,9 +104,9 @@ def draw_jitted_seeded(cdf, size, seed):
 
 
 @njit
-def draw_jitted_optional_rs(cdf, size, random_state, flag):
-    rs = random_state if flag else None
-    return draw(cdf, size, rs)
+def draw_jitted_optional_rng(cdf, size, rng, flag):
+    rng_or_none = rng if flag else None
+    return draw(cdf, size, rng_or_none)
 
 
 class TestDraw:
@@ -145,7 +145,7 @@ class TestDraw:
             atol = 1e-2
             assert_allclose(pmf_computed, self.pmf, atol=atol)
 
-    # random_state: a Generator behaves the same on both paths #
+    # rng: a Generator behaves the same on both paths #
 
     def test_python_jitted_agree(self):
         # The contract that keeps the two implementations in step: for
@@ -153,20 +153,20 @@ class TestDraw:
         for seed in [0, 1234, 20260801]:
             for size in [1, 10, 1000]:
                 out_py = draw(self.cdf, size, np.random.default_rng(seed))
-                out_jit = draw_jitted_rs(self.cdf, size,
-                                         np.random.default_rng(seed))
+                out_jit = draw_jitted_rng(self.cdf, size,
+                                          np.random.default_rng(seed))
                 assert_array_equal(out_py, out_jit)
 
             # Scalar draws are compared as arrays: the Python path
             # returns np.int64 and the jitted path a Python int.
             out_py = draw(self.cdf, None, np.random.default_rng(seed))
-            out_jit = draw_jitted_rs(self.cdf, None,
-                                     np.random.default_rng(seed))
+            out_jit = draw_jitted_rng(self.cdf, None,
+                                      np.random.default_rng(seed))
             assert_array_equal(np.asarray(out_py), np.asarray(out_jit))
 
     def test_generator_reproducible(self):
         for size in [None, 10]:
-            for func in [draw, draw_jitted_rs]:
+            for func in [draw, draw_jitted_rng]:
                 out0 = func(self.cdf, size, np.random.default_rng(1234))
                 out1 = func(self.cdf, size, np.random.default_rng(1234))
                 assert_array_equal(np.asarray(out0), np.asarray(out1))
@@ -176,8 +176,8 @@ class TestDraw:
         # copied at the boundary, so that successive calls continue the
         # stream rather than restarting it.
         rng = np.random.default_rng(1234)
-        parts = [draw_jitted_rs(self.cdf, 5, rng),
-                 draw_jitted_rs(self.cdf, 5, rng),
+        parts = [draw_jitted_rng(self.cdf, 5, rng),
+                 draw_jitted_rng(self.cdf, 5, rng),
                  draw(self.cdf, 5, rng)]
         expected = draw(self.cdf, 15, np.random.default_rng(1234))
         assert_array_equal(np.concatenate(parts), expected)
@@ -188,7 +188,7 @@ class TestDraw:
         # Generator for every later consumer. Complements
         # test_generator_state_advances, which covers the in-place
         # mutation half of the same contract.
-        for func in [draw, draw_jitted_rs]:
+        for func in [draw, draw_jitted_rng]:
             for size in [None, 1, 10]:
                 n = 1 if size is None else size
                 rng = np.random.default_rng(1234)
@@ -198,25 +198,11 @@ class TestDraw:
                 assert_array_equal(rng.random(4), ref.random(4))
 
     def test_generator_keyword_form_in_jit(self):
-        out_py = draw(self.cdf, random_state=np.random.default_rng(1234))
-        out_jit = draw_jitted_rs_kw(self.cdf, np.random.default_rng(1234))
+        out_py = draw(self.cdf, rng=np.random.default_rng(1234))
+        out_jit = draw_jitted_rng_kw(self.cdf, np.random.default_rng(1234))
         assert_array_equal(np.asarray(out_py), np.asarray(out_jit))
 
-    # random_state: the Python path keeps check_random_state's breadth #
-
-    def test_int_seed_python_path(self):
-        for size in [None, 10]:
-            out_seed = draw(self.cdf, size, 1234)
-            out_rs = draw(self.cdf, size, np.random.RandomState(1234))
-            assert_array_equal(np.asarray(out_seed), np.asarray(out_rs))
-
-    def test_int_seed_and_generator_differ(self):
-        # Documented in Notes: same integer, different stream.
-        out_seed = draw(self.cdf, 10, 1234)
-        out_gen = draw(self.cdf, 10, np.random.default_rng(1234))
-        assert_(not np.array_equal(out_seed, out_gen))
-
-    # random_state=None: unchanged behaviour on both paths #
+    # rng=None: unchanged behaviour on both paths #
 
     def test_none_matches_legacy_global(self):
         for size in [None, 10]:
@@ -248,40 +234,42 @@ class TestDraw:
         out1 = draw_jitted_seeded(self.cdf, 10, 1234)
         assert_array_equal(out0, out1)
 
-    # random_state: rejections in nopython mode #
+    # rng: rejections on both paths #
 
-    @pytest.mark.skipif(config.DISABLE_JIT,
-                        reason='requires nopython compilation')
-    def test_int_seed_raises_in_jit(self):
-        assert_raises(TypingError, draw_jitted_rs, self.cdf, 10, 1234)
-        try:
-            draw_jitted_rs(self.cdf, 10, 1234)
-        except TypingError as e:
+    def test_int_seed_raises(self):
+        # Stricter than SPEC 7 by design: nopython mode cannot construct
+        # a generator from a seed, so the Python path rejects seeds too
+        # rather than accept a value the jitted path never can. From
+        # Python this is a TypeError; from a jitted caller a
+        # compile-time TypingError (or the same TypeError when
+        # NUMBA_DISABLE_JIT routes the wrapper to the Python body).
+        for func in [draw, draw_jitted_rng]:
+            with pytest.raises((TypeError, TypingError)) as excinfo:
+                func(self.cdf, 10, 1234)
             # Numba nests the message in its report of the candidate
             # implementations it rejected. Assert on tokens that can
             # only come from draw's own message, not from the caller's
             # source line that numba echoes alongside it.
-            msg = str(e)
+            msg = str(excinfo.value)
             assert_('quantecon.random.draw' in msg)
             assert_('np.random.default_rng' in msg)
 
-    @pytest.mark.skipif(config.DISABLE_JIT,
-                        reason='requires nopython compilation')
-    def test_randomstate_raises_in_jit(self):
-        # A RandomState cannot be typed at all, so it is rejected during
-        # argument typing and the overload never runs. Assert only the
-        # exception type, never the message.
-        assert_raises(TypingError, draw_jitted_rs, self.cdf, 10,
-                      np.random.RandomState(1234))
+    def test_randomstate_raises(self):
+        # In nopython mode a RandomState cannot be typed at all, so it
+        # is rejected during argument typing and the overload never
+        # runs. Assert only the exception type, never the message.
+        for func in [draw, draw_jitted_rng]:
+            assert_raises((TypeError, TypingError), func, self.cdf, 10,
+                          np.random.RandomState(1234))
 
     @pytest.mark.skipif(config.DISABLE_JIT,
                         reason='requires nopython compilation')
     def test_optional_generator_raises_in_jit(self):
-        assert_raises(TypingError, draw_jitted_optional_rs, self.cdf, 10,
+        assert_raises(TypingError, draw_jitted_optional_rng, self.cdf, 10,
                       np.random.default_rng(1234), True)
         try:
-            draw_jitted_optional_rs(self.cdf, 10,
-                                    np.random.default_rng(1234), True)
+            draw_jitted_optional_rng(self.cdf, 10,
+                                     np.random.default_rng(1234), True)
         except TypingError as e:
             # A token unique to the Optional hint, so that this branch
             # cannot be satisfied by the int-seed message.
