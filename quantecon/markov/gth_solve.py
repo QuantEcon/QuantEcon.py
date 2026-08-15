@@ -102,7 +102,7 @@ def gth_solve(A, overwrite=False, use_jit=True):
 @jit(nopython=True)
 def _gth_solve_jit(A, out):
     """
-    JIT complied version of the main routine of gth_solve.
+    JIT-compiled version of the main routine of gth_solve.
 
     Parameters
     ----------

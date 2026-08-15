@@ -29,15 +29,15 @@ def var_quadratic_sum(A, C, H, beta, x0):
         The matrix described above in description.  Should be n x n
     H : array_like(float, ndim=2)
         The matrix described above in description.  Should be n x n
-    beta: scalar(float)
+    beta : scalar(float)
         Should take a value in (0, 1)
-    x_0: array_like(float, ndim=1)
-        The initial condtion. A conformable array (of length n, or with
+    x0 : array_like(float, ndim=1)
+        The initial condition. A conformable array (of length n, or with
         n rows)
 
     Returns
     -------
-    q0: scalar(float)
+    q0 : scalar(float)
         Represents the value :math:`q(x_0)`
 
     Remarks: The formula for computing :math:`q(x_0)` is
@@ -71,7 +71,7 @@ def m_quadratic_sum(A, B, max_it=50):
 
     V is computed by solving the corresponding discrete lyapunov
     equation using the doubling algorithm.  See the documentation of
-    `util.solve_discrete_lyapunov` for more information.
+    `quantecon.solve_discrete_lyapunov` for more information.
 
     Parameters
     ----------
@@ -88,7 +88,7 @@ def m_quadratic_sum(A, B, max_it=50):
 
     Returns
     -------
-    gamma1: array_like(float, ndim=2)
+    gamma1 : array_like(float, ndim=2)
         Represents the value :math:`V`
 
     """

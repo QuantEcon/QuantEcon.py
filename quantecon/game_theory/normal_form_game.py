@@ -57,6 +57,7 @@ There are three ways to construct a `NormalFormGame` instance.
 
 The first is to pass an array of payoffs for all the players:
 
+>>> from quantecon.game_theory import NormalFormGame, Player
 >>> matching_pennies_bimatrix = [[(1, -1), (-1, 1)], [(-1, 1), (1, -1)]]
 >>> g = NormalFormGame(matching_pennies_bimatrix)
 >>> print(g.players[0])
@@ -85,8 +86,8 @@ then set the payoff values to each entry:
 >>> g = NormalFormGame((2, 2))
 >>> print(g)
 2-player NormalFormGame with payoff profile array:
-[[[ 0.,  0.],  [ 0.,  0.]],
- [[ 0.,  0.],  [ 0.,  0.]]]
+[[[0., 0.],  [0., 0.]],
+ [[0., 0.],  [0., 0.]]]
 >>> g[0, 0] = 1, 1
 >>> g[0, 1] = -2, 3
 >>> g[1, 0] = 3, -2
@@ -506,10 +507,9 @@ class Player:
             default to the value of the `tol` attribute.
 
         method : str, optional(default=None)
-            If None, `minmax` from `quantecon.optimize` is used. If
-            `method` is set to `'simplex'`, `'interior-point'`, or
-            `'revised simplex'`, then `scipy.optimize.linprog` is used
-            with the method as specified by `method`.
+            If None, `minmax` from `quantecon.optimize` is used.
+            Otherwise `scipy.optimize.linprog` is used with the method
+            as specified by `method`.
 
         Returns
         -------
@@ -565,6 +565,9 @@ class NormalFormGame:
     payoff_profile_array : ndarray(float, ndim=N+1)
         Array of shape (n_0, ..., n_{N-1}, N) containing the payoff
         profiles, where the last axis represents the players.
+
+    dtype : dtype
+        Data type of the elements of the payoff arrays.
 
     """
     def __init__(self, data, dtype=None):
@@ -799,7 +802,7 @@ class NormalFormGame:
             An array of N objects, where each object must be an integer
             (pure action) or an array of floats (mixed action).
 
-        tol : scalar(float)
+        tol : scalar(float), optional(default=None)
             Tolerance level used in determining best responses. If None,
             default to each player's `tol` attribute value.
 
@@ -909,7 +912,7 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
         Opponent's mixed action. Its length must be equal to
         `payoff_matrix.shape[1]`.
 
-    tol : scalar(float), optional(default=None)
+    tol : scalar(float), optional(default=1e-8)
         Tolerance level used in determining best responses.
 
     Returns

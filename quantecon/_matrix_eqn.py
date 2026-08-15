@@ -58,7 +58,7 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
 
     Returns
     -------
-    gamma1: array_like(float, ndim=2)
+    gamma1 : array_like(float, ndim=2)
         Represents the value :math:`X`
 
     """
@@ -242,10 +242,9 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
     Bs : array_like(float)
         Consists of m state transition matrices B(s) with dimension
         n x k for each Markov state s
-    Cs : array_like(float), optional(default=None)
+    Cs : array_like(float)
         Consists of m state transition matrices C(s) with dimension
-        n x j for each Markov state s. If the model is deterministic
-        then Cs should take default value of None
+        n x j for each Markov state s
     Qs : array_like(float)
         Consists of m symmetric and non-negative definite payoff
         matrices Q(s) with dimension k x k that corresponds with
@@ -254,14 +253,14 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
         Consists of m symmetric and non-negative definite payoff
         matrices R(s) with dimension n x n that corresponds with
         the state variable x for each Markov state s
-    Ns : array_like(float), optional(default=None)
+    Ns : array_like(float)
         Consists of m cross product term matrices N(s) with dimension
         k x n for each Markov state,
-    beta : scalar(float), optional(default=1)
+    beta : scalar(float)
         beta is the discount parameter
     tolerance : scalar(float), optional(default=1e-10)
         The tolerance level for convergence
-    max_iter : scalar(int), optional(default=500)
+    max_iter : scalar(int), optional(default=1000)
         The maximum number of iterations allowed
 
     Returns

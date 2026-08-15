@@ -90,7 +90,7 @@ class TestLinprogSimplexScipy:
     def test_network_flow(self):
         # A network flow problem with supply and demand at nodes
         # and with costs along directed edges.
-        # https://www.princeton.edu/~rvdb/542/lectures/lec10.pdf
+        # https://vanderbei.princeton.edu/542/lectures/lec10.pdf
         c = np.array([2, 4, 9, 11, 4, 3, 8, 7, 0, 15, 16, 18]) * (-1)
         n, p = -1, 1
         A_eq = [
