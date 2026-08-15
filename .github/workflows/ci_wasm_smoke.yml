@@ -37,6 +37,10 @@ jobs:
         use-only-tar-bz2: true
         activate-environment: qe
 
+    - name: Install quantecon from source
+      shell: bash -l {0}
+      run: pip install -e . --no-deps
+
     - name: Run smoke suite (native)
       shell: bash -l {0}
       run: pytest ci/wasm/smoke_test.py -v
@@ -62,6 +66,13 @@ jobs:
       with:
         path: _site
         key: jupyterlite-site-${{ hashFiles('ci/wasm/environment.yml') }}
+
+    - name: Install micromamba
+      uses: mamba-org/setup-micromamba@v2
+      with:
+        micromamba-binary-path: /usr/local/bin/micromamba
+        init-shell: none
+        generate-run-shell: false
 
     - name: Install JupyterLite build tools
       run: |
