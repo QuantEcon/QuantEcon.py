@@ -190,7 +190,7 @@ def draw(cdf, size=None, rng=None):
         Random number generator to draw from. Must be a
         `np.random.Generator` or None; in particular, integer seeds and
         `np.random.RandomState` are not accepted. If None, the global
-        random state described in Notes is used.
+        random state is used (see Notes).
 
     Returns
     -------
@@ -199,29 +199,21 @@ def draw(cdf, size=None, rng=None):
     Notes
     -----
     `draw` is intended primarily for use inside jit-compiled functions.
-    A `np.random.Generator` passed as `rng` behaves identically on both
-    paths: called from Python and called from within a jit-compiled
-    function it consumes the same generator and returns the same draws,
-    and the generator's state advances in place, so a single generator
-    can be shared between Python and jitted call sites and stays in
-    sync. Pass one whenever the draws should be reproducible.
+    Pass a `np.random.Generator` as `rng` whenever the draws should be
+    reproducible; the generator is consumed in place, so its state
+    advances across successive calls.
 
     `rng` accepts only None or a `Generator` because Numba's nopython
     mode can neither construct a generator from a seed nor represent
     `np.random.RandomState`. A jit-compiled caller passing anything
-    else gets a compile-time `numba.TypingError`. The pure-Python path
-    does no input checking -- it is a thin fallback, and its behaviour
-    for anything other than None or a `Generator` is unspecified and
-    unsupported. Build a generator outside any jit-compiled function
-    with `np.random.default_rng(seed)` and pass it in.
+    else gets a compile-time `numba.TypingError`. Build a generator
+    outside any jit-compiled function with `np.random.default_rng(seed)`
+    and pass it in.
 
-    If `rng` is None the draws come from a global random state that
-    depends on the call site: NumPy's legacy global random state from
-    Python, seeded by `np.random.seed`, and Numba's own internal random
-    state from within a jit-compiled function, seeded by calling
-    `np.random.seed` inside the jit-compiled function. Both are Mersenne
-    Twister and give the same stream for the same seed, but they advance
-    independently, so seeding one has no effect on the other.
+    If `rng` is None, a jit-compiled caller draws from Numba's own
+    internal random state, which is seeded by calling `np.random.seed`
+    inside a jit-compiled function; seeding NumPy's global random state
+    from Python has no effect on it.
 
     A single `Generator` must not be shared across the iterations of a
     `numba.prange` loop. Its state is updated in place, so concurrent
@@ -242,15 +234,12 @@ def draw(cdf, size=None, rng=None):
     >>> qe.random.draw(cdf, rng=np.random.default_rng(1234))
     np.int64(1)
 
-    A `Generator` gives the same draws from Python and from within a
-    jit-compiled function:
+    Inside a jit-compiled function:
 
     >>> from numba import njit
     >>> @njit
     ... def draw_jitted(cdf, size, rng):
     ...     return qe.random.draw(cdf, size, rng)
-    >>> qe.random.draw(cdf, 5, np.random.default_rng(1234))
-    array([1, 0, 1, 0, 0])
     >>> draw_jitted(cdf, 5, np.random.default_rng(1234))
     array([1, 0, 1, 0, 0])
 
