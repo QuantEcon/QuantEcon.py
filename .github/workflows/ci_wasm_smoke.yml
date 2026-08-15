@@ -1,0 +1,38 @@
+name: WASM smoke suite (native)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Cache conda
+      uses: actions/cache@v6
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key:
+          ${{ runner.os }}-3.13-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+    - uses: conda-incubator/setup-miniconda@v4
+      with:
+        auto-update-conda: true
+        miniforge-version: latest
+        environment-file: environment.yml
+        python-version: "3.13"
+        auto-activate-base: false
+        use-only-tar-bz2: true
+        activate-environment: qe
+    - name: Run smoke suite
+      shell: bash -l {0}
+      run: |
+        pytest ci/wasm/smoke_test.py -v
