@@ -5,7 +5,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 
 import numpy as np
 from numba import guvectorize, types
-from numba.core.errors import TypingError
+from numba import TypingError
 from numba.extending import overload
 from ..util import check_random_state
 
@@ -208,10 +208,12 @@ def draw(cdf, size=None, rng=None):
 
     `rng` accepts only None or a `Generator` because Numba's nopython
     mode can neither construct a generator from a seed nor represent
-    `np.random.RandomState`. Anything else raises `TypeError` from
-    Python and a compile-time `numba.TypingError` from a jit-compiled
-    caller. Build a generator outside any jit-compiled function with
-    `np.random.default_rng(seed)` and pass it in.
+    `np.random.RandomState`. A jit-compiled caller passing anything
+    else gets a compile-time `numba.TypingError`. The pure-Python path
+    does no input checking -- it is a thin fallback, and its behaviour
+    for anything other than None or a `Generator` is unspecified and
+    unsupported. Build a generator outside any jit-compiled function
+    with `np.random.default_rng(seed)` and pass it in.
 
     If `rng` is None the draws come from a global random state that
     depends on the call site: NumPy's legacy global random state from
@@ -237,8 +239,8 @@ def draw(cdf, size=None, rng=None):
     >>> rng = np.random.default_rng(1234)
     >>> qe.random.draw(cdf, 10, rng=rng)
     array([1, 0, 1, 0, 0, 0, 0, 0, 1, 0])
-    >>> int(qe.random.draw(cdf, rng=np.random.default_rng(1234)))
-    1
+    >>> qe.random.draw(cdf, rng=np.random.default_rng(1234))
+    np.int64(1)
 
     A `Generator` gives the same draws from Python and from within a
     jit-compiled function:
@@ -255,12 +257,6 @@ def draw(cdf, size=None, rng=None):
     """
     if rng is None:
         rng = np.random
-    elif not isinstance(rng, np.random.Generator):
-        raise TypeError(
-            'quantecon.random.draw: `rng` must be None or an '
-            f'np.random.Generator; got {rng!r}. Build a generator with '
-            'np.random.default_rng(seed) and pass that in.'
-        )
     if isinstance(size, int):
         rs = rng.random(size)
         out = np.searchsorted(cdf, rs, side='right')

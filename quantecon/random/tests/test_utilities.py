@@ -13,8 +13,7 @@ import numpy as np
 import pytest
 from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
                            assert_)
-from numba import config, njit
-from numba.core.errors import TypingError
+from numba import config, njit, TypingError
 from quantecon.random import probvec, sample_without_replacement, draw
 
 
@@ -234,33 +233,37 @@ class TestDraw:
         out1 = draw_jitted_seeded(self.cdf, 10, 1234)
         assert_array_equal(out0, out1)
 
-    # rng: rejections on both paths #
+    # rng: compile-time rejections, jitted path only #
+    #
+    # The None | Generator contract is enforced only by the overload:
+    # the pure-Python body does no input checking and its behaviour for
+    # other inputs is unspecified, so nothing here calls `draw`
+    # directly, and all three tests are skipped when NUMBA_DISABLE_JIT
+    # routes the jitted wrappers to the Python body.
 
-    def test_int_seed_raises(self):
+    @pytest.mark.skipif(config.DISABLE_JIT,
+                        reason='requires nopython compilation')
+    def test_int_seed_raises_in_jit(self):
         # Stricter than SPEC 7 by design: nopython mode cannot construct
-        # a generator from a seed, so the Python path rejects seeds too
-        # rather than accept a value the jitted path never can. From
-        # Python this is a TypeError; from a jitted caller a
-        # compile-time TypingError (or the same TypeError when
-        # NUMBA_DISABLE_JIT routes the wrapper to the Python body).
-        for func in [draw, draw_jitted_rng]:
-            with pytest.raises((TypeError, TypingError)) as excinfo:
-                func(self.cdf, 10, 1234)
-            # Numba nests the message in its report of the candidate
-            # implementations it rejected. Assert on tokens that can
-            # only come from draw's own message, not from the caller's
-            # source line that numba echoes alongside it.
-            msg = str(excinfo.value)
-            assert_('quantecon.random.draw' in msg)
-            assert_('np.random.default_rng' in msg)
+        # a generator from a seed.
+        with pytest.raises(TypingError) as excinfo:
+            draw_jitted_rng(self.cdf, 10, 1234)
+        # Numba nests the message in its report of the candidate
+        # implementations it rejected. Assert on tokens that can
+        # only come from draw's own message, not from the caller's
+        # source line that numba echoes alongside it.
+        msg = str(excinfo.value)
+        assert_('quantecon.random.draw' in msg)
+        assert_('np.random.default_rng' in msg)
 
-    def test_randomstate_raises(self):
+    @pytest.mark.skipif(config.DISABLE_JIT,
+                        reason='requires nopython compilation')
+    def test_randomstate_raises_in_jit(self):
         # In nopython mode a RandomState cannot be typed at all, so it
         # is rejected during argument typing and the overload never
         # runs. Assert only the exception type, never the message.
-        for func in [draw, draw_jitted_rng]:
-            assert_raises((TypeError, TypingError), func, self.cdf, 10,
-                          np.random.RandomState(1234))
+        assert_raises(TypingError, draw_jitted_rng, self.cdf, 10,
+                      np.random.RandomState(1234))
 
     @pytest.mark.skipif(config.DISABLE_JIT,
                         reason='requires nopython compilation')
