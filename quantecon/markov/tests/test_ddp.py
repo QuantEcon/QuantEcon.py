@@ -447,7 +447,6 @@ def test_ddp_to_sa_and_to_product():
     Q[0, 0, 0] = 0
     Q[0, 0, 1] = 2/n
     beta = 0.95
-    state_values = np.array(['state0', 'state1', 'state2'])
 
     sparse_R = np.array([0, 1, 1, 0, 1])
     _Q = np.full((5, 3), 1/3)
@@ -455,7 +454,7 @@ def test_ddp_to_sa_and_to_product():
     _Q[0, 1] = 2/n
     sparse_Q = sparse.coo_matrix(_Q)
 
-    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
+    ddp = DiscreteDP(R, Q, beta)
     ddp_sa = ddp.to_sa_pair_form()
     ddp_sa2 = ddp_sa.to_sa_pair_form()
     ddp_sa3 = ddp.to_sa_pair_form(sparse=False)
@@ -469,7 +468,6 @@ def test_ddp_to_sa_and_to_product():
         # allclose doesn't work on sparse
         assert_(np.max(np.abs((sparse_Q - ddp_s.Q))) < 1e-15)
         assert_allclose(ddp_s.beta, beta)
-        assert_array_equal(ddp_s.state_values, state_values)
 
     # these two will have probability 0 in state 2, action 0 b/c
     # of the infeasiability in R
@@ -482,13 +480,11 @@ def test_ddp_to_sa_and_to_product():
         assert_allclose(ddp_f.R, ddp.R)
         assert_allclose(ddp_f.Q, funky_Q)
         assert_allclose(ddp_f.beta, ddp.beta)
-        assert_array_equal(ddp_f.state_values, state_values)
 
     # this one is just the original one.
     assert_allclose(ddp4.R, ddp.R)
     assert_allclose(ddp4.Q, ddp.Q)
     assert_allclose(ddp4.beta, ddp.beta)
-    assert_array_equal(ddp4.state_values, state_values)
 
     for method in ["pi", "vi", "mpi"]:
         sol1 = ddp.solve(method=method)
@@ -499,84 +495,95 @@ def test_ddp_to_sa_and_to_product():
                 assert_allclose(sol1[k], sol2[k])
 
 
-def test_ddp_state_values():
-    R = np.array([[1, 2], [3, 4]])
-    Q = np.full((2, 2, 2), 0.5)
-    beta = 0.95
-    state_values = np.array(['state1', 'state2'])
+class TestDiscreteDPStateValues:
+    def setup_method(self):
+        # From Puterman 2005, Section 3.1
+        beta = 0.95
 
-    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
+        # Formulation with R: n x m, Q: n x m x n
+        n, m = 2, 2  # number of states, number of actions
+        R = [[5, 10], [-1, -np.inf]]
+        Q = np.empty((n, m, n))
+        Q[0, 0, :] = 0.5, 0.5
+        Q[0, 1, :] = 0, 1
+        Q[1, :, :] = 0, 1
 
-    assert_array_equal(ddp.state_values, state_values)
+        # Formulation with state-action pairs
+        s_indices = [0, 0, 1]
+        a_indices = [0, 1, 0]
+        R_sa = [R[0][0], R[0][1], R[1][0]]
+        Q_sa = np.asarray(Q)[s_indices, a_indices]
 
-    ddp = DiscreteDP(R, Q, beta)
-    assert_(ddp.state_values is None)
+        self.state_values = np.array([1.2, 3.4])
+        ddp0 = DiscreteDP(R, Q, beta, state_values=self.state_values)
+        ddp_sa = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices,
+                            state_values=self.state_values)
+        self.ddps = [ddp0, ddp_sa]
 
-    new_state_values = ['new_state1', 'new_state2']
-    ddp.state_values = new_state_values
-    assert_(isinstance(ddp.state_values, np.ndarray))
-    assert_array_equal(ddp.state_values, new_state_values)
+    def test_state_values_stored(self):
+        for ddp in self.ddps:
+            assert_array_equal(ddp.state_values, self.state_values)
 
-    ddp.state_values = None
-    assert_(ddp.state_values is None)
+    def test_state_values_default_none(self):
+        R = [[5, 10], [-1, -np.inf]]
+        Q = [[(0.5, 0.5), (0, 1)], [(0, 1), (0.5, 0.5)]]
+        ddp = DiscreteDP(R, Q, 0.95)
+        assert_(ddp.state_values is None)
 
+    def test_state_values_setter(self):
+        for ddp in self.ddps:
+            ddp.state_values = [5, 6]
+            assert_array_equal(ddp.state_values, [5, 6])
+            ddp.state_values = None
+            assert_(ddp.state_values is None)
+            ddp.state_values = self.state_values
 
-def test_ddp_controlled_mc_state_values():
-    R = np.array([[1, 2], [3, 4]])
-    Q = np.full((2, 2, 2), 0.5)
-    beta = 0.95
-    state_values = np.array(['state1', 'state2'])
-    sigma = np.array([0, 1])
+    def test_state_values_2dim(self):
+        # Values may be vectors (e.g., (asset, productivity) pairs)
+        values_2d = np.array([[0., 0.1], [1., 0.1]])
+        for ddp in self.ddps:
+            ddp.state_values = values_2d
+            assert_array_equal(ddp.state_values, values_2d)
+            ddp.state_values = self.state_values
 
-    ddp = DiscreteDP(R, Q, beta, state_values=state_values)
-    mc = ddp.controlled_mc(sigma)
+    def test_state_values_invalid(self):
+        msg_length = 'state_values must be an array_like of length n'
+        msg_dtype = 'data in state_values must be homogeneous in type'
+        for ddp in self.ddps:
+            for values in [[1.2, 3.4, 5.6],  # Wrong length
+                           'state0',  # Scalar
+                           [(0,), (0, 1)],  # Non-homogeneous
+                           np.array(['state0', 1], dtype=object)]:
+                assert_raises(ValueError, setattr, ddp, 'state_values',
+                              values)
+            with assert_raises(ValueError) as exc_info:
+                ddp.state_values = [1.2, 3.4, 5.6]
+            assert_(str(exc_info.exception) == msg_length)
+            with assert_raises(ValueError) as exc_info:
+                ddp.state_values = np.array(['state0', 1], dtype=object)
+            assert_(str(exc_info.exception) == msg_dtype)
+        R = [[5, 10], [-1, -np.inf]]
+        Q = [[(0.5, 0.5), (0, 1)], [(0, 1), (0.5, 0.5)]]
+        assert_raises(ValueError, DiscreteDP, R, Q, 0.95,
+                      state_values=[1.2])
 
-    assert_array_equal(mc.state_values, state_values)
+    def test_controlled_mc_state_values(self):
+        for ddp in self.ddps:
+            for method in ['vi', 'pi', 'mpi']:
+                res = ddp.solve(method=method)
+                assert_array_equal(res.mc.state_values, self.state_values)
 
+    def test_state_values_recorded_in_result(self):
+        for ddp in self.ddps:
+            res = ddp.solve(method='pi')
+            assert_array_equal(res.state_values, self.state_values)
+        R = [[5, 10], [-1, -np.inf]]
+        Q = [[(0.5, 0.5), (0, 1)], [(0, 1), (0.5, 0.5)]]
+        res = DiscreteDP(R, Q, 0.95).solve(method='pi')
+        assert_(res.state_values is None)
 
-def test_ddp_state_values_wrong_length():
-    R = np.array([[1, 2], [3, 4]])
-    Q = np.full((2, 2, 2), 0.5)
-    beta = 0.95
-    state_values = np.array(['state1'])
-    msg = 'state_values must be an array_like of length n'
-
-    with assert_raises(ValueError) as exc_info:
-        DiscreteDP(R, Q, beta, state_values=state_values)
-    assert_(str(exc_info.exception) == msg)
-
-    ddp = DiscreteDP(R, Q, beta)
-    with assert_raises(ValueError) as exc_info:
-        ddp.state_values = state_values
-    assert_(str(exc_info.exception) == msg)
-
-
-def test_ddp_scalar_state_values():
-    R = np.array([[1, 2], [3, 4]])
-    Q = np.full((2, 2, 2), 0.5)
-    beta = 0.95
-    state_values = 'state1'
-
-    assert_raises(
-        ValueError, DiscreteDP, R, Q, beta, state_values=state_values
-    )
-
-    ddp = DiscreteDP(R, Q, beta)
-    assert_raises(ValueError, setattr, ddp, 'state_values', state_values)
-
-
-def test_ddp_object_dtype_state_values():
-    R = np.array([[1, 2], [3, 4]])
-    Q = np.full((2, 2, 2), 0.5)
-    beta = 0.95
-    state_values = np.array(['state1', 2], dtype=object)
-    msg = 'data in state_values must be homogeneous in type'
-
-    with assert_raises(ValueError) as exc_info:
-        DiscreteDP(R, Q, beta, state_values=state_values)
-    assert_(str(exc_info.exception) == msg)
-
-    ddp = DiscreteDP(R, Q, beta)
-    with assert_raises(ValueError) as exc_info:
-        ddp.state_values = state_values
-    assert_(str(exc_info.exception) == msg)
+    def test_to_sa_and_to_product_carry_state_values(self):
+        ddp0, ddp_sa = self.ddps
+        for ddp_new in [ddp0.to_sa_pair_form(), ddp0.to_sa_pair_form(False),
+                        ddp_sa.to_product_form()]:
+            assert_array_equal(ddp_new.state_values, self.state_values)

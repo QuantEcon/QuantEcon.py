@@ -179,9 +179,11 @@ class DiscreteDP:
         Array containing the indices of the actions.
 
     state_values : array_like, optional(default=None)
-        Array_like of length num_states containing the values associated with
-        the states, which must be homogeneous in type. If None, the values
-        default to integers 0 through num_states-1.
+        Array_like of length n containing the values associated with
+        the states, which must be homogeneous in type. May be
+        2-dimensional, in which case row `state_values[s]` is the value
+        associated with state `s`. If None, the states are represented
+        by their indices, 0 through n-1.
 
     Attributes
     ----------
@@ -420,10 +422,11 @@ class DiscreteDP:
         # Check that for every state, at least one action is feasible
         self._check_action_feasibility()
 
-        self.epsilon = 1e-3
-        self.max_iter = 250
         # Call the setter method
         self.state_values = state_values
+
+        self.epsilon = 1e-3
+        self.max_iter = 250
 
         # Linear equation solver to be used in evaluate_policy
         if self._sparse:
@@ -872,6 +875,7 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
                             method='value iteration',
                             epsilon=epsilon,
                             max_iter=max_iter)
@@ -914,6 +918,7 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
                             method='policy iteration',
                             max_iter=max_iter)
 
@@ -973,6 +978,7 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
                             method='modified policy iteration',
                             epsilon=epsilon,
                             max_iter=max_iter,
@@ -1011,6 +1017,7 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
                             method='linear programming',
                             max_iter=max_iter)
 
@@ -1028,7 +1035,8 @@ class DiscreteDP:
         Returns
         -------
         mc : MarkovChain
-            Controlled Markov chain.
+            Controlled Markov chain, with `state_values` attached if
+            set for this instance.
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)
@@ -1051,7 +1059,11 @@ class DPSolveResult(dict):
         Number of iterations
 
     mc : MarkovChain
-        Controlled Markov chain
+        Controlled Markov chain, with the `state_values` attached if
+        set
+
+    state_values : ndarray or None
+        State values of the `DiscreteDP` instance solved
 
     method : str
         Method employed
