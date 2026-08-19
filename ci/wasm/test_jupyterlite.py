@@ -9,7 +9,14 @@ Build the site first:
 
 Then run:
     pytest ci/wasm/test_jupyterlite.py --browser chromium -v
+
+The CI job that builds the site and runs this file lands with issue #933;
+until then it is run manually.  The harness assumes Linux/Windows
+keybindings (Control+a), i.e. CI or a non-mac dev box.
 """
+import itertools
+import textwrap
+
 import pytest
 from playwright.sync_api import Browser, Page
 
@@ -17,7 +24,9 @@ SITE = "http://localhost:8000"
 
 # First run must download WASM packages + compile with Numba — keep generous.
 BOOT_MS = 600_000   # 10 min
-EXEC_MS  = 180_000  # 3 min per cell
+EXEC_MS = 180_000   # 3 min per cell
+
+_cell_ids = itertools.count()
 
 
 # ---------------------------------------------------------------------------
@@ -48,58 +57,69 @@ def _open_console(page: Page) -> None:
     # Click the first Console launcher card (xeus-python)
     page.locator(".jp-LauncherCard[data-category='Console']").first.click()
 
-    # Wait for the console widget
+    # Wait for the console widget and its input prompt
     page.wait_for_selector(".jp-CodeConsole", timeout=BOOT_MS)
+    page.wait_for_selector(".jp-CodeConsole-input .cm-content, "
+                           ".jp-Console-promptCell .CodeMirror",
+                           timeout=BOOT_MS)
 
-    # Wait for the kernel to reach idle (downloads + first JIT compile)
-    _wait_idle(page, BOOT_MS)
-
-
-def _wait_idle(page: Page, timeout: int) -> None:
-    """Block until the JupyterLab kernel status indicator reads 'Idle'."""
-    page.wait_for_function(
-        """() => {
-            const el = document.querySelector(
-                ".jp-Toolbar-kernelStatus, [data-status]");
-            if (!el) return false;
-            const txt = (el.textContent || el.dataset.status || "").toLowerCase();
-            return txt.includes("idle");
-        }""",
-        timeout=timeout,
-    )
+    # Boot probe: the kernel is ready when it has executed a first cell
+    # (package downloads + kernel start happen here, hence BOOT_MS).
+    _run(page, "print('kernel ready')", timeout=BOOT_MS)
 
 
 def _run(page: Page, code: str, timeout: int = EXEC_MS) -> str:
     """
-    Paste *code* into the active console prompt, execute it with Shift+Enter,
-    wait for the kernel to return to idle, and return the last output text.
+    Execute *code* in the active console prompt and return the output text.
+
+    The code is wrapped in try/finally printing a unique per-cell sentinel,
+    and we wait for THAT sentinel in the output area rather than polling the
+    kernel-status indicator: the indicator can still read "idle" from the
+    previous cell (race), and a status selector is fragile across JupyterLab
+    versions.  finally ensures a failing cell still emits the sentinel, so
+    assertions see the traceback text instead of a timeout.
+
+    insert_text (not keyboard.type) enters the code verbatim: typed newlines
+    would trigger the console's run-on-Enter binding and CodeMirror's
+    auto-indent, mangling multi-line cells.
     """
+    token = f"QE_CELL_DONE_{next(_cell_ids)}"
+    cell = ("try:\n"
+            + textwrap.indent(code, "    ")
+            + f"\nfinally:\n    print('{token}')")
+
     prompt = page.locator(".jp-CodeConsole-input .cm-content, "
                           ".jp-Console-promptCell .CodeMirror")
     prompt.last.click()
     page.keyboard.press("Control+a")
-    page.keyboard.type(code)
+    page.keyboard.insert_text(cell)
     page.keyboard.press("Shift+Enter")
-    _wait_idle(page, timeout)
+
+    # Scoped to output areas so the echoed cell source cannot match.
+    page.wait_for_selector(f'.jp-OutputArea-output:has-text("{token}")',
+                           timeout=timeout)
 
     outputs = page.locator(".jp-OutputArea-output").all()
-    return "\n".join(o.inner_text() for o in outputs[-5:]) if outputs else ""
+    return "\n".join(o.inner_text() for o in outputs[-10:]) if outputs else ""
 
 
 # ---------------------------------------------------------------------------
-# Tests — key items from the smoke checklist, run inside the real WASM kernel
+# Tests — key items from the smoke checklist, run inside the real WASM kernel.
+# Each cell prints a unique uppercase sentinel; asserting on those (never on
+# bare substrings) keeps traceback text from matching accidentally.
 # ---------------------------------------------------------------------------
 
 def test_kernel_boots(console: Page):
-    """xeus-python WASM kernel loads and reaches idle without error."""
+    """xeus-python WASM kernel loads and executes a first cell."""
     # If the fixture succeeds the kernel already booted; just assert no crash.
     assert console.url.startswith(SITE)
 
 
 def test_import_quantecon(console: Page):
     """import quantecon succeeds in the Emscripten environment."""
-    out = _run(console, "import quantecon as qe; print('v', qe.__version__)")
-    assert "v" in out, f"unexpected output: {out!r}"
+    out = _run(console,
+               "import quantecon as qe; print('QE_IMPORT_OK', qe.__version__)")
+    assert "QE_IMPORT_OK" in out, f"unexpected output: {out!r}"
 
 
 def test_tauchen(console: Page):
@@ -108,9 +128,10 @@ def test_tauchen(console: Page):
         "import quantecon as qe, numpy as np\n"
         "mc = qe.tauchen(5, 0.9, 0.1)\n"
         "ok = mc.P.shape == (5,5) and np.allclose(mc.P.sum(1), 1)\n"
-        "print('ok' if ok else 'FAIL')"
+        "print('QE_TAUCHEN_OK' if ok else 'QE_TAUCHEN_FAIL')"
     )
-    assert "ok" in _run(console, code), "tauchen failed"
+    out = _run(console, code)
+    assert "QE_TAUCHEN_OK" in out, f"tauchen failed: {out!r}"
 
 
 def test_np_linalg_solve_jit(console: Page):
@@ -124,10 +145,10 @@ def test_np_linalg_solve_jit(console: Page):
         "@njit\n"
         "def _s(A, b): return np.linalg.solve(A, b)\n"
         "x = _s(np.array([[3.,2.],[1.,-1.]]), np.array([8.,1.]))\n"
-        "print('ok' if abs(x[0]-2.0)<1e-4 else 'FAIL')"
+        "print('QE_SOLVE_OK' if abs(x[0]-2.0)<1e-4 else 'QE_SOLVE_FAIL')"
     )
-    out = _run(console, code, timeout=EXEC_MS)
-    assert "ok" in out, f"_LAPACK proxy failed: {out!r}"
+    out = _run(console, code)
+    assert "QE_SOLVE_OK" in out, f"_LAPACK proxy failed: {out!r}"
 
 
 def test_support_enumeration(console: Page):
@@ -137,10 +158,12 @@ def test_support_enumeration(console: Page):
         "bm=[[(3,3),(3,2)],[(2,2),(5,6)],[(0,3),(6,1)]]\n"
         "g=qe.game_theory.NormalFormGame(bm)\n"
         "nes=qe.game_theory.support_enumeration(g)\n"
-        "print(len(nes))"
+        "print('QE_NE_COUNT', len(nes))"
     )
     out = _run(console, code)
-    assert "3" in out, f"support_enumeration unexpected output: {out!r}"
+    assert "QE_NE_COUNT 3" in out, (
+        f"support_enumeration unexpected output: {out!r}"
+    )
 
 
 def test_gini_fails_on_emscripten(console: Page):
@@ -152,11 +175,11 @@ def test_gini_fails_on_emscripten(console: Page):
         "import quantecon as qe, numpy as np\n"
         "try:\n"
         "    qe.gini_coefficient(np.array([1.,2.,3.]))\n"
-        "    print('NO_ERROR')\n"
+        "    print('QE_GINI_NO_ERROR')\n"
         "except Exception:\n"
-        "    print('EXPECTED_ERROR')"
+        "    print('QE_GINI_EXPECTED_ERROR')"
     )
     out = _run(console, code)
-    assert "EXPECTED_ERROR" in out, (
+    assert "QE_GINI_EXPECTED_ERROR" in out, (
         f"gini_coefficient should fail on Emscripten but did not: {out!r}"
     )
