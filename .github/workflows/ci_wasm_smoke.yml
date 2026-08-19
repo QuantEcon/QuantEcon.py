@@ -10,12 +10,14 @@ on:
 
 jobs:
   # ------------------------------------------------------------------
-  # Job 1 — native Python.  Fast gate: ensures the suite itself is
-  # correct and all 16 tests pass before the slow WASM build starts.
+  # Native Python gate: ensures the smoke suite itself is correct and
+  # all tests pass against this repo's source.  The Emscripten /
+  # JupyterLite job that consumes the same suite lands with issue #933.
   # ------------------------------------------------------------------
   native:
     name: Smoke suite (native)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
     - uses: actions/checkout@v7
 
@@ -44,59 +46,3 @@ jobs:
     - name: Run smoke suite (native)
       shell: bash -l {0}
       run: pytest ci/wasm/smoke_test.py -v
-
-  # ------------------------------------------------------------------
-  # Job 2 — Emscripten / JupyterLite.
-  # Builds a real JupyterLite site from emscripten-forge packages
-  # (xeus-python WASM kernel + numba + quantecon), then drives it
-  # headlessly with Playwright to verify the stack end-to-end.
-  # ------------------------------------------------------------------
-  wasm:
-    name: Smoke suite (Emscripten / JupyterLite)
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v7
-
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-
-    - name: Cache JupyterLite build output
-      uses: actions/cache@v6
-      with:
-        path: _site
-        key: jupyterlite-site-${{ hashFiles('ci/wasm/environment.yml') }}
-
-    - name: Install micromamba
-      uses: mamba-org/setup-micromamba@v2
-      with:
-        micromamba-binary-path: /usr/local/bin/micromamba
-        init-shell: none
-        generate-run-shell: false
-
-    - name: Install JupyterLite build tools
-      run: |
-        pip install \
-          "jupyterlite-core>=0.4" \
-          "jupyterlite-xeus>=4.5" \
-          pytest \
-          pytest-playwright
-
-    - name: Install Playwright browser
-      run: python -m playwright install --with-deps chromium
-
-    - name: Build JupyterLite site
-      run: |
-        jupyter lite build \
-          --XeusAddon.environment_file=ci/wasm/environment.yml \
-          --output-dir=_site
-
-    - name: Start local server
-      run: python -m http.server 8000 --directory _site &
-
-    - name: Run Playwright smoke tests (Emscripten kernel)
-      run: |
-        pytest ci/wasm/test_jupyterlite.py \
-          --browser chromium \
-          --timeout=660 \
-          -v
