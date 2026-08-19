@@ -429,7 +429,7 @@ def num_compositions(m, n):
 def num_compositions_jit(m, n):
     """
     Numba jit version of `num_compositions`. Return `0` if the outcome
-    exceeds the maximum value of `np.intp`.
+    exceeds the maximum value of `np.int64`.
 
     """
     return comb_jit(n+m-1, m-1)

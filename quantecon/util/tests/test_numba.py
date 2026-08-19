@@ -55,7 +55,7 @@ class TestNumbaLinalgSolve:
 
 class TestCombJit:
     def setup_method(self):
-        self.MAX_INTP = np.iinfo(np.intp).max
+        self.MAX_INT64 = np.iinfo(np.int64).max
 
     def test_comb(self):
         N, k = 10, 3
@@ -67,11 +67,11 @@ class TestCombJit:
         assert_(comb_jit(-1, 3) == 0)
         assert_(comb_jit(2, -1) == 0)
 
-        assert_(comb_jit(self.MAX_INTP, 2) == 0)
+        assert_(comb_jit(self.MAX_INT64, 2) == 0)
 
-        N = np.intp(self.MAX_INTP**0.5 * 2**0.5) + 1
+        N = np.int64(self.MAX_INT64**0.5 * 2**0.5) + 1
         assert_(comb_jit(N, 2) == 0)
 
-    def test_max_intp(self):
-        assert_(comb_jit(self.MAX_INTP, 0) == 1)
-        assert_(comb_jit(self.MAX_INTP, 1) == self.MAX_INTP)
+    def test_max_int64(self):
+        assert_(comb_jit(self.MAX_INT64, 0) == 1)
+        assert_(comb_jit(self.MAX_INT64, 1) == self.MAX_INT64)

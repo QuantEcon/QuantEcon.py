@@ -250,10 +250,10 @@ class TestSimplexGrid:
         num = num_compositions_jit(3, 4)
         assert_(num == len(self.simplex_grid_3_4))
 
-        # Exceed max value of np.intp
+        # Exceed max value of np.int64
         assert_(num_compositions_jit(100, 50) == 0)
 
 
 def test_simplex_grid_raises_value_error_overflow():
-    # Exceed max value of np.intp
+    # Exceed max value of np.int64
     assert_raises(ValueError, simplex_grid, 100, 50)

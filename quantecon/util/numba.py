@@ -77,11 +77,11 @@ def _numba_linalg_solve_ol(a, b):
     return _numba_linalg_solve_impl
 
 
-@jit(types.intp(types.intp, types.intp), nopython=True, cache=True)
+@jit(types.int64(types.int64, types.int64), nopython=True, cache=True)
 def comb_jit(N, k):
     """
     Numba jitted function that computes N choose k. Return `0` if the
-    outcome exceeds the maximum value of `np.intp` or if N < 0, k < 0,
+    outcome exceeds the maximum value of `np.int64` or if N < 0, k < 0,
     or k > N.
 
     Parameters
@@ -97,14 +97,14 @@ def comb_jit(N, k):
     """
     # From scipy.special._comb_int_long
     # github.com/scipy/scipy/blob/v1.0.0/scipy/special/_comb.pyx
-    INTP_MAX = np.iinfo(np.intp).max
+    INT64_MAX = np.iinfo(np.int64).max
     if N < 0 or k < 0 or k > N:
         return 0
     if k == 0:
         return 1
     if k == 1:
         return N
-    if N == INTP_MAX:
+    if N == INT64_MAX:
         return 0
 
     M = N + 1
@@ -114,7 +114,7 @@ def comb_jit(N, k):
 
     for j in range(1, nterms + 1):
         # Overflow check
-        if val > INTP_MAX // (M - j):
+        if val > INT64_MAX // (M - j):
             return 0
 
         val *= M - j

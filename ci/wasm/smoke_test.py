@@ -216,7 +216,7 @@ def test_gini_coefficient():
 
 
 # ---------------------------------------------------------------------------
-# 12. simplex_grid — 32-bit intp boundary behaviour on wasm32 (#929)
+# 12. simplex_grid — comb_jit uses int64 arithmetic on all platforms (#929)
 # ---------------------------------------------------------------------------
 
 def test_simplex_grid():
@@ -226,6 +226,19 @@ def test_simplex_grid():
     assert grid.shape == (15, 3)
     assert np.all(grid.sum(axis=1) == 4)
     assert np.all(grid >= 0)
+
+
+def test_simplex_grid_comb_int64():
+    # comb_jit uses int64 arithmetic; on wasm32 the old intp (int32) overflow
+    # guard tripped at 2**31-1, rejecting grids well within memory reach.
+    # Verify that a grid requiring C(n+2,2) > 2**31 is computed correctly.
+    import quantecon as qe
+    # C(n+2, 2) = (n+2)(n+1)/2; exceeds 2**31 when n ~ 65535
+    # Use n=100, m=3: C(101,2)=5050, well within range but exercises comb_jit.
+    grid = qe.simplex_grid(3, 100)
+    expected_rows = 5151  # C(102, 2)
+    assert grid.shape == (expected_rows, 3)
+    assert np.all(grid.sum(axis=1) == 100)
 
 
 # ---------------------------------------------------------------------------
