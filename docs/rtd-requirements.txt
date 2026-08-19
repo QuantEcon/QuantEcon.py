@@ -3,7 +3,6 @@ ipython
 numpydoc
 numba>=0.49
 numpy>=1.17
-sympy
 scipy>=1.5
 requests
 matplotlib

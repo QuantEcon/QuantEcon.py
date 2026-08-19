@@ -27,7 +27,6 @@ dependencies = [
     'numpy>=1.17.0',
     'requests',
     'scipy>=1.5.0',
-    'sympy',
 ]
 
 [project.optional-dependencies]
@@ -39,7 +38,6 @@ testing = [
     "scipy",
     "pandas",
     "numba",
-    "sympy",
 ]
 
 
