@@ -6,10 +6,12 @@ agents too — this file only adds the essentials and repo-specific conventions.
 
 ## Quickstart
 
-- Environment: `conda env create -f environment.yml` (creates `qe`), activate it, then `flit install`.
+- Environment: `conda env create -f environment.yml` (creates `qe`), activate it, then
+  `flit install --symlink`. Environment creation takes several minutes — let it finish.
 - Tests: `pytest quantecon` (bare `pytest` also works — `pytest.ini` scopes collection to
   `quantecon/`). The full suite takes minutes; run `pytest quantecon/<module>/tests/...` while
-  iterating.
+  iterating. Much of the library is Numba-jitted, so the first call of anything compiled is slow —
+  don't mistake JIT compilation for a hang. Slow tests can be skipped with `-m "not slow"`.
 - Lint (same selects as CI): `flake8 --select=F401,F405,E231 quantecon`
 - The `ci/` directory holds CI-only assets (for example the WASM smoke suite in `ci/wasm/`). They
   are not part of the shipped package and are run by explicit path in workflows — keep imports of
