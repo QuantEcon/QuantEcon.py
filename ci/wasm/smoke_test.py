@@ -2,8 +2,10 @@
 Browser smoke suite for QuantEcon.py on the JupyterLite xeus-python kernel.
 
 One representative function per Numba feature class used in the library.
-Run natively with pytest to validate the suite itself; the same file is
-consumed by the WASM CI job (issue #933).
+Run natively with pytest to validate the suite itself; the WASM CI job
+(issue #933) will consume the same file once it is wired to ship it into
+the JupyterLite site.  Until then the Emscripten-only branches below
+(IS_EMSCRIPTEN, xfail) are inert but document the expected behaviour.
 
 Findings from a WASM run should be recorded in issue #928 as a results
 table: function name -> works / fails / notes.

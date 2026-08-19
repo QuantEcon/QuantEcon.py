@@ -6,4 +6,3 @@ dependencies:
   - xeus-python
   - numba
   - quantecon
-  - pytest
