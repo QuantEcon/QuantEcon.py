@@ -296,25 +296,33 @@ class _BestResponsePolytope:
         self.trans_recip = trans_recip
 
 
-@guvectorize(['(i4[:], u8[:])'], '(m)->()', nopython=True, cache=True)
-def _ints_arr_to_bits(ints_arr, out):
+def _ints_arr_to_bits_kernel(ints_arr, out):  # pragma: no cover
+    m = ints_arr.shape[0]
+    out[0] = 0
+    for i in range(m):
+        out[0] |= np.uint64(1) << np.uint64(ints_arr[i])
+
+
+_ints_arr_to_bits_gufunc = None
+
+
+def _ints_arr_to_bits(ints_arr):
     """
     Convert an array of integers representing the set bits into the
     corresponding integer.
 
-    Compiled as a ufunc by Numba's `@guvectorize`: if the input is a
-    2-dim array with shape[0]=K, the function returns a 1-dim array of
-    K converted integers.
+    If the input is a 2-dim array with shape[0]=K, returns a 1-dim array
+    of K converted integers.
 
     Parameters
     ----------
-    ints_arr : ndarray(int32, ndim=1)
+    ints_arr : ndarray(int32, ndim=1 or 2)
         Array of distinct integers from 0, ..., 63.
 
     Returns
     -------
-    np.uint64
-        Integer with set bits represented by the input integers.
+    np.uint64 or ndarray(uint64)
+        Integer(s) with set bits represented by the input integers.
 
     Examples
     --------
@@ -326,10 +334,12 @@ def _ints_arr_to_bits(ints_arr, out):
     array([ 7, 11], dtype=uint64)
 
     """
-    m = ints_arr.shape[0]
-    out[0] = 0
-    for i in range(m):
-        out[0] |= np.uint64(1) << np.uint64(ints_arr[i])
+    global _ints_arr_to_bits_gufunc
+    if _ints_arr_to_bits_gufunc is None:
+        _ints_arr_to_bits_gufunc = guvectorize(
+            ['(i4[:], u8[:])'], '(m)->()', nopython=True, cache=True
+        )(_ints_arr_to_bits_kernel)
+    return _ints_arr_to_bits_gufunc(ints_arr)
 
 
 @jit(nopython=True, cache=True)

@@ -89,14 +89,26 @@ def _probvec(r, out):  # pragma: no cover
         out[i] = r[i] - r[i-1]
     out[n] = 1 - r[n-1]
 
-_probvec_parallel = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel',
-    cache=True
-    )(_probvec)
-_probvec_cpu = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu',
-    cache=True
-    )(_probvec)
+_probvec_parallel_gufunc = None
+_probvec_cpu_gufunc = None
+
+
+def _probvec_parallel(r, out):
+    global _probvec_parallel_gufunc
+    if _probvec_parallel_gufunc is None:
+        _probvec_parallel_gufunc = guvectorize(
+            ['(f8[:], f8[:])'], '(n),(k)', nopython=True,
+            target='parallel', cache=True)(_probvec)
+    _probvec_parallel_gufunc(r, out)
+
+
+def _probvec_cpu(r, out):
+    global _probvec_cpu_gufunc
+    if _probvec_cpu_gufunc is None:
+        _probvec_cpu_gufunc = guvectorize(
+            ['(f8[:], f8[:])'], '(n),(k)', nopython=True,
+            target='cpu', cache=True)(_probvec)
+    _probvec_cpu_gufunc(r, out)
 
 
 def sample_without_replacement(n, k, num_trials=None, random_state=None):
@@ -153,10 +165,9 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
     return result
 
 
-@guvectorize(['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True)
-def _sample_without_replacement(n, r, out):
+def _sample_without_replacement_kernel(n, r, out):  # pragma: no cover
     """
-    Main body of `sample_without_replacement`. To be complied as a ufunc
+    Main body of `sample_without_replacement`. To be compiled as a ufunc
     by guvectorize of Numba.
 
     """
@@ -168,6 +179,18 @@ def _sample_without_replacement(n, r, out):
         idx = np.intp(np.floor(r[j] * (n-j)))  # np.floor returns a float
         out[j] = pool[idx]
         pool[idx] = pool[n-j-1]
+
+
+_swr_gufunc = None
+
+
+def _sample_without_replacement(n, r):
+    global _swr_gufunc
+    if _swr_gufunc is None:
+        _swr_gufunc = guvectorize(
+            ['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True
+        )(_sample_without_replacement_kernel)
+    return _swr_gufunc(n, r)
 
 
 # Pure python implementation that will run if the JIT compiler is disabled
