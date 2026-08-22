@@ -272,7 +272,7 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
 
     """
     m = Qs.shape[0]
-    k, n = Qs.shape[1], Rs.shape[1]
+    n = Rs.shape[1]
     # Create the Ps matrices, initialize as identity matrix
     Ps = np.array([np.eye(n) for i in range(m)])
     Ps1 = np.copy(Ps)
