@@ -105,8 +105,12 @@ def vertex_enumeration_gen(g, qhull_options=None):
         g.players[1-i], idx=i, qhull_options=qhull_options
     ) for i in range(N)]
 
-    labelings_bits_tup = \
-        tuple(_ints_arr_to_bits(brps[i].labelings) for i in range(N))
+    labelings_bits_tup = tuple(
+        _ints_arr_to_bits(
+            brps[i].labelings,
+            np.empty(brps[i].labelings.shape[0], dtype=np.uint64)
+        ) for i in range(N)
+    )
     equations_tup = tuple(brps[i].equations for i in range(N))
     trans_recips = tuple(brps[i].trans_recip for i in range(N))
 
@@ -296,33 +300,37 @@ class _BestResponsePolytope:
         self.trans_recip = trans_recip
 
 
-@guvectorize(['(i4[:], u8[:])'], '(m)->()', nopython=True, cache=True)
+@guvectorize('(m)->()', nopython=True, cache=True)
 def _ints_arr_to_bits(ints_arr, out):
     """
     Convert an array of integers representing the set bits into the
     corresponding integer.
 
-    Compiled as a ufunc by Numba's `@guvectorize`: if the input is a
-    2-dim array with shape[0]=K, the function returns a 1-dim array of
-    K converted integers.
+    Compiled as a dynamic (signature-less) gufunc by Numba's
+    `@guvectorize` on first call: if the input is a 2-dim array with
+    shape[0]=K, the function fills the 1-dim output array `out` with
+    K converted integers. The output array must be supplied by the
+    caller, with dtype np.uint64.
 
     Parameters
     ----------
-    ints_arr : ndarray(int32, ndim=1)
-        Array of distinct integers from 0, ..., 63.
+    ints_arr : ndarray(int, ndim=2)
+        Array of distinct integers from 0, ..., 63 in each row.
+
+    out : ndarray(np.uint64, ndim=1)
+        Output array, of length ints_arr.shape[0].
 
     Returns
     -------
-    np.uint64
-        Integer with set bits represented by the input integers.
+    out : ndarray(np.uint64, ndim=1)
+        Array of integers with set bits represented by the rows of
+        the input.
 
     Examples
     --------
-    >>> ints_arr = np.array([0, 1, 2], dtype=np.int32)
-    >>> _ints_arr_to_bits(ints_arr)
-    7
-    >>> ints_arr2d = np.array([[0, 1, 2], [3, 0, 1]], dtype=np.int32)
-    >>> _ints_arr_to_bits(ints_arr2d)
+    >>> ints_arr = np.array([[0, 1, 2], [3, 0, 1]], dtype=np.int32)
+    >>> out = np.empty(ints_arr.shape[0], dtype=np.uint64)
+    >>> _ints_arr_to_bits(ints_arr, out)
     array([ 7, 11], dtype=uint64)
 
     """
