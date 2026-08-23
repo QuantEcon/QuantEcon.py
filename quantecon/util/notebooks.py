@@ -11,15 +11,10 @@ when downloaded as a support File
 
 "https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./something.py
 
-TODO
-----
-1. Write Style guide for QuantEcon.notebook contributions
-2. Write an interface for Dat Server
-3. Platform Agnostic (replace wget usage)
-
 """
 
 import os
+import warnings
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
@@ -27,16 +22,19 @@ RAW = "raw"
 BRANCH = "master"
 #Hard Coded Dependencies Folder on QuantEcon.notebooks
 FOLDER = "dependencies"
+#-Default timeout (seconds) for the remote request: (connect, read)-#
+TIMEOUT = (10, 30)
 
 
-def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False, verbose=True):
+def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False,
+                          verbose=True, timeout=TIMEOUT):
     """
     Retrieve raw files from QuantEcon.notebooks or other Github repo
     
     Parameters
     ----------
-    file_list   list or dict
-                A list of files to specify a collection of filenames	
+    file_list   list, tuple or dict
+                A list or tuple of files to specify a collection of filenames
                 A dict of dir : list(files) to specify a directory
     repo        str, optional(default=REPO)
     raw 		str, optional(default=RAW)
@@ -45,6 +43,17 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     folder      str, optional(default=FOLDER)
     overwrite   bool, optional(default=False)
     verbose     bool, optional(default=True)
+    timeout     float or tuple, optional(default=TIMEOUT)
+                Passed through to ``requests.get``. Either a single value or a
+                ``(connect, read)`` pair, in seconds.
+
+    Returns
+    -------
+    status      list(bool)
+                One entry per requested file: ``True`` if the file was fetched
+                and written, ``False`` if it was skipped or could not be
+                retrieved. A failed request emits a warning and leaves no file
+                on disk.
 
     Examples
     --------
@@ -74,8 +83,8 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     import requests
 
     #-Generate Common Data Structure-#
-    if type(files) == list:
-        files = {"" : files}
+    if isinstance(files, (list, tuple)):
+        files = {"" : list(files)}
 
     status = []
 
@@ -98,9 +107,16 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
             if verbose: print("Fetching file: %s"%fl)
             #-Get file in OS agnostic way using requests-#
             url = "/".join([repo, raw, branch, folder, fl])
-            r = requests.get(url)
-            with open(fl, "wb") as fl:
-                fl.write(r.content)
+            try:
+                r = requests.get(url, timeout=timeout)
+                r.raise_for_status()
+            except requests.RequestException as e:
+                #-Do not write the response body: an error page is not the requested file-#
+                warnings.warn("Failed to fetch %s: %s" % (url, e), stacklevel=2)
+                status.append(False)
+                continue
+            with open(fl, "wb") as f:
+                f.write(r.content)
             status.append(True)
 
     return status
