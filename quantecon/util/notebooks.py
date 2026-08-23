@@ -27,9 +27,12 @@ RAW = "raw"
 BRANCH = "master"
 #Hard Coded Dependencies Folder on QuantEcon.notebooks
 FOLDER = "dependencies"
+#-Default timeout (seconds) for each request-#
+TIMEOUT = 30
 
 
-def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False, verbose=True):
+def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False, verbose=True,
+                          timeout=TIMEOUT):
     """
     Retrieve raw files from QuantEcon.notebooks or other Github repo
     
@@ -45,6 +48,8 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     folder      str, optional(default=FOLDER)
     overwrite   bool, optional(default=False)
     verbose     bool, optional(default=True)
+    timeout     int or float, optional(default=TIMEOUT)
+                Timeout in seconds passed to each request
 
     Examples
     --------
@@ -74,7 +79,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     import requests
 
     #-Generate Common Data Structure-#
-    if type(files) == list:
+    if isinstance(files, (list, tuple)):
         files = {"" : files}
 
     status = []
@@ -98,9 +103,15 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
             if verbose: print("Fetching file: %s"%fl)
             #-Get file in OS agnostic way using requests-#
             url = "/".join([repo, raw, branch, folder, fl])
-            r = requests.get(url)
-            with open(fl, "wb") as fl:
-                fl.write(r.content)
+            try:
+                r = requests.get(url, timeout=timeout)
+                r.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                if verbose: print("Failed to fetch %s: %s ... skipping."%(fl, e))
+                status.append(False)
+                continue
+            with open(fl, "wb") as f:
+                f.write(r.content)
             status.append(True)
 
     return status
