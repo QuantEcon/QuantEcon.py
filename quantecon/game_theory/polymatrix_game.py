@@ -314,6 +314,7 @@ class PolymatrixGame:
         tuple[float, float]
             Tuple of minimum and maximum.
         """
-        min_p = min([np.min(M) for M in self.polymatrix.values()])
-        max_p = max([np.max(M) for M in self.polymatrix.values()])
+        all_values = np.concatenate([M.ravel() for M in self.polymatrix.values()])
+        min_p = np.min(all_values)
+        max_p = np.max(all_values)
         return (min_p, max_p)
