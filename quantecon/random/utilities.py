@@ -5,6 +5,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 
 import numpy as np
 from numba import guvectorize, types
+from numba import TypingError
 from numba.extending import overload
 from ..util import check_random_state
 
@@ -170,10 +171,10 @@ def _sample_without_replacement(n, r, out):
 
 
 # Pure python implementation that will run if the JIT compiler is disabled
-def draw(cdf, size=None):
+def draw(cdf, size=None, rng=None):
     """
     Generate a random sample according to the cumulative distribution
-    given by `cdf`. Jit-complied by Numba in nopython mode.
+    given by `cdf`. JIT-compiled by Numba in nopython mode.
 
     Parameters
     ----------
@@ -185,40 +186,145 @@ def draw(cdf, size=None):
         `size` independent draws is returned; otherwise, a single draw
         is returned as a scalar.
 
+    rng : np.random.Generator, optional(default=None)
+        Random number generator to draw from. Must be a
+        `np.random.Generator` or None; in particular, integer seeds and
+        `np.random.RandomState` are not accepted. If None, the global
+        random state is used (see Notes).
+
     Returns
     -------
     scalar(int) or ndarray(int, ndim=1)
 
+    Notes
+    -----
+    `draw` is intended primarily for use inside jit-compiled functions.
+    Pass a `np.random.Generator` as `rng` whenever the draws should be
+    reproducible; the generator is consumed in place, so its state
+    advances across successive calls.
+
+    `rng` accepts only None or a `Generator` because Numba's nopython
+    mode can neither construct a generator from a seed nor represent
+    `np.random.RandomState`. A jit-compiled caller passing anything
+    else gets a compile-time `numba.TypingError`. Build a generator
+    outside any jit-compiled function with `np.random.default_rng(seed)`
+    and pass it in.
+
+    If `rng` is None, a jit-compiled caller draws from Numba's own
+    internal random state, which is seeded by calling `np.random.seed`
+    inside a jit-compiled function; seeding NumPy's global random state
+    from Python has no effect on it.
+
+    A single `Generator` must not be shared across the iterations of a
+    `numba.prange` loop. Its state is updated in place, so concurrent
+    iterations race and can consume the same underlying random number;
+    the draws are then neither reproducible nor independent. Give each
+    iteration its own generator, spawned with `Generator.spawn` outside
+    the jit-compiled function -- `spawn` itself cannot be called in
+    nopython mode.
+
     Examples
     --------
+    >>> import numpy as np
+    >>> import quantecon as qe
     >>> cdf = np.cumsum([0.4, 0.6])
-    >>> qe.random.draw(cdf)
-    1
-    >>> qe.random.draw(cdf, 10)
-    array([1, 0, 1, 0, 1, 0, 0, 0, 1, 0])
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.draw(cdf, 10, rng=rng)
+    array([1, 0, 1, 0, 0, 0, 0, 0, 1, 0])
+    >>> qe.random.draw(cdf, rng=np.random.default_rng(1234))
+    np.int64(1)
+
+    Inside a jit-compiled function:
+
+    >>> from numba import njit
+    >>> @njit
+    ... def draw_jitted(cdf, size, rng):
+    ...     return qe.random.draw(cdf, size, rng)
+    >>> draw_jitted(cdf, 5, np.random.default_rng(1234))
+    array([1, 0, 1, 0, 0])
 
     """
+    if rng is None:
+        rng = np.random
     if isinstance(size, int):
-        rs = np.random.random(size)
+        rs = rng.random(size)
         out = np.searchsorted(cdf, rs, side='right')
         return out
     else:
-        r = np.random.random()
+        r = rng.random()
         return np.searchsorted(cdf, r, side='right')
 
 
+def _is_no_rng(numba_type):
+    """
+    Return True if `numba_type`, as seen from inside the `draw`
+    overload, means that `rng` was not supplied.
+
+    Numba spells "no value" in more than one way depending on the call
+    site, and each must be recognised: an omitted argument, as in
+    ``draw(cdf, 10)``, arrives as the *Python* object `None`, while an
+    explicit `None`, as in ``draw(cdf, 10, None)``, and a `None` default
+    forwarded by a jit-compiled caller both arrive as
+    `numba.types.none`. `numba.types.Omitted` is not currently observed
+    in an `@overload` body but is handled for the benefit of other Numba
+    typing templates.
+
+    """
+    return (numba_type is None or
+            isinstance(numba_type, types.NoneType) or
+            (isinstance(numba_type, types.Omitted) and
+             numba_type.value is None))
+
+
 # Overload for the `draw` function
+#
+# The implementations below must return the same values as the pure
+# Python body above: the same random numbers drawn in the same order,
+# and the same `searchsorted` result. The sized branches keep the
+# hand-written loop rather than the array `np.searchsorted` used in the
+# Python body -- Numba supports both and they agree exactly, but the
+# loop is measurably faster. `TestDraw.test_python_jitted_agree` is what
+# holds the two paths together.
 @overload(draw)
-def ol_draw(cdf, size=None):
-    if isinstance(size, types.Integer):
-        def draw_impl(cdf, size=None):
-            rs = np.random.random(size)
-            out = np.empty(size, dtype=np.int_)
-            for i in range(size):
-                out[i] = np.searchsorted(cdf, rs[i], side='right')
-            return out
+def ol_draw(cdf, size=None, rng=None):
+    if isinstance(rng, types.NumPyRandomGeneratorType):
+        if isinstance(size, types.Integer):
+            def draw_impl(cdf, size=None, rng=None):
+                rs = rng.random(size)
+                out = np.empty(size, dtype=np.int_)
+                for i in range(size):
+                    out[i] = np.searchsorted(cdf, rs[i], side='right')
+                return out
+        else:
+            def draw_impl(cdf, size=None, rng=None):
+                r = rng.random()
+                return np.searchsorted(cdf, r, side='right')
+    elif _is_no_rng(rng):
+        if isinstance(size, types.Integer):
+            def draw_impl(cdf, size=None, rng=None):
+                rs = np.random.random(size)
+                out = np.empty(size, dtype=np.int_)
+                for i in range(size):
+                    out[i] = np.searchsorted(cdf, rs[i], side='right')
+                return out
+        else:
+            def draw_impl(cdf, size=None, rng=None):
+                r = np.random.random()
+                return np.searchsorted(cdf, r, side='right')
     else:
-        def draw_impl(cdf, size=None):
-            r = np.random.random()
-            return np.searchsorted(cdf, r, side='right')
+        if (isinstance(rng, types.Optional) and
+                isinstance(rng.type, types.NumPyRandomGeneratorType)):
+            hint = ('Numba could not prove that `rng` is a Generator '
+                    'rather than None at this call site; hoist the None '
+                    'case out of the branch that reaches `draw`.')
+        else:
+            hint = ('Integer seeds and np.random.RandomState are not '
+                    'accepted, because nopython mode cannot construct a '
+                    'generator. Build one outside the jit-compiled '
+                    'function with np.random.default_rng(seed) and pass '
+                    'that in.')
+        raise TypingError(
+            'quantecon.random.draw: `rng` must be None or an '
+            f'np.random.Generator; got {rng}. {hint}'
+        )
     return draw_impl

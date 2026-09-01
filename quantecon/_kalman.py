@@ -75,7 +75,7 @@ class Kalman:
             self.x_hat = np.zeros((self.ss.n, 1))
         else:
             self.x_hat = np.atleast_2d(x_hat)
-            self.x_hat.shape = self.ss.n, 1
+            self.x_hat = self.x_hat.reshape(self.ss.n, 1)
 
     def __repr__(self):
         return self.__str__()
@@ -204,7 +204,7 @@ class Kalman:
 
         # === and then update === #
         y = np.atleast_2d(y)
-        y.shape = self.ss.k, 1
+        y = y.reshape(self.ss.k, 1)
         E = self.Sigma @ G.T
         F = (G @ self.Sigma @ G.T) + R
         M = E @ inv(F)

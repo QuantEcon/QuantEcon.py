@@ -1,9 +1,10 @@
-name: conda-build (NumPy v2)
+name: conda-build (numba rc/latest)
 
 on:
   push:
+    branches: [ main ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ main ]
 
 jobs:
   tests:

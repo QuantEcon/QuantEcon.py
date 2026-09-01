@@ -178,6 +178,23 @@ class DiscreteDP:
     a_indices : array_like(int, ndim=1), optional(default=None)
         Array containing the indices of the actions.
 
+    state_values : array_like, optional(default=None)
+        Array_like of length n containing the values associated with
+        the states, which must be homogeneous in type. May be
+        2-dimensional, in which case row `state_values[s]` is the value
+        associated with state `s`. If None, the states are represented
+        by their indices, 0 through n-1.
+
+    action_values : array_like, optional(default=None)
+        Array_like of length m containing the values associated with
+        the actions, which must be homogeneous in type. May be
+        2-dimensional, in which case row `action_values[a]` is the
+        value associated with action `a`. If None, the actions are
+        represented by their indices, 0 through m-1. In the
+        state-action pairs formulation, the length defines the number
+        of actions m, and may exceed `a_indices.max() + 1` (actions
+        feasible at no state).
+
     Attributes
     ----------
     R, Q, beta : see Parameters.
@@ -194,6 +211,12 @@ class DiscreteDP:
 
     max_iter : scalar(int), default=250
         Default value for the maximum number of iterations.
+
+    state_values : array_like or None
+        Array of state values if set, None otherwise.
+
+    action_values : array_like or None
+        Array of action values if set, None otherwise.
 
     Notes
     -----
@@ -296,7 +319,8 @@ class DiscreteDP:
     4
 
     """
-    def __init__(self, R, Q, beta, s_indices=None, a_indices=None):
+    def __init__(self, R, Q, beta, s_indices=None, a_indices=None,
+                 state_values=None, action_values=None):
         if not (0 <= beta <= 1):
             raise ValueError('beta must be in [0, 1]')
         if beta == 1:
@@ -411,6 +435,16 @@ class DiscreteDP:
         # Check that for every state, at least one action is feasible
         self._check_action_feasibility()
 
+        # Number of actions
+        if self._sa_pair:
+            self._num_actions = self.a_indices.max() + 1
+        else:
+            self._num_actions = self.R.shape[1]
+
+        # Call the setter methods
+        self.state_values = state_values
+        self.action_values = action_values
+
         self.epsilon = 1e-3
         self.max_iter = 250
 
@@ -422,6 +456,80 @@ class DiscreteDP:
         else:
             self._lineq_solve = np.linalg.solve
             self._I = np.identity(self.num_states)
+
+    @property
+    def state_values(self):
+        return self._state_values
+
+    @state_values.setter
+    def state_values(self, values):
+        """
+        Set state values of the DiscreteDP.
+
+        Parameters
+        ----------
+        values : array_like or None
+            Array of state values with length n, or None to unset.
+        """
+        if values is None:
+            self._state_values = None
+        else:
+            values = np.asarray(values)
+            if (values.ndim < 1) or (values.shape[0] != self.num_states):
+                raise ValueError(
+                    'state_values must be an array_like of length n'
+                )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in state_values must be homogeneous in type'
+                )
+            self._state_values = values
+
+    @property
+    def action_values(self):
+        return self._action_values
+
+    @action_values.setter
+    def action_values(self, values):
+        """
+        Set action values of the DiscreteDP.
+
+        Parameters
+        ----------
+        values : array_like or None
+            Array of action values, or None to unset. For the product
+            formulation, must be of length m; for the state-action
+            pairs formulation, of length at least `a_indices.max() +
+            1`, and the length defines the number of actions.
+        """
+        if values is None:
+            self._action_values = None
+            if self._sa_pair:
+                # Restore the default number of actions
+                self._num_actions = self.a_indices.max() + 1
+        else:
+            values = np.asarray(values)
+            if self._sa_pair:
+                if (values.ndim < 1) or \
+                        (values.shape[0] < self.a_indices.max() + 1):
+                    raise ValueError(
+                        'action_values must be an array_like of length '
+                        'at least a_indices.max() + 1'
+                    )
+            else:
+                if (values.ndim < 1) or \
+                        (values.shape[0] != self._num_actions):
+                    raise ValueError(
+                        'action_values must be an array_like of length m'
+                    )
+            if np.issubdtype(values.dtype, np.object_):
+                raise ValueError(
+                    'data in action_values must be homogeneous in type'
+                )
+            self._action_values = values
+            if self._sa_pair:
+                # The length defines the number of actions
+                self._num_actions = values.shape[0]
 
     def _check_action_feasibility(self):
         """
@@ -511,7 +619,11 @@ class DiscreteDP:
                 QL = sp.csr_matrix(self.Q[s_ind, a_ind])
             else:
                 QL = self.Q[s_ind, a_ind]
-            return DiscreteDP(RL, QL, self.beta, s_ind, a_ind)
+            return DiscreteDP(
+                RL, QL, self.beta, s_ind, a_ind,
+                state_values=self.state_values,
+                action_values=self.action_values
+            )
 
     def to_product_form(self):
         """
@@ -533,7 +645,7 @@ class DiscreteDP:
         """
         if self._sa_pair:
             ns = self.num_states
-            na = self.a_indices.max() + 1
+            na = self._num_actions
             R = np.full((ns, na), -np.inf)
             R[self.s_indices, self.a_indices] = self.R
             Q = np.zeros((ns, na, ns))
@@ -542,7 +654,10 @@ class DiscreteDP:
                               self.Q.toarray(), Q)
             else:
                 _fill_dense_Q(self.s_indices, self.a_indices, self.Q, Q)
-            return DiscreteDP(R, Q, self.beta)
+            return DiscreteDP(
+                R, Q, self.beta, state_values=self.state_values,
+                action_values=self.action_values
+            )
         else:
             return self
 
@@ -828,6 +943,8 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
+                            action_values=self.action_values,
                             method='value iteration',
                             epsilon=epsilon,
                             max_iter=max_iter)
@@ -870,6 +987,8 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
+                            action_values=self.action_values,
                             method='policy iteration',
                             max_iter=max_iter)
 
@@ -929,6 +1048,8 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
+                            action_values=self.action_values,
                             method='modified policy iteration',
                             epsilon=epsilon,
                             max_iter=max_iter,
@@ -967,6 +1088,8 @@ class DiscreteDP:
                             sigma=sigma,
                             num_iter=num_iter,
                             mc=self.controlled_mc(sigma),
+                            state_values=self.state_values,
+                            action_values=self.action_values,
                             method='linear programming',
                             max_iter=max_iter)
 
@@ -984,11 +1107,12 @@ class DiscreteDP:
         Returns
         -------
         mc : MarkovChain
-            Controlled Markov chain.
+            Controlled Markov chain, with `state_values` attached if
+            set for this instance.
 
         """
         _, Q_sigma = self.RQ_sigma(sigma)
-        return MarkovChain(Q_sigma)
+        return MarkovChain(Q_sigma, state_values=self.state_values)
 
 
 class DPSolveResult(dict):
@@ -1007,7 +1131,18 @@ class DPSolveResult(dict):
         Number of iterations
 
     mc : MarkovChain
-        Controlled Markov chain
+        Controlled Markov chain, with the `state_values` attached if
+        set
+
+    state_values : ndarray or None
+        State values of the `DiscreteDP` instance solved
+
+    action_values : ndarray or None
+        Action values of the `DiscreteDP` instance solved
+
+    sigma_values : ndarray
+        Computed optimal policy function, decoded to action values
+        (`sigma` itself if `action_values` is None)
 
     method : str
         Method employed
@@ -1019,6 +1154,20 @@ class DPSolveResult(dict):
         Maximum number of iterations
 
     """
+    @property
+    def sigma_values(self):
+        """
+        Return the optimal policy function decoded to action values,
+        i.e., the array whose s-th element is
+        `action_values[sigma[s]]`. If `action_values` is None, return
+        `sigma` itself.
+
+        """
+        action_values = self.get('action_values')
+        if action_values is None:
+            return self['sigma']
+        return action_values[self['sigma']]
+
     # This is sourced from sicpy.optimize.OptimizeResult.
     def __getattr__(self, name):
         try:
