@@ -455,8 +455,10 @@ class LQMarkov:
 
         self.beta = beta
 
-        if beta > 1.0:
-            raise ValueError("Discount factor beta cannot be greater than 1.")
+        if (self.Cs != 0).any() and beta >= 1:
+            raise ValueError(
+                'beta must be strictly smaller than 1 if C != 0'
+            )
 
         self.Π = np.asarray(Π, dtype='float')
 
@@ -541,8 +543,13 @@ class LQMarkov:
 
             Fs[i][:, :] = solve(Qs[i] + sum1, sum2 + Ns[i])
 
-        ds = solve(np.eye(m) - beta * Π,
-                   np.diag(beta * Π @ X).reshape((m, 1))).flatten()
+        if (Cs == 0).all():
+            ds = np.zeros(m)
+        else:
+            ds = solve(
+                np.eye(m) - beta * Π,
+                np.diag(beta * Π @ X).reshape((m, 1))
+            ).flatten()
 
         self.Ps, self.ds, self.Fs = Ps, ds, Fs
 

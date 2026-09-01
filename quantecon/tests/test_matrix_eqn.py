@@ -55,10 +55,10 @@ def test_solve_discrete_riccati_system_beta_one_failure_message():
     message = str(excinfo.exception)
     expected_parts = (
         "beta=1",
-        "strict contraction",
-        "may be very slow",
-        "fail to reach the requested tolerance",
-        "try increasing max_iter",
+        "stationary solution",
+        "stabilized without discounting",
     )
     for expected in expected_parts:
         assert expected in message
+
+    assert "max_iter" not in message
