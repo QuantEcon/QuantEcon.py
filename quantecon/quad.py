@@ -168,8 +168,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     random_state = check_random_state(random_state)
 
     if equidist_pp is None:
-        import sympy as sym
-        equidist_pp = np.sqrt(np.array(list(sym.primerange(0, 7920))))
+        equidist_pp = np.sqrt(_primes_below(7920))
 
     n, a, b = list(map(np.atleast_1d, list(map(np.asarray, [n, a, b]))))
 
@@ -208,6 +207,20 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
     weights = (np.prod(r) / n) * np.ones(n)
 
     return nodes, weights
+
+
+def _primes_below(n):
+    """
+    Return all primes strictly less than n, by the Sieve of
+    Eratosthenes.
+
+    """
+    sieve = np.ones(n, dtype=bool)
+    sieve[:2] = False
+    for i in range(2, int(n**0.5) + 1):
+        if sieve[i]:
+            sieve[i*i::i] = False
+    return np.flatnonzero(sieve)
 
 
 def qnwlege(n, a, b):

@@ -13,12 +13,12 @@ a section of comments.
 import os
 from scipy.io import loadmat
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_array_equal
 import pandas as pd
 from quantecon.quad import (
     qnwcheb, qnwequi, qnwlege, qnwnorm, qnwlogn,
     qnwsimp, qnwtrap, qnwunif, quadrect, qnwbeta,
-    qnwgamma
+    qnwgamma, _primes_below
 )
 from quantecon.tests.util import get_data_dir
 
@@ -500,3 +500,18 @@ class TestQnwgamm:
 
     def test_qnwgamm_weights_3d(self):
         assert_allclose(self.w_gamm_3, data['w_gamm_3'])
+
+
+def test_primes_below():
+    # Invariants of the first 1000 primes (= sympy.primerange(0, 7920)),
+    # on which qnwequi's Weyl and Haber sequences depend
+    primes = _primes_below(7920)
+    assert len(primes) == 1000
+    assert_array_equal(primes[:5], [2, 3, 5, 7, 11])
+    assert primes[99] == 541       # 100th prime
+    assert primes[499] == 3571     # 500th prime
+    assert primes[-1] == 7919      # 1000th prime
+    assert primes.sum() == 3682913
+    # The upper bound is exclusive, matching primerange(0, n)
+    assert_array_equal(_primes_below(2), [])
+    assert_array_equal(_primes_below(3), [2])
