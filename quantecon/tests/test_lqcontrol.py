@@ -37,6 +37,11 @@ class TestLQControl:
         del self.lq_scalar
         del self.lq_mat
 
+    def test_default_beta_one_constructs(self):
+        lq = LQ(1., 1., .95, -1.)
+
+        assert lq.beta == 1
+
     def test_scalar_sequences(self):
 
         lq_scalar = self.lq_scalar
@@ -134,13 +139,10 @@ class TestLQMarkov:
 
         self.lq_markov_mat1 = LQMarkov(Π, Qs, Rs, As, Bs,
                                        Cs=Cs, Ns=Ns, beta=0.95)
-        self.lq_markov_mat2 = LQMarkov(Π, Qs, Rs, As, Bs,
-                                       Cs=Cs, Ns=Ns, beta=1.05)
 
     def teardown_method(self):
         del self.lq_markov_scalar
         del self.lq_markov_mat1
-        del self.lq_markov_mat2
 
     def test_print(self):
         print(self.lq_markov_scalar)
@@ -220,8 +222,38 @@ class TestLQMarkov:
         assert_allclose(P_answer, Ps, atol=1e-6)
         assert_allclose(d_answer, ds, atol=1e-6)
 
-    def test_raise_error(self):
-        # test raising error for not converging
-        lq_markov_mat = self.lq_markov_mat2
+    def test_beta_one_without_shocks_one_state(self):
+        lq = LQMarkov([[1.]], [1.], [1.], [.5], [0.], beta=1)
 
-        assert_raises(ValueError, lq_markov_mat.stationary_values)
+        Ps, ds, Fs = lq.stationary_values()
+
+        assert_allclose(ds, np.zeros(1))
+
+    def test_beta_one_without_shocks_two_states(self):
+        lq = LQMarkov([[.8, .2], [.3, .7]],
+                      [1., 1.], [1., 1.], [.5, .4], [0., 0.], beta=1)
+
+        Ps, ds, Fs = lq.stationary_values()
+
+        assert_allclose(ds, np.zeros(2))
+
+    def test_beta_one_with_partial_shocks_raises(self):
+        with assert_raises(ValueError) as excinfo:
+            LQMarkov([[.8, .2], [.3, .7]],
+                     [1., 1.], [1., 1.], [.5, .4], [0., 0.],
+                     Cs=[0., .1], beta=1)
+
+        assert str(excinfo.exception) == (
+            'beta must be strictly smaller than 1 if C != 0'
+        )
+
+    def test_beta_greater_than_one_with_partial_shocks_raises(self):
+        assert_raises(ValueError, LQMarkov,
+                      [[.8, .2], [.3, .7]],
+                      [1., 1.], [1., 1.], [.5, .4], [0., 0.],
+                      Cs=[0., .1], beta=1.05)
+
+    def test_beta_greater_than_one_without_shocks_constructs(self):
+        lq = LQMarkov([[1.]], [1.], [1.], [.5], [0.], beta=1.05)
+
+        assert lq.beta == 1.05
