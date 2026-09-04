@@ -211,8 +211,7 @@ def qnwequi(n, a, b, kind="N", equidist_pp=None, random_state=None):
 
 def _primes_below(n):
     """
-    Return all primes strictly less than n (the upper bound is
-    exclusive, matching sympy.primerange(0, n)), by the Sieve of
+    Return all primes strictly less than n, by the Sieve of
     Eratosthenes.
 
     """
