@@ -404,7 +404,8 @@ class LQMarkov:
         Consists of m cross product term matrices N(s) with dimension
         k x n for each Markov state,
     beta : scalar(float), optional(default=1)
-        beta is the discount parameter
+        beta is the discount parameter. Must be strictly smaller than 1 if
+        any of the Cs is nonzero.
 
     Attributes
     ----------

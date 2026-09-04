@@ -38,7 +38,7 @@ def test_solve_discrete_lyapunov_complex():
                     atol=1e-15)
 
 
-def test_solve_discrete_riccati_system_beta_one_failure_message():
+def test_solve_discrete_riccati_system_beta_ge_one_failure_message():
     Π = np.ones((1, 1))
     As = np.ones((1, 1, 1))
     Bs = np.zeros((1, 1, 1))
@@ -47,18 +47,20 @@ def test_solve_discrete_riccati_system_beta_one_failure_message():
     Rs = np.ones((1, 1, 1))
     Ns = np.zeros((1, 1, 1))
 
-    with assert_raises(ValueError) as excinfo:
-        qme.solve_discrete_riccati_system(
-            Π, As, Bs, Cs, Qs, Rs, Ns, beta=1, max_iter=0
+    for beta in (1.0, 1.05):
+        with assert_raises(ValueError) as excinfo:
+            qme.solve_discrete_riccati_system(
+                Π, As, Bs, Cs, Qs, Rs, Ns,
+                beta=beta, max_iter=0
+            )
+
+        message = str(excinfo.exception)
+        expected_parts = (
+            "beta>=1",
+            "stationary solution",
+            "stabilized without discounting",
         )
+        for expected in expected_parts:
+            assert expected in message
 
-    message = str(excinfo.exception)
-    expected_parts = (
-        "beta=1",
-        "stationary solution",
-        "stabilized without discounting",
-    )
-    for expected in expected_parts:
-        assert expected in message
-
-    assert "max_iter" not in message
+        assert "max_iter" not in message

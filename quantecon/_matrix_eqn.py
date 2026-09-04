@@ -274,15 +274,14 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
     m = Qs.shape[0]
     k, n = Qs.shape[1], Rs.shape[1]
     # Create the Ps matrices, initialize as identity matrix
-
     Ps = np.array([np.eye(n) for i in range(m)])
     Ps1 = np.copy(Ps)
 
     # == Set up for iteration on Riccati equations system == #
     error = tolerance + 1
-    if beta == 1.0:
+    if beta >= 1.0:
         fail_msg = (
-            "Convergence failed after {} iterations. When beta=1, a "
+            "Convergence failed after {} iterations. When beta>=1, a "
             "stationary solution may not exist if the system cannot be "
             "stabilized without discounting. Check the model specification."
         )
