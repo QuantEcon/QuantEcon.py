@@ -204,7 +204,20 @@ class GAMReader:
         """
         Read from a URL.
 
+        Raises
+        ------
+        OSError
+            On Emscripten (JupyterLite/xeus-python), where HTTP socket access
+            is unavailable.
+
         """
+        if sys.platform == "emscripten":
+            raise OSError(
+                "GAMReader.from_url requires HTTP socket access, which is "
+                "unavailable in the browser (Emscripten/xeus-python). "
+                "Use GAMReader.from_string or GAMReader.from_file with "
+                "pre-downloaded data instead."
+            )
         import urllib.request
         with urllib.request.urlopen(url) as response:
             string = response.read().decode()

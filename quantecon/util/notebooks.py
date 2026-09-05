@@ -20,6 +20,7 @@ TODO
 """
 
 import os
+import sys
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
@@ -71,6 +72,13 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     by setting ``overwrite=True``.
 
     """
+    if sys.platform == "emscripten":
+        raise OSError(
+            "fetch_nb_dependencies requires HTTP socket access, which is "
+            "unavailable in the browser (Emscripten/xeus-python). "
+            "Pre-download the required files before running in JupyterLite."
+        )
+
     import requests
 
     #-Generate Common Data Structure-#
