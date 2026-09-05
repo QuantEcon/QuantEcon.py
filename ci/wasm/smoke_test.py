@@ -229,7 +229,25 @@ def test_simplex_grid():
 
 
 # ---------------------------------------------------------------------------
-# 13. searchsorted — objmode() shim (deprecated helper)
+# 13. Network utilities — raise OSError on Emscripten (#931)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.skipif(not IS_EMSCRIPTEN, reason="Emscripten-only guard check")
+def test_fetch_nb_dependencies_raises_on_emscripten():
+    from quantecon.util import fetch_nb_dependencies
+    with pytest.raises(OSError, match="unavailable in the browser"):
+        fetch_nb_dependencies(["dummy.csv"])
+
+
+@pytest.mark.skipif(not IS_EMSCRIPTEN, reason="Emscripten-only guard check")
+def test_gam_reader_from_url_raises_on_emscripten():
+    from quantecon.game_theory.game_converters import GAMReader
+    with pytest.raises(OSError, match="unavailable in the browser"):
+        GAMReader.from_url("http://example.com/dummy.gam")
+
+
+# ---------------------------------------------------------------------------
+# 15. searchsorted — objmode() shim (deprecated helper)
 # ---------------------------------------------------------------------------
 
 def test_searchsorted():
