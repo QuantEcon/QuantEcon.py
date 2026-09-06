@@ -3,9 +3,9 @@ Tests for pivoting.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_, assert_array_equal
 
-from quantecon.optimize.pivoting import _pivoting
+from quantecon.optimize.pivoting import _pivoting, _lex_min_ratio_test
 
 
 def _pivoting_reference(tableau, pivot_col, pivot_row):
@@ -48,3 +48,24 @@ class TestPivoting:
         tableau = np.array([[p, p, 0.], [p, 2*p, p]])
         _pivoting(tableau, 0, 0)
         assert_array_equal(tableau, np.array([[1., 1., 0.], [0., p, p]]))
+
+
+class TestLexMinRatioTest:
+    def test_unresolved_tie_is_found(self):
+        # Two identical rows: the ratios tie in the rhs column and, with
+        # entries of order 1e14, also in all the slack columns within
+        # `tol_ratio_diff`. The pivot column has positive entries, so the
+        # row must be reported as found.
+        tableau = np.array([[1e14, 1., 0., 0.],
+                            [1e14, 0., 1., 0.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, row = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(found)
+        assert_(row in (0, 1))
+
+    def test_no_positive_entry_is_not_found(self):
+        tableau = np.array([[-1., 1., 0., 1.],
+                            [0., 0., 1., 1.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, _ = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(not found)

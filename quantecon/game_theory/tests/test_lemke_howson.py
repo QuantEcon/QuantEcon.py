@@ -2,6 +2,7 @@
 Tests for lemke_howson.py
 """
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose, assert_, assert_raises
 from quantecon.game_theory import Player, NormalFormGame, lemke_howson
 
@@ -127,3 +128,20 @@ def test_lemke_howson_invalid_init_pivot_float():
                 [(0, 3), (6, 1)]]
     g = NormalFormGame(bimatrix)
     assert_raises(TypeError, lemke_howson, g, 1.0)
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="`tol_ratio_diff` in the lexico-minimum ratio test is absolute, "
+           "so with payoffs of order 1e16 the ratios all tie",
+)
+def test_lemke_howson_scaled_game_returns_nash():
+    scale = 1e16
+    A = scale * np.array([[3., 1.],
+                          [1., 3.]])
+    B = scale * np.array([[1., 3.],
+                          [3., 1.]])
+    g = NormalFormGame((A, B))
+    NE, res = lemke_howson(g, full_output=True)
+    assert_(res.converged)
+    assert_(g.is_nash(NE))

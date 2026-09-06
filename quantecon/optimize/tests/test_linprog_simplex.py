@@ -251,3 +251,15 @@ class TestLinprogSimplex:
         desired_x = [0.1, 0]
         res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
         _assert_success(res, c, b_ub=b_ub, desired_x=desired_x)
+
+    def test_lex_tie_is_not_unbounded(self):
+        # maximize x subject to 1e14*x <= 0 (twice) and x >= 0, so that
+        # x = 0 is the unique feasible, hence optimal, solution. The two
+        # constraint rows tie in the lexico-minimum ratio test in all
+        # columns within `tol_ratio_diff`, which used to be reported as
+        # "unbounded".
+        c = np.array([1.])
+        A_ub = np.array([[1e14], [1e14]])
+        b_ub = np.zeros(2)
+        res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
+        _assert_success(res, c, b_ub=b_ub, desired_fun=0., desired_x=[0.])

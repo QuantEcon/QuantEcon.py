@@ -157,10 +157,14 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
     Returns
     -------
     found : bool
-        False if there is no positive entry in the pivot column.
+        False if there is no positive entry in the pivot column (up to
+        `tol_piv`), True otherwise.
 
     row_min : scalar(int)
-        Index of the row with the lexico-minimum ratio.
+        Index of the row with the lexico-minimum ratio. If the
+        lexicographic tie breaking fails to single out one row, which
+        can only happen when the remaining candidate rows are
+        indistinguishable within `tol_ratio_diff`, the first of them.
 
     """
     nrows = tableau.shape[0]
@@ -175,9 +179,16 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
     num_argmins = _min_ratio_test_no_tie_breaking(
         tableau, pivot, -1, argmins, num_candidates, tol_piv, tol_ratio_diff
     )
-    if num_argmins == 1:
-        found = True
-    elif num_argmins >= 2:
+    if num_argmins == 0:  # No positive entry in the pivot column
+        return found, argmins[0]
+
+    # `found` is True from here: the pivot column has a positive entry.
+    # The lexicographic passes below only refine the choice among the
+    # rows that tie in the ratio test; if they fail to single out one
+    # row, the remaining candidates are numerically indistinguishable
+    # (they cannot be linearly dependent), and the first is taken.
+    found = True
+    if num_argmins >= 2:
         for j in range(slack_start, slack_start+nrows):
             if j == pivot:
                 continue
@@ -186,8 +197,8 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
                 tol_piv, tol_ratio_diff
             )
             if num_argmins == 1:
-                found = True
                 break
+
     return found, argmins[0]
 
 
