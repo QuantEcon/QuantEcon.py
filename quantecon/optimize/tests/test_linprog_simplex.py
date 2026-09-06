@@ -257,12 +257,13 @@ class TestLinprogSimplex:
         # x = 0 is the unique feasible, hence optimal, solution. The two
         # constraint rows tie in the lexico-minimum ratio test in all
         # columns within `tol_ratio_diff`, which used to be reported as
-        # "unbounded".
+        # "unbounded"; it is a numerical breakdown.
         c = np.array([1.])
         A_ub = np.array([[1e14], [1e14]])
         b_ub = np.zeros(2)
         res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
-        _assert_success(res, c, b_ub=b_ub, desired_fun=0., desired_x=[0.])
+        assert_(not res.success)
+        assert_(res.status == 4)
 
 
 class TestLinprogSimplexFailureOutputs:
@@ -327,3 +328,16 @@ def test_linprog_simplex_artificial_variables_at_zero():
     b_eq = np.array([0., 0.])
     res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
     _assert_success(res, c, b_eq=b_eq, desired_fun=0., desired_x=[0., 0.])
+
+
+def test_linprog_simplex_phase_1_breakdown_is_not_unbounded():
+    # Eleven identical equalities with coefficients at `tol_piv`: Phase 1
+    # finds no admissible pivot, which cannot mean unboundedness, as the
+    # auxiliary problem is bounded
+    c = np.array([1.])
+    A_eq = np.full((11, 1), 1e-7)
+    b_eq = np.full(11, 1e-7)
+    res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+    assert_(not res.success)
+    assert_(res.status == 4)
+    assert_(res.fun != np.inf)

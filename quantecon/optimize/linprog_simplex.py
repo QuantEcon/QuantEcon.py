@@ -249,6 +249,7 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                     1 : Iteration limit reached
                     2 : Problem appears to be infeasible
                     3 : Problem appears to be unbounded
+                    4 : Numerical difficulties encountered
 
             num_iter : int
                 The number of iterations performed.
@@ -547,7 +548,7 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True,
             break
 
         aux_start = tableau.shape[1] - L - 1
-        pivrow_found, pivrow, _ = _lex_min_ratio_test(
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
             tableau[:-1, :], pivcol, aux_start, argmins,
             piv_options.tol_piv, piv_options.tol_ratio_diff
         )
@@ -555,6 +556,10 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True,
         if not pivrow_found:  # Unbounded
             success = False
             status = 3
+            break
+        if not resolved:  # Numerical breakdown: lexicographic tie not
+            success = False  # broken, impossible in exact arithmetic
+            status = 4
             break
 
         _pivoting(tableau, pivcol, pivrow)
@@ -588,7 +593,10 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
         solve_tableau(tableau, basis, max_iter, skip_aux=False,
                       piv_options=piv_options)
 
-    if not success:  # max_iter exceeded
+    if not success:
+        if status == 3:
+            # The auxiliary problem is bounded: a numerical breakdown
+            status = 4
         return success, status, num_iter_1
     if tableau[-1, -1] > piv_options.fea_tol * b_scale:  # Infeasible
         success = False
