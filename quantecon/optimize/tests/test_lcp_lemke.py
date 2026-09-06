@@ -154,3 +154,18 @@ def test_lcp_lemke_numerical_breakdown():
     res = lcp_lemke(M, q)
     assert_(not res.success)
     assert_equal(res.status, 3)
+
+
+def test_lcp_lemke_initial_ratio_test_anchored():
+    # Chained near-ties in the initial ratios q / d: the second is within
+    # `tol_ratio_diff` of the first, the third within the tolerance of the
+    # second but not of the first. Ties are measured against the minimum,
+    # so the artificial variable enters at row 1, not at row 2 (chaining).
+    # With max_iter=1 only the initial pivot is performed.
+    n, tol = 3, 1e-13
+    M = np.eye(n)
+    q = np.array([-3., -3. + 0.9*tol, -3. + 1.8*tol])
+    basis = np.empty(n, dtype=int)
+    res = lcp_lemke(M, q, basis=basis, max_iter=1)
+    assert_equal(res.status, 1)
+    assert_equal(basis[1], 2*n)  # Artificial variable
