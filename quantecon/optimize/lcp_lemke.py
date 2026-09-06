@@ -133,6 +133,8 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
 
     if d is None:
         d = np.ones(n)
+    elif not np.all(d > 0):
+        raise ValueError('d must be strictly positive')
     if tableau is None:
         tableau = np.empty((n, 2*n+2))
     if basis is None:
@@ -143,14 +145,20 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     art_var = 2*n  # Artificial variable
     pivcol = art_var
 
-    # Equivalent to lex_min_ratio_test
+    # Equivalent to lex_min_ratio_test: the lexicographic tie breaking
+    # reduces to taking the largest row index, as the slack columns form
+    # the identity matrix. Ties are measured against the smallest ratio
+    # found so far, which is not updated on a tie, so that the accepted
+    # set cannot drift away from the minimum by chaining tolerances.
     pivrow = 0
     ratio_min = q[0] / d[0]
     for i in range(1, n):
         ratio = q[i] / d[i]
-        if ratio <= ratio_min + piv_options.tol_ratio_diff:
+        if ratio < ratio_min - piv_options.tol_ratio_diff:  # Smaller
             pivrow = i
             ratio_min = ratio
+        elif ratio <= ratio_min + piv_options.tol_ratio_diff:  # Tie
+            pivrow = i
 
     _pivoting(tableau, pivcol, pivrow)
     basis[pivrow], pivcol = pivcol, pivrow + n
@@ -281,7 +289,7 @@ def _get_solution(tableau, basis, z):
         View to `z`.
 
     """
-    n = z.size
+    n = basis.shape[0]
 
     z[:] = 0
     for i in range(n):

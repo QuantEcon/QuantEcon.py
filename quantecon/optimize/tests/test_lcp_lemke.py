@@ -3,7 +3,9 @@ Tests for lcp_lemke
 
 """
 import numpy as np
-from numpy.testing import assert_, assert_allclose, assert_equal
+from numpy.testing import (
+    assert_, assert_allclose, assert_equal, assert_raises
+)
 
 from quantecon.optimize import lcp_lemke
 
@@ -117,3 +119,21 @@ class TestLCPLemke:
         q = rng.standard_normal(n)
         res = lcp_lemke(M, q)
         _assert_success(res, M, q)
+
+
+def test_lcp_lemke_nonpositive_d():
+    M = np.array([[2., 1.], [1., 2.]])
+    q = np.array([-1., -1.])
+    assert_raises(ValueError, lcp_lemke, M, q, np.array([1., 0.]))
+    assert_raises(ValueError, lcp_lemke, M, q, np.array([1., -1.]))
+
+
+def test_lcp_lemke_workspaces():
+    M = np.array([[2., 1.], [1., 2.]])
+    q = np.array([-1., -1.])
+    n = 2
+    res = lcp_lemke(M, q, tableau=np.empty((n, 2*n+2)),
+                    basis=np.empty(n, dtype=int), z=np.empty(n))
+    assert_(res.success)
+    assert_allclose(M @ res.z + q, np.zeros(n) + (M @ res.z + q).clip(0))
+    assert_allclose(res.z @ (M @ res.z + q), 0, atol=1e-12)
