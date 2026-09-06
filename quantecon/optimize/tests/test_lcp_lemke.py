@@ -169,3 +169,10 @@ def test_lcp_lemke_initial_ratio_test_anchored():
     res = lcp_lemke(M, q, basis=basis, max_iter=1)
     assert_equal(res.status, 1)
     assert_equal(basis[1], 2*n)  # Artificial variable
+
+    # Decreasing then increasing: the second ratio is the minimum, the
+    # third is within the tolerance of the first but not of the minimum
+    q = np.array([-3., -3. - 0.9*tol, -3. + 0.9*tol])
+    res = lcp_lemke(M, q, basis=basis, max_iter=1)
+    assert_equal(res.status, 1)
+    assert_equal(basis[1], 2*n)  # Artificial variable

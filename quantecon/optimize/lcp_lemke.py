@@ -148,14 +148,14 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
 
     # Equivalent to lex_min_ratio_test: the lexicographic tie breaking
     # reduces to taking the largest row index, as the slack columns form
-    # the identity matrix. Ties are measured against the smallest ratio
-    # found so far, which is not updated on a tie, so that the accepted
-    # set cannot drift away from the minimum by chaining tolerances.
+    # the identity matrix. Ties are measured against the minimum ratio
+    # found so far, updated on every strictly smaller ratio, so that the
+    # row chosen is the last one within the tolerance of the minimum.
     pivrow = 0
     ratio_min = q[0] / d[0]
     for i in range(1, n):
         ratio = q[i] / d[i]
-        if ratio < ratio_min - piv_options.tol_ratio_diff:  # Smaller
+        if ratio < ratio_min:  # Smaller
             pivrow = i
             ratio_min = ratio
         elif ratio <= ratio_min + piv_options.tol_ratio_diff:  # Tie
