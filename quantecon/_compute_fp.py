@@ -256,7 +256,7 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         tableaux_curr = tuple(tableau[:m, :2*m+1] for tableau in tableaux)
         bases_curr = tuple(basis[:m] for basis in bases)
         _initialize_tableaux_ig(X[:m], Y[:m], tableaux_curr, bases_curr)
-        converged, num_iter = _lemke_howson_tbl(
+        converged, num_iter, _ = _lemke_howson_tbl(
             tableaux_curr, bases_curr, init_pivot=m-1, max_iter=max_piv
         )
         _, rho = _get_mixed_actions(tableaux_curr, bases_curr)

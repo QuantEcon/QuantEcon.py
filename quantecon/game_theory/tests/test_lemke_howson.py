@@ -146,6 +146,9 @@ def test_lemke_howson_large_payoffs_report_breakdown(scale):
     g = NormalFormGame((Player(A), Player(B)))
     NE, res = lemke_howson(g, full_output=True)
     assert_(not res.converged)
+    # Without capping, no other initial pivot is tried on breakdown
+    assert_(res.init == 0)
+    assert_(res.num_iter == 0)
 
 
 def test_lemke_howson_tbl_breakdown():
@@ -160,6 +163,8 @@ def test_lemke_howson_tbl_breakdown():
     _initialize_tableaux((A, B), tableaux, bases)
     init_pivot = 0
     tableaux[0][:, init_pivot] = 0
-    converged, num_iter = _lemke_howson_tbl(tableaux, bases, init_pivot, 10)
+    converged, num_iter, breakdown = \
+        _lemke_howson_tbl(tableaux, bases, init_pivot, 10)
     assert_(not converged)
     assert_(num_iter == 0)
+    assert_(breakdown)
