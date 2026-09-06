@@ -160,7 +160,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     argmins = np.empty(n, dtype=np.int_)
 
     while num_iter < max_iter:
-        pivrow_found, pivrow = _lex_min_ratio_test(
+        pivrow_found, pivrow, _ = _lex_min_ratio_test(
             tableau, pivcol, 0, argmins,
             piv_options.tol_piv, piv_options.tol_ratio_diff
         )

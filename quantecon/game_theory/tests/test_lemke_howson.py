@@ -133,21 +133,19 @@ def test_lemke_howson_invalid_init_pivot_float():
     assert_raises(TypeError, lemke_howson, g, 1.0)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="`tol_ratio_diff` in the lexico-minimum ratio test is absolute, "
-           "so with payoffs of order 1e16 the ratios all tie",
-)
-def test_lemke_howson_scaled_game_returns_nash():
-    scale = 1e16
+@pytest.mark.parametrize('scale', [1e15, 1e16])
+def test_lemke_howson_large_payoffs_report_breakdown(scale):
+    # With payoffs of this size, the ratios in the lexico-minimum ratio
+    # test all tie within the (absolute) `tol_ratio_diff`, and the tie
+    # breaking fails. The routine must then report non-convergence
+    # rather than return a wrong "equilibrium" with `converged=True`.
     A = scale * np.array([[3., 1.],
                           [1., 3.]])
     B = scale * np.array([[1., 3.],
                           [3., 1.]])
-    g = NormalFormGame((A, B))
+    g = NormalFormGame((Player(A), Player(B)))
     NE, res = lemke_howson(g, full_output=True)
-    assert_(res.converged)
-    assert_(g.is_nash(NE))
+    assert_(not res.converged)
 
 
 def test_lemke_howson_tbl_breakdown():

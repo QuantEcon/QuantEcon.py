@@ -59,13 +59,35 @@ class TestLexMinRatioTest:
         tableau = np.array([[1e14, 1., 0., 0.],
                             [1e14, 0., 1., 0.]])
         argmins = np.empty(2, dtype=np.int_)
-        found, row = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins,
+                                                   1e-7, 1e-13)
         assert_(found)
         assert_(row in (0, 1))
+        assert_(not resolved)
+
+    def test_unique_row_is_resolved(self):
+        tableau = np.array([[1., 1., 0., 2.],
+                            [1., 0., 1., 1.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(found)
+        assert_(row == 1)
+        assert_(resolved)
+
+    def test_tie_broken_lexicographically(self):
+        # Equal ratios in the rhs column; the slack columns break the tie
+        tableau = np.array([[1., 1., 0., 1.],
+                            [1., 0., 1., 1.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(found)
+        assert_(row == 1)
+        assert_(resolved)
 
     def test_no_positive_entry_is_not_found(self):
         tableau = np.array([[-1., 1., 0., 1.],
                             [0., 0., 1., 1.]])
         argmins = np.empty(2, dtype=np.int_)
-        found, _ = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        found, _, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins)
         assert_(not found)
+        assert_(not resolved)

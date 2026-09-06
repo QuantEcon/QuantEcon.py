@@ -176,9 +176,16 @@ def polym_lcp_solver(
                 break
             num_iter += 1
 
-            _, pivrow = _lex_min_ratio_test(
+            found, pivrow, resolved = _lex_min_ratio_test(
                 tableau, pivcol, 0, argmins,
             )
+            if not (found and resolved):
+                # Numerical breakdown: no positive entry in the pivot
+                # column, or lexicographic tie not broken, both
+                # impossible in exact arithmetic; stop with
+                # `converged = False`
+                converging = False
+                break
 
             _pivoting(tableau, pivcol, pivrow)
             basis[pivrow], leaving_var = pivcol, basis[pivrow]

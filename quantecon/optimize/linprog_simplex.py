@@ -540,7 +540,7 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True,
             break
 
         aux_start = tableau.shape[1] - L - 1
-        pivrow_found, pivrow = _lex_min_ratio_test(
+        pivrow_found, pivrow, _ = _lex_min_ratio_test(
             tableau[:-1, :], pivcol, aux_start, argmins,
             piv_options.tol_piv, piv_options.tol_ratio_diff
         )

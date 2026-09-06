@@ -108,6 +108,10 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
     ratio_min = np.inf
     num_argmins = 0
 
+    # `ratio_min` is deliberately not updated when a tie is recorded:
+    # ties are measured against the smallest ratio found so far, not
+    # against the last tied ratio, so that the accepted set cannot drift
+    # away from the minimum by chaining tolerances.
     for k in range(num_candidates):
         i = argmins[k]
         if tableau[i, pivot] <= tol_piv:  # Treated as nonpositive
@@ -161,10 +165,29 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
         `tol_piv`), True otherwise.
 
     row_min : scalar(int)
-        Index of the row with the lexico-minimum ratio. If the
-        lexicographic tie breaking fails to single out one row, which
-        can only happen when the remaining candidate rows are
-        indistinguishable within `tol_ratio_diff`, the first of them.
+        Index of the row with the lexico-minimum ratio (meaningless if
+        `found` is False). If the lexicographic tie breaking fails to
+        single out one row, which can only happen when the remaining
+        candidate rows are indistinguishable within `tol_ratio_diff`,
+        the first of them.
+
+    resolved : bool
+        True if `row_min` is the unique lexico-minimum row, False if
+        `found` is False or the tie breaking failed to single out one
+        row. In exact arithmetic the latter cannot happen (the rows of
+        the tableau restricted to the slack columns are linearly
+        independent), so `found and not resolved` signals a numerical
+        breakdown that callers may want to act on.
+
+    Notes
+    -----
+    The last column of `tableau` must contain the values of the basic
+    variables (the right hand side), and the columns `slack_start`, ...,
+    `slack_start+nrows-1` must be those that initially formed an identity
+    matrix (typically the slack or artificial variables), so that they
+    contain the inverse of the current basis matrix: the lexicographic
+    rule breaks the ties in the ratio test by comparing these columns in
+    order.
 
     """
     nrows = tableau.shape[0]
@@ -180,7 +203,7 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
         tableau, pivot, -1, argmins, num_candidates, tol_piv, tol_ratio_diff
     )
     if num_argmins == 0:  # No positive entry in the pivot column
-        return found, argmins[0]
+        return found, argmins[0], False
 
     # `found` is True from here: the pivot column has a positive entry.
     # The lexicographic passes below only refine the choice among the
@@ -198,8 +221,9 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
             )
             if num_argmins == 1:
                 break
+    resolved = num_argmins == 1
 
-    return found, argmins[0]
+    return found, argmins[0], resolved
 
 
 _lex_min_ratio_test.__doc__ = _lex_min_ratio_test.__doc__.format(
