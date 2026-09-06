@@ -581,13 +581,16 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
     L = tableau.shape[0] - 1
     nm = tableau.shape[1] - (L+1)  # n + m
 
+    # Scale of the right hand side, for the feasibility test below: the
+    # initial value of the Phase 1 objective is the sum of |b|
+    b_scale = max(1., tableau[-1, -1])
     success, status, num_iter_1 = \
         solve_tableau(tableau, basis, max_iter, skip_aux=False,
                       piv_options=piv_options)
 
     if not success:  # max_iter exceeded
         return success, status, num_iter_1
-    if tableau[-1, -1] > piv_options.fea_tol:  # Infeasible
+    if tableau[-1, -1] > piv_options.fea_tol * b_scale:  # Infeasible
         success = False
         status = 2
         return success, status, num_iter_1

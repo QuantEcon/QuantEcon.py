@@ -294,3 +294,26 @@ def test_linprog_simplex_workspaces():
                           x=np.empty(n), lambd=np.empty(L))
     assert_(res.success)
     assert_allclose(res.x, [0.5, 0.5])
+
+
+class TestLinprogSimplexPhase1Scale:
+    # The infeasibility test at the end of Phase 1 is relative to the
+    # scale of the right hand side
+    def test_feasible_relative_to_scale(self):
+        # Two equality constraints inconsistent by 1e-3, which is below
+        # fea_tol times the scale of b (2e5)
+        c = np.array([-1., -1.])
+        A_eq = np.array([[1., 1.], [1., 1.]])
+        b_eq = np.array([1e5, 1e5 + 1e-3])
+        res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+        assert_(res.success)
+        assert_(res.status == 0)
+        assert_allclose(res.fun, -1e5, atol=1e-3)
+
+    def test_infeasible_at_unit_scale(self):
+        # The same inconsistency at scale 1 is infeasible
+        c = np.array([-1., -1.])
+        A_eq = np.array([[1., 1.], [1., 1.]])
+        b_eq = np.array([1., 1. + 1e-3])
+        res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+        assert_(res.status == 2)
