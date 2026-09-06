@@ -9,6 +9,7 @@ https://www.math.ucdavis.edu/~hunter/book/ch3.pdf
 TODO: add multivariate case
 
 """
+import warnings
 import numpy as np
 from numpy.testing import assert_, assert_raises
 from quantecon import compute_fixed_point
@@ -133,3 +134,30 @@ def test_raises_value_error_nonpositive_max_iter():
     init = 1.
     max_iter = 0
     assert_raises(ValueError, compute_fixed_point, f, init, max_iter=max_iter)
+
+
+def test_imitation_game_numerical_breakdown():
+    # Values of order 1e7: the Lemke-Howson pivoting on the imitation
+    # game breaks down numerically (the tableaux hold no equilibrium);
+    # the routine must stop and report non-convergence, with a specific
+    # warning, instead of forming the next iterate from the tableaux
+    X = np.array([-43904436.689917795, -58130594.69589446,
+                  -51017515.692906134])
+    Y = np.array([-58130594.69589446, 73372551.04835357,
+                  45264022.10520259])
+    max_iter = 10
+    evaluations = []
+
+    def T(x):  # Map reproducing the sequence: nearest recorded point
+        evaluations.append(x)
+        return Y[np.argmin(np.abs(X - x))]
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        x = compute_fixed_point(T, X[0], error_tol=1e-3, max_iter=max_iter,
+                                verbose=1, method='imitation_game')
+    messages = [str(wi.message) for wi in w]
+    assert_(any('numerical breakdown' in msg for msg in messages))
+    assert_(not any('max_iter' in msg for msg in messages))
+    assert_(len(evaluations) < max_iter)  # Stopped at the breakdown
+    assert_(np.isfinite(x))
