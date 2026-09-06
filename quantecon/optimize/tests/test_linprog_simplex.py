@@ -317,3 +317,13 @@ class TestLinprogSimplexPhase1Scale:
         b_eq = np.array([1., 1. + 1e-3])
         res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
         assert_(res.status == 2)
+
+
+def test_linprog_simplex_artificial_variables_at_zero():
+    # b = 0: Phase 1 ends immediately with the artificial variables
+    # basic at level zero, and they are pivoted out afterwards
+    c = np.array([-1., -1.])
+    A_eq = np.array([[1., 1.], [1., -1.]])
+    b_eq = np.array([0., 0.])
+    res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+    _assert_success(res, c, b_eq=b_eq, desired_fun=0., desired_x=[0., 0.])

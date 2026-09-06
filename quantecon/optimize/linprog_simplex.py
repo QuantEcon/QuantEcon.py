@@ -599,13 +599,19 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
     tol_piv = piv_options.tol_piv
     for i in range(L):
         if basis[i] >= nm:  # Artificial variable not eliminated
+            # Pivot on the largest entry (in absolute value) of the row,
+            # if treated as nonzero
+            j_max = -1
+            v_max = tol_piv
             for j in range(nm):
-                if tableau[i, j] < -tol_piv or \
-                   tableau[i, j] > tol_piv:  # Treated nonzero
-                    _pivoting(tableau, j, i)
-                    basis[i] = j
-                    num_iter_1 += 1
-                    break
+                v = abs(tableau[i, j])
+                if v > v_max:
+                    v_max = v
+                    j_max = j
+            if j_max >= 0:
+                _pivoting(tableau, j_max, i)
+                basis[i] = j_max
+                num_iter_1 += 1
 
     return success, status, num_iter_1
 
