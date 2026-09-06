@@ -306,9 +306,10 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
     return SimplexResult(x, lambd, fun, success, status, num_iter)
 
 
-linprog_simplex.__doc__ = linprog_simplex.__doc__.format(
-    FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
-)
+if linprog_simplex.__doc__ is not None:  # None under python -OO
+    linprog_simplex.__doc__ = linprog_simplex.__doc__.format(
+        FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+    )
 
 
 @jit(nopython=True, cache=True)

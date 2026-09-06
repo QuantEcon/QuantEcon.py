@@ -196,9 +196,10 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     return LCPResult(z, success, status, num_iter)
 
 
-lcp_lemke.__doc__ = lcp_lemke.__doc__.format(
-    FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
-)
+if lcp_lemke.__doc__ is not None:  # None under python -OO
+    lcp_lemke.__doc__ = lcp_lemke.__doc__.format(
+        FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+    )
 
 
 @jit(nopython=True, cache=True)

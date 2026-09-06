@@ -226,6 +226,7 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
     return found, argmins[0], resolved
 
 
-_lex_min_ratio_test.__doc__ = _lex_min_ratio_test.__doc__.format(
-    TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
-)
+if _lex_min_ratio_test.__doc__ is not None:  # None under python -OO
+    _lex_min_ratio_test.__doc__ = _lex_min_ratio_test.__doc__.format(
+        TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+    )
