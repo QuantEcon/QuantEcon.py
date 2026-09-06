@@ -37,6 +37,8 @@ def _print_after_skip(skip, it=None, dist=None, etime=None):
 _convergence_msg = 'Converged in {iterate} steps'
 _non_convergence_msg = \
     'max_iter attained before convergence in compute_fixed_point'
+_breakdown_msg = \
+    'numerical breakdown in the imitation game in compute_fixed_point'
 
 
 def _is_approx_fp(T, v, error_tol, *args, **kwargs):
@@ -223,6 +225,7 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
     tableaux = tuple(np.empty((buff_size, buff_size*2+1)) for i in range(2))
     bases = tuple(np.empty(buff_size, dtype=int) for i in range(2))
     max_piv = 10**6  # Max number of pivoting steps in _lemke_howson_tbl
+    breakdown = False
 
     while True:
         y_new = T(x_new, *args, **kwargs)
@@ -256,9 +259,11 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         tableaux_curr = tuple(tableau[:m, :2*m+1] for tableau in tableaux)
         bases_curr = tuple(basis[:m] for basis in bases)
         _initialize_tableaux_ig(X[:m], Y[:m], tableaux_curr, bases_curr)
-        converged, num_iter = _lemke_howson_tbl(
+        _, _, breakdown = _lemke_howson_tbl(
             tableaux_curr, bases_curr, init_pivot=m-1, max_iter=max_piv
         )
+        if breakdown:  # The tableaux do not hold an equilibrium
+            break
         _, rho = _get_mixed_actions(tableaux_curr, bases_curr)
 
         if Y.ndim <= 2:
@@ -274,7 +279,9 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         print_skip = 1
         _print_after_skip(print_skip, iterate, error, etime)
     if verbose >= 1:
-        if not converged:
+        if breakdown:
+            warnings.warn(_breakdown_msg, RuntimeWarning)
+        elif not converged:
             warnings.warn(_non_convergence_msg, RuntimeWarning)
         elif verbose == 2:
             print(_convergence_msg.format(iterate=iterate))

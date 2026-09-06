@@ -251,3 +251,93 @@ class TestLinprogSimplex:
         desired_x = [0.1, 0]
         res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
         _assert_success(res, c, b_ub=b_ub, desired_x=desired_x)
+
+    def test_lex_tie_is_not_unbounded(self):
+        # maximize x subject to 1e14*x <= 0 (twice) and x >= 0, so that
+        # x = 0 is the unique feasible, hence optimal, solution. The two
+        # constraint rows tie in the lexico-minimum ratio test in all
+        # columns within `tol_ratio_diff`, which used to be reported as
+        # "unbounded"; it is a numerical breakdown.
+        c = np.array([1.])
+        A_ub = np.array([[1e14], [1e14]])
+        b_ub = np.zeros(2)
+        res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
+        assert_(not res.success)
+        assert_(res.status == 4)
+
+
+class TestLinprogSimplexFailureOutputs:
+    def test_infeasible(self):
+        # x >= 0 and x <= -1
+        res = linprog_simplex(np.array([1.]), A_ub=np.array([[1.]]),
+                              b_ub=np.array([-1.]))
+        assert_(res.status == 2)
+        assert_(res.fun == -np.inf)
+
+    def test_unbounded(self):
+        # max x0 s.t. x0 - x1 <= 1
+        res = linprog_simplex(np.array([1., 0.]), A_ub=np.array([[1., -1.]]),
+                              b_ub=np.array([1.]))
+        assert_(res.status == 3)
+        assert_(res.fun == np.inf)
+        assert_(np.isfinite(res.x).all())
+
+
+def test_linprog_simplex_workspaces():
+    c = np.array([1., 1.])
+    A_ub, b_ub = np.array([[1., 1.]]), np.array([1.])
+    A_eq, b_eq = np.array([[1., -1.]]), np.array([0.])
+    n, m, k = 2, 1, 1
+    L = m + k
+    res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                          tableau=np.empty((L+1, n+m+L+1)),
+                          basis=np.empty(L, dtype=int),
+                          x=np.empty(n), lambd=np.empty(L))
+    assert_(res.success)
+    assert_allclose(res.x, [0.5, 0.5])
+
+
+class TestLinprogSimplexPhase1Scale:
+    # The infeasibility test at the end of Phase 1 is relative to the
+    # scale of the right hand side
+    def test_feasible_relative_to_scale(self):
+        # Two equality constraints inconsistent by 1e-3, which is below
+        # fea_tol times the scale of b (2e5)
+        c = np.array([-1., -1.])
+        A_eq = np.array([[1., 1.], [1., 1.]])
+        b_eq = np.array([1e5, 1e5 + 1e-3])
+        res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+        assert_(res.success)
+        assert_(res.status == 0)
+        assert_allclose(res.fun, -1e5, atol=1e-3)
+
+    def test_infeasible_at_unit_scale(self):
+        # The same inconsistency at scale 1 is infeasible
+        c = np.array([-1., -1.])
+        A_eq = np.array([[1., 1.], [1., 1.]])
+        b_eq = np.array([1., 1. + 1e-3])
+        res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+        assert_(res.status == 2)
+
+
+def test_linprog_simplex_artificial_variables_at_zero():
+    # b = 0: Phase 1 ends immediately with the artificial variables
+    # basic at level zero, and they are pivoted out afterwards
+    c = np.array([-1., -1.])
+    A_eq = np.array([[1., 1.], [1., -1.]])
+    b_eq = np.array([0., 0.])
+    res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+    _assert_success(res, c, b_eq=b_eq, desired_fun=0., desired_x=[0., 0.])
+
+
+def test_linprog_simplex_phase_1_breakdown_is_not_unbounded():
+    # Eleven identical equalities with coefficients at `tol_piv`: Phase 1
+    # finds no admissible pivot, which cannot mean unboundedness, as the
+    # auxiliary problem is bounded
+    c = np.array([1.])
+    A_eq = np.full((11, 1), 1e-7)
+    b_eq = np.full(11, 1e-7)
+    res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+    assert_(not res.success)
+    assert_(res.status == 4)
+    assert_(res.fun != np.inf)

@@ -3,7 +3,9 @@ Tests for lcp_lemke
 
 """
 import numpy as np
-from numpy.testing import assert_, assert_allclose, assert_equal
+from numpy.testing import (
+    assert_, assert_allclose, assert_equal, assert_raises
+)
 
 from quantecon.optimize import lcp_lemke
 
@@ -117,3 +119,60 @@ class TestLCPLemke:
         q = rng.standard_normal(n)
         res = lcp_lemke(M, q)
         _assert_success(res, M, q)
+
+
+def test_lcp_lemke_nonpositive_d():
+    M = np.array([[2., 1.], [1., 2.]])
+    q = np.array([-1., -1.])
+    assert_raises(ValueError, lcp_lemke, M, q, np.array([1., 0.]))
+    assert_raises(ValueError, lcp_lemke, M, q, np.array([1., -1.]))
+    # Also in the trivial case, where d is not used
+    q_trivial = np.array([1., 1.])
+    assert_raises(ValueError, lcp_lemke, M, q_trivial, np.array([1., 0.]))
+
+
+def test_lcp_lemke_workspaces():
+    M = np.array([[2., 1.], [1., 2.]])
+    q = np.array([-1., -1.])
+    n = 2
+    res = lcp_lemke(M, q, tableau=np.empty((n, 2*n+2)),
+                    basis=np.empty(n, dtype=int), z=np.empty(n))
+    assert_(res.success)
+    assert_allclose(M @ res.z + q, np.zeros(n) + (M @ res.z + q).clip(0))
+    assert_allclose(res.z @ (M @ res.z + q), 0, atol=1e-12)
+
+
+def test_lcp_lemke_numerical_breakdown():
+    # Entries of order 1e14: the lexicographic tie breaking fails within
+    # `tol_ratio_diff`; an arbitrary pivot led to a wrong "solution"
+    # reported as success
+    s = 2e14
+    M = np.array([[-1., -4., 1.],
+                  [-5*s, s, 3*s],
+                  [-5*s, 3*s, s]])
+    q = -np.ones(3)
+    res = lcp_lemke(M, q)
+    assert_(not res.success)
+    assert_equal(res.status, 3)
+
+
+def test_lcp_lemke_initial_ratio_test_anchored():
+    # Chained near-ties in the initial ratios q / d: the second is within
+    # `tol_ratio_diff` of the first, the third within the tolerance of the
+    # second but not of the first. Ties are measured against the minimum,
+    # so the artificial variable enters at row 1, not at row 2 (chaining).
+    # With max_iter=1 only the initial pivot is performed.
+    n, tol = 3, 1e-13
+    M = np.eye(n)
+    q = np.array([-3., -3. + 0.9*tol, -3. + 1.8*tol])
+    basis = np.empty(n, dtype=int)
+    res = lcp_lemke(M, q, basis=basis, max_iter=1)
+    assert_equal(res.status, 1)
+    assert_equal(basis[1], 2*n)  # Artificial variable
+
+    # Decreasing then increasing: the second ratio is the minimum, the
+    # third is within the tolerance of the first but not of the minimum
+    q = np.array([-3., -3. - 0.9*tol, -3. + 0.9*tol])
+    res = lcp_lemke(M, q, basis=basis, max_iter=1)
+    assert_equal(res.status, 1)
+    assert_equal(basis[1], 2*n)  # Artificial variable
