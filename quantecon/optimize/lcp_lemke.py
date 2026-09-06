@@ -117,6 +117,8 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
 
     """
     n = M.shape[0]
+    if d is not None and not np.all(d > 0):
+        raise ValueError('d must be strictly positive')
 
     success = False
     status = 1
@@ -133,8 +135,6 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
 
     if d is None:
         d = np.ones(n)
-    elif not np.all(d > 0):
-        raise ValueError('d must be strictly positive')
     if tableau is None:
         tableau = np.empty((n, 2*n+2))
     if basis is None:

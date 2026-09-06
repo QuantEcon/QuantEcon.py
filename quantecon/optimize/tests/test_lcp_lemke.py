@@ -126,6 +126,9 @@ def test_lcp_lemke_nonpositive_d():
     q = np.array([-1., -1.])
     assert_raises(ValueError, lcp_lemke, M, q, np.array([1., 0.]))
     assert_raises(ValueError, lcp_lemke, M, q, np.array([1., -1.]))
+    # Also in the trivial case, where d is not used
+    q_trivial = np.array([1., 1.])
+    assert_raises(ValueError, lcp_lemke, M, q_trivial, np.array([1., 0.]))
 
 
 def test_lcp_lemke_workspaces():
