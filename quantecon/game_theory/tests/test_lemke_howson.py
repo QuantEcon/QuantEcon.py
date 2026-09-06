@@ -5,6 +5,9 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_, assert_raises
 from quantecon.game_theory import Player, NormalFormGame, lemke_howson
+from quantecon.game_theory.lemke_howson import (
+    _initialize_tableaux, _lemke_howson_tbl
+)
 
 
 class TestLemkeHowson():
@@ -145,3 +148,20 @@ def test_lemke_howson_scaled_game_returns_nash():
     NE, res = lemke_howson(g, full_output=True)
     assert_(res.converged)
     assert_(g.is_nash(NE))
+
+
+def test_lemke_howson_tbl_breakdown():
+    # No positive entry in the column of the initial pivot: the routine
+    # must stop and report non-convergence rather than pivot on a
+    # meaningless row
+    A = np.array([[3, 3], [2, 5], [0, 6]])
+    B = np.array([[3, 2, 3], [2, 6, 1]])
+    m, n = A.shape
+    tableaux = (np.empty((n, m+n+1)), np.empty((m, m+n+1)))
+    bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
+    _initialize_tableaux((A, B), tableaux, bases)
+    init_pivot = 0
+    tableaux[0][:, init_pivot] = 0
+    converged, num_iter = _lemke_howson_tbl(tableaux, bases, init_pivot, 10)
+    assert_(not converged)
+    assert_(num_iter == 0)

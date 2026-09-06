@@ -394,8 +394,11 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     while True:
         for pl in pls:
             # Determine the leaving variable
-            _, row_min = _lex_min_ratio_test(tableaux[pl], pivot,
-                                             slack_starts[pl], argmins)
+            found, row_min = _lex_min_ratio_test(tableaux[pl], pivot,
+                                                 slack_starts[pl], argmins)
+            if not found:  # Numerical breakdown: no positive entry in
+                break      # the pivot column, impossible in exact
+                           # arithmetic; stop with `converged = False`
 
             # Pivoting step: modify tableau in place
             _pivoting(tableaux[pl], pivot, row_min)
