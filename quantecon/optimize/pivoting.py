@@ -105,26 +105,27 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
         Number of minimizing rows.
 
     """
+    # Ties are measured against the exact minimum ratio, determined in a
+    # first pass, so that the accepted set cannot drift away from the
+    # minimum by chaining tolerances
     ratio_min = np.inf
-    num_argmins = 0
-
-    # `ratio_min` is deliberately not updated when a tie is recorded:
-    # ties are measured against the smallest ratio found so far, not
-    # against the last tied ratio, so that the accepted set cannot drift
-    # away from the minimum by chaining tolerances.
     for k in range(num_candidates):
         i = argmins[k]
         if tableau[i, pivot] <= tol_piv:  # Treated as nonpositive
             continue
         ratio = tableau[i, test_col] / tableau[i, pivot]
-        if ratio > ratio_min + tol_ratio_diff:  # Ratio large for i
-            continue
-        elif ratio < ratio_min - tol_ratio_diff:  # Ratio smaller for i
+        if ratio < ratio_min:
             ratio_min = ratio
-            num_argmins = 1
-        else:  # Ratio equal
+
+    num_argmins = 0
+    for k in range(num_candidates):
+        i = argmins[k]
+        if tableau[i, pivot] <= tol_piv:  # Treated as nonpositive
+            continue
+        ratio = tableau[i, test_col] / tableau[i, pivot]
+        if ratio <= ratio_min + tol_ratio_diff:  # Ratio minimal for i
             num_argmins += 1
-        argmins[num_argmins-1] = i
+            argmins[num_argmins-1] = i
 
     return num_argmins
 

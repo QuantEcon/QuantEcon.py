@@ -5,7 +5,9 @@ Tests for pivoting.py
 import numpy as np
 from numpy.testing import assert_, assert_array_equal
 
-from quantecon.optimize.pivoting import _pivoting, _lex_min_ratio_test
+from quantecon.optimize.pivoting import (
+    _pivoting, _lex_min_ratio_test, _min_ratio_test_no_tie_breaking
+)
 
 
 def _pivoting_reference(tableau, pivot_col, pivot_row):
@@ -83,6 +85,25 @@ class TestLexMinRatioTest:
         assert_(found)
         assert_(row == 1)
         assert_(resolved)
+
+    def test_ties_measured_against_the_minimum(self):
+        # Ratios -3.00, -3.09, -2.91 with tolerance 0.1: the second is
+        # within the tolerance of the first, the third within the
+        # tolerance of the first but not of the minimum (the second), so
+        # the candidates must be the first two rows only
+        tableau = np.array([[1., 1., 0., 0., -3.00],
+                            [1., 0., 1., 0., -3.09],
+                            [1., 0., 0., 1., -2.91]])
+        argmins = np.arange(3)
+        num_argmins = _min_ratio_test_no_tie_breaking(
+            tableau, 0, -1, argmins, 3, 1e-7, 0.1
+        )
+        assert_(num_argmins == 2)
+        assert_(set(argmins[:2]) == {0, 1})
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins,
+                                                   1e-7, 0.1)
+        assert_(found and resolved)
+        assert_(row == 1)
 
     def test_no_positive_entry_is_not_found(self):
         tableau = np.array([[-1., 1., 0., 1.],
