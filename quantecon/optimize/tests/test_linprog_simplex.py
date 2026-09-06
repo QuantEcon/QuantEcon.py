@@ -263,3 +263,34 @@ class TestLinprogSimplex:
         b_ub = np.zeros(2)
         res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub)
         _assert_success(res, c, b_ub=b_ub, desired_fun=0., desired_x=[0.])
+
+
+class TestLinprogSimplexFailureOutputs:
+    def test_infeasible(self):
+        # x >= 0 and x <= -1
+        res = linprog_simplex(np.array([1.]), A_ub=np.array([[1.]]),
+                              b_ub=np.array([-1.]))
+        assert_(res.status == 2)
+        assert_(res.fun == -np.inf)
+
+    def test_unbounded(self):
+        # max x0 s.t. x0 - x1 <= 1
+        res = linprog_simplex(np.array([1., 0.]), A_ub=np.array([[1., -1.]]),
+                              b_ub=np.array([1.]))
+        assert_(res.status == 3)
+        assert_(res.fun == np.inf)
+        assert_(np.isfinite(res.x).all())
+
+
+def test_linprog_simplex_workspaces():
+    c = np.array([1., 1.])
+    A_ub, b_ub = np.array([[1., 1.]]), np.array([1.])
+    A_eq, b_eq = np.array([[1., -1.]]), np.array([0.])
+    n, m, k = 2, 1, 1
+    L = m + k
+    res = linprog_simplex(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq,
+                          tableau=np.empty((L+1, n+m+L+1)),
+                          basis=np.empty(L, dtype=int),
+                          x=np.empty(n), lambd=np.empty(L))
+    assert_(res.success)
+    assert_allclose(res.x, [0.5, 0.5])

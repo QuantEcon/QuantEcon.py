@@ -233,7 +233,9 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                 ndarray of shape (L,) containing the dual solution.
 
             fun : float
-                Value of the objective function.
+                Value of the objective function (-inf if the problem
+                appears to be infeasible, inf if it appears to be
+                unbounded).
 
             success : bool
                 True if the algorithm succeeded in finding an optimal
@@ -285,6 +287,8 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
         solve_phase_1(tableau, basis, max_iter, piv_options=piv_options)
     num_iter += num_iter_1
     if not success:
+        if status == 3:  # Unbounded
+            fun = np.inf
         return SimplexResult(x, lambd, fun, success, status, num_iter)
 
     # Modify the criterion row for Phase 2
@@ -296,6 +300,8 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                       piv_options=piv_options)
     num_iter += num_iter_2
     fun = get_solution(tableau, basis, x, lambd, b_signs)
+    if status == 3:  # Unbounded
+        fun = np.inf
 
     return SimplexResult(x, lambd, fun, success, status, num_iter)
 
@@ -607,7 +613,7 @@ def _pivot_col(tableau, skip_aux, piv_options):
     containing the maximum positive element in the last row of the
     tableau.
 
-    `skip_aux` should be True in phase 1, and False in phase 2.
+    `skip_aux` should be False in phase 1, and True in phase 2.
 
     Parameters
     ----------
@@ -673,7 +679,7 @@ def get_solution(tableau, basis, x, lambd, b_signs):
 
     b_signs : ndarray(bool, ndim=1)
         ndarray of shape (L,) whose i-th element is True iff the i-th
-        element of the vector (b_ub, b_eq) is positive.
+        element of the vector (b_ub, b_eq) is nonnegative.
 
     Returns
     -------
@@ -681,7 +687,7 @@ def get_solution(tableau, basis, x, lambd, b_signs):
         The optimal value.
 
     """
-    n, L = x.size, lambd.size
+    n, L = x.size, basis.size
     aux_start = tableau.shape[1] - L - 1
 
     x[:] = 0
