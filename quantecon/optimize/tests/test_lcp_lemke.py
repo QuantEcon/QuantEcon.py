@@ -140,3 +140,17 @@ def test_lcp_lemke_workspaces():
     assert_(res.success)
     assert_allclose(M @ res.z + q, np.zeros(n) + (M @ res.z + q).clip(0))
     assert_allclose(res.z @ (M @ res.z + q), 0, atol=1e-12)
+
+
+def test_lcp_lemke_numerical_breakdown():
+    # Entries of order 1e14: the lexicographic tie breaking fails within
+    # `tol_ratio_diff`; an arbitrary pivot led to a wrong "solution"
+    # reported as success
+    s = 2e14
+    M = np.array([[-1., -4., 1.],
+                  [-5*s, s, 3*s],
+                  [-5*s, 3*s, s]])
+    q = -np.ones(3)
+    res = lcp_lemke(M, q)
+    assert_(not res.success)
+    assert_equal(res.status, 3)

@@ -91,6 +91,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
                     0 : Solution found successfully
                     1 : Iteration limit reached
                     2 : Secondary ray termination
+                    3 : Numerical difficulties encountered
 
             num_iter : int
                 The number of iterations performed.
@@ -168,7 +169,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     argmins = np.empty(n, dtype=np.int_)
 
     while num_iter < max_iter:
-        pivrow_found, pivrow, _ = _lex_min_ratio_test(
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
             tableau, pivcol, 0, argmins,
             piv_options.tol_piv, piv_options.tol_ratio_diff
         )
@@ -176,6 +177,10 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
         if not pivrow_found:  # Ray termination
             success = False
             status = 2
+            break
+        if not resolved:  # Numerical breakdown: lexicographic tie not
+            success = False  # broken, impossible in exact arithmetic
+            status = 3
             break
 
         _pivoting(tableau, pivcol, pivrow)
