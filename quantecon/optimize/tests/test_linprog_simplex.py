@@ -311,6 +311,17 @@ class TestLinprogSimplexPhase1Scale:
         assert_(res.status == 0)
         assert_allclose(res.fun, -1e5, atol=1e-3)
 
+    def test_infeasible_in_a_small_constraint(self):
+        # x1 = 1e6, x2 = 0 and x2 = 0.9: the contradiction of 0.9 in a
+        # small constraint is below fea_tol times the scale of the whole
+        # right hand side, but not below fea_tol times its own scale
+        c = np.array([-1., -1.])
+        A_eq = np.array([[1., 0.], [0., 1.], [0., 1.]])
+        b_eq = np.array([1e6, 0., 0.9])
+        res = linprog_simplex(c, A_eq=A_eq, b_eq=b_eq)
+        assert_(not res.success)
+        assert_(res.status == 2)
+
     def test_infeasible_at_unit_scale(self):
         # The same inconsistency at scale 1 is infeasible
         c = np.array([-1., -1.])

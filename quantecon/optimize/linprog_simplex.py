@@ -288,8 +288,6 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
         solve_phase_1(tableau, basis, max_iter, piv_options=piv_options)
     num_iter += num_iter_1
     if not success:
-        if status == 3:  # Unbounded
-            fun = np.inf
         return SimplexResult(x, lambd, fun, success, status, num_iter)
 
     # Modify the criterion row for Phase 2
@@ -586,9 +584,11 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
     L = tableau.shape[0] - 1
     nm = tableau.shape[1] - (L+1)  # n + m
 
-    # Scale of the right hand side, for the feasibility test below: the
-    # initial value of the Phase 1 objective is the sum of |b|
+    # Scales of the right hand side, for the feasibility tests below: the
+    # initial value of the Phase 1 objective is the sum of |b|, and the
+    # initial values of the basic variables are |b_k|
     b_scale = max(1., tableau[-1, -1])
+    b_abs = tableau[:L, -1].copy()
     success, status, num_iter_1 = \
         solve_tableau(tableau, basis, max_iter, skip_aux=False,
                       piv_options=piv_options)
@@ -602,6 +602,17 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
         success = False
         status = 2
         return success, status, num_iter_1
+    # The artificial variable of constraint k enters that constraint only,
+    # so its level is the residual of the constraint: test each one still
+    # basic against the scale of its own constraint, as the total above
+    # can hide a violation of a constraint with a small right hand side
+    for i in range(L):
+        if basis[i] >= nm:  # Artificial variable of constraint k
+            k = basis[i] - nm
+            if tableau[i, -1] > piv_options.fea_tol * max(1., b_abs[k]):
+                success = False  # Infeasible
+                status = 2
+                return success, status, num_iter_1
 
     # Check artificial variables have been eliminated
     tol_piv = piv_options.tol_piv
