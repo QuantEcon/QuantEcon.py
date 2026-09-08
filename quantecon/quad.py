@@ -217,7 +217,7 @@ def _primes_below(n):
     """
     sieve = np.ones(n, dtype=bool)
     sieve[:2] = False
-    for i in range(2, int(n**0.5) + 1):
+    for i in range(2, math.isqrt(n) + 1):
         if sieve[i]:
             sieve[i*i::i] = False
     return np.flatnonzero(sieve)
