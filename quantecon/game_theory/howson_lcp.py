@@ -68,7 +68,8 @@ def polym_lcp_solver(
     -------
     NE : tuple(ndarray(float, ndim=1))
         Tuple of computed Nash equilibrium mixed actions. A Nash
-        Equilibrium if not stopped early by reaching `max_iter`.
+        Equilibrium if not stopped early by reaching `max_iter` or by a
+        numerical breakdown of the pivoting.
 
     res : NashResult
         Object containing information about the computation: the number

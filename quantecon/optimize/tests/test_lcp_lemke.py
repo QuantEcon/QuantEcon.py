@@ -144,8 +144,9 @@ def test_lcp_lemke_workspaces():
 
 def test_lcp_lemke_numerical_breakdown():
     # Entries of order 1e14: the lexicographic tie breaking fails within
-    # `tol_ratio_diff`; an arbitrary pivot led to a wrong "solution"
-    # reported as success
+    # `tol_ratio_diff`. This used to be reported as ray termination, and
+    # pivoting through the tie leads to a wrong "solution" reported as
+    # success; it is a numerical breakdown
     s = 2e14
     M = np.array([[-1., -4., 1.],
                   [-5*s, s, 3*s],
