@@ -4,6 +4,8 @@ Tests for timing.py
 """
 
 import time
+import warnings
+import pytest
 from numpy.testing import assert_
 from quantecon.util import tic, tac, toc, loop_timer, Timer, timeit
 import quantecon as qe
@@ -54,6 +56,9 @@ class TestTicTacToc:
         self.h = 0.1
         self.digits = 10
 
+    # tic/tac/toc are deprecated; silence the warnings for this
+    # behavioural test (deprecation is asserted in TestDeprecation).
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_timer(self):
 
         tic()
@@ -71,6 +76,7 @@ class TestTicTacToc:
                                    [self.h, self.h, self.h*3]):
             assert_at_least(actual, desired)
 
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_loop(self):
 
         def test_function_one_arg(n):
@@ -91,6 +97,54 @@ class TestTicTacToc:
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
             assert_(average_time >= average_of_best)
+
+
+class TestDeprecation:
+    """The Matlab-like tic/tac/toc/loop_timer functions are deprecated."""
+
+    def test_tic_warns(self):
+        with pytest.warns(DeprecationWarning, match="tic"):
+            tic()
+
+    def test_tac_warns(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            tic()
+        with pytest.warns(DeprecationWarning, match="tac"):
+            tac(verbose=False)
+
+    def test_toc_warns(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            tic()
+        with pytest.warns(DeprecationWarning, match="toc"):
+            toc(verbose=False)
+
+    def test_loop_timer_warns(self):
+        def noop():
+            pass
+
+        with pytest.warns(DeprecationWarning, match="loop_timer"):
+            loop_timer(2, noop, verbose=False)
+
+    def test_loop_timer_warns_only_once(self):
+        """`loop_timer` must not emit nested tic/tac/toc warnings per run."""
+        def noop():
+            pass
+
+        with warnings.catch_warnings(record=True) as records:
+            warnings.simplefilter("always", DeprecationWarning)
+            loop_timer(3, noop, verbose=False)
+
+        deprecations = [w for w in records
+                        if issubclass(w.category, DeprecationWarning)]
+        assert len(deprecations) == 1
+
+    def test_warning_points_to_caller(self):
+        """`stacklevel` should attribute the warning to the user's call site."""
+        with pytest.warns(DeprecationWarning) as records:
+            tic()  # this line is the expected warning source
+        assert records[0].filename == __file__
 
 
 class TestTimer:
@@ -394,20 +448,22 @@ class TestGlobalPrecision:
         timer = Timer(precision=3, verbose=False)
         assert timer.precision == 3
         
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_tac_toc_keep_original_defaults(self):
         """Test that tac/toc functions maintain original default (digits=2)."""
         # These functions are deprecated and should maintain original behavior
         tic()
         time.sleep(0.01)
-        
+
         # These should use digits=2 by default, not global precision
         result_tac = tac(verbose=False)  # Uses default digits=2
         result_toc = toc(verbose=False)  # Uses default digits=2
-        
+
         # Just verify they work without error
         assert result_tac > 0
         assert result_toc > 0
         
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_loop_timer_keeps_original_default(self):
         """Test that loop_timer maintains original default (digits=2)."""
         def test_func():
