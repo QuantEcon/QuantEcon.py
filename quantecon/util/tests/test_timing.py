@@ -4,6 +4,8 @@ Tests for timing.py
 """
 
 import time
+import warnings
+import pytest
 from numpy.testing import assert_
 from quantecon.util import tic, tac, toc, loop_timer, Timer, timeit
 import quantecon as qe
@@ -56,16 +58,21 @@ class TestTicTacToc:
 
     def test_timer(self):
 
-        tic()
+        # tic/tac/toc are deprecated; silence the warnings for this
+        # behavioural test (deprecation is asserted in TestDeprecation).
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
 
-        time.sleep(self.h)
-        tm1 = tac()
+            tic()
 
-        time.sleep(self.h)
-        tm2 = tac()
+            time.sleep(self.h)
+            tm1 = tac()
 
-        time.sleep(self.h)
-        tm3 = toc()
+            time.sleep(self.h)
+            tm2 = tac()
+
+            time.sleep(self.h)
+            tm3 = toc()
 
         for actual, desired in zip([tm1, tm2, tm3],
                                    [self.h, self.h, self.h*3]):
@@ -79,10 +86,13 @@ class TestTicTacToc:
         def test_function_two_arg(n, a):
             return time.sleep(n)
 
-        test_one_arg = \
-            loop_timer(5, test_function_one_arg, self.h, digits=10)
-        test_two_arg = \
-            loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+
+            test_one_arg = \
+                loop_timer(5, test_function_one_arg, self.h, digits=10)
+            test_two_arg = \
+                loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
 
         for tm in test_one_arg:
             assert_at_least(tm, self.h)
@@ -91,6 +101,54 @@ class TestTicTacToc:
 
         for (average_time, average_of_best) in [test_one_arg, test_two_arg]:
             assert_(average_time >= average_of_best)
+
+
+class TestDeprecation:
+    """The Matlab-like tic/tac/toc/loop_timer functions are deprecated."""
+
+    def test_tic_warns(self):
+        with pytest.warns(DeprecationWarning, match="tic"):
+            tic()
+
+    def test_tac_warns(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            tic()
+        with pytest.warns(DeprecationWarning, match="tac"):
+            tac(verbose=False)
+
+    def test_toc_warns(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            tic()
+        with pytest.warns(DeprecationWarning, match="toc"):
+            toc(verbose=False)
+
+    def test_loop_timer_warns(self):
+        def noop():
+            pass
+
+        with pytest.warns(DeprecationWarning, match="loop_timer"):
+            loop_timer(2, noop, verbose=False)
+
+    def test_loop_timer_warns_only_once(self):
+        """`loop_timer` must not emit nested tic/tac/toc warnings per run."""
+        def noop():
+            pass
+
+        with warnings.catch_warnings(record=True) as records:
+            warnings.simplefilter("always", DeprecationWarning)
+            loop_timer(3, noop, verbose=False)
+
+        deprecations = [w for w in records
+                        if issubclass(w.category, DeprecationWarning)]
+        assert len(deprecations) == 1
+
+    def test_warning_points_to_caller(self):
+        """`stacklevel` should attribute the warning to the user's call site."""
+        with pytest.warns(DeprecationWarning) as records:
+            tic()  # noqa: this line is the expected warning source
+        assert records[0].filename == __file__
 
 
 class TestTimer:
@@ -397,13 +455,16 @@ class TestGlobalPrecision:
     def test_tac_toc_keep_original_defaults(self):
         """Test that tac/toc functions maintain original default (digits=2)."""
         # These functions are deprecated and should maintain original behavior
-        tic()
-        time.sleep(0.01)
-        
-        # These should use digits=2 by default, not global precision
-        result_tac = tac(verbose=False)  # Uses default digits=2
-        result_toc = toc(verbose=False)  # Uses default digits=2
-        
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+
+            tic()
+            time.sleep(0.01)
+
+            # These should use digits=2 by default, not global precision
+            result_tac = tac(verbose=False)  # Uses default digits=2
+            result_toc = toc(verbose=False)  # Uses default digits=2
+
         # Just verify they work without error
         assert result_tac > 0
         assert result_toc > 0
@@ -414,7 +475,9 @@ class TestGlobalPrecision:
             time.sleep(0.001)
             
         # Should use digits=2 by default, not global precision
-        result = loop_timer(2, test_func, verbose=False)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            result = loop_timer(2, test_func, verbose=False)
         assert len(result) == 2  # Returns (average_time, average_of_best)
         
     def test_timeit_uses_global_precision(self):
