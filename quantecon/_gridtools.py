@@ -293,6 +293,13 @@ def simplex_grid(m, n):
     A grid of the (m-1)-dimensional *unit* simplex with n subdivisions
     along each dimension can be obtained by `simplex_grid(m, n) / n`.
 
+    The maximum grid size L is bounded by ``np.iinfo(np.intp).max``, which
+    is platform-dependent: 2³¹−1 on wasm32 (JupyterLite/xeus-python) and
+    2⁶³−1 on 64-bit platforms. Inputs that would produce a larger L raise
+    ``ValueError``. With ``m >= 2``, the wasm32 limit is reached only for
+    grids that would require ≥ 16 GB of memory, far exceeding the wasm32
+    address space.
+
     Examples
     --------
     >>> simplex_grid(3, 4)
@@ -430,6 +437,12 @@ def num_compositions_jit(m, n):
     """
     Numba jit version of `num_compositions`. Return `0` if the outcome
     exceeds the maximum value of `np.intp`.
+
+    Notes
+    -----
+    The overflow boundary ``np.iinfo(np.intp).max`` is platform-dependent:
+    2³¹−1 on wasm32 (JupyterLite/xeus-python) and 2⁶³−1 on 64-bit
+    platforms.
 
     """
     return comb_jit(n+m-1, m-1)
