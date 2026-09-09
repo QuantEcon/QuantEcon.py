@@ -158,7 +158,7 @@ class Kalman:
         K = self.K_infinity
 
         # Get the matrix sizes
-        n, k, m, l = self.ss.n, self.ss.k, self.ss.m, self.ss.l
+        n, m, l = self.ss.n, self.ss.m, self.ss.l
         A, C, G, H = self.ss.A, self.ss.C, self.ss.G, self.ss.H
 
         Atil = np.vstack([np.hstack([A, np.zeros((n, n)), np.zeros((n, l))]),

@@ -212,12 +212,15 @@ def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
         capping_curr = min(max_iter_curr, capping)
 
         _initialize_tableaux(payoff_matrices, tableaux, bases)
-        converged, num_iter = \
+        converged, num_iter, breakdown = \
             _lemke_howson_tbl(tableaux, bases, init_pivot_curr, capping_curr)
 
         total_num_iter += num_iter
 
         if converged or total_num_iter >= max_iter:
+            return converged, total_num_iter, init_pivot_curr
+        if breakdown and capping >= max_iter:
+            # Capping not enabled: do not try another initial pivot
             return converged, total_num_iter, init_pivot_curr
 
         init_pivot_curr += 1
@@ -226,7 +229,7 @@ def _lemke_howson_capping(payoff_matrices, tableaux, bases, init_pivot,
         max_iter_curr -= num_iter
 
     _initialize_tableaux(payoff_matrices, tableaux, bases)
-    converged, num_iter = \
+    converged, num_iter, _ = \
         _lemke_howson_tbl(tableaux, bases, init_pivot_curr, max_iter_curr)
     total_num_iter += num_iter
 
@@ -360,6 +363,11 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     num_iter : scalar(int)
         Number of pivoting steps performed.
 
+    breakdown : bool
+        Whether the pivoting stopped because of a numerical breakdown
+        (no positive entry in the pivot column, or lexicographic tie not
+        broken, neither of which can happen in exact arithmetic).
+
     Examples
     --------
     >>> import numpy as np
@@ -371,7 +379,7 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     >>> bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
     >>> tableaux, bases = _initialize_tableaux((A, B), tableaux, bases)
     >>> _lemke_howson_tbl(tableaux, bases, 1, 10)
-    (True, 4)
+    (True, 4, False)
     >>> tableaux[0]
     array([[ 0.875 ,  0.    ,  1.    ,  0.375 , -0.125 ,  0.25  ],
            [ 0.1875,  1.    ,  0.    , -0.0625,  0.1875,  0.125 ]])
@@ -404,13 +412,22 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     argmins = np.empty(max(m, n), dtype=np.int_)
 
     converged = False
+    breakdown = False
     num_iter = 0
 
     while True:
         for pl in pls:
             # Determine the leaving variable
-            _, row_min = _lex_min_ratio_test(tableaux[pl], pivot,
-                                             slack_starts[pl], argmins)
+            found, row_min, resolved = _lex_min_ratio_test(
+                tableaux[pl], pivot, slack_starts[pl], argmins
+            )
+            if not (found and resolved):
+                # Numerical breakdown: no positive entry in the pivot
+                # column, or lexicographic tie not broken, both
+                # impossible in exact arithmetic; stop with
+                # `converged = False`
+                breakdown = True
+                break
 
             # Pivoting step: modify tableau in place
             _pivoting(tableaux[pl], pivot, row_min)
@@ -429,7 +446,7 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
             continue
         break
 
-    return converged, num_iter
+    return converged, num_iter, breakdown
 
 
 @jit(nopython=True, cache=True)

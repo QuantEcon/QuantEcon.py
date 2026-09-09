@@ -80,6 +80,34 @@ The rendered pages are written to ``docs/build/html``. Once you open a pull requ
 documentation is also built automatically by `Read the Docs <https://readthedocs.org>`_ and linked from
 the pull request checks.
 
+Multi-phase projects and releases
+---------------------------------
+
+Some improvements are too large for a single pull request — for example a compatibility campaign that
+touches CI, library code and packaging. We organise this kind of work as follows (the JupyterLite/WASM
+browser-support campaign, `#925 <https://github.com/QuantEcon/QuantEcon.py/issues/925>`_, is the
+reference example):
+
+- **Track the work on GitHub.** Open an umbrella issue holding the plan, with one sub-issue per
+  deliverable, all grouped under a milestone. Write enough context into the issue bodies that the
+  issues themselves are the durable record.
+
+- **Merge to** ``main`` **as you go — do not use long-lived feature branches.** Each pull request
+  should be small, individually reviewed, green in CI and safe to release on its own. Integration
+  branches rot as ``main`` moves, their pull requests bypass the required CI contexts configured for
+  ``main``, and workflows only become ``workflow_dispatch``-able once they exist on the default
+  branch.
+
+- **Keep** ``main`` **releasable after every merge.** Publishing to PyPI is automated on ``v*`` tags,
+  so anything merged can ship at any time. Library changes must leave default behaviour unchanged
+  unless that change is the reviewed purpose of the pull request. CI and test scaffolding (workflows,
+  the ``ci/`` directory) is not part of the shipped package, so it can land freely.
+
+- **Cut an intermediate release when a later phase depends on shipped fixes.** Downstream consumers
+  (conda-forge, emscripten-forge, the lecture repositories) only see released versions, so don't hold
+  the release until a campaign is finished — release as soon as the milestone's library fixes have
+  landed, and treat the milestone as the release checklist.
+
 Further questions
 -----------------
 

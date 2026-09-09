@@ -91,6 +91,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
                     0 : Solution found successfully
                     1 : Iteration limit reached
                     2 : Secondary ray termination
+                    3 : Numerical difficulties encountered
 
             num_iter : int
                 The number of iterations performed.
@@ -117,6 +118,8 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
 
     """
     n = M.shape[0]
+    if d is not None and not np.all(d > 0):
+        raise ValueError('d must be strictly positive')
 
     success = False
     status = 1
@@ -143,14 +146,20 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     art_var = 2*n  # Artificial variable
     pivcol = art_var
 
-    # Equivalent to lex_min_ratio_test
+    # Equivalent to lex_min_ratio_test: the lexicographic tie breaking
+    # reduces to taking the largest row index, as the slack columns form
+    # the identity matrix. Ties are measured against the minimum ratio
+    # found so far, updated on every strictly smaller ratio, so that the
+    # row chosen is the last one within the tolerance of the minimum.
     pivrow = 0
     ratio_min = q[0] / d[0]
     for i in range(1, n):
         ratio = q[i] / d[i]
-        if ratio <= ratio_min + piv_options.tol_ratio_diff:
+        if ratio < ratio_min:  # Smaller
             pivrow = i
             ratio_min = ratio
+        elif ratio <= ratio_min + piv_options.tol_ratio_diff:  # Tie
+            pivrow = i
 
     _pivoting(tableau, pivcol, pivrow)
     basis[pivrow], pivcol = pivcol, pivrow + n
@@ -160,7 +169,7 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     argmins = np.empty(n, dtype=np.int_)
 
     while num_iter < max_iter:
-        pivrow_found, pivrow = _lex_min_ratio_test(
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
             tableau, pivcol, 0, argmins,
             piv_options.tol_piv, piv_options.tol_ratio_diff
         )
@@ -168,6 +177,10 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
         if not pivrow_found:  # Ray termination
             success = False
             status = 2
+            break
+        if not resolved:  # Numerical breakdown: lexicographic tie not
+            success = False  # broken, impossible in exact arithmetic
+            status = 3
             break
 
         _pivoting(tableau, pivcol, pivrow)
@@ -188,9 +201,10 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     return LCPResult(z, success, status, num_iter)
 
 
-lcp_lemke.__doc__ = lcp_lemke.__doc__.format(
-    FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
-)
+if lcp_lemke.__doc__ is not None:  # None under python -OO
+    lcp_lemke.__doc__ = lcp_lemke.__doc__.format(
+        FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+    )
 
 
 @jit(nopython=True, cache=True)
@@ -281,7 +295,7 @@ def _get_solution(tableau, basis, z):
         View to `z`.
 
     """
-    n = z.size
+    n = basis.shape[0]
 
     z[:] = 0
     for i in range(n):

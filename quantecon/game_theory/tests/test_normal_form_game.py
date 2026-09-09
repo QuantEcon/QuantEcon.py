@@ -556,3 +556,12 @@ def test_best_response_2p():
             br_computed = \
                 best_response_2p(test_case['payoff_array'], mixed_action)
             assert_(br_computed == br_expected)
+
+
+def test_best_response_2p_negative_tol():
+    # With tol < 0 no action can satisfy the tolerance condition;
+    # -1 is returned rather than falling through to None
+    payoff_array = np.array([[4., 0.], [3., 2.]])
+    mixed_action = np.array([0.5, 0.5])
+    br_computed = best_response_2p(payoff_array, mixed_action, tol=-1e-8)
+    assert_(br_computed == -1)

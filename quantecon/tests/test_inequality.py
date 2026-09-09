@@ -59,6 +59,11 @@ def test_gini_coeff():
     coeff = gini_coefficient(y)
     assert_allclose(expected, coeff, rtol=1e-01)
 
+    # Regression against the pairwise definition
+    y = np.array([1.0, 2.0, 4.0, 8.0])
+    expected = np.abs(y[:, None] - y).sum() / (2 * len(y) * y.sum())
+    assert_allclose(expected, gini_coefficient(y))
+
     # Tests Weibull: G = 1 - 2**(-1/a)
     a = np.random.randint(2, 15)
     expected = 1 - 2 ** (-1 / a)
@@ -130,4 +135,3 @@ def test_rank_size():
     r_sqval_exp = r_value_exp**2
 
     assert_raises(AssertionError, assert_allclose, r_sqval_exp, 1, rtol=1e-3)
-
