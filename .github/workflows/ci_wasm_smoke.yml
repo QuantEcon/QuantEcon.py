@@ -1,0 +1,48 @@
+name: WASM smoke suite
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # ------------------------------------------------------------------
+  # Native Python gate: ensures the smoke suite itself is correct and
+  # all tests pass against this repo's source.  The Emscripten /
+  # JupyterLite job that consumes the same suite lands with issue #933.
+  # ------------------------------------------------------------------
+  native:
+    name: Smoke suite (native)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Cache conda
+      uses: actions/cache@v6
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-3.13-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+
+    - uses: conda-incubator/setup-miniconda@v4
+      with:
+        auto-update-conda: true
+        miniforge-version: latest
+        environment-file: environment.yml
+        python-version: "3.13"
+        auto-activate-base: false
+        use-only-tar-bz2: true
+        activate-environment: qe
+
+    - name: Install quantecon from source
+      shell: bash -l {0}
+      run: pip install -e . --no-deps
+
+    - name: Run smoke suite (native)
+      shell: bash -l {0}
+      run: pytest ci/wasm/smoke_test.py -v

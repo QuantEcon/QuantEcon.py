@@ -8,6 +8,7 @@ Utilities
    util/combinatorics
    util/common_messages
    util/compat
+   util/indexing
    util/notebooks
    util/numba
    util/random

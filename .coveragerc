@@ -4,6 +4,8 @@
 relative_files = True
 source = quantecon
 omit =
+    # Exclude the test tree from the headline figure
+    */tests/*
     */python?.?/*
     */lib-python/?.?/*.py
     */lib_pypy/_*.py
@@ -29,10 +31,3 @@ exclude_lines =
     # Don't complain if non-runnable code isn't run:
     if 0:
     if __name__ == .__main__.:
-
-    # Don't count Numba nopython=True jit functions
-    @jit
-    @jit\(.*nopython=True
-    @njit
-    @overload
-    @guvectorize\(.*nopython=True
