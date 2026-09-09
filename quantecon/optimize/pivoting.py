@@ -105,22 +105,27 @@ def _min_ratio_test_no_tie_breaking(tableau, pivot, test_col,
         Number of minimizing rows.
 
     """
+    # Ties are measured against the exact minimum ratio, determined in a
+    # first pass, so that the accepted set cannot drift away from the
+    # minimum by chaining tolerances
     ratio_min = np.inf
-    num_argmins = 0
-
     for k in range(num_candidates):
         i = argmins[k]
         if tableau[i, pivot] <= tol_piv:  # Treated as nonpositive
             continue
         ratio = tableau[i, test_col] / tableau[i, pivot]
-        if ratio > ratio_min + tol_ratio_diff:  # Ratio large for i
-            continue
-        elif ratio < ratio_min - tol_ratio_diff:  # Ratio smaller for i
+        if ratio < ratio_min:
             ratio_min = ratio
-            num_argmins = 1
-        else:  # Ratio equal
+
+    num_argmins = 0
+    for k in range(num_candidates):
+        i = argmins[k]
+        if tableau[i, pivot] <= tol_piv:  # Treated as nonpositive
+            continue
+        ratio = tableau[i, test_col] / tableau[i, pivot]
+        if ratio <= ratio_min + tol_ratio_diff:  # Ratio minimal for i
             num_argmins += 1
-        argmins[num_argmins-1] = i
+            argmins[num_argmins-1] = i
 
     return num_argmins
 
@@ -157,10 +162,33 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
     Returns
     -------
     found : bool
-        False if there is no positive entry in the pivot column.
+        False if there is no positive entry in the pivot column (up to
+        `tol_piv`), True otherwise.
 
     row_min : scalar(int)
-        Index of the row with the lexico-minimum ratio.
+        Index of the row with the lexico-minimum ratio (meaningless if
+        `found` is False). If the lexicographic tie breaking fails to
+        single out one row, which can only happen when the remaining
+        candidate rows are indistinguishable within `tol_ratio_diff`,
+        the first of them.
+
+    resolved : bool
+        True if `row_min` is the unique lexico-minimum row, False if
+        `found` is False or the tie breaking failed to single out one
+        row. In exact arithmetic the latter cannot happen (the rows of
+        the tableau restricted to the slack columns are linearly
+        independent), so `found and not resolved` signals a numerical
+        breakdown that callers may want to act on.
+
+    Notes
+    -----
+    The last column of `tableau` must contain the values of the basic
+    variables (the right hand side), and the columns `slack_start`, ...,
+    `slack_start+nrows-1` must be those that initially formed an identity
+    matrix (typically the slack or artificial variables), so that they
+    contain the inverse of the current basis matrix: the lexicographic
+    rule breaks the ties in the ratio test by comparing these columns in
+    order.
 
     """
     nrows = tableau.shape[0]
@@ -175,9 +203,16 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
     num_argmins = _min_ratio_test_no_tie_breaking(
         tableau, pivot, -1, argmins, num_candidates, tol_piv, tol_ratio_diff
     )
-    if num_argmins == 1:
-        found = True
-    elif num_argmins >= 2:
+    if num_argmins == 0:  # No positive entry in the pivot column
+        return found, argmins[0], False
+
+    # `found` is True from here: the pivot column has a positive entry.
+    # The lexicographic passes below only refine the choice among the
+    # rows that tie in the ratio test; if they fail to single out one
+    # row, the remaining candidates are numerically indistinguishable
+    # (they cannot be linearly dependent), and the first is taken.
+    found = True
+    if num_argmins >= 2:
         for j in range(slack_start, slack_start+nrows):
             if j == pivot:
                 continue
@@ -186,11 +221,13 @@ def _lex_min_ratio_test(tableau, pivot, slack_start, argmins,
                 tol_piv, tol_ratio_diff
             )
             if num_argmins == 1:
-                found = True
                 break
-    return found, argmins[0]
+    resolved = num_argmins == 1
+
+    return found, argmins[0], resolved
 
 
-_lex_min_ratio_test.__doc__ = _lex_min_ratio_test.__doc__.format(
-    TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
-)
+if _lex_min_ratio_test.__doc__ is not None:  # None under python -OO
+    _lex_min_ratio_test.__doc__ = _lex_min_ratio_test.__doc__.format(
+        TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+    )

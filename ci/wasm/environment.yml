@@ -1,0 +1,8 @@
+name: qe-lite
+channels:
+  - https://prefix.dev/emscripten-forge-4x
+  - https://prefix.dev/conda-forge
+dependencies:
+  - xeus-python
+  - numba
+  - quantecon

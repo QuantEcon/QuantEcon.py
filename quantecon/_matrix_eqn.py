@@ -279,7 +279,14 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
 
     # == Set up for iteration on Riccati equations system == #
     error = tolerance + 1
-    fail_msg = "Convergence failed after {} iterations."
+    if beta >= 1.0:
+        fail_msg = (
+            "Convergence failed after {} iterations. When beta>=1, a "
+            "stationary solution may not exist if the system cannot be "
+            "stabilized without discounting. Check the model specification."
+        )
+    else:
+        fail_msg = "Convergence failed after {} iterations."
 
     # == Prepare array for iteration == #
     sum1, sum2 = np.empty((n, n)), np.empty((n, n))
