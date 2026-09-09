@@ -2,8 +2,12 @@
 Tests for lemke_howson.py
 """
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose, assert_, assert_raises
 from quantecon.game_theory import Player, NormalFormGame, lemke_howson
+from quantecon.game_theory.lemke_howson import (
+    _initialize_tableaux, _lemke_howson_tbl
+)
 
 
 class TestLemkeHowson():
@@ -127,3 +131,40 @@ def test_lemke_howson_invalid_init_pivot_float():
                 [(0, 3), (6, 1)]]
     g = NormalFormGame(bimatrix)
     assert_raises(TypeError, lemke_howson, g, 1.0)
+
+
+@pytest.mark.parametrize('scale', [1e15, 1e16])
+def test_lemke_howson_large_payoffs_report_breakdown(scale):
+    # With payoffs of this size, the ratios in the lexico-minimum ratio
+    # test all tie within the (absolute) `tol_ratio_diff`, and the tie
+    # breaking fails. The routine must then report non-convergence
+    # rather than return a wrong "equilibrium" with `converged=True`.
+    A = scale * np.array([[3., 1.],
+                          [1., 3.]])
+    B = scale * np.array([[1., 3.],
+                          [3., 1.]])
+    g = NormalFormGame((Player(A), Player(B)))
+    NE, res = lemke_howson(g, full_output=True)
+    assert_(not res.converged)
+    # Without capping, no other initial pivot is tried on breakdown
+    assert_(res.init == 0)
+    assert_(res.num_iter == 0)
+
+
+def test_lemke_howson_tbl_breakdown():
+    # No positive entry in the column of the initial pivot: the routine
+    # must stop and report non-convergence rather than pivot on a
+    # meaningless row
+    A = np.array([[3, 3], [2, 5], [0, 6]])
+    B = np.array([[3, 2, 3], [2, 6, 1]])
+    m, n = A.shape
+    tableaux = (np.empty((n, m+n+1)), np.empty((m, m+n+1)))
+    bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
+    _initialize_tableaux((A, B), tableaux, bases)
+    init_pivot = 0
+    tableaux[0][:, init_pivot] = 0
+    converged, num_iter, breakdown = \
+        _lemke_howson_tbl(tableaux, bases, init_pivot, 10)
+    assert_(not converged)
+    assert_(num_iter == 0)
+    assert_(breakdown)

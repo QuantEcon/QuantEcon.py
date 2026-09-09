@@ -233,7 +233,9 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                 ndarray of shape (L,) containing the dual solution.
 
             fun : float
-                Value of the objective function.
+                Value of the objective function (-inf if the problem
+                appears to be infeasible, inf if it appears to be
+                unbounded).
 
             success : bool
                 True if the algorithm succeeded in finding an optimal
@@ -247,6 +249,7 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                     1 : Iteration limit reached
                     2 : Problem appears to be infeasible
                     3 : Problem appears to be unbounded
+                    4 : Numerical difficulties encountered
 
             num_iter : int
                 The number of iterations performed.
@@ -296,13 +299,16 @@ def linprog_simplex(c, A_ub=np.empty((0, 0)), b_ub=np.empty((0,)),
                       piv_options=piv_options)
     num_iter += num_iter_2
     fun = get_solution(tableau, basis, x, lambd, b_signs)
+    if status == 3:  # Unbounded
+        fun = np.inf
 
     return SimplexResult(x, lambd, fun, success, status, num_iter)
 
 
-linprog_simplex.__doc__ = linprog_simplex.__doc__.format(
-    FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
-)
+if linprog_simplex.__doc__ is not None:  # None under python -OO
+    linprog_simplex.__doc__ = linprog_simplex.__doc__.format(
+        FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
+    )
 
 
 @jit(nopython=True, cache=True)
@@ -540,7 +546,7 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True,
             break
 
         aux_start = tableau.shape[1] - L - 1
-        pivrow_found, pivrow = _lex_min_ratio_test(
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
             tableau[:-1, :], pivcol, aux_start, argmins,
             piv_options.tol_piv, piv_options.tol_ratio_diff
         )
@@ -548,6 +554,10 @@ def solve_tableau(tableau, basis, max_iter=10**6, skip_aux=True,
         if not pivrow_found:  # Unbounded
             success = False
             status = 3
+            break
+        if not resolved:  # Numerical breakdown: lexicographic tie not
+            success = False  # broken, impossible in exact arithmetic
+            status = 4
             break
 
         _pivoting(tableau, pivcol, pivrow)
@@ -574,28 +584,53 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
     L = tableau.shape[0] - 1
     nm = tableau.shape[1] - (L+1)  # n + m
 
+    # Scales of the right hand side, for the feasibility tests below: the
+    # initial value of the Phase 1 objective is the sum of |b|, and the
+    # initial values of the basic variables are |b_k|
+    b_scale = max(1., tableau[-1, -1])
+    b_abs = tableau[:L, -1].copy()
     success, status, num_iter_1 = \
         solve_tableau(tableau, basis, max_iter, skip_aux=False,
                       piv_options=piv_options)
 
-    if not success:  # max_iter exceeded
+    if not success:
+        if status == 3:
+            # The auxiliary problem is bounded: a numerical breakdown
+            status = 4
         return success, status, num_iter_1
-    if tableau[-1, -1] > piv_options.fea_tol:  # Infeasible
+    if tableau[-1, -1] > piv_options.fea_tol * b_scale:  # Infeasible
         success = False
         status = 2
         return success, status, num_iter_1
+    # The artificial variable of constraint k enters that constraint only,
+    # so its level is the residual of the constraint: test each one still
+    # basic against the scale of its own constraint, as the total above
+    # can hide a violation of a constraint with a small right hand side
+    for i in range(L):
+        if basis[i] >= nm:  # Artificial variable of constraint k
+            k = basis[i] - nm
+            if tableau[i, -1] > piv_options.fea_tol * max(1., b_abs[k]):
+                success = False  # Infeasible
+                status = 2
+                return success, status, num_iter_1
 
     # Check artificial variables have been eliminated
     tol_piv = piv_options.tol_piv
     for i in range(L):
         if basis[i] >= nm:  # Artificial variable not eliminated
+            # Pivot on the largest entry (in absolute value) of the row,
+            # if treated as nonzero
+            j_max = -1
+            v_max = tol_piv
             for j in range(nm):
-                if tableau[i, j] < -tol_piv or \
-                   tableau[i, j] > tol_piv:  # Treated nonzero
-                    _pivoting(tableau, j, i)
-                    basis[i] = j
-                    num_iter_1 += 1
-                    break
+                v = abs(tableau[i, j])
+                if v > v_max:
+                    v_max = v
+                    j_max = j
+            if j_max >= 0:
+                _pivoting(tableau, j_max, i)
+                basis[i] = j_max
+                num_iter_1 += 1
 
     return success, status, num_iter_1
 
@@ -607,7 +642,7 @@ def _pivot_col(tableau, skip_aux, piv_options):
     containing the maximum positive element in the last row of the
     tableau.
 
-    `skip_aux` should be True in phase 1, and False in phase 2.
+    `skip_aux` should be False in phase 1, and True in phase 2.
 
     Parameters
     ----------
@@ -673,7 +708,7 @@ def get_solution(tableau, basis, x, lambd, b_signs):
 
     b_signs : ndarray(bool, ndim=1)
         ndarray of shape (L,) whose i-th element is True iff the i-th
-        element of the vector (b_ub, b_eq) is positive.
+        element of the vector (b_ub, b_eq) is nonnegative.
 
     Returns
     -------
@@ -681,7 +716,7 @@ def get_solution(tableau, basis, x, lambd, b_signs):
         The optimal value.
 
     """
-    n, L = x.size, lambd.size
+    n, L = x.size, basis.size
     aux_start = tableau.shape[1] - L - 1
 
     x[:] = 0

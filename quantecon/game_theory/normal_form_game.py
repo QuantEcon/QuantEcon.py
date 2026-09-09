@@ -461,7 +461,7 @@ class Player:
         if D.shape[0] == 0:  # num_actions == 1
             return False
         if self.num_opponents >= 2:
-            D.shape = (D.shape[0], np.prod(D.shape[1:]))
+            D = D.reshape(D.shape[0], np.prod(D.shape[1:]))
 
         if method is None:
             from ..optimize.minmax import minmax
@@ -909,13 +909,16 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
         Opponent's mixed action. Its length must be equal to
         `payoff_matrix.shape[1]`.
 
-    tol : scalar(float), optional(default=None)
-        Tolerance level used in determining best responses.
+    tol : scalar(float), optional(default=1e-8)
+        Tolerance level used in determining best responses. Must be
+        nonnegative.
 
     Returns
     -------
     scalar(int)
-        Best response action.
+        Best response action. -1 indicates an error condition: no
+        action satisfies the tolerance condition, which occurs only
+        if `tol` < 0.
 
     """
     n, m = payoff_matrix.shape
@@ -932,3 +935,5 @@ def best_response_2p(payoff_matrix, opponent_mixed_action, tol=1e-8):
     for a in range(n):
         if payoff_vector[a] >= payoff_max - tol:
             return a
+
+    return -1  # Unreachable unless tol < 0

@@ -104,8 +104,8 @@ class MarkovChain:
 
     state_values : array_like(default=None)
         Array_like of length n containing the values associated with the
-        states, which must be homogeneous in type. If None, the values
-        default to integers 0 through n-1.
+        states, which must be homogeneous in type. If None, the states
+        are represented by their indices, 0 through n-1.
 
     Attributes
     ----------

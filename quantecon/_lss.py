@@ -126,7 +126,7 @@ class LinearStateSpace:
             self.mu_0 = np.zeros((self.n, 1))
         else:
             self.mu_0 = self.convert(mu_0)
-            self.mu_0.shape = self.n, 1
+            self.mu_0 = self.mu_0.reshape(self.n, 1)
         if Sigma_0 is None:
             self.Sigma_0 = np.zeros((self.n, self.n))
         else:
@@ -391,7 +391,7 @@ class LinearStateSpace:
             The coefficients for y
         """
         # Pull out matrices
-        A, C, G, H = self.A, self.C, self.G, self.H
+        A, C, G = self.A, self.C, self.G
         Apower = np.copy(A)
 
         # Create room for coefficients
