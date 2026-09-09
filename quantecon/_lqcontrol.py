@@ -404,7 +404,8 @@ class LQMarkov:
         Consists of m cross product term matrices N(s) with dimension
         k x n for each Markov state,
     beta : scalar(float), optional(default=1)
-        beta is the discount parameter
+        beta is the discount parameter. Must be strictly smaller than 1 if
+        any of the Cs is nonzero.
 
     Attributes
     ----------
@@ -454,6 +455,11 @@ class LQMarkov:
         self.j = self.Cs.shape[2]
 
         self.beta = beta
+
+        if (self.Cs != 0).any() and beta >= 1:
+            raise ValueError(
+                'beta must be strictly smaller than 1 if C != 0'
+            )
 
         self.Π = np.asarray(Π, dtype='float')
 
@@ -538,8 +544,13 @@ class LQMarkov:
 
             Fs[i][:, :] = solve(Qs[i] + sum1, sum2 + Ns[i])
 
-        ds = solve(np.eye(m) - beta * Π,
-                   np.diag(beta * Π @ X).reshape((m, 1))).flatten()
+        if (Cs == 0).all():
+            ds = np.zeros(m)
+        else:
+            ds = solve(
+                np.eye(m) - beta * Π,
+                np.diag(beta * Π @ X).reshape((m, 1))
+            ).flatten()
 
         self.Ps, self.ds, self.Fs = Ps, ds, Fs
 
