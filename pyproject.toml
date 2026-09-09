@@ -25,11 +25,15 @@ requires-python = ">=3.7"
 dependencies = [
     'numba>=0.56.0',
     'numpy>=1.17.0',
-    'requests',
     'scipy>=1.5.0',
 ]
 
 [project.optional-dependencies]
+# Supports the deprecated quantecon.util.notebooks helpers; removed in v1.0
+# together with the module itself.
+notebooks = [
+    "requests",
+]
 testing = [
     "pytest",
     "coverage",

@@ -11,15 +11,18 @@ when downloaded as a support File
 
 "https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./something.py
 
-TODO
-----
-1. Write Style guide for QuantEcon.notebook contributions
-2. Write an interface for Dat Server
-3. Platform Agnostic (replace wget usage)
+.. deprecated:: 0.12.0
+    ``fetch_nb_dependencies`` is deprecated and will be removed in v1.0, along
+    with this module. It has no remaining callers in the QuantEcon lecture
+    series, and ``requests`` is no longer a mandatory dependency of
+    QuantEcon.py. Datasets referenced by the lectures live in
+    `QuantEcon/data-lectures <https://github.com/QuantEcon/data-lectures>`_ and
+    should be fetched by stable URL with the tool of your choice.
 
 """
 
 import os
+import warnings
 
 #-Remote Structure-#
 REPO = "https://github.com/QuantEcon/QuantEcon.notebooks"
@@ -32,6 +35,11 @@ FOLDER = "dependencies"
 def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDER, overwrite=False, verbose=True):
     """
     Retrieve raw files from QuantEcon.notebooks or other Github repo
+
+    .. deprecated:: 0.12.0
+        Deprecated and will be removed in v1.0. Fetch data by stable URL from
+        `QuantEcon/data-lectures <https://github.com/QuantEcon/data-lectures>`_
+        instead.
     
     Parameters
     ----------
@@ -71,7 +79,22 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     by setting ``overwrite=True``.
 
     """
-    import requests
+    warnings.warn(
+        "`fetch_nb_dependencies` is deprecated and will be removed in v1.0. "
+        "Fetch data by stable URL from QuantEcon/data-lectures instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+
+    try:
+        import requests
+    except ImportError:                                   # pragma: no cover
+        raise ImportError(
+            "`fetch_nb_dependencies` requires `requests`, which is no longer a "
+            "mandatory dependency of QuantEcon.py. Install it with "
+            "`pip install 'quantecon[notebooks]'`. This function is deprecated "
+            "and will be removed in v1.0."
+        )
 
     #-Generate Common Data Structure-#
     if type(files) == list:
@@ -99,6 +122,8 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
             #-Get file in OS agnostic way using requests-#
             url = "/".join([repo, raw, branch, folder, fl])
             r = requests.get(url)
+            #-Do not write an error page to disk under the requested name (#870)-#
+            r.raise_for_status()
             with open(fl, "wb") as fl:
                 fl.write(r.content)
             status.append(True)
