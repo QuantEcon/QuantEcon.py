@@ -3,8 +3,8 @@ Provides Matlab-like tic, tac and toc functions.
 
 .. deprecated:: 0.12.0
     The Matlab-like ``tic``, ``tac``, ``toc`` and ``loop_timer`` functions
-    are deprecated and will be removed in a future release. Use the
-    :class:`Timer` context manager or the :func:`timeit` function instead.
+    are deprecated and will be removed in v1.0. Use the :class:`Timer`
+    context manager or the :func:`timeit` function instead.
 
 """
 import time

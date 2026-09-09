@@ -56,28 +56,27 @@ class TestTicTacToc:
         self.h = 0.1
         self.digits = 10
 
+    # tic/tac/toc are deprecated; silence the warnings for this
+    # behavioural test (deprecation is asserted in TestDeprecation).
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_timer(self):
 
-        # tic/tac/toc are deprecated; silence the warnings for this
-        # behavioural test (deprecation is asserted in TestDeprecation).
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+        tic()
 
-            tic()
+        time.sleep(self.h)
+        tm1 = tac()
 
-            time.sleep(self.h)
-            tm1 = tac()
+        time.sleep(self.h)
+        tm2 = tac()
 
-            time.sleep(self.h)
-            tm2 = tac()
-
-            time.sleep(self.h)
-            tm3 = toc()
+        time.sleep(self.h)
+        tm3 = toc()
 
         for actual, desired in zip([tm1, tm2, tm3],
                                    [self.h, self.h, self.h*3]):
             assert_at_least(actual, desired)
 
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_loop(self):
 
         def test_function_one_arg(n):
@@ -86,13 +85,10 @@ class TestTicTacToc:
         def test_function_two_arg(n, a):
             return time.sleep(n)
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-
-            test_one_arg = \
-                loop_timer(5, test_function_one_arg, self.h, digits=10)
-            test_two_arg = \
-                loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
+        test_one_arg = \
+            loop_timer(5, test_function_one_arg, self.h, digits=10)
+        test_two_arg = \
+            loop_timer(5, test_function_two_arg, [self.h, 1], digits=10)
 
         for tm in test_one_arg:
             assert_at_least(tm, self.h)
@@ -147,7 +143,7 @@ class TestDeprecation:
     def test_warning_points_to_caller(self):
         """`stacklevel` should attribute the warning to the user's call site."""
         with pytest.warns(DeprecationWarning) as records:
-            tic()  # noqa: this line is the expected warning source
+            tic()  # this line is the expected warning source
         assert records[0].filename == __file__
 
 
@@ -452,32 +448,29 @@ class TestGlobalPrecision:
         timer = Timer(precision=3, verbose=False)
         assert timer.precision == 3
         
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_tac_toc_keep_original_defaults(self):
         """Test that tac/toc functions maintain original default (digits=2)."""
         # These functions are deprecated and should maintain original behavior
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
+        tic()
+        time.sleep(0.01)
 
-            tic()
-            time.sleep(0.01)
-
-            # These should use digits=2 by default, not global precision
-            result_tac = tac(verbose=False)  # Uses default digits=2
-            result_toc = toc(verbose=False)  # Uses default digits=2
+        # These should use digits=2 by default, not global precision
+        result_tac = tac(verbose=False)  # Uses default digits=2
+        result_toc = toc(verbose=False)  # Uses default digits=2
 
         # Just verify they work without error
         assert result_tac > 0
         assert result_toc > 0
         
+    @pytest.mark.filterwarnings("ignore::DeprecationWarning")
     def test_loop_timer_keeps_original_default(self):
         """Test that loop_timer maintains original default (digits=2)."""
         def test_func():
             time.sleep(0.001)
             
         # Should use digits=2 by default, not global precision
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            result = loop_timer(2, test_func, verbose=False)
+        result = loop_timer(2, test_func, verbose=False)
         assert len(result) == 2  # Returns (average_time, average_of_best)
         
     def test_timeit_uses_global_precision(self):
