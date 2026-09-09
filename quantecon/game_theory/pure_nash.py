@@ -16,7 +16,7 @@ def pure_nash_brute(g, tol=None):
     g : NormalFormGame
     tol : scalar(float), optional(default=None)
         Tolerance level used in determining best responses. If None,
-        default to the value of the `tol` attribute of `g`.
+        default to each player's `tol` attribute value.
 
     Returns
     -------
@@ -28,6 +28,7 @@ def pure_nash_brute(g, tol=None):
     --------
     Consider the "Prisoners' Dilemma" game:
 
+    >>> from quantecon.game_theory import NormalFormGame, pure_nash_brute
     >>> PD_bimatrix = [[(1, 1), (-2, 3)],
     ...                [(3, -2), (0, 0)]]
     >>> g_PD = NormalFormGame(PD_bimatrix)
@@ -56,7 +57,7 @@ def pure_nash_brute_gen(g, tol=None):
     g : NormalFormGame
     tol : scalar(float), optional(default=None)
         Tolerance level used in determining best responses. If None,
-        default to the value of the `tol` attribute of `g`.
+        default to each player's `tol` attribute value.
 
     Yields
     ------

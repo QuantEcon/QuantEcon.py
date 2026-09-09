@@ -572,13 +572,7 @@ def solve_phase_1(tableau, basis, max_iter=10**6, piv_options=PivOptions()):
     Perform the simplex algorithm for Phase 1 on a given tableau in
     canonical form, by calling `solve_tableau` with `skip_aux=False`.
 
-    Parameters
-    ----------
-    See `solve_tableau`.
-
-    Returns
-    -------
-    See `solve_tableau`.
+    For the parameters and the return values, see `solve_tableau`.
 
     """
     L = tableau.shape[0] - 1
@@ -653,7 +647,7 @@ def _pivot_col(tableau, skip_aux, piv_options):
         Whether to skip the coefficients of the auxiliary (or
         artificial) variables in pivot column selection.
 
-    piv_options : PivOptions, optional
+    piv_options : PivOptions
         PivOptions namedtuple to set the tolerance values.
 
     Returns

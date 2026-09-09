@@ -348,7 +348,7 @@ class LinearStateSpace:
         beta : scalar(float)
             Discount factor, in [0, 1)
 
-        beta : array_like(float)
+        x_t : array_like(float)
             The term x_t for conditioning
 
         Returns
@@ -369,7 +369,7 @@ class LinearStateSpace:
 
     def impulse_response(self, j=5):
         r"""
-        Pulls off the imuplse response coefficients to a shock
+        Pulls off the impulse response coefficients to a shock
         in :math:`w_{t}` for :math:`x` and :math:`y`
 
         Important to note: We are uninterested in the shocks to
@@ -381,7 +381,8 @@ class LinearStateSpace:
         Parameters
         ----------
         j : Scalar(int)
-            Number of coefficients that we want
+            Number of lags of the impulse response to compute; the
+            returned lists have j + 1 entries (lags 0 through j)
 
         Returns
         -------

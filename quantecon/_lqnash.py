@@ -45,9 +45,9 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
     Q2 : scalar(float) or array_like(float)
         As above, size (k_2, k_2)
     S1 : scalar(float) or array_like(float)
-        As above, size (k_1, k_1)
-    S2 : scalar(float) or array_like(float)
         As above, size (k_2, k_2)
+    S2 : scalar(float) or array_like(float)
+        As above, size (k_1, k_1)
     W1 : scalar(float) or array_like(float)
         As above, size (n, k_1)
     W2 : scalar(float) or array_like(float)
@@ -61,7 +61,7 @@ def nnash(A, B1, B2, R1, R2, Q1, Q2, S1, S2, W1, W2, M1, M2,
     tol : scalar(float), optional(default=1e-8)
         This is the tolerance level for convergence
     max_iter : scalar(int), optional(default=1000)
-        This is the maximum number of iteratiosn allowed
+        This is the maximum number of iterations allowed
 
     Returns
     -------

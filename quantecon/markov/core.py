@@ -112,8 +112,15 @@ class MarkovChain:
     P : ndarray or scipy.sparse.csr_matrix (float, ndim=2)
         See Parameters
 
+    n : int
+        Number of states.
+
     state_values : array_like or None
         Array of state values if set, None otherwise.
+
+    is_sparse : bool
+        Whether the transition matrix `P` is stored in sparse
+        (scipy.sparse.csr_matrix) form.
 
     digraph : DiGraph
         Directed graph representation of the Markov chain with nodes as 
@@ -479,8 +486,8 @@ class MarkovChain:
         Returns
         -------
         X : ndarray(ndim=1 or 2)
-            Array containing the state values of the sample path(s). See
-            the `simulate` method for more information.
+            Array containing the state indices of the sample path(s).
+            See the `simulate` method for the shape conventions.
 
         """
         random_state = check_random_state(random_state)
@@ -619,7 +626,7 @@ def _generate_sample_paths(P_cdfs, init_states, random_values, out):
 
     Notes
     -----
-    This routine is jit-complied by Numba.
+    This routine is jit-compiled by Numba.
 
     """
     num_reps, ts_length = out.shape
@@ -672,7 +679,7 @@ def _generate_sample_paths_sparse(P_cdfs1d, indices, indptr, init_states,
 
     Notes
     -----
-    This routine is jit-complied by Numba.
+    This routine is jit-compiled by Numba.
 
     """
     num_reps, ts_length = out.shape
@@ -698,6 +705,11 @@ def mc_compute_stationary(P):
     Computes stationary distributions of P, one for each recurrent
     class. Any stationary distribution is written as a convex
     combination of these distributions.
+
+    Parameters
+    ----------
+    P : array_like or scipy sparse matrix (float, ndim=2)
+        A Markov transition matrix, of shape n x n.
 
     Returns
     -------

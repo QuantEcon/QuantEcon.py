@@ -48,6 +48,7 @@ class GAMPayoffVector:
     flat 1-dim array.
 
     Payoff values are ordered as in the GameTracer .gam format:
+
     1. Player-major blocks: player 0, ..., player N-1.
     2. Within each block, action profiles are ordered with player 0
        varying fastest, then player 1, ..., player N-1 (i.e.,
@@ -98,6 +99,20 @@ class GAMPayoffVector:
         """
         Construct a GAMPayoffVector from a NormalFormGame `g`.
 
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance.
+
+        dtype : data-type, optional(default=None)
+            Data type of the payoff array. If None, default to the
+            `dtype` attribute of `g`.
+
+        Returns
+        -------
+        GAMPayoffVector
+            The GAMPayoffVector representation of `g`.
+
         Examples
         --------
         >>> player0 = Player([[0, 3], [1, 4], [2, 5]])
@@ -132,6 +147,17 @@ class GAMPayoffVector:
     def to_nfg(self, dtype=None):
         """
         Construct a NormalFormGame from self.
+
+        Parameters
+        ----------
+        dtype : data-type, optional(default=None)
+            Data type of the players' payoff arrays. If None, default to
+            the data type of the `payoffs` attribute.
+
+        Returns
+        -------
+        NormalFormGame
+            The NormalFormGame represented by self.
 
         Examples
         --------
@@ -194,6 +220,16 @@ class GAMReader:
         """
         Read from a .gam format file.
 
+        Parameters
+        ----------
+        file_path : str
+            Path to the .gam file.
+
+        Returns
+        -------
+        NormalFormGame
+            The game described by the .gam file.
+
         """
         with open(file_path, 'r') as f:
             string = f.read()
@@ -203,6 +239,16 @@ class GAMReader:
     def from_url(cls, url):
         """
         Read from a URL.
+
+        Parameters
+        ----------
+        url : str
+            String containing a URL of the .gam file.
+
+        Returns
+        -------
+        NormalFormGame
+            The game described by the .gam file.
 
         """
         import urllib.request
@@ -214,6 +260,16 @@ class GAMReader:
     def from_string(cls, string):
         """
         Read from a .gam format string.
+
+        Parameters
+        ----------
+        string : str
+            String in .gam format.
+
+        Returns
+        -------
+        NormalFormGame
+            The game described by the .gam string.
 
         """
         return cls._parse(string)
@@ -266,6 +322,14 @@ class GAMWriter:
         """
         Write `g` to a file in GameTracer .gam format.
 
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to write.
+
+        file_path : str
+            Path to the file to write to.
+
         """
         with open(file_path, 'w') as f:
             f.write(cls._dump(g) + '\n')
@@ -274,6 +338,16 @@ class GAMWriter:
     def to_string(cls, g):
         """
         Return the GameTracer .gam string representation of `g`.
+
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to convert.
+
+        Returns
+        -------
+        str
+            The .gam format string representation of `g`.
 
         """
         return cls._dump(g)
