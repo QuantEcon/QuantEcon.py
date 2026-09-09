@@ -4,7 +4,7 @@ Implements inequality and segregation measures such as Gini, Lorenz Curve
 """
 
 import numpy as np
-from numba import njit, prange
+from numba import njit
 
 
 @njit
@@ -54,7 +54,7 @@ def lorenz_curve(y):
     return cum_people, cum_income
 
 
-@njit(parallel=True)
+@njit
 def gini_coefficient(y):
     r"""
     Implements the Gini inequality index
@@ -76,11 +76,13 @@ def gini_coefficient(y):
     https://en.wikipedia.org/wiki/Gini_coefficient
     """
     n = len(y)
-    i_sum = np.zeros(n)
-    for i in prange(n):
-        for j in range(n):
-            i_sum[i] += abs(y[i] - y[j])
-    return np.sum(i_sum) / (2 * n * np.sum(y))
+    y_s = np.sort(y)
+    i_weighted = 0.0
+    total = 0.0
+    for i in range(n):
+        i_weighted += (i + 1) * y_s[i]
+        total += y_s[i]
+    return (2 * i_weighted) / (n * total) - (n + 1) / n
 
 
 def shorrocks_index(A):
@@ -152,4 +154,3 @@ def rank_size(data, c=1.0):
     rank_data = np.arange(len(w)) + 1
     size_data = w
     return rank_data, size_data
-

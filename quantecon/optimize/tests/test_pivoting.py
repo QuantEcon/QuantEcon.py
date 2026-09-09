@@ -3,9 +3,11 @@ Tests for pivoting.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_, assert_array_equal
 
-from quantecon.optimize.pivoting import _pivoting
+from quantecon.optimize.pivoting import (
+    _pivoting, _lex_min_ratio_test, _min_ratio_test_no_tie_breaking
+)
 
 
 def _pivoting_reference(tableau, pivot_col, pivot_row):
@@ -48,3 +50,65 @@ class TestPivoting:
         tableau = np.array([[p, p, 0.], [p, 2*p, p]])
         _pivoting(tableau, 0, 0)
         assert_array_equal(tableau, np.array([[1., 1., 0.], [0., p, p]]))
+
+
+class TestLexMinRatioTest:
+    def test_unresolved_tie_is_found(self):
+        # Two identical rows: the ratios tie in the rhs column and, with
+        # entries of order 1e14, also in all the slack columns within
+        # `tol_ratio_diff`. The pivot column has positive entries, so the
+        # row must be reported as found.
+        tableau = np.array([[1e14, 1., 0., 0.],
+                            [1e14, 0., 1., 0.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins,
+                                                   1e-7, 1e-13)
+        assert_(found)
+        assert_(row in (0, 1))
+        assert_(not resolved)
+
+    def test_unique_row_is_resolved(self):
+        tableau = np.array([[1., 1., 0., 2.],
+                            [1., 0., 1., 1.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(found)
+        assert_(row == 1)
+        assert_(resolved)
+
+    def test_tie_broken_lexicographically(self):
+        # Equal ratios in the rhs column; the slack columns break the tie
+        tableau = np.array([[1., 1., 0., 1.],
+                            [1., 0., 1., 1.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(found)
+        assert_(row == 1)
+        assert_(resolved)
+
+    def test_ties_measured_against_the_minimum(self):
+        # Ratios -3.00, -3.09, -2.91 with tolerance 0.1: the second is
+        # within the tolerance of the first, the third within the
+        # tolerance of the first but not of the minimum (the second), so
+        # the candidates must be the first two rows only
+        tableau = np.array([[1., 1., 0., 0., -3.00],
+                            [1., 0., 1., 0., -3.09],
+                            [1., 0., 0., 1., -2.91]])
+        argmins = np.arange(3)
+        num_argmins = _min_ratio_test_no_tie_breaking(
+            tableau, 0, -1, argmins, 3, 1e-7, 0.1
+        )
+        assert_(num_argmins == 2)
+        assert_(set(argmins[:2]) == {0, 1})
+        found, row, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins,
+                                                   1e-7, 0.1)
+        assert_(found and resolved)
+        assert_(row == 1)
+
+    def test_no_positive_entry_is_not_found(self):
+        tableau = np.array([[-1., 1., 0., 1.],
+                            [0., 0., 1., 1.]])
+        argmins = np.empty(2, dtype=np.int_)
+        found, _, resolved = _lex_min_ratio_test(tableau, 0, 1, argmins)
+        assert_(not found)
+        assert_(not resolved)

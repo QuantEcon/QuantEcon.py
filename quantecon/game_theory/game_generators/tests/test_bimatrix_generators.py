@@ -80,7 +80,7 @@ def test_sgc_game():
         0.500 0.000 0.500 0.000 0.500 0.000 0.000 0.000 0.000 0.000 0.000 0.750
         0.750 0.000"""
     bimatrix = np.fromstring(s, sep=' ')
-    bimatrix.shape = (4*k-1, 4*k-1, 2)
+    bimatrix = bimatrix.reshape(4*k-1, 4*k-1, 2)
     bimatrix = bimatrix.swapaxes(0, 1)
 
     g = sgc_game(k)
