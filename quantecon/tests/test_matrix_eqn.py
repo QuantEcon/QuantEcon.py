@@ -34,8 +34,7 @@ def test_solve_discrete_lyapunov_complex():
 
     X = qme.solve_discrete_lyapunov(A, B)
 
-    assert_allclose(np.dot(np.dot(A, X), A.conj().transpose()) - X, -B,
-                    atol=1e-15)
+    assert_allclose(A @ X @ A.conj().T - X, -B, atol=1e-15)
 
 
 def test_solve_discrete_riccati_system_beta_ge_one_failure_message():
