@@ -21,8 +21,7 @@ def capture(command, *args, **kwargs):
 
     References
     ----------
-    http://schinckel.net/2013/04/15/capture-and-test-sys.stdout-sys.
-    stderr-in-unittest.testcase/
+    https://schinckel.net/2013/04/15/capture-and-test-sys.stdout-sys.stderr-in-unittest.testcase/
 
     Examples
     --------

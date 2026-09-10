@@ -31,8 +31,8 @@ def hamilton_filter(data, h, p=None):
     Notes
     -----
     For seasonal data, it's desirable for p and h to be integer multiples of
-    the number of obsevations in a year. E.g. for quarterly data, h = 8 and p =
-    4 are recommended.
+    the number of observations in a year. E.g. for quarterly data, h = 8 and
+    p = 4 are recommended.
 
     """
     # transform data to array

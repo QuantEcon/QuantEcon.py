@@ -174,12 +174,12 @@ class RBLQ:
         -------
         F : array_like(float, ndim=2)
             The optimal control matrix from above
-        P : array_like(float, ndim=2)
-            The positive semi-definite matrix defining the value
-            function
         K : array_like(float, ndim=2)
             the worst-case shock matrix K, where
             :math:`w_{t+1} = K x_t` is the worst case shock
+        P : array_like(float, ndim=2)
+            The positive semi-definite matrix defining the value
+            function
 
         """
         # == Simplify names == #
@@ -233,17 +233,17 @@ class RBLQ:
         -------
         F : array_like(float, ndim=2)
             The optimal control matrix from above
-        P : array_like(float, ndim=2)
-            The positive semi-definite matrix defining the value
-            function
         K : array_like(float, ndim=2)
             the worst-case shock matrix K, where
             :math:`w_{t+1} = K x_t` is the worst case shock
+        P : array_like(float, ndim=2)
+            The positive semi-definite matrix defining the value
+            function
 
         """
         # == Simplify names == #
-        A, B, C, Q, R = self.A, self.B, self.C, self.Q, self.R
-        beta, theta = self.beta, self.theta
+        A, B, C = self.A, self.B, self.C
+        theta = self.theta
         # == Set up loop == #
         P = np.zeros((self.n, self.n)) if P_init is None else P_init
         iterate, e = 0, tol + 1
@@ -344,7 +344,7 @@ class RBLQ:
 
         Returns
         -------
-        e : scalar(int)
+        e : scalar(float)
             The deterministic entropy
 
         """
@@ -368,12 +368,12 @@ class RBLQ:
 
         Returns
         -------
+        K_F : array_like(float, ndim=2)
+            Worst case policy
         P_F : array_like(float, ndim=2)
             Matrix for discounted cost
         d_F : scalar(float)
             Constant for discounted cost
-        K_F : array_like(float, ndim=2)
-            Worst case policy
         O_F : array_like(float, ndim=2)
             Matrix for discounted entropy
         o_F : scalar(float)
@@ -381,7 +381,7 @@ class RBLQ:
 
         """
         # == Simplify names == #
-        Q, R, A, B, C = self.Q, self.R, self.A, self.B, self.C
+        A, B, C = self.A, self.B, self.C
         beta, theta = self.beta, self.theta
 
         # == Solve for policies and costs using agent 2's problem == #

@@ -42,9 +42,12 @@ def probvec(m, k, random_state=None, parallel=True):
 
     Examples
     --------
-    >>> qe.random.probvec(2, 3, random_state=1234)
-    array([[ 0.19151945,  0.43058932,  0.37789123],
-           [ 0.43772774,  0.34763084,  0.21464142]])
+    >>> import numpy as np
+    >>> import quantecon as qe
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.probvec(2, 3, random_state=rng)
+    array([[0.38019574, 0.59650403, 0.02330023],
+           [0.26169242, 0.66155381, 0.07675377]])
 
     """
     if k == 1:
@@ -68,7 +71,7 @@ def _probvec(r, out):  # pragma: no cover
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
-    To be complied as a ufunc by guvectorize of Numba. The inputs must
+    To be compiled as a ufunc by guvectorize of Numba. The inputs must
     have the same shape except the last axis; the length of the last
     axis of `r` must be that of `out` minus 1, i.e., if out.shape[-1] is
     k, then r.shape[-1] must be k-1.
@@ -129,14 +132,18 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     Examples
     --------
-    >>> qe.random.sample_without_replacement(5, 3, random_state=1234)
-    array([0, 2, 1])
+    >>> import numpy as np
+    >>> import quantecon as qe
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.sample_without_replacement(5, 3, random_state=rng)
+    array([4, 1, 2])
+    >>> rng = np.random.default_rng(1234)
     >>> qe.random.sample_without_replacement(5, 3, num_trials=4,
-    ...                                      random_state=1234)
-    array([[0, 2, 1],
-           [3, 4, 0],
-           [1, 3, 2],
-           [4, 1, 3]])
+    ...                                      random_state=rng)
+    array([[4, 1, 2],
+           [1, 4, 0],
+           [1, 4, 2],
+           [1, 4, 3]])
 
     """
     if n <= 0:
@@ -156,7 +163,7 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 @guvectorize(['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True)
 def _sample_without_replacement(n, r, out):
     """
-    Main body of `sample_without_replacement`. To be complied as a ufunc
+    Main body of `sample_without_replacement`. To be compiled as a ufunc
     by guvectorize of Numba.
 
     """

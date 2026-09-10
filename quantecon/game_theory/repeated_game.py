@@ -66,8 +66,9 @@ class RepeatedGame:
         
         Returns
         -------
-        ndarray(float, ndim=2)
-            Array containing the set of equilibrium payoff pairs.
+        hull : scipy.spatial.ConvexHull
+            The convex hull of the set of equilibrium payoff pairs. Its
+            extreme points are given by `hull.points[hull.vertices]`.
 
         Notes
         -----
@@ -275,11 +276,11 @@ def _R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
     action_profile_payoff : ndarray(float, ndim=1)
         Array of payoff for one action profile.
 
-    extended_payoff : ndarray(float, ndim=2)
+    extended_payoff : ndarray(float, ndim=1)
         The array [payoff0, payoff1, 1] for checking if
         [payoff0, payoff1] is in the feasible payoff convex hull.
 
-    new_pts : ndarray(float, ndim=1)
+    new_pts : ndarray(float, ndim=2)
         The 4 by 2 array for storing the generated potential
         extreme points of one action profile. One action profile
         can only generate at most 4 points.
@@ -288,7 +289,7 @@ def _R(delta, nums_actions, payoff_arrays, best_dev_gains, points,
         Array for storing the coordinates of the generated potential
         extreme points that construct a new feasible payoff convex hull.
 
-    tol: scalar(float), optional(default=1e-10)
+    tol : scalar(float), optional(default=1e-10)
         The tolerance for checking if two values are equal.
 
     Returns
@@ -469,7 +470,7 @@ def _update_u(u, W):
     u : ndarray(float, ndim=1)
         The threat points.
 
-    W : ndarray(float, ndim=1)
+    W : ndarray(float, ndim=2)
         The points that construct the feasible payoff convex hull.
 
     Returns
