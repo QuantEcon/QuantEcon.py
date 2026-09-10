@@ -4,7 +4,7 @@ from numpy.linalg import svd
 
 def rank_est(A, atol=1e-13, rtol=0):
     """
-    Estimate the rank (i.e. the dimension of the nullspace) of a matrix.
+    Estimate the rank (i.e. the dimension of the column space) of a matrix.
 
     The algorithm used by this function is based on the singular value
     decomposition of `A`.

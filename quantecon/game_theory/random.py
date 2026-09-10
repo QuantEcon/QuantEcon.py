@@ -191,8 +191,8 @@ def _random_mixed_actions(out, random_state):
 
     random_state : np.random.RandomState or np.random.Generator
 
-    Return
-    ------
+    Returns
+    -------
     out : tuple(ndarray(float, ndim=1))
 
     """

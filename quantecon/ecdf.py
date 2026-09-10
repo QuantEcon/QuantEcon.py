@@ -1,4 +1,5 @@
-# This file is not meant for public use and will be removed v0.8.0.
+# This file is not meant for public use and will be removed in a
+# future release.
 # Use the `quantecon` namespace for importing the objects
 # included below.
 

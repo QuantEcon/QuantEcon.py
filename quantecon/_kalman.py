@@ -104,7 +104,7 @@ class Kalman:
         r"""
         This function takes the linear state space system
         that is an input to the Kalman class and it converts
-        that system to the time-invariant whitener represenation
+        that system to the time-invariant whitener representation
         given by
 
         .. math::
@@ -289,7 +289,17 @@ class Kalman:
         coeff_type : string, either 'ma' or 'var' (default='ma')
             The type of coefficent sequence to compute.  Either 'ma' for
             moving average or 'var' for VAR.
-            
+
+        Returns
+        -------
+        coeffs : list(array_like(float, ndim=2))
+            List of the j + 1 coefficient matrices.  Each matrix is
+            k x k, where k is the dimension of the observation vector.
+            For `coeff_type='ma'` these are the moving average
+            coefficients at lags 0 through j, with coeffs[0] the
+            identity; for `coeff_type='var'` they are the VAR
+            coefficients at lags 1 through j + 1.
+
         """
         # == simplify notation == #
         A, G = self.ss.A, self.ss.G
@@ -314,6 +324,18 @@ class Kalman:
         return coeffs
 
     def stationary_innovation_covar(self):
+        r"""
+        Compute the covariance matrix of the innovations for the steady
+        state Kalman filter, given by :math:`G \Sigma_\infty G' + R`,
+        where :math:`R = H H'`.
+
+        Returns
+        -------
+        array_like(float, ndim=2)
+            The k x k innovation covariance matrix, where k is the
+            dimension of the observation vector.
+
+        """
         # == simplify notation == #
         H, G = self.ss.H, self.ss.G
         R = H @ H.T

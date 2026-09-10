@@ -50,7 +50,7 @@ class ARMA:
 
     Attributes
     ----------
-    phi, theta, sigma : see Parmeters
+    phi, theta, sigma : see Parameters
     ar_poly : array_like(float)
         The polynomial form that is needed by scipy.signal to do the
         processing we desire.  Corresponds with the phi values
@@ -155,6 +155,11 @@ class ARMA:
         """
         Get the impulse response corresponding to our model.
 
+        Parameters
+        ----------
+        impulse_length : scalar(int), optional(default=30)
+            Number of periods of the impulse response to compute
+
         Returns
         -------
         psi : array_like(float)
@@ -219,6 +224,13 @@ class ARMA:
         ----------
         num_autocov : scalar(int), optional(default=16)
             The number of autocovariances to calculate
+
+        Returns
+        -------
+        acov : array_like(float)
+            The autocovariance function, where acov[j] is the
+            autocovariance at lag j.  Its length is num_autocov, or
+            len(self.spectral_density()[1]) if that is smaller.
 
         """
         spect = self.spectral_density()[1]
