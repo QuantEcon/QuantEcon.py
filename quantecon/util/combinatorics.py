@@ -114,7 +114,9 @@ def k_array_rank_jit(a):
     responsibility to ensure that the rank of the input array fits
     within the range of possible values of `np.intp`; a sufficient
     condition for it is `scipy.special.comb(a[-1]+1, len(a), exact=True)
-    <= np.iinfo(np.intp).max`.
+    <= np.iinfo(np.intp).max`. The bound ``np.iinfo(np.intp).max`` is
+    platform-dependent: 2³¹−1 on wasm32 (JupyterLite/xeus-python) and
+    2⁶³−1 on 64-bit platforms.
 
     """
     k = len(a)

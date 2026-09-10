@@ -94,6 +94,13 @@ def comb_jit(N, k):
     -------
     val : scalar(int)
 
+    Notes
+    -----
+    The overflow boundary ``np.iinfo(np.intp).max`` is platform-dependent:
+    2³¹−1 on wasm32 (JupyterLite/xeus-python) and 2⁶³−1 on 64-bit
+    platforms. The result is an array size or rank, so ``np.intp`` is the
+    correct width on every platform.
+
     """
     # From scipy.special._comb_int_long
     # github.com/scipy/scipy/blob/v1.0.0/scipy/special/_comb.pyx
