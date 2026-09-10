@@ -178,30 +178,17 @@ def test_markovchain_pmatrices():
 # Basic Class Structure with Setup #
 ####################################
 
-class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
+class _Test_markovchain_stationary_distributions_Base():
     """
-    Test Suite for MarkovChain.stationary_distributions using KMR Markov
-    Matrix [suitable for nose]
+    Shared test suite for MarkovChain.stationary_distributions. Concrete
+    subclasses provide `setup_method`, which must set `self.mc`,
+    `self.stationary` (`self.mc.stationary_distributions`) and
+    `self.n_stat_dists` (the number of stationary distributions), so that
+    both the single- and multiple-stationary-distribution cases are
+    exercised by `test_left_eigen_vec`.
     """
 
-    # Starting Values #
-
-    N = 27
-    epsilon = 1e-2
-    p = 1/3
     TOL = 1e-2
-
-    def setup_method(self):
-        """ Setup a KMRMarkovMatrix and Compute Stationary Values """
-        self.P = KMR_Markov_matrix_sequential(self.N, self.p, self.epsilon)
-        self.mc = MarkovChain(self.P)
-        self.stationary = self.mc.stationary_distributions
-        stat_shape = self.stationary.shape
-
-        if len(stat_shape) == 1:
-            self.n_stat_dists = 1
-        else:
-            self.n_stat_dists = stat_shape[0]
 
     def test_markov_matrix(self):
         "Check that each row of matrix sums to 1"
@@ -231,6 +218,60 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
             for i in range(self.n_stat_dists):
                 curr_v = stationary_distributions[i, :]
                 assert_allclose(curr_v @ mc.P, curr_v, atol=self.TOL)
+
+
+class Test_markovchain_stationary_distributions_KMRMarkovMatrix2(
+        _Test_markovchain_stationary_distributions_Base):
+    """
+    Test Suite for MarkovChain.stationary_distributions using KMR Markov
+    Matrix [suitable for nose]
+
+    The KMR matrix is irreducible, so this suite only ever exercises the
+    single-stationary-distribution case (`n_stat_dists == 1`); see
+    Test_markovchain_stationary_distributions_ReducibleMarkovMatrix below
+    for the multiple-stationary-distribution case.
+    """
+
+    # Starting Values #
+
+    N = 27
+    epsilon = 1e-2
+    p = 1/3
+
+    def setup_method(self):
+        """ Setup a KMRMarkovMatrix and Compute Stationary Values """
+        self.P = KMR_Markov_matrix_sequential(self.N, self.p, self.epsilon)
+        self.mc = MarkovChain(self.P)
+        self.stationary = self.mc.stationary_distributions
+        # stationary_distributions is always 2-dimensional, of shape
+        # (n_stat_dists, mc.n)
+        self.n_stat_dists = self.stationary.shape[0]
+
+
+class Test_markovchain_stationary_distributions_ReducibleMarkovMatrix(
+        _Test_markovchain_stationary_distributions_Base):
+    """
+    Test Suite for MarkovChain.stationary_distributions using a reducible
+    matrix with two recurrent classes (two absorbing states, reached from
+    two transient states), so that `n_stat_dists > 1` and the
+    multiple-stationary-distribution branch of test_left_eigen_vec is
+    exercised.
+    """
+
+    # States 0 and 1 are absorbing (each its own recurrent class); states 2
+    # and 3 are transient.
+    P = np.array([[1.0, 0.0, 0.0, 0.0],
+                  [0.0, 1.0, 0.0, 0.0],
+                  [0.3, 0.3, 0.4, 0.0],
+                  [0.0, 0.2, 0.0, 0.8]])
+
+    def setup_method(self):
+        """ Setup the reducible MarkovChain and Compute Stationary Values """
+        self.mc = MarkovChain(self.P)
+        self.stationary = self.mc.stationary_distributions
+        # stationary_distributions is always 2-dimensional, of shape
+        # (n_stat_dists, mc.n)
+        self.n_stat_dists = self.stationary.shape[0]
 
 
 def test_simulate_shape():
