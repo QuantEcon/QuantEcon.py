@@ -105,7 +105,7 @@ _PROBVEC_SIGNATURE = ['(f8[:], f8[:])']
 _PROBVEC_LAYOUT = '(n), (k)'
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _probvec_parallel():
     """
     Return the parallel-target gufunc of `_probvec`, compiling it on
@@ -118,7 +118,7 @@ def _probvec_parallel():
         )(_probvec)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _probvec_cpu():
     """
     Return the cpu-target gufunc of `_probvec`, compiling it on first
