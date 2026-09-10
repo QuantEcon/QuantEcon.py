@@ -243,7 +243,7 @@ class DLE(object):
 
         # === Value of asset whose payout vector is Pay*xt === #
         # See p.145: Equation (7.11.1)
-        if isinstance(Pay, np.ndarray) == True:
+        if isinstance(Pay, np.ndarray):
             self.Za = Pay.T @ self.Mc
             self.Q = solve_discrete_lyapunov(
                 self.A0.T * self.beta**0.5, self.Za)
@@ -277,7 +277,7 @@ class DLE(object):
 
         """
 
-        if type(shock) != np.ndarray:
+        if not isinstance(shock, np.ndarray):
             # Default is to select first element of w
             shock = np.vstack((np.ones((1, 1)), np.zeros((self.nw - 1, 1))))
 
