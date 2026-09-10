@@ -247,7 +247,7 @@ class Timer:
         self._start_time = time.time()
         return self
         
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, *exc_info):
         end_time = time.time()
         self.elapsed = end_time - self._start_time
         

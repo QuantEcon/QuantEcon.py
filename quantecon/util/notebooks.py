@@ -86,7 +86,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     import requests
 
     #-Generate Common Data Structure-#
-    if type(files) == list:
+    if isinstance(files, list):
         files = {"" : files}
 
     status = []

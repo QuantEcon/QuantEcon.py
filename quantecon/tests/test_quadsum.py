@@ -53,11 +53,3 @@ def test_m_matsum():
         summedval = summedval + a**i * b * a.T**i
 
     assert_allclose(retval, summedval, atol=1e-5, rtol=0)
-
-
-
-if __name__ == '__main__':
-    test_simplesum()
-    test_identitysum()
-    test_m_simplesum()
-    test_m_identitysum
