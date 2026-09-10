@@ -134,7 +134,7 @@ class TestDiGraph:
         for graph_dict in self.graphs.graph_dicts:
             try:
                 weighted = graph_dict['weighted']
-            except:
+            except KeyError:
                 weighted = False
             graph_dict['g'] = DiGraph(graph_dict['A'], weighted=weighted)
 

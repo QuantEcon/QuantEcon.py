@@ -7,10 +7,10 @@ __version__ = '0.11.4'
 
 try:
     import numba
-except:
+except ImportError as e:
     raise ImportError(
-        "Cannot import numba from current anaconda distribution. \
-            Please run `conda install numba` to install the latest version.")
+        "Cannot import numba, which QuantEcon.py requires. Install it with "
+        "`pip install numba` or `conda install numba`.") from e
 
 #-Modules-#
 from . import distributions
