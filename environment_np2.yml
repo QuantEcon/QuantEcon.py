@@ -1,5 +1,6 @@
 name: qe
 channels:
+  - conda-forge/label/python_rc
   - conda-forge
   - defaults
   - numba
