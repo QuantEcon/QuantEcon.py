@@ -140,7 +140,7 @@ jobs:
       working-directory: docs
       run: sphinx-build -b html source build/html
     - name: Upload built docs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: docs-html
         path: docs/build/html
