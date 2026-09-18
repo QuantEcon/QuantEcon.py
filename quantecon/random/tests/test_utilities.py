@@ -125,6 +125,17 @@ class TestDraw:
             out = func(self.cdf, size)
             assert_(out.shape == (size,))
 
+    def test_numpy_integer_size(self):
+        """
+        A numpy integer `size` must request an array, as a Python `int`
+        does and as the jitted path already did. See #918.
+
+        """
+        size = np.int64(10)
+        for func in self.draw_funcs:
+            out = func(self.cdf, size)
+            assert_(out.shape == (size,))
+
     def test_return_values(self):
         for func in self.draw_funcs:
             out = func(self.cdf)
