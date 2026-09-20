@@ -13,7 +13,9 @@ from numpy.testing import (
 from quantecon.game_theory import (
     Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url
 )
-from quantecon.game_theory.game_converters import GAMPayoffVector
+from quantecon.game_theory.game_converters import (
+    GAMPayoffVector, _str2num
+)
 
 
 # GAMPayoffVector #
@@ -191,6 +193,21 @@ def test_gam_writer_many_actions():
 
 
 # GAMReader/from_gam #
+
+def test_str2num():
+    for s, x in [('3', 3), ('-3', -3), ('+3', 3)]:
+        assert_(_str2num(s) == x)
+        assert_(isinstance(_str2num(s), int))
+
+    for s, x in [('0.5', 0.5), ('.5', 0.5), ('1e3', 1000.), ('1E-2', 0.01),
+                 ('1/3', 1/3), ('-1/3', -1/3), ('+1/3', 1/3), ('6/4', 1.5),
+                 ('2/1', 2.)]:
+        assert_(_str2num(s) == x)
+        assert_(isinstance(_str2num(s), float))
+
+    for s in ['1/0', '1/2/3', '0.5/2', '/3', '1/', 'abc', '']:
+        assert_raises(ValueError, _str2num, s)
+
 
 def test_from_gam_string():
     s = """\

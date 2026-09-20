@@ -38,6 +38,7 @@ References
 import io
 import sys
 import numbers
+from fractions import Fraction
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
 
@@ -197,18 +198,26 @@ def _str2num(s):
     Parameters
     ----------
     s : str
-        String representation of a number.
+        String representation of a number: an integer, a decimal with
+        an optional exponent, or a rational `n/d`.
 
     Returns
     -------
     int or float
-        Integer if `s` represents an integer, otherwise float.
+        Integer if `s` represents an integer, otherwise float. A
+        rational is converted to the nearest float.
 
     """
     try:
         return int(s)
     except ValueError:
-        return float(s)
+        pass
+    if '/' in s:
+        try:
+            return float(Fraction(s))
+        except ZeroDivisionError as err:
+            raise ValueError(f'zero denominator: {s!r}') from err
+    return float(s)
 
 
 class GAMReader:
