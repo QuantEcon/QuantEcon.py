@@ -40,7 +40,7 @@ For example, if the entries of :math:`P` are all strictly positive, then
 the whole state space is a communication class as well as a recurrent
 class. (More generally, if there is only one communication class, then
 it is a recurrent class.) As another example, consider the stochastic
-matrix :math:`P = [[1, 0], [0,5, 0.5]]`. This has two communication
+matrix :math:`P = [[1, 0], [0.5, 0.5]]`. This has two communication
 classes, :math:`\{0\}` and :math:`\{1\}`, and :math:`\{0\}` is the only
 recurrent class.
 
@@ -234,6 +234,26 @@ class MarkovChain:
 
     @property
     def state_values(self):
+        """
+        Values associated with the states, or ``None`` if not set.
+
+        An ndarray of length `n` whose ``i``-th entry is the value
+        attached to state ``i``. When it is ``None``, the states are
+        represented by their indices ``0, ..., n-1``. Assigning an
+        array_like of length `n` (or ``None``) sets (or unsets) the
+        state values.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> mc = qe.MarkovChain([[0.9, 0.1], [0.4, 0.6]])
+        >>> mc.state_values is None
+        True
+        >>> mc.state_values = ['boom', 'bust']
+        >>> mc.state_values
+        array(['boom', 'bust'], dtype='<U4')
+
+        """
         return self._state_values
 
     @state_values.setter
@@ -335,40 +355,185 @@ class MarkovChain:
 
     @property
     def digraph(self):
+        r"""
+        Directed graph :math:`\Gamma(P)` associated with the chain.
+
+        A `DiGraph` instance with one node per state and an edge from
+        ``i`` to ``j`` if and only if ``P[i, j] > 0``; the nodes are
+        labeled with `state_values`. It is constructed on first access
+        and cached. The class structure of the chain (communication,
+        recurrent, and cyclic classes, and the period) is computed from
+        this graph.
+
+        """
         if self._digraph is None:
             self._digraph = DiGraph(self.P, node_labels=self.state_values)
         return self._digraph
 
     @property
     def is_irreducible(self):
+        """
+        ``True`` if the Markov chain is irreducible, ``False`` otherwise.
+
+        The chain is irreducible if all states communicate with each
+        other, that is, if it has exactly one communication class;
+        equivalently, if `digraph` is strongly connected.
+
+        See Also
+        --------
+        num_communication_classes, communication_classes
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> qe.MarkovChain([[0.9, 0.1], [0.4, 0.6]]).is_irreducible
+        True
+        >>> qe.MarkovChain([[1, 0], [0.5, 0.5]]).is_irreducible
+        False
+
+        """
         return self.digraph.is_strongly_connected
 
     @property
     def num_communication_classes(self):
+        """
+        Number of communication classes of the Markov chain (int).
+
+        See Also
+        --------
+        communication_classes, communication_classes_indices
+
+        """
         return self.digraph.num_strongly_connected_components
 
     @property
     def communication_classes_indices(self):
+        """
+        Communication classes, as a list of arrays of state indices.
+
+        A list of 1-dimensional integer ndarrays, one for each
+        communication class (strongly connected component of
+        `digraph`). The arrays partition ``0, ..., n-1``.
+
+        See Also
+        --------
+        communication_classes : The same classes in terms of state
+            values.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> mc = qe.MarkovChain([[1, 0], [0.5, 0.5]])
+        >>> sorted(c.tolist() for c in mc.communication_classes_indices)
+        [[0], [1]]
+
+        """
         return self.digraph.strongly_connected_components_indices
 
     @property
     def communication_classes(self):
+        """
+        Communication classes, as a list of arrays of state values.
+
+        Same as `communication_classes_indices`, except that the
+        states are annotated with their values if `state_values` is not
+        ``None``.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> mc = qe.MarkovChain([[1, 0], [0.5, 0.5]],
+        ...                     state_values=['a', 'b'])
+        >>> sorted(c.tolist() for c in mc.communication_classes)
+        [['a'], ['b']]
+
+        """
         return self.digraph.strongly_connected_components
 
     @property
     def num_recurrent_classes(self):
+        """
+        Number of recurrent classes of the Markov chain (int).
+
+        It is always at least one, and it equals the number of rows of
+        `stationary_distributions`.
+
+        See Also
+        --------
+        recurrent_classes, recurrent_classes_indices
+
+        """
         return self.digraph.num_sink_strongly_connected_components
 
     @property
     def recurrent_classes_indices(self):
+        """
+        Recurrent classes, as a list of arrays of state indices.
+
+        A list of 1-dimensional integer ndarrays, one for each
+        recurrent (i.e., closed communication) class. States that
+        belong to no recurrent class are transient.
+
+        See Also
+        --------
+        recurrent_classes : The same classes in terms of state values.
+
+        Examples
+        --------
+        States 0 and 2 are absorbing and state 1 is transient:
+
+        >>> import quantecon as qe
+        >>> P = [[1, 0, 0], [0.2, 0.5, 0.3], [0, 0, 1]]
+        >>> mc = qe.MarkovChain(P)
+        >>> mc.num_recurrent_classes
+        2
+        >>> sorted(c.tolist() for c in mc.recurrent_classes_indices)
+        [[0], [2]]
+
+        """
         return self.digraph.sink_strongly_connected_components_indices
 
     @property
     def recurrent_classes(self):
+        """
+        Recurrent classes, as a list of arrays of state values.
+
+        Same as `recurrent_classes_indices`, except that the states are
+        annotated with their values if `state_values` is not ``None``.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> P = [[1, 0, 0], [0.2, 0.5, 0.3], [0, 0, 1]]
+        >>> mc = qe.MarkovChain(P, state_values=['low', 'mid', 'high'])
+        >>> sorted(c.tolist() for c in mc.recurrent_classes)
+        [['high'], ['low']]
+
+        """
         return self.digraph.sink_strongly_connected_components
 
     @property
     def is_aperiodic(self):
+        """
+        ``True`` if the Markov chain is aperiodic, ``False`` otherwise.
+
+        The chain is aperiodic if its `period` is one. For a reducible
+        chain this means that every recurrent class is aperiodic;
+        transient states play no role.
+
+        See Also
+        --------
+        period
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> qe.MarkovChain([[0, 1], [1, 0]]).is_aperiodic
+        False
+        >>> qe.MarkovChain([[0.5, 0.5], [1, 0]]).is_aperiodic
+        True
+
+        """
         if self.is_irreducible:
             return self.digraph.is_aperiodic
         else:
@@ -376,6 +541,38 @@ class MarkovChain:
 
     @property
     def period(self):
+        """
+        Period of the Markov chain (int).
+
+        For an irreducible chain, the period is the greatest common
+        divisor of the lengths of the cycles in `digraph`. For a
+        reducible chain, it is defined as the least common multiple of
+        the periods of the recurrent classes.
+
+        See Also
+        --------
+        is_aperiodic, cyclic_classes
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> P = [[0, 1, 0], [0.5, 0, 0.5], [0, 1, 0]]
+        >>> qe.MarkovChain(P).period
+        2
+
+        A reducible chain whose two recurrent classes have periods 2
+        and 3 (state 5 is transient):
+
+        >>> P = [[0, 1, 0, 0, 0, 0],
+        ...      [1, 0, 0, 0, 0, 0],
+        ...      [0, 0, 0, 1, 0, 0],
+        ...      [0, 0, 0, 0, 1, 0],
+        ...      [0, 0, 1, 0, 0, 0],
+        ...      [0.5, 0, 0.5, 0, 0, 0]]
+        >>> qe.MarkovChain(P).period
+        6
+
+        """
         if self.is_irreducible:
             return self.digraph.period
         else:
@@ -389,6 +586,27 @@ class MarkovChain:
 
     @property
     def cyclic_classes(self):
+        """
+        Cyclic classes, as a list of arrays of state values.
+
+        Same as `cyclic_classes_indices`, except that the states are
+        annotated with their values if `state_values` is not ``None``.
+        Defined only when the Markov chain is irreducible.
+
+        Raises
+        ------
+        NotImplementedError
+            If the Markov chain is reducible.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> P = [[0, 1, 0], [0.5, 0, 0.5], [0, 1, 0]]
+        >>> mc = qe.MarkovChain(P, state_values=['a', 'b', 'c'])
+        >>> sorted(c.tolist() for c in mc.cyclic_classes)
+        [['a', 'c'], ['b']]
+
+        """
         if not self.is_irreducible:
             raise NotImplementedError(
                 'Not defined for a reducible Markov chain'
@@ -398,6 +616,32 @@ class MarkovChain:
 
     @property
     def cyclic_classes_indices(self):
+        """
+        Cyclic classes, as a list of arrays of state indices.
+
+        A list of `period` 1-dimensional integer ndarrays that
+        partition the state space: from a state in one cyclic class the
+        chain moves with probability one to the next cyclic class.
+        Defined only when the Markov chain is irreducible.
+
+        Raises
+        ------
+        NotImplementedError
+            If the Markov chain is reducible.
+
+        See Also
+        --------
+        cyclic_classes : The same classes in terms of state values.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> P = [[0, 1, 0], [0.5, 0, 0.5], [0, 1, 0]]
+        >>> mc = qe.MarkovChain(P)
+        >>> sorted(c.tolist() for c in mc.cyclic_classes_indices)
+        [[0, 2], [1]]
+
+        """
         if not self.is_irreducible:
             raise NotImplementedError(
                 'Not defined for a reducible Markov chain'
@@ -431,12 +675,56 @@ class MarkovChain:
 
     @property
     def stationary_distributions(self):
+        """
+        Stationary distributions, one for each recurrent class, as rows.
+
+        An ndarray of shape ``(num_recurrent_classes, n)``. Row ``i``
+        is the unique stationary distribution whose support is the
+        ``i``-th recurrent class (in the order of
+        `recurrent_classes_indices`), computed by the GTH algorithm
+        (`gth_solve`). Every stationary distribution of the chain is a
+        convex combination of these rows. The array is computed on
+        first access and cached; a sparse `P` is converted to a dense
+        matrix internally.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> mc = qe.MarkovChain([[0.9, 0.1], [0.4, 0.6]])
+        >>> mc.stationary_distributions
+        array([[0.8, 0.2]])
+
+        With two recurrent classes there are two rows:
+
+        >>> P = [[1, 0, 0], [0.2, 0.5, 0.3], [0, 0, 1]]
+        >>> qe.MarkovChain(P).stationary_distributions
+        array([[1., 0., 0.],
+               [0., 0., 1.]])
+
+        """
         if self._stationary_dists is None:
             self._compute_stationary()
         return self._stationary_dists
 
     @property
     def cdfs(self):
+        """
+        Row-wise cumulative sums of `P`, used in simulation (dense case).
+
+        An ndarray of shape ``(n, n)`` with ``cdfs[i, j] = P[i, 0] +
+        ... + P[i, j]``, computed on first access and cached. It is
+        ``None`` if `P` is sparse; see `cdfs1d` for that case.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> P = [[0, 1, 0], [0.5, 0, 0.5], [0, 1, 0]]
+        >>> qe.MarkovChain(P).cdfs
+        array([[0. , 1. , 1. ],
+               [0.5, 0.5, 1. ],
+               [0. , 1. , 1. ]])
+
+        """
         if (self._cdfs is None) and not self.is_sparse:
             # See issue #137#issuecomment-96128186
             cdfs = np.empty((self.n, self.n), order='C', dtype=self.P.dtype)
@@ -446,6 +734,25 @@ class MarkovChain:
 
     @property
     def cdfs1d(self):
+        """
+        Row-wise cumulative sums of the nonzeros of `P` (sparse case).
+
+        Used in simulation. A 1-dimensional ndarray of length ``P.nnz``
+        aligned with ``P.data``: for each row ``i``, the entries in
+        positions ``P.indptr[i]:P.indptr[i+1]`` are the cumulative sums
+        of the nonzero transition probabilities out of state ``i``.
+        Computed on first access and cached. It is ``None`` if `P` is
+        dense; see `cdfs` for that case.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> from scipy import sparse
+        >>> P = sparse.csr_matrix([[0, 1, 0], [0.5, 0, 0.5], [0, 1, 0]])
+        >>> qe.MarkovChain(P).cdfs1d
+        array([1. , 0.5, 1. , 1. ])
+
+        """
         if (self._cdfs1d is None) and self.is_sparse:
             data = self.P.data
             indptr = self.P.indptr
