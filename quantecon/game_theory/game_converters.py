@@ -372,14 +372,19 @@ class GAMWriter:
         buf.write(' '.join(map(str, p.nums_actions)))
         buf.write('\n\n')
 
-        if np.issubdtype(p.payoffs.dtype, np.floating):
+        payoffs = p.payoffs
+        if payoffs.dtype == np.bool_:
+            # Written as 0 and 1, not True and False
+            payoffs = payoffs.astype(int)
+
+        if np.issubdtype(payoffs.dtype, np.floating):
             # Shortest representation that round-trips, without exponent
             def fmt(x):
                 return np.format_float_positional(x, trim='.')
         else:
             fmt = str
 
-        buf.write(' '.join(map(fmt, p.payoffs)))
+        buf.write(' '.join(map(fmt, payoffs)))
 
         return buf.getvalue().rstrip()
 

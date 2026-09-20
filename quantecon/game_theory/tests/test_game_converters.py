@@ -214,6 +214,21 @@ def test_gam_writer_float_precision():
         )
 
 
+def test_gam_writer_bool():
+    A = np.array([[True, False], [False, True]])
+    g = NormalFormGame((Player(A), Player(A)))
+
+    s = to_gam(g)
+    assert_string_equal(s, """\
+2
+2 2
+
+1 0 0 1 1 0 0 1""")
+
+    g2 = from_gam_string(s)
+    assert_array_equal(g2.payoff_profile_array, g.payoff_profile_array)
+
+
 # GAMReader/from_gam #
 
 def test_str2num():
