@@ -36,7 +36,6 @@ References
 
 """
 import io
-import sys
 import numbers
 from fractions import Fraction
 import numpy as np
@@ -373,16 +372,14 @@ class GAMWriter:
         buf.write(' '.join(map(str, p.nums_actions)))
         buf.write('\n\n')
 
-        payoffs_str = np.array2string(
-            p.payoffs,
-            separator=' ',
-            threshold=sys.maxsize,  # no truncation '...'
-            # suppress_small helps avoid scientific notation for small |x|;
-            # large |x| values may still print with e+...
-            suppress_small=True
-        )[1:-1]  # strip brackets
+        if np.issubdtype(p.payoffs.dtype, np.floating):
+            # Shortest representation that round-trips, without exponent
+            def fmt(x):
+                return np.format_float_positional(x, trim='.')
+        else:
+            fmt = str
 
-        buf.write(' '.join(payoffs_str.split()))
+        buf.write(' '.join(map(fmt, p.payoffs)))
 
         return buf.getvalue().rstrip()
 

@@ -192,6 +192,28 @@ def test_gam_writer_many_actions():
     assert_(len(payoff_tokens) == expected)
 
 
+def test_gam_writer_float_precision():
+    # Values that need more than 8 significant digits, and large and
+    # small values
+    payoffs = [1/3, np.pi, 0.1 + 0.2, 1e10, 1e-7, -2.5e22, 123456.789, 1.]
+    for dtype in [np.float64, np.float32]:
+        a = np.array(payoffs, dtype=dtype).reshape(2, 2, 2)
+        g = NormalFormGame(a)
+
+        s = to_gam(g)
+        payoff_tokens = s.split()[3:]
+
+        # Written without exponent
+        for tok in payoff_tokens:
+            assert_('e' not in tok.lower())
+
+        # Read back without loss
+        g2 = from_gam_string(s)
+        assert_array_equal(
+            g2.payoff_profile_array.astype(dtype), g.payoff_profile_array
+        )
+
+
 # GAMReader/from_gam #
 
 def test_str2num():
