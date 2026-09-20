@@ -210,6 +210,39 @@ def test_from_gam_string():
     assert_array_equal(g.payoff_profile_array, expected.payoff_profile_array)
 
 
+def test_from_gam_string_number_formats():
+    # Exponent with and without decimal point, signs
+    s = """\
+2
+2 2
+
+1e3 1E3 1.0e3 +1.5e+2 -2.5E-1 +3 -4 .5"""
+
+    g = from_gam_string(s)
+    payoffs = [1000., 1000., 1000., 150., -0.25, 3., -4., 0.5]
+
+    assert_(g.dtype == np.float64)
+    assert_array_equal(
+        GAMPayoffVector.from_nfg(g).payoffs, payoffs
+    )
+
+    # Integers only, with signs
+    s = """\
+2
+2 2
+
+1 +2 -3 4 5 6 7 8"""
+
+    g = from_gam_string(s)
+
+    assert_(np.issubdtype(g.dtype, np.integer))
+    assert_array_equal(
+        GAMPayoffVector.from_nfg(g).payoffs, [1, 2, -3, 4, 5, 6, 7, 8]
+    )
+
+    assert_raises(ValueError, from_gam_string, "2\n2 2\n\n1 2 3 4 5 6 7 x")
+
+
 class _FakeResponse(io.BytesIO):
     def __enter__(self): return self
     def __exit__(self, exc_type, exc, tb): self.close()

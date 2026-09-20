@@ -193,21 +193,22 @@ class GAMPayoffVector:
 def _str2num(s):
     """
     Convert string to appropriate numeric type.
-    
+
     Parameters
     ----------
     s : str
         String representation of a number.
-    
+
     Returns
     -------
     int or float
-        Integer if no decimal point, otherwise float.
+        Integer if `s` represents an integer, otherwise float.
 
     """
-    if '.' in s:
+    try:
+        return int(s)
+    except ValueError:
         return float(s)
-    return int(s)
 
 
 class GAMReader:
