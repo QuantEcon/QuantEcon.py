@@ -207,11 +207,48 @@ def test_gam_writer_float_precision():
         for tok in payoff_tokens:
             assert_('e' not in tok.lower())
 
-        # Read back without loss
+        # Read back, the original values are recovered when cast to the
+        # source dtype
         g2 = from_gam_string(s)
         assert_array_equal(
             g2.payoff_profile_array.astype(dtype), g.payoff_profile_array
         )
+
+
+def test_gam_writer_float_boundary_values():
+    for dtype in [np.float64, np.float32]:
+        info = np.finfo(dtype)
+        payoffs = np.array([
+            0.0,
+            -0.0,
+            np.nextafter(dtype(0), dtype(1)),  # smallest subnormal
+            info.tiny,
+            info.max,
+            -info.max,
+            np.nextafter(dtype(1), dtype(2)),
+            1.0,
+        ], dtype=dtype).reshape(2, 2, 2)
+        g = NormalFormGame(payoffs)
+
+        g2 = from_gam_string(to_gam(g))
+        restored = g2.payoff_profile_array.astype(dtype)
+
+        assert_array_equal(restored, g.payoff_profile_array)
+        assert_array_equal(
+            np.signbit(restored), np.signbit(g.payoff_profile_array)
+        )
+
+
+def test_gam_writer_print_options():
+    # The output does not depend on the print options of NumPy
+    payoffs = np.array([1/3, np.pi, 1e10, 1e-7, 2., 3., 4., 5.])
+    g = NormalFormGame(payoffs.reshape(2, 2, 2))
+    s_desired = to_gam(g)
+
+    with np.printoptions(
+        precision=2, formatter={'float_kind': lambda x: 'BAD'}
+    ):
+        assert_string_equal(to_gam(g), s_desired)
 
 
 def test_gam_writer_bool():
