@@ -273,7 +273,9 @@ def test_str2num():
         assert_(_str2num(s) == x)
         assert_(isinstance(_str2num(s), int))
 
-    for s, x in [('0.5', 0.5), ('.5', 0.5), ('1e3', 1000.), ('1E-2', 0.01),
+    # Float even if the value is an integer, unless written as an integer
+    for s, x in [('0.5', 0.5), ('.5', 0.5), ('3.', 3.), ('1e3', 1000.),
+                 ('1E-2', 0.01),
                  ('1/3', 1/3), ('-1/3', -1/3), ('+1/3', 1/3), ('6/4', 1.5),
                  ('2/1', 2.)]:
         assert_(_str2num(s) == x)

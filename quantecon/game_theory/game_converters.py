@@ -203,8 +203,9 @@ def _str2num(s):
     Returns
     -------
     int or float
-        Integer if `s` represents an integer, otherwise float. A
-        rational is converted to the nearest float.
+        Integer if `s` is written as an integer (digits with an optional
+        sign), otherwise float. A rational is converted to the nearest
+        float.
 
     """
     try:
