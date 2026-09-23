@@ -108,6 +108,13 @@ reference example):
   the release until a campaign is finished — release as soon as the milestone's library fixes have
   landed, and treat the milestone as the release checklist.
 
+
+When cutting a release, update ``CITATION.cff`` so the top-level
+``version`` and ``date-released`` fields match the tag being published.
+Citation exporters use those fields for the software snapshot; the
+``preferred-citation`` block remains the JOSS article and should not be
+edited as part of a routine release.
+
 Further questions
 -----------------
 
