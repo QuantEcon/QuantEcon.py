@@ -8,6 +8,7 @@ Utilities
 Utilities to Support Generation of Random Arrays or Matrices
 1. probvec
 2. sample_without_replacement
+3. draw
 
 .. Future Work
    -----------

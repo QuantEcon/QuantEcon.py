@@ -6,7 +6,6 @@ Utilities
 
    util/array
    util/combinatorics
-   util/common_messages
    util/compat
    util/indexing
    util/notebooks

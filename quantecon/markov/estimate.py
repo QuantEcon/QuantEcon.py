@@ -65,16 +65,29 @@ def fit_discrete_mc(X, grids, order='C'):
     Parameters
     ----------
 
-    X: array_like(ndim=2)
+    X : array_like(ndim=2)
         Time-series such that the t-th row is :math:`x_t`.
         It should be of the shape T x n, where n is the number of dimensions.
 
-    grids: array_like(array_like(ndim=1))
+    grids : array_like(array_like(ndim=1))
         Array of `n` sorted arrays. Set of grid points in each dimension
+
+    order : str, optional(default='C')
+        ('C' or 'F') order in which the states in the cartesian grid are
+        enumerated.
+
+    Returns
+    -------
+
+    mc : MarkovChain
+        An instance of the MarkovChain class constructed after discretization
+        onto the grid.
 
     Examples
     --------
 
+    >>> import numpy as np
+    >>> from quantecon.markov import fit_discrete_mc
     >>> grids = (np.arange(3), np.arange(2))
     >>> X = [(-0.1, 1.2), (2, 0), (0.6, 0.4), (1.0, 0.1)]
     >>> mc = fit_discrete_mc(X, grids)
@@ -86,13 +99,6 @@ def fit_discrete_mc(X, grids, order='C'):
     array([[0., 0., 1.],
            [0., 1., 0.],
            [0., 1., 0.]])
-
-    Returns
-    -------
-
-    mc: MarkovChain
-        An instance of the MarkovChain class constructed after discretization
-        onto the grid.
     """
     X_indices = cartesian_nearest_index(X, grids, order=order)
     mc = estimate_mc(X_indices)

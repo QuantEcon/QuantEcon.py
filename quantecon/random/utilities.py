@@ -3,6 +3,9 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 
 """
 
+import functools
+import numbers
+
 import numpy as np
 from numba import guvectorize, types
 from numba import TypingError
@@ -42,9 +45,12 @@ def probvec(m, k, random_state=None, parallel=True):
 
     Examples
     --------
-    >>> qe.random.probvec(2, 3, random_state=1234)
-    array([[ 0.19151945,  0.43058932,  0.37789123],
-           [ 0.43772774,  0.34763084,  0.21464142]])
+    >>> import numpy as np
+    >>> import quantecon as qe
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.probvec(2, 3, random_state=rng)
+    array([[0.38019574, 0.59650403, 0.02330023],
+           [0.26169242, 0.66155381, 0.07675377]])
 
     """
     if k == 1:
@@ -57,9 +63,9 @@ def probvec(m, k, random_state=None, parallel=True):
 
     # Parse Parallel Option #
     if parallel:
-        _probvec_parallel(r, x)
+        _probvec_parallel()(r, x)
     else:
-        _probvec_cpu(r, x)
+        _probvec_cpu()(r, x)
 
     return x
 
@@ -68,7 +74,7 @@ def _probvec(r, out):  # pragma: no cover
     """
     Fill `out` with randomly sampled probability vectors as rows.
 
-    To be complied as a ufunc by guvectorize of Numba. The inputs must
+    To be compiled as a ufunc by guvectorize of Numba. The inputs must
     have the same shape except the last axis; the length of the last
     axis of `r` must be that of `out` minus 1, i.e., if out.shape[-1] is
     k, then r.shape[-1] must be k-1.
@@ -89,14 +95,41 @@ def _probvec(r, out):  # pragma: no cover
         out[i] = r[i] - r[i-1]
     out[n] = 1 - r[n-1]
 
-_probvec_parallel = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='parallel',
-    cache=True
-    )(_probvec)
-_probvec_cpu = guvectorize(
-    ['(f8[:], f8[:])'], '(n), (k)', nopython=True, target='cpu',
-    cache=True
-    )(_probvec)
+# The two gufuncs of `_probvec` are constructed on first call rather than
+# at import, since an explicit signature makes `guvectorize` compile
+# eagerly. The explicit signature is required by the parallel target, and
+# is retained for the cpu target as well: an explicit-signature gufunc and
+# a dynamic (signature-less) gufunc of the same kernel must not be mixed
+# with `cache=True`, as they share a cache entry that is not compatible.
+
+_PROBVEC_SIGNATURE = ['(f8[:], f8[:])']
+_PROBVEC_LAYOUT = '(n), (k)'
+
+
+@functools.cache
+def _probvec_parallel():
+    """
+    Return the parallel-target gufunc of `_probvec`, compiling it on
+    first call.
+
+    """
+    return guvectorize(
+        _PROBVEC_SIGNATURE, _PROBVEC_LAYOUT, nopython=True,
+        target='parallel', cache=True
+        )(_probvec)
+
+
+@functools.cache
+def _probvec_cpu():
+    """
+    Return the cpu-target gufunc of `_probvec`, compiling it on first
+    call.
+
+    """
+    return guvectorize(
+        _PROBVEC_SIGNATURE, _PROBVEC_LAYOUT, nopython=True,
+        target='cpu', cache=True
+        )(_probvec)
 
 
 def sample_without_replacement(n, k, num_trials=None, random_state=None):
@@ -129,16 +162,22 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     Examples
     --------
-    >>> qe.random.sample_without_replacement(5, 3, random_state=1234)
-    array([0, 2, 1])
+    >>> import numpy as np
+    >>> import quantecon as qe
+    >>> rng = np.random.default_rng(1234)
+    >>> qe.random.sample_without_replacement(5, 3, random_state=rng)
+    array([4, 1, 2])
+    >>> rng = np.random.default_rng(1234)
     >>> qe.random.sample_without_replacement(5, 3, num_trials=4,
-    ...                                      random_state=1234)
-    array([[0, 2, 1],
-           [3, 4, 0],
-           [1, 3, 2],
-           [4, 1, 3]])
+    ...                                      random_state=rng)
+    array([[4, 1, 2],
+           [1, 4, 0],
+           [1, 4, 2],
+           [1, 4, 3]])
 
     """
+    if not isinstance(n, numbers.Integral):
+        raise TypeError('n must be an integer')
     if n <= 0:
         raise ValueError('n must be greater than 0')
     if k > n:
@@ -148,16 +187,18 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
 
     random_state = check_random_state(random_state)
     r = random_state.random(size=size)
-    result = _sample_without_replacement(n, r)
+    result = np.empty(size, dtype=np.int64)
+    _sample_without_replacement(n, r, result)
 
     return result
 
 
-@guvectorize(['(i8, f8[:], i8[:])'], '(),(k)->(k)', nopython=True, cache=True)
+@guvectorize('(),(k)->(k)', nopython=True, cache=True)
 def _sample_without_replacement(n, r, out):
     """
-    Main body of `sample_without_replacement`. To be complied as a ufunc
-    by guvectorize of Numba.
+    Main body of `sample_without_replacement`. Compiled as a dynamic
+    (signature-less) gufunc by Numba's `@guvectorize` on first call;
+    the output array `out` must be supplied by the caller.
 
     """
     k = r.shape[0]

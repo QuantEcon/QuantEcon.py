@@ -19,12 +19,12 @@ from numba import jit, objmode
 def searchsorted(a, v):
     """
     Custom version of np.searchsorted. Return the largest index `i` such
-    that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `v[n-1] <=
+    that `a[i-1] <= v < a[i]` (for `i = 0`, `v < a[0]`); if `a[n-1] <=
     v`, return `n`, where `n = len(a)`.
 
-    .. deprecated::
+    .. deprecated:: 0.11.0
 
-        Deprecated, use `np.searchsorted(a, v, side='right')` instead.
+        Use `np.searchsorted(a, v, side='right')` instead.
 
     Parameters
     ----------
@@ -42,11 +42,12 @@ def searchsorted(a, v):
 
     Notes
     -----
-    This routine is jit-complied if the module Numba is vailable; if
-    not, it is an alias of np.searchsorted(a, v, side='right').
+    This routine is jit-compiled by Numba in nopython mode.
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon.util import searchsorted
     >>> a = np.array([0.2, 0.4, 1.0])
     >>> searchsorted(a, 0.1)
     0

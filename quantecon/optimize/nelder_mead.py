@@ -34,7 +34,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
         Initial guess. Array of real elements of size (n,), where ‘n’ is the
         number of independent variables.
 
-    bounds: ndarray(float, ndim=2), optional
+    bounds : ndarray(float, ndim=2), optional
         Bounds for each variable for proposed solution, encoded as a sequence
         of (min, max) pairs for each element in x. The default option is used
         to specify no bounds on x.
@@ -59,23 +59,34 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
             "x" : Approximate local maximizer
             "fun" : Approximate local maximum value
-            "success" : 1 if the algorithm successfully terminated, 0 otherwise
+            "success" : True if the algorithm successfully terminated,
+                        False otherwise
             "nit" : Number of iterations
             "final_simplex" : Vertices of the final simplex
 
     Examples
     --------
+    >>> import numpy as np
+    >>> import quantecon as qe
+    >>> from numba import njit
     >>> @njit
     ... def rosenbrock(x):
     ...     return -(100 * (x[1] - x[0] ** 2) ** 2 + (1 - x[0])**2)
     ...
     >>> x0 = np.array([-2, 1])
-    >>> qe.optimize.nelder_mead(rosenbrock, x0)
-    results(x=array([0.99999814, 0.99999756]), fun=-1.6936258239463265e-10,
-            success=True, nit=110,
-            final_simplex=array([[0.99998652, 0.9999727],
-                                 [1.00000218, 1.00000301],
-                                 [0.99999814, 0.99999756]]))
+    >>> res = qe.optimize.nelder_mead(rosenbrock, x0)
+    >>> res.x
+    array([0.99999814, 0.99999756])
+    >>> res.fun
+    -1.6936258239463265e-10
+    >>> res.success
+    True
+    >>> res.nit
+    110
+    >>> res.final_simplex
+    array([[0.99998652, 0.9999727 ],
+           [1.00000218, 1.00000301],
+           [0.99999814, 0.99999756]])
 
     Notes
     -----
@@ -145,6 +156,11 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
     vertices : ndarray(float, ndim=2)
         Initial simplex with shape (n+1, n) to be modified in-place.
 
+    bounds : ndarray(float, ndim=2), optional
+        Bounds for each variable for proposed solution, encoded as a sequence
+        of (min, max) pairs for each element in x. The default option is used
+        to specify no bounds on x.
+
     args : tuple, optional
         Extra arguments passed to the objective function.
 
@@ -160,10 +176,10 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
     σ : scalar(float), optional(default=0.5)
         Shrinkage parameter. Must be strictly between 0 and 1.
 
-    tol_f : scalar(float), optional(default=1e-10)
+    tol_f : scalar(float), optional(default=1e-8)
         Tolerance to be used for the function value convergence test.
 
-    tol_x : scalar(float), optional(default=1e-10)
+    tol_x : scalar(float), optional(default=1e-8)
         Tolerance to be used for the function domain convergence test.
 
     max_iter : scalar(float), optional(default=1000)
@@ -177,7 +193,7 @@ def _nelder_mead_algorithm(fun, vertices, bounds=np.array([[], []]).T,
 
             "x" : Approximate solution
             "fun" : Approximate local maximum
-            "success" : 1 if successfully terminated, 0 otherwise
+            "success" : True if successfully terminated, False otherwise
             "nit" : Number of iterations
             "final_simplex" : The vertices of the final simplex
 
@@ -308,7 +324,7 @@ def _initialize_simplex(x0, bounds):
         Initial guess. Array of real elements of size (n,), where ‘n’ is the
         number of independent variables.
 
-    bounds: ndarray(float, ndim=2)
+    bounds : ndarray(float, ndim=2)
         Sequence of (min, max) pairs for each element in x0.
 
     Returns
@@ -357,7 +373,7 @@ def _check_params(ρ, χ, γ, σ, bounds, n):
     σ : scalar(float)
         Shrinkage parameter. Must be strictly between 0 and 1.
 
-    bounds: ndarray(float, ndim=2)
+    bounds : ndarray(float, ndim=2)
         Sequence of (min, max) pairs for each element in x.
 
     n : scalar(int)
@@ -392,7 +408,7 @@ def _check_bounds(x, bounds):
     x : ndarray(float, ndim=1)
         1-D array with shape (n,) of independent variables.
 
-    bounds: ndarray(float, ndim=2)
+    bounds : ndarray(float, ndim=2)
         Sequence of (min, max) pairs for each element in x.
 
     Returns
@@ -423,7 +439,7 @@ def _neg_bounded_fun(fun, bounds, x, args=()):
         fixed parameters needed to completely specify the function. This
         function must be JIT-compiled in `nopython` mode using Numba.
 
-    bounds: ndarray(float, ndim=2)
+    bounds : ndarray(float, ndim=2)
         Sequence of (min, max) pairs for each element in x.
 
     x : ndarray(float, ndim=1)

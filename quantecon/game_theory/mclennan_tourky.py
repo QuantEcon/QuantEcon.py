@@ -32,7 +32,7 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     epsilon : scalar(float), optional(default=1e-3)
         Value of epsilon-optimality.
 
-    max_iter : scalar(int), optional(default=100)
+    max_iter : scalar(int), optional(default=200)
         Maximum number of iterations.
 
     full_output : bool, optional(default=False)
@@ -56,19 +56,23 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     1 yields payoff :math:`v` if no other player plays 1 and payoff 0
     otherwise:
 
+    >>> import numpy as np
+    >>> from quantecon.game_theory import (NormalFormGame, Player,
+    ...                                    mclennan_tourky)
     >>> N = 3
     >>> v = 2
-    >>> payoff_array = np.empty((2,)*n)
+    >>> payoff_array = np.empty((2,)*N)
     >>> payoff_array[0, :] = 1
     >>> payoff_array[1, :] = 0
     >>> payoff_array[1].flat[0] = v
     >>> g = NormalFormGame((Player(payoff_array),)*N)
     >>> print(g)
     3-player NormalFormGame with payoff profile array:
-    [[[[ 1.,  1.,  1.],   [ 1.,  1.,  2.]],
-      [[ 1.,  2.,  1.],   [ 1.,  0.,  0.]]],
-     [[[ 2.,  1.,  1.],   [ 0.,  1.,  0.]],
-      [[ 0.,  0.,  1.],   [ 0.,  0.,  0.]]]]
+    [[[[1., 1., 1.],   [1., 1., 2.]],
+      [[1., 2., 1.],   [1., 0., 0.]]],
+    <BLANKLINE>
+     [[[2., 1., 1.],   [0., 1., 0.]],
+      [[0., 0., 1.],   [0., 0., 0.]]]]
 
     This game has a unique symmetric Nash equilibrium, where the
     equilibrium action is given by :math:`(p^*, 1-p^*)` with :math:`p^*
@@ -84,9 +88,9 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     >>> epsilon = 1e-5  # Value of epsilon-optimality
     >>> NE = mclennan_tourky(g, epsilon=epsilon)
     >>> print(NE[0], NE[1], NE[2], sep='\n')
-    [ 0.70710754  0.29289246]
-    [ 0.70710754  0.29289246]
-    [ 0.70710754  0.29289246]
+    [0.70710754 0.29289246]
+    [0.70710754 0.29289246]
+    [0.70710754 0.29289246]
     >>> g.is_nash(NE, tol=epsilon)
     True
 

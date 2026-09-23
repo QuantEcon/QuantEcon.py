@@ -191,8 +191,8 @@ def _random_mixed_actions(out, random_state):
 
     random_state : np.random.RandomState or np.random.Generator
 
-    Return
-    ------
+    Returns
+    -------
     out : tuple(ndarray(float, ndim=1))
 
     """
@@ -202,7 +202,7 @@ def _random_mixed_actions(out, random_state):
             x[0] = 1
         else:
             r = random_state.random(size=n-1)
-            _probvec_cpu(r, x)
+            _probvec_cpu()(r, x)
     return out
 
 

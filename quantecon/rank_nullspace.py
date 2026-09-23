@@ -1,4 +1,5 @@
-# This file is not meant for public use and will be removed v0.8.0.
+# This file is not meant for public use and will be removed in a
+# future release.
 # Use the `quantecon` namespace for importing the objects
 # included below.
 
@@ -20,9 +21,10 @@ def __getattr__(name):
                 f" '{name}'."
             )
 
-    warnings.warn(f"Please use `{name}` from the `quantecon` namespace, the"
+    warnings.warn(f"Please use `{name}` from the `quantecon` namespace, the "
                   "`quantecon.rank_nullspace` namespace is deprecated. You can"
-                  f" use following instead:\n `from quantecon import {name}`.",
+                  " use the following instead:\n"
+                  f" `from quantecon import {name}`.",
                   category=DeprecationWarning, stacklevel=2)
 
     return getattr(_rank_nullspace, name)

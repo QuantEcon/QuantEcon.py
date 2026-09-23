@@ -13,7 +13,9 @@ from numpy.testing import (
 from quantecon.game_theory import (
     Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url
 )
-from quantecon.game_theory.game_converters import GAMPayoffVector
+from quantecon.game_theory.game_converters import (
+    GAMPayoffVector, _str2num
+)
 
 
 # GAMPayoffVector #
@@ -190,7 +192,98 @@ def test_gam_writer_many_actions():
     assert_(len(payoff_tokens) == expected)
 
 
+def test_gam_writer_float_precision():
+    # Values that need more than 8 significant digits, and large and
+    # small values
+    payoffs = [1/3, np.pi, 0.1 + 0.2, 1e10, 1e-7, -2.5e22, 123456.789, 1.]
+    for dtype in [np.float64, np.float32]:
+        a = np.array(payoffs, dtype=dtype).reshape(2, 2, 2)
+        g = NormalFormGame(a)
+
+        s = to_gam(g)
+        payoff_tokens = s.split()[3:]
+
+        # Written without exponent
+        for tok in payoff_tokens:
+            assert_('e' not in tok.lower())
+
+        # Read back, the original values are recovered when cast to the
+        # source dtype
+        g2 = from_gam_string(s)
+        assert_array_equal(
+            g2.payoff_profile_array.astype(dtype), g.payoff_profile_array
+        )
+
+
+def test_gam_writer_float_boundary_values():
+    for dtype in [np.float64, np.float32]:
+        info = np.finfo(dtype)
+        payoffs = np.array([
+            0.0,
+            -0.0,
+            np.nextafter(dtype(0), dtype(1)),  # smallest subnormal
+            info.tiny,
+            info.max,
+            -info.max,
+            np.nextafter(dtype(1), dtype(2)),
+            1.0,
+        ], dtype=dtype).reshape(2, 2, 2)
+        g = NormalFormGame(payoffs)
+
+        g2 = from_gam_string(to_gam(g))
+        restored = g2.payoff_profile_array.astype(dtype)
+
+        assert_array_equal(restored, g.payoff_profile_array)
+        assert_array_equal(
+            np.signbit(restored), np.signbit(g.payoff_profile_array)
+        )
+
+
+def test_gam_writer_print_options():
+    # The output does not depend on the print options of NumPy
+    payoffs = np.array([1/3, np.pi, 1e10, 1e-7, 2., 3., 4., 5.])
+    g = NormalFormGame(payoffs.reshape(2, 2, 2))
+    s_desired = to_gam(g)
+
+    with np.printoptions(
+        precision=2, formatter={'float_kind': lambda x: 'BAD'}
+    ):
+        assert_string_equal(to_gam(g), s_desired)
+
+
+def test_gam_writer_bool():
+    A = np.array([[True, False], [False, True]])
+    g = NormalFormGame((Player(A), Player(A)))
+
+    s = to_gam(g)
+    assert_string_equal(s, """\
+2
+2 2
+
+1 0 0 1 1 0 0 1""")
+
+    g2 = from_gam_string(s)
+    assert_array_equal(g2.payoff_profile_array, g.payoff_profile_array)
+
+
 # GAMReader/from_gam #
+
+def test_str2num():
+    for s, x in [('3', 3), ('-3', -3), ('+3', 3)]:
+        assert_(_str2num(s) == x)
+        assert_(isinstance(_str2num(s), int))
+
+    # Float even if the value is an integer, unless written as an integer
+    for s, x in [('0.5', 0.5), ('.5', 0.5), ('3.', 3.), ('1e3', 1000.),
+                 ('1E-2', 0.01),
+                 ('1/3', 1/3), ('-1/3', -1/3), ('+1/3', 1/3), ('6/4', 1.5),
+                 ('2/1', 2.)]:
+        assert_(_str2num(s) == x)
+        assert_(isinstance(_str2num(s), float))
+
+    for s in ['1/0', '1/2/3', '0.5/2', '/3', '1/', 'abc', '']:
+        assert_raises(ValueError, _str2num, s)
+
 
 def test_from_gam_string():
     s = """\
@@ -208,6 +301,39 @@ def test_from_gam_string():
     ])
 
     assert_array_equal(g.payoff_profile_array, expected.payoff_profile_array)
+
+
+def test_from_gam_string_number_formats():
+    # Exponent with and without decimal point, signs
+    s = """\
+2
+2 2
+
+1e3 1E3 1.0e3 +1.5e+2 -2.5E-1 +3 -4 .5"""
+
+    g = from_gam_string(s)
+    payoffs = [1000., 1000., 1000., 150., -0.25, 3., -4., 0.5]
+
+    assert_(g.dtype == np.float64)
+    assert_array_equal(
+        GAMPayoffVector.from_nfg(g).payoffs, payoffs
+    )
+
+    # Integers only, with signs
+    s = """\
+2
+2 2
+
+1 +2 -3 4 5 6 7 8"""
+
+    g = from_gam_string(s)
+
+    assert_(np.issubdtype(g.dtype, np.integer))
+    assert_array_equal(
+        GAMPayoffVector.from_nfg(g).payoffs, [1, 2, -3, 4, 5, 6, 7, 8]
+    )
+
+    assert_raises(ValueError, from_gam_string, "2\n2 2\n\n1 2 3 4 5 6 7 x")
 
 
 class _FakeResponse(io.BytesIO):

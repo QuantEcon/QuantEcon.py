@@ -334,7 +334,7 @@ class DiGraph:
     def subgraph(self, nodes):
         """
         Return the subgraph consisting of the given nodes and edges
-        between thses nodes.
+        between these nodes.
 
         Parameters
         ----------

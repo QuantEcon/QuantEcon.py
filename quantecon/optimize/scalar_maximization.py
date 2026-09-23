@@ -14,16 +14,18 @@ def brent_max(func, a, b, args=(), xtol=1e-5, maxiter=500):
     Parameters
     ----------
     func : jitted function
+        The objective function to be maximized, of the form
+        `func(x, *args) -> float`. Must be jitted via Numba.
     a : scalar
         Lower bound for search
     b : scalar
         Upper bound for search
     args : tuple, optional
         Extra arguments passed to the objective function.
-    maxiter : int, optional
-        Maximum number of iterations to perform.
-    xtol : float, optional
+    xtol : float, optional(default=1e-5)
         Absolute error in solution `xopt` acceptable for convergence.
+    maxiter : int, optional(default=500)
+        Maximum number of iterations to perform.
 
     Returns
     -------

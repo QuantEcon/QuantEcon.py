@@ -38,9 +38,15 @@ class LAE:
 
     Examples
     --------
+    >>> import numpy as np
+    >>> from quantecon import LAE
+    >>> from scipy.stats import lognorm
+    >>> p = lambda x, y: lognorm.pdf(y / x, 1)
+    >>> X = np.exp(np.random.randn(100))
     >>> psi = LAE(p, X)
-    >>> y = np.linspace(0, 1, 100)
-    >>> psi(y)  # Evaluate look ahead estimate at grid of points y
+    >>> y = np.linspace(0.1, 3, 100)
+    >>> psi(y).shape  # Evaluate look ahead estimate at grid of points y
+    (100,)
 
     """
 

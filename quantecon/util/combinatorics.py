@@ -30,6 +30,8 @@ def next_k_array(a):
     --------
     Enumerate all the subsets with k elements of the set {0, ..., n-1}.
 
+    >>> import numpy as np
+    >>> from quantecon.util.combinatorics import next_k_array
     >>> n, k = 4, 2
     >>> a = np.arange(k)
     >>> while a[-1] < n:

@@ -36,8 +36,8 @@ References
 
 """
 import io
-import sys
 import numbers
+from fractions import Fraction
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
 
@@ -48,6 +48,7 @@ class GAMPayoffVector:
     flat 1-dim array.
 
     Payoff values are ordered as in the GameTracer .gam format:
+
     1. Player-major blocks: player 0, ..., player N-1.
     2. Within each block, action profiles are ordered with player 0
        varying fastest, then player 1, ..., player N-1 (i.e.,
@@ -98,6 +99,20 @@ class GAMPayoffVector:
         """
         Construct a GAMPayoffVector from a NormalFormGame `g`.
 
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance.
+
+        dtype : data-type, optional(default=None)
+            Data type of the payoff array. If None, default to the
+            `dtype` attribute of `g`.
+
+        Returns
+        -------
+        GAMPayoffVector
+            The GAMPayoffVector representation of `g`.
+
         Examples
         --------
         >>> player0 = Player([[0, 3], [1, 4], [2, 5]])
@@ -133,6 +148,17 @@ class GAMPayoffVector:
         """
         Construct a NormalFormGame from self.
 
+        Parameters
+        ----------
+        dtype : data-type, optional(default=None)
+            Data type of the players' payoff arrays. If None, default to
+            the data type of the `payoffs` attribute.
+
+        Returns
+        -------
+        NormalFormGame
+            The NormalFormGame represented by self.
+
         Examples
         --------
         >>> nums_actions = (3, 2)
@@ -167,21 +193,31 @@ class GAMPayoffVector:
 def _str2num(s):
     """
     Convert string to appropriate numeric type.
-    
+
     Parameters
     ----------
     s : str
-        String representation of a number.
-    
+        String representation of a number: an integer, a decimal with
+        an optional exponent, or a rational `n/d`.
+
     Returns
     -------
     int or float
-        Integer if no decimal point, otherwise float.
+        Integer if `s` is written as an integer (digits with an optional
+        sign), otherwise float. A rational is converted to the nearest
+        float.
 
     """
-    if '.' in s:
-        return float(s)
-    return int(s)
+    try:
+        return int(s)
+    except ValueError:
+        pass
+    if '/' in s:
+        try:
+            return float(Fraction(s))
+        except ZeroDivisionError as err:
+            raise ValueError(f'zero denominator: {s!r}') from err
+    return float(s)
 
 
 class GAMReader:
@@ -194,6 +230,16 @@ class GAMReader:
         """
         Read from a .gam format file.
 
+        Parameters
+        ----------
+        file_path : str
+            Path to the .gam file.
+
+        Returns
+        -------
+        NormalFormGame
+            The game described by the .gam file.
+
         """
         with open(file_path, 'r') as f:
             string = f.read()
@@ -203,6 +249,16 @@ class GAMReader:
     def from_url(cls, url):
         """
         Read from a URL.
+
+        Parameters
+        ----------
+        url : str
+            String containing a URL of the .gam file.
+
+        Returns
+        -------
+        NormalFormGame
+            The game described by the .gam file.
 
         """
         import urllib.request
@@ -214,6 +270,16 @@ class GAMReader:
     def from_string(cls, string):
         """
         Read from a .gam format string.
+
+        Parameters
+        ----------
+        string : str
+            String in .gam format.
+
+        Returns
+        -------
+        NormalFormGame
+            The game described by the .gam string.
 
         """
         return cls._parse(string)
@@ -266,6 +332,14 @@ class GAMWriter:
         """
         Write `g` to a file in GameTracer .gam format.
 
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to write.
+
+        file_path : str
+            Path to the file to write to.
+
         """
         with open(file_path, 'w') as f:
             f.write(cls._dump(g) + '\n')
@@ -274,6 +348,16 @@ class GAMWriter:
     def to_string(cls, g):
         """
         Return the GameTracer .gam string representation of `g`.
+
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to convert.
+
+        Returns
+        -------
+        str
+            The .gam format string representation of `g`.
 
         """
         return cls._dump(g)
@@ -289,16 +373,19 @@ class GAMWriter:
         buf.write(' '.join(map(str, p.nums_actions)))
         buf.write('\n\n')
 
-        payoffs_str = np.array2string(
-            p.payoffs,
-            separator=' ',
-            threshold=sys.maxsize,  # no truncation '...'
-            # suppress_small helps avoid scientific notation for small |x|;
-            # large |x| values may still print with e+...
-            suppress_small=True
-        )[1:-1]  # strip brackets
+        payoffs = p.payoffs
+        if payoffs.dtype == np.bool_:
+            # Written as 0 and 1, not True and False
+            payoffs = payoffs.astype(int)
 
-        buf.write(' '.join(payoffs_str.split()))
+        if np.issubdtype(payoffs.dtype, np.floating):
+            # Shortest representation that round-trips, without exponent
+            def fmt(x):
+                return np.format_float_positional(x, trim='.')
+        else:
+            fmt = str
+
+        buf.write(' '.join(map(fmt, payoffs)))
 
         return buf.getvalue().rstrip()
 

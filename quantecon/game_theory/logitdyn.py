@@ -14,7 +14,7 @@ class LogitDynamics:
     data : NormalFormGame or array_like
         The game played in the logit-response dynamics model.
 
-    beta : scalar(float)
+    beta : scalar(float), optional(default=1.0)
         The level of noise in player's decision.
 
     Attributes
@@ -22,8 +22,8 @@ class LogitDynamics:
     N : scalar(int)
         The number of players in the game.
 
-    players : list(Player)
-        The list consisting of all players with the given payoff matrix.
+    players : tuple(Player)
+        Tuple of the Player instances of the game.
 
     nums_actions : tuple(int)
         Tuple of the number of actions, one for each player.
