@@ -36,8 +36,8 @@ References
 
 """
 import io
-import sys
 import numbers
+from fractions import Fraction
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
 
@@ -193,21 +193,31 @@ class GAMPayoffVector:
 def _str2num(s):
     """
     Convert string to appropriate numeric type.
-    
+
     Parameters
     ----------
     s : str
-        String representation of a number.
-    
+        String representation of a number: an integer, a decimal with
+        an optional exponent, or a rational `n/d`.
+
     Returns
     -------
     int or float
-        Integer if no decimal point, otherwise float.
+        Integer if `s` is written as an integer (digits with an optional
+        sign), otherwise float. A rational is converted to the nearest
+        float.
 
     """
-    if '.' in s:
-        return float(s)
-    return int(s)
+    try:
+        return int(s)
+    except ValueError:
+        pass
+    if '/' in s:
+        try:
+            return float(Fraction(s))
+        except ZeroDivisionError as err:
+            raise ValueError(f'zero denominator: {s!r}') from err
+    return float(s)
 
 
 class GAMReader:
@@ -363,16 +373,19 @@ class GAMWriter:
         buf.write(' '.join(map(str, p.nums_actions)))
         buf.write('\n\n')
 
-        payoffs_str = np.array2string(
-            p.payoffs,
-            separator=' ',
-            threshold=sys.maxsize,  # no truncation '...'
-            # suppress_small helps avoid scientific notation for small |x|;
-            # large |x| values may still print with e+...
-            suppress_small=True
-        )[1:-1]  # strip brackets
+        payoffs = p.payoffs
+        if payoffs.dtype == np.bool_:
+            # Written as 0 and 1, not True and False
+            payoffs = payoffs.astype(int)
 
-        buf.write(' '.join(payoffs_str.split()))
+        if np.issubdtype(payoffs.dtype, np.floating):
+            # Shortest representation that round-trips, without exponent
+            def fmt(x):
+                return np.format_float_positional(x, trim='.')
+        else:
+            fmt = str
+
+        buf.write(' '.join(map(fmt, payoffs)))
 
         return buf.getvalue().rstrip()
 
