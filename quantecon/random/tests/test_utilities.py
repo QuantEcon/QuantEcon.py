@@ -68,6 +68,12 @@ def test_sample_without_replacement_value_error():
     assert_raises(ValueError, sample_without_replacement, 2, 3)
 
 
+def test_sample_without_replacement_type_error():
+    # non-integer n
+    assert_raises(TypeError, sample_without_replacement, 10.0, 3)
+    assert_raises(TypeError, sample_without_replacement, np.float64(10), 3)
+
+
 # draw #
 
 @njit

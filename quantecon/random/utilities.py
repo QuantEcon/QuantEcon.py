@@ -4,6 +4,7 @@ Utilities to Support Random Operations and Generating Vectors and Matrices
 """
 
 import functools
+import numbers
 
 import numpy as np
 from numba import guvectorize, types
@@ -175,6 +176,8 @@ def sample_without_replacement(n, k, num_trials=None, random_state=None):
            [1, 4, 3]])
 
     """
+    if not isinstance(n, numbers.Integral):
+        raise TypeError('n must be an integer')
     if n <= 0:
         raise ValueError('n must be greater than 0')
     if k > n:
