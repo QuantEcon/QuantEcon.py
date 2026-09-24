@@ -2,6 +2,10 @@
 
 Future CHANGELOG entries will be documented under the [release notes on GitHub](https://github.com/QuantEcon/QuantEcon.py/releases)
 
+## Ver 0.12.0 (24th-September-2026)
+
+See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.12.0)
+
 ## Ver 0.11.4 (14th-July-2026)
 
 See [release notes](https://github.com/QuantEcon/QuantEcon.py/releases/tag/v0.11.4)
