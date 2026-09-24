@@ -9,6 +9,12 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Name of an existing tag to build and publish to PyPI (for example v0.12.0); branch names and SHAs are rejected"
+        required: true
+        type: string
 
 
 jobs:
@@ -149,18 +155,26 @@ jobs:
 
     name: Publish to PyPi
     needs: [tests]
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v7
+        with:
+          # On manual dispatch, check out the input as a fully qualified tag ref: a branch
+          # name or SHA cannot resolve, and a missing tag fails here before anything is built.
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.ref) || github.ref }}
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.x"
       - name: Install flit
         run: |
-          pip install flit~=3.6
+          # Keep flit and flit_core in the same major series: flit 3.x only requires
+          # flit_core>=3.12 with no upper bound, and flit_core 4 (August 2026) dropped
+          # the gen_setup_py argument flit 3.x still passes, so an unpinned flit_core
+          # breaks `flit publish` with a TypeError.
+          pip install "flit~=3.12" "flit_core~=3.12"
       - name: Build and publish
         run: |
           flit publish
