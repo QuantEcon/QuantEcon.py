@@ -14,14 +14,14 @@ from quantecon.game_theory import (
     Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url
 )
 from quantecon.game_theory.game_converters import (
-    GAMPayoffVector, _str2num
+    PayoffVector, _str2num
 )
 
 
-# GAMPayoffVector #
+# PayoffVector #
 
-class TestGAMPayoffVector:
-    """Golden test for GAMPayoffVector"""
+class TestPayoffVector:
+    """Golden test for PayoffVector"""
 
     def setup_method(self):
         nums_actions = (2, 3, 4)
@@ -32,80 +32,160 @@ class TestGAMPayoffVector:
         A1 = np.arange(100, 100+na).reshape(nums_actions, order='F')
         A2 = np.arange(200, 200+na).reshape(nums_actions, order='F')
 
-        self.payoffs1d = np.hstack([A.ravel(order='F') for A in [A0, A1, A2]])
         self.payoffs4d = np.stack([A0, A1, A2], axis=N)
+        self.payoffs1d = {
+            'player-major':
+                np.hstack([A.ravel(order='F') for A in [A0, A1, A2]]),
+            'profile-major':
+                np.moveaxis(self.payoffs4d, -1, 0).ravel(order='F'),
+        }
 
         self.N = N
         self.nums_actions = nums_actions
 
     def test_init(self):
-        p = GAMPayoffVector(self.nums_actions, self.payoffs1d)
+        for layout, payoffs1d in self.payoffs1d.items():
+            p = PayoffVector(self.nums_actions, payoffs1d, layout=layout)
 
-        assert_(p.N == self.N)
-        assert_(p.nums_actions == self.nums_actions)
-        assert_array_equal(p.payoffs, self.payoffs1d)
+            assert_(p.N == self.N)
+            assert_(p.nums_actions == self.nums_actions)
+            assert_(p.layout == layout)
+            assert_array_equal(p.payoffs, payoffs1d)
 
-    def test_from_nfg(self):
+    def test_from_normal_form_game(self):
         g = NormalFormGame(self.payoffs4d)
-        p = GAMPayoffVector.from_nfg(g)
+        for layout, payoffs1d in self.payoffs1d.items():
+            p = PayoffVector.from_normal_form_game(g, layout=layout)
 
-        assert_(p.N == self.N)
-        assert_(p.nums_actions == self.nums_actions)
-        assert_array_equal(p.payoffs, self.payoffs1d)
+            assert_(p.N == self.N)
+            assert_(p.nums_actions == self.nums_actions)
+            assert_(p.layout == layout)
+            assert_array_equal(p.payoffs, payoffs1d)
 
-    def test_to_nfg(self):
-        p = GAMPayoffVector(self.nums_actions, self.payoffs1d)
-        g = p.to_nfg()
-        assert_array_equal(g.payoff_profile_array, self.payoffs4d)
+    def test_to_normal_form_game(self):
+        for layout, payoffs1d in self.payoffs1d.items():
+            p = PayoffVector(self.nums_actions, payoffs1d, layout=layout)
+            g = p.to_normal_form_game()
+            assert_array_equal(g.payoff_profile_array, self.payoffs4d)
+
+    def test_to_layout(self):
+        for layout, payoffs1d in self.payoffs1d.items():
+            p = PayoffVector(self.nums_actions, payoffs1d, layout=layout)
+            for layout_new, payoffs1d_new in self.payoffs1d.items():
+                p_new = p.to_layout(layout_new)
+                assert_(p_new.layout == layout_new)
+                assert_array_equal(p_new.payoffs, payoffs1d_new)
+                assert_(not np.shares_memory(p_new.payoffs, p.payoffs))
 
 
-def test_gampayoffvector_roundtrip():
+def test_payoffvector_2p():
+    # 3x2 game with payoff profiles, in column-major order over the
+    # action profiles:
+    #   (0,0): (3,2)  (1,0): (0,6)  (2,0): (2,1)
+    #   (0,1): (1,3)  (1,1): (4,0)  (2,1): (5,4)
+    g = NormalFormGame((Player([[3, 1], [0, 4], [2, 5]]),
+                        Player([[2, 6, 1], [3, 0, 4]])))
+    payoffs1d = {
+        'player-major': [3, 0, 2, 1, 4, 5, 2, 6, 1, 3, 0, 4],
+        'profile-major': [3, 2, 0, 6, 2, 1, 1, 3, 4, 0, 5, 4],
+    }
+
+    for layout, payoffs in payoffs1d.items():
+        p = PayoffVector.from_normal_form_game(g, layout=layout)
+        assert_array_equal(p.payoffs, payoffs)
+
+        p = PayoffVector((3, 2), payoffs, layout=layout)
+        assert_array_equal(p.to_normal_form_game().payoff_profile_array,
+                           g.payoff_profile_array)
+
+
+def test_payoffvector_roundtrip():
     for ns in [(4, 3), (2, 2, 3, 2)]:
         N = len(ns)
         seed = 12345
         rng = np.random.default_rng(seed)
         payoffs = rng.integers(low=0, high=100, size=(*ns, N), dtype=np.int64)
         g = NormalFormGame(payoffs)
-        p = GAMPayoffVector.from_nfg(g)
-        g1 = p.to_nfg()
 
-        p_32 = GAMPayoffVector.from_nfg(g, dtype=np.int32)
-        g2 = p_32.to_nfg()
-        g3 = p_32.to_nfg(dtype=np.int64)
+        for layout in ['player-major', 'profile-major']:
+            p = PayoffVector.from_normal_form_game(g, layout=layout)
+            g1 = p.to_normal_form_game()
 
-        assert_(p_32.payoffs.dtype == np.int32)
-        assert_(g2.dtype == np.int32)
-        assert_(g3.dtype == np.int64)
+            p_32 = PayoffVector.from_normal_form_game(
+                g, layout=layout, dtype=np.int32
+            )
+            g2 = p_32.to_normal_form_game()
+            g3 = p_32.to_normal_form_game(dtype=np.int64)
 
-        for g_new in [g1, g2, g3]:
-            assert_(g_new.N == g.N)
-            assert_(g_new.nums_actions == g.nums_actions)
-            for i in range(N):
-                assert_array_equal(g_new.players[i].payoff_array,
-                                   g.players[i].payoff_array)
+            assert_(p_32.payoffs.dtype == np.int32)
+            assert_(g2.dtype == np.int32)
+            assert_(g3.dtype == np.int64)
+
+            for g_new in [g1, g2, g3]:
+                assert_(g_new.N == g.N)
+                assert_(g_new.nums_actions == g.nums_actions)
+                for i in range(N):
+                    assert_array_equal(g_new.players[i].payoff_array,
+                                       g.players[i].payoff_array)
 
 
-def test_gampayoffvector_1p():
+def test_payoffvector_1p():
     payoffs = [1., 2., 3.]
     nums_actions = (3,)
 
-    p0 = GAMPayoffVector(nums_actions, payoffs)
-
     g = NormalFormGame((Player(payoffs),))
-    p1 = GAMPayoffVector.from_nfg(g)
 
-    for p in [p0, p1]:
-        assert_(p.N == 1)
-        assert_(p.nums_actions == nums_actions)
-        assert_array_equal(p.payoffs, payoffs)
+    for layout in ['player-major', 'profile-major']:
+        p0 = PayoffVector(nums_actions, payoffs, layout=layout)
+        p1 = PayoffVector.from_normal_form_game(g, layout=layout)
+
+        for p in [p0, p1]:
+            assert_(p.N == 1)
+            assert_(p.nums_actions == nums_actions)
+            assert_array_equal(p.payoffs, payoffs)
+            assert_array_equal(p.to_normal_form_game().players[0].payoff_array,
+                               payoffs)
+
+
+def test_payoffvector_views():
+    payoffs = np.arange(12)
+
+    for layout in ['player-major', 'profile-major']:
+        p = PayoffVector((3, 2), payoffs, layout=layout)
+
+        # `payoffs` and the player blocks are views of the input
+        assert_(np.shares_memory(p.payoffs, payoffs))
+        assert_(np.shares_memory(p._player_block(1), payoffs))
+
+        # The game does not alias the input
+        g = p.to_normal_form_game()
+        assert_(not any(np.shares_memory(player.payoff_array, payoffs)
+                        for player in g.players))
+
+    # Also for one player
+    p1 = PayoffVector((3,), np.arange(3), layout='player-major')
+    g = p1.to_normal_form_game()
+    assert_(not np.shares_memory(g.players[0].payoff_array, p1.payoffs))
 
 
 def test_invalid_inputs():
-    assert_raises(ValueError, GAMPayoffVector, (), np.array([], dtype=float))
-    assert_raises(TypeError, GAMPayoffVector, (2, 2.0), np.zeros(8))
-    assert_raises(ValueError, GAMPayoffVector, (2, 0), np.zeros(0))
-    assert_raises(ValueError, GAMPayoffVector, (2, 2), np.zeros((2, 4)))
-    assert_raises(ValueError, GAMPayoffVector, (2, 2), np.zeros(7))
+    pm = 'player-major'
+    assert_raises(ValueError, PayoffVector, (), np.array([]), layout=pm)
+    assert_raises(TypeError, PayoffVector, (2, 2.0), np.zeros(8), layout=pm)
+    assert_raises(ValueError, PayoffVector, (2, 0), np.zeros(0), layout=pm)
+    assert_raises(ValueError, PayoffVector, (2, 2), np.zeros((2, 4)),
+                  layout=pm)
+    assert_raises(ValueError, PayoffVector, (2, 2), np.zeros(7), layout=pm)
+    # np.prod would overflow and give 0
+    assert_raises(ValueError, PayoffVector, (2**62, 2**62), np.zeros(2),
+                  layout=pm)
+    # layout is required, and must be 'player-major' or 'profile-major'
+    assert_raises(TypeError, PayoffVector, (2, 2), np.zeros(8))
+    for layout in ['F', 'C', 'player_major']:
+        assert_raises(ValueError, PayoffVector, (2, 2), np.zeros(8),
+                      layout=layout)
+    p = PayoffVector((2, 2), np.zeros(8), layout=pm)
+    assert_raises(ValueError, p.to_layout, 'F')
 
 
 # GAMWriter/to_gam #
@@ -316,7 +396,8 @@ def test_from_gam_string_number_formats():
 
     assert_(g.dtype == np.float64)
     assert_array_equal(
-        GAMPayoffVector.from_nfg(g).payoffs, payoffs
+        PayoffVector.from_normal_form_game(g, layout='player-major').payoffs,
+        payoffs
     )
 
     # Integers only, with signs
@@ -330,7 +411,8 @@ def test_from_gam_string_number_formats():
 
     assert_(np.issubdtype(g.dtype, np.integer))
     assert_array_equal(
-        GAMPayoffVector.from_nfg(g).payoffs, [1, 2, -3, 4, 5, 6, 7, 8]
+        PayoffVector.from_normal_form_game(g, layout='player-major').payoffs,
+        [1, 2, -3, 4, 5, 6, 7, 8]
     )
 
     assert_raises(ValueError, from_gam_string, "2\n2 2\n\n1 2 3 4 5 6 7 x")

@@ -36,23 +36,45 @@ References
 
 """
 import io
+import math
 import numbers
 from fractions import Fraction
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
 
 
-class GAMPayoffVector:
+_LAYOUTS = ('player-major', 'profile-major')
+_LAYOUT_ERROR = "layout must be 'player-major' or 'profile-major' (got {!r})"
+
+
+class PayoffVector:
     """
-    Internal intermediate representation that stores payoffs in a single
-    flat 1-dim array.
+    Intermediate representation that stores the payoffs of an N-player
+    game in a single flat 1-dim array, in one of the two orders in which
+    game files list them:
 
-    Payoff values are ordered as in the GameTracer .gam format:
+    'player-major' (as in the GameTracer .gam format)
+        All the payoffs to player 0, then those to player 1, ..., then
+        those to player N-1. Within each block, action profiles are
+        ordered with player 0 varying fastest, then player 1, ...,
+        player N-1 (i.e., column-major order).
 
-    1. Player-major blocks: player 0, ..., player N-1.
-    2. Within each block, action profiles are ordered with player 0
-       varying fastest, then player 1, ..., player N-1 (i.e.,
-       Fortran/column-major order).
+    'profile-major' (as in the Gambit .nfg format)
+        The payoffs to players 0, ..., N-1 at the first action profile,
+        then those at the second action profile, and so on. Action
+        profiles are ordered with player 0 varying fastest, then player
+        1, ..., player N-1 (i.e., column-major order).
+
+    Parameters
+    ----------
+    nums_actions : array_like(int, ndim=1)
+        Numbers of actions, one for each player.
+
+    payoffs : array_like(ndim=1)
+        Payoffs, of length prod(nums_actions) * N, in the order `layout`.
+
+    layout : {'player-major', 'profile-major'}
+        Order in which `payoffs` lists the payoffs.
 
     Attributes
     ----------
@@ -63,10 +85,13 @@ class GAMPayoffVector:
         Tuple of the numbers of actions, one for each player.
 
     payoffs : ndarray(ndim=1)
-        Array storing payoffs in .gam order.
+        Array storing the payoffs in the order `layout`.
+
+    layout : str
+        Order in which `payoffs` lists the payoffs.
 
     """
-    def __init__(self, nums_actions, payoffs):
+    def __init__(self, nums_actions, payoffs, *, layout):
         nums_actions = tuple(nums_actions)
         if len(nums_actions) == 0:
             raise ValueError('nums_actions must be a non-empty iterable ' +
@@ -81,11 +106,15 @@ class GAMPayoffVector:
         self.nums_actions = tuple(int(n) for n in nums_actions)
         self.N = len(self.nums_actions)
 
+        if layout not in _LAYOUTS:
+            raise ValueError(_LAYOUT_ERROR.format(layout))
+        self.layout = layout
+
         payoffs = np.ascontiguousarray(payoffs)
         if payoffs.ndim != 1:
             raise ValueError('payoffs must be a 1-dim array_like')
 
-        expected = np.prod(self.nums_actions) * self.N
+        expected = math.prod(self.nums_actions) * self.N  # no overflow
         if payoffs.size != expected:
             raise ValueError(
                 f'payoffs length mismatch: expected {expected}, ' +
@@ -94,15 +123,29 @@ class GAMPayoffVector:
 
         self.payoffs = payoffs
 
+    def _player_block(self, i):
+        # The payoffs to player i as an array indexed by the action
+        # profile; a view of `payoffs`. This is the only place where the
+        # layout matters.
+        if self.layout == 'player-major':
+            shape = self.nums_actions + (self.N,)
+            return self.payoffs.reshape(shape, order='F')[..., i]
+        else:
+            shape = (self.N,) + self.nums_actions
+            return self.payoffs.reshape(shape, order='F')[i, ...]
+
     @classmethod
-    def from_nfg(cls, g, dtype=None):
+    def from_normal_form_game(cls, g, *, layout, dtype=None):
         """
-        Construct a GAMPayoffVector from a NormalFormGame `g`.
+        Construct a PayoffVector from a NormalFormGame `g`.
 
         Parameters
         ----------
         g : NormalFormGame
             NormalFormGame instance.
+
+        layout : {'player-major', 'profile-major'}
+            Order in which the payoffs are stored.
 
         dtype : data-type, optional(default=None)
             Data type of the payoff array. If None, default to the
@@ -110,8 +153,8 @@ class GAMPayoffVector:
 
         Returns
         -------
-        GAMPayoffVector
-            The GAMPayoffVector representation of `g`.
+        PayoffVector
+            The PayoffVector representation of `g`.
 
         Examples
         --------
@@ -123,28 +166,66 @@ class GAMPayoffVector:
         [[[ 0,  6],  [ 3,  9]],
          [[ 1,  7],  [ 4, 10]],
          [[ 2,  8],  [ 5, 11]]]
-        >>> p = GAMPayoffVector.from_nfg(g)
+        >>> p = PayoffVector.from_normal_form_game(g, layout='player-major')
         >>> p.payoffs
         array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
+        >>> p = PayoffVector.from_normal_form_game(g, layout='profile-major')
+        >>> p.payoffs
+        array([ 0,  6,  1,  7,  2,  8,  3,  9,  4, 10,  5, 11])
 
         """
         N = g.N
-        nums_actions = g.nums_actions
         if dtype is None:
             dtype = g.dtype
 
-        na = np.prod(nums_actions)
-        payoffs = np.empty(na*N, dtype=dtype)
+        payoffs = np.empty(math.prod(g.nums_actions) * N, dtype=dtype)
+        p = cls(g.nums_actions, payoffs, layout=layout)
 
         for i, player in enumerate(g.players):
-            payoffs[na*i:na*(i+1)].reshape(nums_actions, order='F')[:] = \
-                player.payoff_array.transpose(
-                    (*range(N-i, g.N), *range(N-i))
-                )
+            p._player_block(i)[...] = player.payoff_array.transpose(
+                (*range(N-i, N), *range(N-i))
+            )
 
-        return cls(nums_actions, payoffs)
+        return p
 
-    def to_nfg(self, dtype=None):
+    def to_layout(self, layout, dtype=None):
+        """
+        Return a new PayoffVector with the payoffs in the order `layout`.
+        The payoffs are copied.
+
+        Parameters
+        ----------
+        layout : {'player-major', 'profile-major'}
+            Order in which the payoffs are stored.
+
+        dtype : data-type, optional(default=None)
+            Data type of the payoff array. If None, default to the data
+            type of the `payoffs` attribute.
+
+        Returns
+        -------
+        PayoffVector
+            The PayoffVector with the payoffs in the order `layout`.
+
+        Examples
+        --------
+        >>> p = PayoffVector((3, 2), np.arange(12), layout='player-major')
+        >>> p.to_layout('profile-major').payoffs
+        array([ 0,  6,  1,  7,  2,  8,  3,  9,  4, 10,  5, 11])
+
+        """
+        if dtype is None:
+            dtype = self.payoffs.dtype
+
+        payoffs = np.empty(self.payoffs.size, dtype=dtype)
+        p = type(self)(self.nums_actions, payoffs, layout=layout)
+
+        for i in range(self.N):
+            p._player_block(i)[...] = self._player_block(i)
+
+        return p
+
+    def to_normal_form_game(self, dtype=None):
         """
         Construct a NormalFormGame from self.
 
@@ -163,26 +244,26 @@ class GAMPayoffVector:
         --------
         >>> nums_actions = (3, 2)
         >>> payoffs = np.arange(12)
-        >>> p = GAMPayoffVector(nums_actions, payoffs)
-        >>> g = p.to_nfg()
-        >>> print(g)
+        >>> p = PayoffVector(nums_actions, payoffs, layout='player-major')
+        >>> print(p.to_normal_form_game())
         2-player NormalFormGame with payoff profile array:
         [[[ 0,  6],  [ 3,  9]],
          [[ 1,  7],  [ 4, 10]],
          [[ 2,  8],  [ 5, 11]]]
+        >>> p = PayoffVector(nums_actions, payoffs, layout='profile-major')
+        >>> print(p.to_normal_form_game())
+        2-player NormalFormGame with payoff profile array:
+        [[[ 0,  1],  [ 6,  7]],
+         [[ 2,  3],  [ 8,  9]],
+         [[ 4,  5],  [10, 11]]]
 
         """
         N = self.N
-        nums_actions = self.nums_actions
-
-        na = np.prod(nums_actions)
-        payoffs2d = self.payoffs.reshape((na, N), order='F')
         players = tuple(
             Player(
-                np.asarray(
-                    payoffs2d[:, i].reshape(nums_actions, order='F').transpose(
-                        (*range(i, N), *range(i))
-                    ), dtype=dtype, order='C'
+                np.array(  # always a copy: no aliasing with `payoffs`
+                    self._player_block(i).transpose((*range(i, N), *range(i))),
+                    dtype=dtype, order='C'
                 )
             ) for i in range(N)
         )
@@ -318,8 +399,8 @@ class GAMReader:
         # payoffs
         payoffs = np.array([_str2num(tok) for tok in tokens[pos:]])
 
-        p = GAMPayoffVector(nums_actions, payoffs)
-        return p.to_nfg()
+        p = PayoffVector(nums_actions, payoffs, layout='player-major')
+        return p.to_normal_form_game()
 
 
 class GAMWriter:
@@ -364,7 +445,7 @@ class GAMWriter:
 
     @staticmethod
     def _dump(g):
-        p = GAMPayoffVector.from_nfg(g)
+        p = PayoffVector.from_normal_form_game(g, layout='player-major')
 
         buf = io.StringIO()
 
