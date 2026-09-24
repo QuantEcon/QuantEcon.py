@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Existing tag to build and publish to PyPI (for example v0.12.0)"
+        description: "Name of an existing tag to build and publish to PyPI (for example v0.12.0); branch names and SHAs are rejected"
         required: true
         type: string
 
@@ -161,8 +161,9 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v7
         with:
-          # On manual dispatch, publish the named tag rather than the branch the workflow ran from.
-          ref: ${{ inputs.ref || github.ref }}
+          # On manual dispatch, check out the input as a fully qualified tag ref: a branch
+          # name or SHA cannot resolve, and a missing tag fails here before anything is built.
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.ref) || github.ref }}
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
