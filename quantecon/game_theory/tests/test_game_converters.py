@@ -14,14 +14,14 @@ from quantecon.game_theory import (
     Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url
 )
 from quantecon.game_theory.game_converters import (
-    GAMPayoffVector, _str2num
+    PayoffProfileMatrix, _str2num
 )
 
 
-# GAMPayoffVector #
+# PayoffProfileMatrix #
 
-class TestGAMPayoffVector:
-    """Golden test for GAMPayoffVector"""
+class TestPayoffProfileMatrix:
+    """Golden test for PayoffProfileMatrix"""
 
     def setup_method(self):
         nums_actions = (2, 3, 4)
@@ -32,46 +32,77 @@ class TestGAMPayoffVector:
         A1 = np.arange(100, 100+na).reshape(nums_actions, order='F')
         A2 = np.arange(200, 200+na).reshape(nums_actions, order='F')
 
-        self.payoffs1d = np.hstack([A.ravel(order='F') for A in [A0, A1, A2]])
         self.payoffs4d = np.stack([A0, A1, A2], axis=N)
+        self.payoffs2d = self.payoffs4d.reshape((na, N), order='F')
+        # Player-major (.gam) and profile-major (.nfg)
+        self.payoffs1d_F = np.hstack(
+            [A.ravel(order='F') for A in [A0, A1, A2]]
+        )
+        self.payoffs1d_C = self.payoffs2d.ravel(order='C')
 
         self.N = N
         self.nums_actions = nums_actions
 
     def test_init(self):
-        p = GAMPayoffVector(self.nums_actions, self.payoffs1d)
+        for order, payoffs1d in [('F', self.payoffs1d_F),
+                                 ('C', self.payoffs1d_C)]:
+            p = PayoffProfileMatrix(self.nums_actions, payoffs1d, order=order)
 
-        assert_(p.N == self.N)
-        assert_(p.nums_actions == self.nums_actions)
-        assert_array_equal(p.payoffs, self.payoffs1d)
+            assert_(p.N == self.N)
+            assert_(p.nums_actions == self.nums_actions)
+            assert_array_equal(p.payoffs, self.payoffs2d)
+            assert_array_equal(p.as_vector(order='F'), self.payoffs1d_F)
+            assert_array_equal(p.as_vector(order='C'), self.payoffs1d_C)
 
-    def test_from_nfg(self):
+    def test_from_normal_form_game(self):
         g = NormalFormGame(self.payoffs4d)
-        p = GAMPayoffVector.from_nfg(g)
+        p = PayoffProfileMatrix.from_normal_form_game(g)
 
         assert_(p.N == self.N)
         assert_(p.nums_actions == self.nums_actions)
-        assert_array_equal(p.payoffs, self.payoffs1d)
+        assert_array_equal(p.payoffs, self.payoffs2d)
 
-    def test_to_nfg(self):
-        p = GAMPayoffVector(self.nums_actions, self.payoffs1d)
-        g = p.to_nfg()
-        assert_array_equal(g.payoff_profile_array, self.payoffs4d)
+    def test_to_normal_form_game(self):
+        for order, payoffs1d in [('F', self.payoffs1d_F),
+                                 ('C', self.payoffs1d_C)]:
+            p = PayoffProfileMatrix(self.nums_actions, payoffs1d, order=order)
+            g = p.to_normal_form_game()
+            assert_array_equal(g.payoff_profile_array, self.payoffs4d)
 
 
-def test_gampayoffvector_roundtrip():
+def test_payoffprofilematrix_2p():
+    # 3x2 game with payoff profiles, in column-major order over the
+    # action profiles:
+    #   (0,0): (3,2)  (1,0): (0,6)  (2,0): (2,1)
+    #   (0,1): (1,3)  (1,1): (4,0)  (2,1): (5,4)
+    g = NormalFormGame((Player([[3, 1], [0, 4], [2, 5]]),
+                        Player([[2, 6, 1], [3, 0, 4]])))
+    payoffs_F = [3, 0, 2, 1, 4, 5, 2, 6, 1, 3, 0, 4]  # player-major
+    payoffs_C = [3, 2, 0, 6, 2, 1, 1, 3, 4, 0, 5, 4]  # profile-major
+
+    p = PayoffProfileMatrix.from_normal_form_game(g)
+    assert_array_equal(p.as_vector(order='F'), payoffs_F)
+    assert_array_equal(p.as_vector(order='C'), payoffs_C)
+
+    for order, payoffs in [('F', payoffs_F), ('C', payoffs_C)]:
+        p = PayoffProfileMatrix((3, 2), payoffs, order=order)
+        assert_array_equal(p.to_normal_form_game().payoff_profile_array,
+                           g.payoff_profile_array)
+
+
+def test_payoffprofilematrix_roundtrip():
     for ns in [(4, 3), (2, 2, 3, 2)]:
         N = len(ns)
         seed = 12345
         rng = np.random.default_rng(seed)
         payoffs = rng.integers(low=0, high=100, size=(*ns, N), dtype=np.int64)
         g = NormalFormGame(payoffs)
-        p = GAMPayoffVector.from_nfg(g)
-        g1 = p.to_nfg()
+        p = PayoffProfileMatrix.from_normal_form_game(g)
+        g1 = p.to_normal_form_game()
 
-        p_32 = GAMPayoffVector.from_nfg(g, dtype=np.int32)
-        g2 = p_32.to_nfg()
-        g3 = p_32.to_nfg(dtype=np.int64)
+        p_32 = PayoffProfileMatrix.from_normal_form_game(g, dtype=np.int32)
+        g2 = p_32.to_normal_form_game()
+        g3 = p_32.to_normal_form_game(dtype=np.int64)
 
         assert_(p_32.payoffs.dtype == np.int32)
         assert_(g2.dtype == np.int32)
@@ -84,28 +115,58 @@ def test_gampayoffvector_roundtrip():
                 assert_array_equal(g_new.players[i].payoff_array,
                                    g.players[i].payoff_array)
 
+        # Conversion between the orders
+        for order in ['F', 'C']:
+            p_new = PayoffProfileMatrix(ns, p.as_vector(order=order),
+                                        order=order)
+            assert_array_equal(p_new.payoffs, p.payoffs)
 
-def test_gampayoffvector_1p():
+
+def test_payoffprofilematrix_1p():
     payoffs = [1., 2., 3.]
     nums_actions = (3,)
 
-    p0 = GAMPayoffVector(nums_actions, payoffs)
+    p0 = PayoffProfileMatrix(nums_actions, payoffs, order='F')
 
     g = NormalFormGame((Player(payoffs),))
-    p1 = GAMPayoffVector.from_nfg(g)
+    p1 = PayoffProfileMatrix.from_normal_form_game(g)
 
     for p in [p0, p1]:
         assert_(p.N == 1)
         assert_(p.nums_actions == nums_actions)
-        assert_array_equal(p.payoffs, payoffs)
+        assert_array_equal(p.as_vector(order='F'), payoffs)
+        assert_array_equal(p.as_vector(order='C'), payoffs)
+
+
+def test_payoffprofilematrix_views():
+    payoffs = np.arange(12)
+    p = PayoffProfileMatrix((3, 2), payoffs, order='F')
+
+    # `payoffs` and the player-major vector are views of the input
+    assert_(np.shares_memory(p.payoffs, payoffs))
+    assert_(np.shares_memory(p.as_vector(order='F'), payoffs))
+    assert_(not np.shares_memory(p.as_vector(order='C'), payoffs))
+
+    # The game does not alias the input, even for one player
+    p1 = PayoffProfileMatrix((3,), np.arange(3), order='F')
+    g = p1.to_normal_form_game()
+    assert_(not np.shares_memory(g.players[0].payoff_array, p1.payoffs))
 
 
 def test_invalid_inputs():
-    assert_raises(ValueError, GAMPayoffVector, (), np.array([], dtype=float))
-    assert_raises(TypeError, GAMPayoffVector, (2, 2.0), np.zeros(8))
-    assert_raises(ValueError, GAMPayoffVector, (2, 0), np.zeros(0))
-    assert_raises(ValueError, GAMPayoffVector, (2, 2), np.zeros((2, 4)))
-    assert_raises(ValueError, GAMPayoffVector, (2, 2), np.zeros(7))
+    assert_raises(ValueError, PayoffProfileMatrix, (), np.array([]),
+                  order='F')
+    assert_raises(TypeError, PayoffProfileMatrix, (2, 2.0), np.zeros(8),
+                  order='F')
+    assert_raises(ValueError, PayoffProfileMatrix, (2, 0), np.zeros(0),
+                  order='F')
+    assert_raises(ValueError, PayoffProfileMatrix, (2, 2), np.zeros(7),
+                  order='F')
+    # np.prod would overflow and give 0
+    assert_raises(ValueError, PayoffProfileMatrix, (2**62, 2**62),
+                  np.zeros(2), order='F')
+    # order is required
+    assert_raises(TypeError, PayoffProfileMatrix, (2, 2), np.zeros(8))
 
 
 # GAMWriter/to_gam #
@@ -316,7 +377,8 @@ def test_from_gam_string_number_formats():
 
     assert_(g.dtype == np.float64)
     assert_array_equal(
-        GAMPayoffVector.from_nfg(g).payoffs, payoffs
+        PayoffProfileMatrix.from_normal_form_game(g).as_vector(order='F'),
+        payoffs
     )
 
     # Integers only, with signs
@@ -330,7 +392,8 @@ def test_from_gam_string_number_formats():
 
     assert_(np.issubdtype(g.dtype, np.integer))
     assert_array_equal(
-        GAMPayoffVector.from_nfg(g).payoffs, [1, 2, -3, 4, 5, 6, 7, 8]
+        PayoffProfileMatrix.from_normal_form_game(g).as_vector(order='F'),
+        [1, 2, -3, 4, 5, 6, 7, 8]
     )
 
     assert_raises(ValueError, from_gam_string, "2\n2 2\n\n1 2 3 4 5 6 7 x")
