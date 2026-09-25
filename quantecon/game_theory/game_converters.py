@@ -565,6 +565,29 @@ class NFGReader(_Reader):
         return p.to_normal_form_game()
 
 
+class NFGWriter(_Writer):
+    """
+    Serializer for the Gambit .nfg format, in the payoff version. The
+    title is empty and the players are named "1", ..., "N".
+
+    """
+    @staticmethod
+    def _dump(g):
+        p = PayoffVector.from_normal_form_game(g, layout='profile-major')
+
+        buf = io.StringIO()
+
+        buf.write('NFG 1 R ""')
+        buf.write(' { ')
+        buf.write(' '.join(f'"{i}"' for i in range(1, p.N + 1)))
+        buf.write(' } { ')
+        buf.write(' '.join(map(str, p.nums_actions)))
+        buf.write(' }\n\n')
+        buf.write(_format_payoffs(p.payoffs))
+
+        return buf.getvalue()
+
+
 def from_gam(filename: str) -> NormalFormGame:
     """
     Read a GameTracer .gam file and return a NormalFormGame.
@@ -763,3 +786,35 @@ def from_nfg_url(url):
 
     """
     return NFGReader.from_url(url)
+
+
+def to_nfg(g, file_path=None):
+    """
+    Write a NormalFormGame to a file in .nfg format.
+
+    Parameters
+    ----------
+    g : NormalFormGame
+
+    file_path : str, optional(default=None)
+        Path to the file to write to. If None, the result is returned as
+        a string.
+
+    Returns
+    -------
+    None or str
+
+    Examples
+    --------
+    >>> g = NormalFormGame([[(3, 2), (1, 3)],
+    ...                     [(0, 6), (4, 0)],
+    ...                     [(2, 1), (5, 4)]])
+    >>> print(to_nfg(g))
+    NFG 1 R "" { "1" "2" } { 3 2 }
+    <BLANKLINE>
+    3 2 0 6 2 1 1 3 4 0 5 4
+
+    """
+    if file_path is None:
+        return NFGWriter.to_string(g)
+    return NFGWriter.to_file(g, file_path)

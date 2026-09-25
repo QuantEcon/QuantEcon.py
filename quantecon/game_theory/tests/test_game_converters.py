@@ -12,7 +12,7 @@ from numpy.testing import (
 )
 from quantecon.game_theory import (
     Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url,
-    from_nfg, from_nfg_string, from_nfg_url
+    from_nfg, from_nfg_string, from_nfg_url, to_nfg
 )
 from quantecon.game_theory.game_converters import (
     PayoffVector, _str2num
@@ -565,3 +565,48 @@ def test_from_nfg_url():
 def test_from_nfg_string_not_nfg():
     s_gam = "2\n3 2\n\n1 2 3 4 5 6 7 8 9 10 11 12"
     assert_raises(ValueError, from_nfg_string, s_gam)
+
+
+# NFGWriter/to_nfg #
+
+def test_to_nfg():
+    g = _game_3x2()
+    s_desired = 'NFG 1 R "" { "1" "2" } { 3 2 }\n\n3 2 0 6 2 1 1 3 4 0 5 4'
+
+    assert_string_equal(to_nfg(g), s_desired)
+
+    with NamedTemporaryFile(delete=False) as tmp_file:
+        temp_path = tmp_file.name
+        to_nfg(g, temp_path)
+
+    with open(temp_path, 'r') as f:
+        s_actual = f.read()
+    assert_string_equal(s_actual, s_desired + '\n')
+
+    os.remove(temp_path)
+
+
+def test_nfg_roundtrip():
+    rng = np.random.default_rng(12345)
+    for ns in [(4, 3), (2, 2, 3, 2)]:
+        N = len(ns)
+        for payoffs in [rng.integers(0, 100, size=(*ns, N)),
+                        rng.random(size=(*ns, N)),
+                        rng.random(size=(*ns, N)) < 0.5]:
+            g = NormalFormGame(payoffs)
+            g_read = from_nfg_string(to_nfg(g))
+            assert_array_equal(g_read.payoff_profile_array,
+                               g.payoff_profile_array)
+
+
+def test_gam_nfg_same_game():
+    # The two writers list the same payoffs in the two orders
+    rng = np.random.default_rng(0)
+    g = NormalFormGame(rng.integers(0, 100, size=(2, 3, 4, 3)))
+    g_gam = from_gam_string(to_gam(g))
+    g_nfg = from_nfg_string(to_nfg(g))
+    assert_array_equal(g_gam.payoff_profile_array, g_nfg.payoff_profile_array)
+
+    payoffs_gam = np.array(to_gam(g).split()[4:], dtype=int)
+    payoffs_nfg = np.array(to_nfg(g).split('\n')[-1].split(), dtype=int)
+    assert_array_equal(payoffs_gam.reshape((3, 24)).T.ravel(), payoffs_nfg)
