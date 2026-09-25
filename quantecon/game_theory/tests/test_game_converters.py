@@ -529,6 +529,14 @@ NFG 1 R "" { "1" "2" } { 2 2 }
                         [[0., 0.], [0., 0.]]])
 
 
+def test_from_nfg_string_null_outcomes_only():
+    # An empty list of outcomes, with the null outcome at every profile
+    s = 'NFG 1 R "" { "Row" "Col" } { 2 2 } { } 0 0 0 0'
+    g = from_nfg_string(s)
+    assert_(np.issubdtype(g.dtype, np.integer))
+    assert_array_equal(g.payoff_profile_array, np.zeros((2, 2, 2)))
+
+
 def test_from_nfg_string_3p():
     # 2x2x2 game, profile-major: player 0 varies fastest
     payoffs = np.arange(24).reshape((2, 2, 2, 3), order='F')
