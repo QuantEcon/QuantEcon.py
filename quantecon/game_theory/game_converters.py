@@ -301,25 +301,26 @@ def _str2num(s):
     return float(s)
 
 
-class GAMReader:
+class _Reader:
     """
-    Parser for the GameTracer .gam format.
+    Base class of the parsers. `from_file`, `from_url`, and `from_string`
+    read the text and pass it to `_parse`, defined by each format.
 
     """
     @classmethod
     def from_file(cls, file_path):
         """
-        Read from a .gam format file.
+        Read from a file in the format of this reader.
 
         Parameters
         ----------
         file_path : str
-            Path to the .gam file.
+            Path to the file.
 
         Returns
         -------
         NormalFormGame
-            The game described by the .gam file.
+            The game described by the file.
 
         """
         with open(file_path, 'r') as f:
@@ -334,12 +335,12 @@ class GAMReader:
         Parameters
         ----------
         url : str
-            String containing a URL of the .gam file.
+            String containing a URL of the file.
 
         Returns
         -------
         NormalFormGame
-            The game described by the .gam file.
+            The game described by the file.
 
         """
         import urllib.request
@@ -350,21 +351,92 @@ class GAMReader:
     @classmethod
     def from_string(cls, string):
         """
-        Read from a .gam format string.
+        Read from a string in the format of this reader.
 
         Parameters
         ----------
         string : str
-            String in .gam format.
+            String in the format.
 
         Returns
         -------
         NormalFormGame
-            The game described by the .gam string.
+            The game described by the string.
 
         """
         return cls._parse(string)
 
+
+class _Writer:
+    """
+    Base class of the serializers. `to_file` and `to_string` write the
+    text returned by `_dump`, defined by each format.
+
+    """
+    @classmethod
+    def to_file(cls, g, file_path):
+        """
+        Write `g` to a file in the format of this writer.
+
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to write.
+
+        file_path : str
+            Path to the file to write to.
+
+        """
+        with open(file_path, 'w') as f:
+            f.write(cls._dump(g) + '\n')
+
+    @classmethod
+    def to_string(cls, g):
+        """
+        Return the string representation of `g` in the format of this
+        writer.
+
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to convert.
+
+        Returns
+        -------
+        str
+            The string representation of `g`.
+
+        """
+        return cls._dump(g)
+
+
+def _format_payoffs(payoffs):
+    """
+    Return the 1-dim array `payoffs` as a string of space-separated
+    numbers.
+
+    """
+    if payoffs.dtype == np.bool_:
+        # Written as 0 and 1, not True and False
+        payoffs = payoffs.astype(int)
+
+    if np.issubdtype(payoffs.dtype, np.floating):
+        # Shortest representation that round-trips, without exponent
+        def fmt(x):
+            return np.format_float_positional(x, trim='.')
+    else:
+        fmt = str
+
+    return ' '.join(map(fmt, payoffs))
+
+
+# GameTracer .gam #
+
+class GAMReader(_Reader):
+    """
+    Parser for the GameTracer .gam format.
+
+    """
     @staticmethod
     def _parse(string):
         tokens = string.split()
@@ -403,46 +475,11 @@ class GAMReader:
         return p.to_normal_form_game()
 
 
-class GAMWriter:
+class GAMWriter(_Writer):
     """
     Serializer for the GameTracer .gam format.
 
     """
-    @classmethod
-    def to_file(cls, g, file_path):
-        """
-        Write `g` to a file in GameTracer .gam format.
-
-        Parameters
-        ----------
-        g : NormalFormGame
-            NormalFormGame instance to write.
-
-        file_path : str
-            Path to the file to write to.
-
-        """
-        with open(file_path, 'w') as f:
-            f.write(cls._dump(g) + '\n')
-
-    @classmethod
-    def to_string(cls, g):
-        """
-        Return the GameTracer .gam string representation of `g`.
-
-        Parameters
-        ----------
-        g : NormalFormGame
-            NormalFormGame instance to convert.
-
-        Returns
-        -------
-        str
-            The .gam format string representation of `g`.
-
-        """
-        return cls._dump(g)
-
     @staticmethod
     def _dump(g):
         p = PayoffVector.from_normal_form_game(g, layout='player-major')
@@ -453,22 +490,9 @@ class GAMWriter:
         buf.write('\n')
         buf.write(' '.join(map(str, p.nums_actions)))
         buf.write('\n\n')
+        buf.write(_format_payoffs(p.payoffs))
 
-        payoffs = p.payoffs
-        if payoffs.dtype == np.bool_:
-            # Written as 0 and 1, not True and False
-            payoffs = payoffs.astype(int)
-
-        if np.issubdtype(payoffs.dtype, np.floating):
-            # Shortest representation that round-trips, without exponent
-            def fmt(x):
-                return np.format_float_positional(x, trim='.')
-        else:
-            fmt = str
-
-        buf.write(' '.join(map(fmt, payoffs)))
-
-        return buf.getvalue().rstrip()
+        return buf.getvalue()
 
 
 def from_gam(filename: str) -> NormalFormGame:
