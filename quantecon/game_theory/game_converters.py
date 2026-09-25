@@ -2,7 +2,7 @@
 Utilities for converting between representations of games.
 
 Currently supports reading and writing the GameTracer `.gam` text format
-[1]_.
+[1]_ and the Gambit `.nfg` text format [2]_.
 
 Examples
 --------
@@ -33,11 +33,14 @@ References
 ----------
 .. [1] Ben Blum, Daphne Koller, Christian Shelton, "Game Theory:
    GameTracer," http://dags.stanford.edu/Games/gametracer.html
+.. [2] The Gambit Project, "Game representation formats,"
+   https://gambitproject.readthedocs.io/en/latest/formats.html
 
 """
 import io
 import math
 import numbers
+import re
 from fractions import Fraction
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
@@ -495,6 +498,73 @@ class GAMWriter(_Writer):
         return buf.getvalue()
 
 
+# Gambit .nfg #
+
+# A token is a quoted string (with `\"` for a quote inside), a brace, or a
+# run of other characters; commas are separators
+_NFG_TOKEN = re.compile(r'"((?:[^"\\]|\\.)*)"|([{}])|([^\s{}",]+)')
+
+
+def _read_tree(tokens, pos):
+    """
+    Return the item starting at `tokens[pos]` and the position after it: a
+    nested list for a braced group, the token itself otherwise (the Lisp
+    reader).
+
+    """
+    if tokens[pos] == '{':
+        items, pos = [], pos + 1
+        while tokens[pos] != '}':
+            item, pos = _read_tree(tokens, pos)
+            items.append(item)
+        return items, pos + 1
+    return tokens[pos], pos + 1
+
+
+class NFGReader(_Reader):
+    """
+    Parser for the Gambit .nfg format, in both the payoff version and the
+    outcome version. The title, the names of the players and of the
+    actions, the comment, and the names of the outcomes are ignored.
+
+    """
+    @staticmethod
+    def _parse(string):
+        # Braces around the whole file, so that it reads as one list
+        tokens = ['{']
+        tokens.extend(m.group(0) for m in _NFG_TOKEN.finditer(string))
+        tokens.append('}')
+        if len(tokens) < 3 or tokens[1] != 'NFG':
+            raise ValueError('not in the .nfg format')
+        tree, _ = _read_tree(tokens, 0)
+
+        # Prologue: NFG, version, R or D, title, players, actions (the
+        # numbers of actions, or the lists of their names), and an
+        # optional comment
+        _, _, _, _, _, actions, *body = tree
+        if isinstance(body[0], str) and body[0].startswith('"'):
+            body = body[1:]
+        nums_actions = tuple(
+            len(a) if isinstance(a, list) else int(a) for a in actions
+        )
+
+        if isinstance(body[0], list):
+            # Outcome version: a list of outcomes, each a name and N
+            # payoffs, then the index of the outcome at each action
+            # profile, 0 meaning zero payoffs
+            outcomes, indices = body[0], body[1:]
+            table = np.array([[_str2num(x) for x in o[1:]] for o in outcomes])
+            table = np.vstack([np.zeros((1, table.shape[1]), table.dtype),
+                               table])
+            payoffs = table[[int(i) for i in indices]].ravel()
+        else:
+            # Payoff version: the payoffs at each action profile
+            payoffs = np.array([_str2num(tok) for tok in body])
+
+        p = PayoffVector(nums_actions, payoffs, layout='profile-major')
+        return p.to_normal_form_game()
+
+
 def from_gam(filename: str) -> NormalFormGame:
     """
     Read a GameTracer .gam file and return a NormalFormGame.
@@ -605,3 +675,91 @@ def to_gam(g, file_path=None):
     if file_path is None:
         return GAMWriter.to_string(g)
     return GAMWriter.to_file(g, file_path)
+
+
+def from_nfg(filename: str) -> NormalFormGame:
+    """
+    Read a Gambit .nfg file and return a NormalFormGame.
+
+    Parameters
+    ----------
+    filename : str
+        Path to .nfg file.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .nfg file.
+
+    Examples
+    --------
+    Save a .nfg format string in a temporary file:
+
+    >>> import tempfile
+    >>> fname = tempfile.mkstemp()[1]
+    >>> with open(fname, mode='w') as f:
+    ...       _ = f.write(\"\"\"\\
+    ... NFG 1 R "" { "1" "2" } { 3 2 }
+    ...
+    ... 3 2 0 6 2 1 1 3 4 0 5 4\"\"\")
+
+    Read the file:
+
+    >>> g = from_nfg(fname)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[3, 2],  [1, 3]],
+     [[0, 6],  [4, 0]],
+     [[2, 1],  [5, 4]]]
+
+    """
+    return NFGReader.from_file(filename)
+
+
+def from_nfg_string(string):
+    """
+    Read a .nfg format string and return a NormalFormGame.
+
+    Parameters
+    ----------
+    string : str
+        String in .nfg format.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .nfg string.
+
+    Examples
+    --------
+    >>> string = \"\"\"\\
+    ... NFG 1 R "" { "1" "2" } { 3 2 }
+    ...
+    ... 3 2 0 6 2 1 1 3 4 0 5 4\"\"\"
+    >>> g = from_nfg_string(string)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[3, 2],  [1, 3]],
+     [[0, 6],  [4, 0]],
+     [[2, 1],  [5, 4]]]
+
+    """
+    return NFGReader.from_string(string)
+
+
+def from_nfg_url(url):
+    """
+    Read a Gambit .nfg file from a URL and return a NormalFormGame.
+
+    Parameters
+    ----------
+    url : str
+        String containing a URL of the .nfg file.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .nfg file.
+
+    """
+    return NFGReader.from_url(url)

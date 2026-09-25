@@ -11,7 +11,8 @@ from numpy.testing import (
     assert_, assert_array_equal, assert_string_equal, assert_raises
 )
 from quantecon.game_theory import (
-    Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url
+    Player, NormalFormGame, GAMWriter, to_gam, from_gam_string, from_gam_url,
+    from_nfg, from_nfg_string, from_nfg_url
 )
 from quantecon.game_theory.game_converters import (
     PayoffVector, _str2num
@@ -438,3 +439,129 @@ def test_from_gam_url():
 
     g_str = from_gam_string(s)
     assert_array_equal(g_url.payoff_profile_array, g_str.payoff_profile_array)
+
+
+# NFGReader/from_nfg #
+
+def _game_3x2():
+    # 3x2 game with payoff profiles, in column-major order over the
+    # action profiles:
+    #   (0,0): (3,2)  (1,0): (0,6)  (2,0): (2,1)
+    #   (0,1): (1,3)  (1,1): (4,0)  (2,1): (5,4)
+    return NormalFormGame([[(3, 2), (1, 3)],
+                           [(0, 6), (4, 0)],
+                           [(2, 1), (5, 4)]])
+
+
+_NFG_PAYOFF = """\
+NFG 1 R "3x2 game" { "Row" "Column" } { 3 2 }
+
+3 2 0 6 2 1 1 3 4 0 5 4"""
+
+_NFG_OUTCOME = """\
+NFG 1 R "3x2 game" { "Row" "Column" }
+
+{ { "1" "2" "3" }
+{ "1" "2" }
+}
+""
+
+{
+{ "" 3, 2 }
+{ "" 0, 6 }
+{ "" 2, 1 }
+{ "" 1, 3 }
+{ "" 4, 0 }
+{ "" 5, 4 }
+}
+1 2 3 4 5 6
+"""
+
+
+def test_from_nfg_string():
+    g = _game_3x2()
+    for s in [_NFG_PAYOFF, _NFG_OUTCOME]:
+        g_read = from_nfg_string(s)
+        assert_(np.issubdtype(g_read.dtype, np.integer))
+        assert_array_equal(g_read.payoff_profile_array,
+                           g.payoff_profile_array)
+
+
+def test_from_nfg_string_variants():
+    g = _game_3x2()
+    variants = [
+        # D instead of R
+        _NFG_PAYOFF.replace("NFG 1 R", "NFG 1 D"),
+        # Names of the actions instead of their numbers
+        _NFG_PAYOFF.replace('{ 3 2 }', '{ { "a" "b" "c" } { "x" "y" } }'),
+        # Comment after the actions
+        _NFG_PAYOFF.replace('{ 3 2 }', '{ 3 2 } "a comment"'),
+        # Escaped quote, braces, and a comma in the title
+        _NFG_PAYOFF.replace('"3x2 game"', '"a \\"3x2\\" {game}, R"'),
+        # Numbers of actions in the outcome version, no comment
+        _NFG_OUTCOME.replace('{ { "1" "2" "3" }\n{ "1" "2" }\n}\n""',
+                             '{ 3 2 }'),
+        # Commas absent
+        _NFG_OUTCOME.replace(',', ''),
+        # CRLF
+        _NFG_OUTCOME.replace('\n', '\r\n'),
+    ]
+    for s in variants:
+        assert_array_equal(from_nfg_string(s).payoff_profile_array,
+                           g.payoff_profile_array)
+
+
+def test_from_nfg_string_null_outcome():
+    # Outcome 0 is the null outcome with zero payoffs
+    s = """\
+NFG 1 R "" { "1" "2" } { 2 2 }
+
+{
+{ "" 1, 2 }
+{ "" 3/2, -4.5 }
+}
+1 0 2 0
+"""
+    g = from_nfg_string(s)
+    assert_(g.dtype == np.float64)
+    assert_array_equal(g.payoff_profile_array,
+                       [[[1., 2.], [1.5, -4.5]],
+                        [[0., 0.], [0., 0.]]])
+
+
+def test_from_nfg_string_3p():
+    # 2x2x2 game, profile-major: player 0 varies fastest
+    payoffs = np.arange(24).reshape((2, 2, 2, 3), order='F')
+    g = NormalFormGame(payoffs)
+    s = 'NFG 1 R "" { "1" "2" "3" } { 2 2 2 }\n\n' + \
+        ' '.join(map(str, payoffs.reshape((8, 3), order='F').ravel()))
+    assert_array_equal(from_nfg_string(s).payoff_profile_array,
+                       g.payoff_profile_array)
+
+
+def test_from_nfg_files():
+    path = os.path.join(os.path.dirname(__file__), 'game_files')
+    for fname in ['3x2_payoff.nfg', '3x2_outcome.nfg']:
+        g_read = from_nfg(os.path.join(path, fname))
+        g_expected = _game_3x2()
+        if fname == '3x2_outcome.nfg':
+            # The profile (1, 1) has the null outcome in this file
+            g_expected[1, 1] = (0, 0)
+        assert_array_equal(g_read.payoff_profile_array,
+                           g_expected.payoff_profile_array)
+
+
+def test_from_nfg_url():
+    def fake_urlopen(url):
+        return _FakeResponse(_NFG_PAYOFF.encode("utf-8"))
+
+    with patch("urllib.request.urlopen", fake_urlopen):
+        g_url = from_nfg_url("http://example.com/game.nfg")
+
+    assert_array_equal(g_url.payoff_profile_array,
+                       _game_3x2().payoff_profile_array)
+
+
+def test_from_nfg_string_not_nfg():
+    s_gam = "2\n3 2\n\n1 2 3 4 5 6 7 8 9 10 11 12"
+    assert_raises(ValueError, from_nfg_string, s_gam)

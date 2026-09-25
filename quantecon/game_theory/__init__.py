@@ -25,5 +25,6 @@ from .logitdyn import LogitDynamics
 from .polymatrix_game import PolymatrixGame
 from .howson_lcp import polym_lcp_solver
 from .game_converters import (
-    GAMReader, GAMWriter, from_gam, from_gam_string, from_gam_url, to_gam
+    GAMReader, GAMWriter, from_gam, from_gam_string, from_gam_url, to_gam,
+    NFGReader, from_nfg, from_nfg_string, from_nfg_url
 )
