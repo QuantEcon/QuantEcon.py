@@ -177,8 +177,8 @@ def test_invalid_inputs():
     assert_raises(ValueError, PayoffVector, (2, 2), np.zeros((2, 4)),
                   layout=pm)
     assert_raises(ValueError, PayoffVector, (2, 2), np.zeros(7), layout=pm)
-    # np.prod would overflow and give 0
-    assert_raises(ValueError, PayoffVector, (2**62, 2**62), np.zeros(2),
+    # np.prod would overflow and give 0, accepting an empty array
+    assert_raises(ValueError, PayoffVector, (2**62, 2**62), np.zeros(0),
                   layout=pm)
     # layout is required, and must be 'player-major' or 'profile-major'
     assert_raises(TypeError, PayoffVector, (2, 2), np.zeros(8))
