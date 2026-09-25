@@ -3,7 +3,7 @@ NFG 1 R "3x2 game, outcome version" { "Row" "Column" }
 { { "1" "2" "3" }
 { "1" "2" }
 }
-"Hand-written test file; the profile (2, 1) has the null outcome"
+"Hand-written test file; the fifth action profile has the null outcome"
 
 {
 { "a" 3, 2 }
