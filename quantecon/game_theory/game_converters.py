@@ -2,7 +2,17 @@
 Utilities for converting between representations of games.
 
 Currently supports reading and writing the GameTracer `.gam` text format
-[1]_ and the Gambit `.nfg` text format [2]_.
+[1]_ and the Gambit `.nfg` text format [2]_ through the following
+functions:
+
+from_gam, from_gam_string, from_gam_url
+    Read a NormalFormGame from a .gam file, string, or URL.
+to_gam
+    Write a NormalFormGame to a .gam file, or return it as a string.
+from_nfg, from_nfg_string, from_nfg_url
+    Read a NormalFormGame from a .nfg file, string, or URL.
+to_nfg
+    Write a NormalFormGame to a .nfg file, or return it as a string.
 
 Examples
 --------
@@ -505,17 +515,20 @@ class GAMWriter(_Writer):
 _NFG_TOKEN = re.compile(r'"((?:[^"\\]|\\.)*)"|([{}])|([^\s{}",]+)')
 
 
-def _read_tree(tokens, pos):
+def _read_from_tokens(tokens, pos):
     """
     Return the item starting at `tokens[pos]` and the position after it: a
-    nested list for a braced group, the token itself otherwise (the Lisp
-    reader).
+    nested list for a braced group, the token itself otherwise.
+
+    Parses the braces only and leaves the meaning to the caller, in the
+    manner of a Lisp reader, which parses only the parentheses. Adapted from
+    Norvig's `read_from_tokens`, https://norvig.com/lispy.html.
 
     """
     if tokens[pos] == '{':
         items, pos = [], pos + 1
         while tokens[pos] != '}':
-            item, pos = _read_tree(tokens, pos)
+            item, pos = _read_from_tokens(tokens, pos)
             items.append(item)
         return items, pos + 1
     return tokens[pos], pos + 1
@@ -536,12 +549,12 @@ class NFGReader(_Reader):
         tokens.append('}')
         if len(tokens) < 3 or tokens[1] != 'NFG':
             raise ValueError('not in the .nfg format')
-        tree, _ = _read_tree(tokens, 0)
+        items, _ = _read_from_tokens(tokens, 0)
 
         # Prologue: NFG, version, R or D, title, players, actions (the
         # numbers of actions, or the lists of their names), and an
         # optional comment
-        _, _, _, _, _, actions, *body = tree
+        _, _, _, _, _, actions, *body = items
         if isinstance(body[0], str) and body[0].startswith('"'):
             body = body[1:]
         nums_actions = tuple(
