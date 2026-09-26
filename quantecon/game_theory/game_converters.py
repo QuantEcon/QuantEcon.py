@@ -2,7 +2,17 @@
 Utilities for converting between representations of games.
 
 Currently supports reading and writing the GameTracer `.gam` text format
-[1]_ and the Gambit `.nfg` text format [2]_.
+[1]_ and the Gambit `.nfg` text format [2]_ through the following
+functions:
+
+from_gam, from_gam_string, from_gam_url
+    Read a NormalFormGame from a .gam file, string, or URL.
+to_gam
+    Write a NormalFormGame to a .gam file, or return it as a string.
+from_nfg, from_nfg_string, from_nfg_url
+    Read a NormalFormGame from a .nfg file, string, or URL.
+to_nfg
+    Write a NormalFormGame to a .nfg file, or return it as a string.
 
 Examples
 --------
@@ -507,9 +517,12 @@ _NFG_TOKEN = re.compile(r'"((?:[^"\\]|\\.)*)"|([{}])|([^\s{}",]+)')
 
 def _read_tree(tokens, pos):
     """
-    Return the item starting at `tokens[pos]` and the position after it: a
-    nested list for a braced group, the token itself otherwise (the Lisp
-    reader).
+    Return the subtree starting at `tokens[pos]` and the position after it:
+    a nested list for a braced group, the token itself (a leaf) otherwise.
+
+    Parses the braces only and leaves the meaning to the caller, in the
+    manner of a Lisp reader, which parses only the parentheses. Adapted from
+    Norvig's `read_from_tokens`, https://norvig.com/lispy.html.
 
     """
     if tokens[pos] == '{':
