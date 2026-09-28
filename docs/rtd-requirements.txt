@@ -4,6 +4,5 @@ numpydoc
 numba>=0.49
 numpy>=1.17
 scipy>=1.5
-requests
 matplotlib
 sphinx_rtd_theme

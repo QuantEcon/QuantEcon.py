@@ -13,7 +13,6 @@ dependencies:
   - numba=0.68.0rc1
   - ipython
   - flake8
-  - requests
   - urllib3>=2
   - flit
   - chardet # python>3.9,osx
