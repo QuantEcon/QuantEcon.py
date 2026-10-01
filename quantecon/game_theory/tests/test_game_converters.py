@@ -537,6 +537,17 @@ def test_from_nfg_string_null_outcomes_only():
     assert_array_equal(g.payoff_profile_array, np.zeros((2, 2, 2)))
 
 
+def test_from_nfg_string_large_unsigned_outcome():
+    # Payoffs beyond int64: the null outcome row must not turn the uint64
+    # table into float64
+    a, b = 2**63 + 1, 2**63 + 3
+    s = f'NFG 1 R "" {{ "Row" "Col" }} {{ 1 1 }} {{ {{ "" {a}, {b} }} }} 1'
+    g = from_nfg_string(s)
+    assert_(g.dtype == np.uint64)  # equality alone would promote and pass
+    assert_array_equal(g.payoff_profile_array,
+                       np.array([[[a, b]]], dtype=np.uint64))
+
+
 def test_from_nfg_string_3p():
     # 2x2x2 game, profile-major: player 0 varies fastest
     payoffs = np.arange(24).reshape((2, 2, 2, 3), order='F')

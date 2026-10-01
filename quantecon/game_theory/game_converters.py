@@ -568,7 +568,9 @@ class NFGReader(_Reader):
             outcomes, indices = body[0], body[1:]
             N = len(nums_actions)
             rows = [[_str2num(x) for x in o[1:]] for o in outcomes]
-            table = np.array([[0] * N] + rows)  # row 0: the null outcome
+            table = np.array(rows) if rows else np.empty((0, N), dtype=int)
+            # Row 0: the null outcome, in the dtype of the other rows
+            table = np.vstack((np.zeros((1, N), dtype=table.dtype), table))
             payoffs = table[[int(i) for i in indices]].ravel()
         else:
             # Payoff version: the payoffs at each action profile
