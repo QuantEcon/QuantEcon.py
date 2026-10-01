@@ -548,6 +548,12 @@ def test_from_nfg_string_large_unsigned_outcome():
                        np.array([[[a, b]]], dtype=np.uint64))
 
 
+def test_from_nfg_string_backslash_newline_in_title():
+    s = _NFG_PAYOFF.replace('"3x2 game"', '"first\\\nsecond"')
+    assert_array_equal(from_nfg_string(s).payoff_profile_array,
+                       _game_3x2().payoff_profile_array)
+
+
 def test_from_nfg_string_3p():
     # 2x2x2 game, profile-major: player 0 varies fastest
     payoffs = np.arange(24).reshape((2, 2, 2, 3), order='F')
