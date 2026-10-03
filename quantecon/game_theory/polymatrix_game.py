@@ -14,7 +14,7 @@ Turn a Matching Pennies Normal Form Game into a Polymatrix Game.
 >>> matching_pennies_bimatrix = [
 ...     [(1, -1), (-1, 1)], [(-1, 1), (1, -1)]]
 >>> nfg = NormalFormGame(matching_pennies_bimatrix)
->>> polymg = PolymatrixGame.from_nf(nfg)
+>>> polymg = PolymatrixGame.from_normal_form_game(nfg)
 >>> print(polymg)
 2-player PolymatrixGame with payoff matrices:
 (0, 1):
@@ -31,6 +31,7 @@ could not be reliably quoted for this doctest.)
 
 """
 
+import warnings
 import numpy as np
 from itertools import product
 from math import isqrt
@@ -220,7 +221,7 @@ class PolymatrixGame:
             self.polymatrix[(p1, p2)] = matrix_builder
 
     @classmethod
-    def from_nf(
+    def from_normal_form_game(
         cls,
         nf: NormalFormGame,
         is_polymatrix: bool = True
@@ -263,6 +264,24 @@ class PolymatrixGame:
 
         return cls(polymatrix_builder)
 
+    @classmethod
+    def from_nf(cls, nf: NormalFormGame, is_polymatrix: bool = True):
+        """
+        Creates a Polymatrix from a Normal Form Game.
+
+        .. deprecated:: 0.12.1
+
+            Use `from_normal_form_game` instead.
+
+        """
+        warnings.warn(
+            "`PolymatrixGame.from_nf` is deprecated. "
+            "Use `PolymatrixGame.from_normal_form_game` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return cls.from_normal_form_game(nf, is_polymatrix=is_polymatrix)
+
     def get_player(self, player_idx: int) -> Player:
         """
         Calculates the payoff function of a player.
@@ -288,7 +307,7 @@ class PolymatrixGame:
         ])
         return Player(payoff_array)
 
-    def to_nfg(self) -> NormalFormGame:
+    def to_normal_form_game(self) -> NormalFormGame:
         """
         Creates a Normal Form Game from the Polymatrix Game.
 
@@ -300,6 +319,23 @@ class PolymatrixGame:
         nfg = NormalFormGame([self.get_player(i) for i in range(self.N)])
 
         return nfg
+
+    def to_nfg(self) -> NormalFormGame:
+        """
+        Creates a Normal Form Game from the Polymatrix Game.
+
+        .. deprecated:: 0.12.1
+
+            Use `to_normal_form_game` instead.
+
+        """
+        warnings.warn(
+            "`PolymatrixGame.to_nfg` is deprecated. "
+            "Use `PolymatrixGame.to_normal_form_game` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.to_normal_form_game()
 
     def range_of_payoffs(self) -> tuple[float, float]:
         """

@@ -2,6 +2,7 @@
 Tests for polymatrix_game.py
 """
 
+import pytest
 from numpy.testing import assert_, assert_raises
 from quantecon.game_theory.game_converters import from_gam
 from quantecon.game_theory import NormalFormGame, PolymatrixGame
@@ -61,23 +62,24 @@ class TestPolymatrixGame():
         assert_(are_close)
 
     def test_normal_form_to_polymatrix_to_normal_form_multiplayer(self):
-        polymg = PolymatrixGame.from_nf(self.pmg1, is_polymatrix=True)
-        back_in_nf = polymg.to_nfg()
+        polymg = PolymatrixGame.from_normal_form_game(
+            self.pmg1, is_polymatrix=True)
+        back_in_nf = polymg.to_normal_form_game()
         are_close = close_normal_form_games(self.pmg1, back_in_nf)
         assert_(are_close)
 
     def test_normal_form_to_polymatrix_to_normal_form_bimatrix(self):
-        polymg = PolymatrixGame.from_nf(
+        polymg = PolymatrixGame.from_normal_form_game(
             self.bimatrix_game, is_polymatrix=True)
-        back_in_nf = polymg.to_nfg()
+        back_in_nf = polymg.to_normal_form_game()
         are_close = close_normal_form_games(
             self.bimatrix_game, back_in_nf)
         assert_(are_close)
 
     def test_comes_up_with_approximation(self):
-        polymg = PolymatrixGame.from_nf(
+        polymg = PolymatrixGame.from_normal_form_game(
             self.non_pmg, is_polymatrix=False)
-        back_in_nf = polymg.to_nfg()
+        back_in_nf = polymg.to_normal_form_game()
         assert_(not close_normal_form_games(
             self.non_pmg,
             back_in_nf
@@ -85,10 +87,17 @@ class TestPolymatrixGame():
 
     def test_nonpolymatrix_gets_error_if_is_polymatrix_flag(self):
         with assert_raises(AssertionError):
-            PolymatrixGame.from_nf(
+            PolymatrixGame.from_normal_form_game(
                 self.non_pmg,
                 is_polymatrix=True
             )
+
+    def test_deprecated_names_warn(self):
+        with pytest.warns(DeprecationWarning, match="from_nf"):
+            polymg = PolymatrixGame.from_nf(self.pmg1, is_polymatrix=True)
+        with pytest.warns(DeprecationWarning, match="to_nfg"):
+            back_in_nf = polymg.to_nfg()
+        assert_(close_normal_form_games(self.pmg1, back_in_nf))
 
     def test_matchups_get_filled_with_zeros(self):
         polymatrix = {
