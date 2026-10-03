@@ -11,7 +11,7 @@ dependencies:
   - numpy>=2
   - scipy
   - pandas
-  - numba=0.68.0rc1
+  - numba>=0.68
   - ipython
   - flake8
   - requests
