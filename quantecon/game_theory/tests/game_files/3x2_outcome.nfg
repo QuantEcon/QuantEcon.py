@@ -1,0 +1,15 @@
+NFG 1 R "3x2 game, outcome version" { "Row" "Column" }
+
+{ { "1" "2" "3" }
+{ "1" "2" }
+}
+"Hand-written test file; the fifth action profile has the null outcome"
+
+{
+{ "a" 3, 2 }
+{ "b" 0, 6 }
+{ "c" 2, 1 }
+{ "d" 1, 3 }
+{ "e" 5, 4 }
+}
+1 2 3 4 0 5
