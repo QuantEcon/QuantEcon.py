@@ -23,7 +23,7 @@ data_dir = os.path.join(this_dir, data_dir_name)
 def test_polym_lcp_solver_where_solution_is_pure_NE():
     filename = "big_polym.gam"
     nfg = from_gam(os.path.join(data_dir, filename))
-    polymg = PolymatrixGame.from_nf(nfg)
+    polymg = PolymatrixGame.from_normal_form_game(nfg)
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -32,7 +32,7 @@ def test_polym_lcp_solver_where_solution_is_pure_NE():
 def test_polym_lcp_solver_where_lcp_solver_must_backtrack():
     filename = "triggers_back_case.gam"
     nfg = from_gam(os.path.join(data_dir, filename))
-    polymg = PolymatrixGame.from_nf(nfg)
+    polymg = PolymatrixGame.from_normal_form_game(nfg)
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -54,7 +54,7 @@ def test_solves_rock_paper_scissors():
     polymg = PolymatrixGame(
         polymatrix
     )
-    nfg = polymg.to_nfg()
+    nfg = polymg.to_normal_form_game()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -98,7 +98,7 @@ def test_solves_rps_with_scissorless_third_player():
     polymg = PolymatrixGame(
         polymatrix
     )
-    nfg = polymg.to_nfg()
+    nfg = polymg.to_normal_form_game()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -144,7 +144,7 @@ def test_solves_rps_with_rocking_third_player():
     polymg = PolymatrixGame(
         polymatrix
     )
-    nfg = polymg.to_nfg()
+    nfg = polymg.to_normal_form_game()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne)
     assert_(worked)
@@ -297,7 +297,7 @@ def test_solves_multiplayer_rps_like():
         polymatrix,
         nums_actions=[3, 2, 2, 2, 3, 2],
     )
-    nfg = polymg.to_nfg()
+    nfg = polymg.to_normal_form_game()
     ne = polym_lcp_solver(polymg)
     worked = nfg.is_nash(ne, tol=1e-5)
     assert_(worked)
@@ -306,7 +306,7 @@ def test_solves_multiplayer_rps_like():
 def test_different_starting():
     filename = "triggers_back_case.gam"
     nfg = from_gam(os.path.join(data_dir, filename))
-    polymg = PolymatrixGame.from_nf(nfg)
+    polymg = PolymatrixGame.from_normal_form_game(nfg)
     starting = [3, 2, 2, 0, 3]
     # We also notice that changing the start
     # can avoid the backrtrack
@@ -361,7 +361,7 @@ class TestHowsonLCPDegenerate():
         for d in self.game_dicts:
             for k in d['NEs_dict'].keys():
                 NE_computed, res = polym_lcp_solver(
-                    PolymatrixGame.from_nf(d['g']),
+                    PolymatrixGame.from_normal_form_game(d['g']),
                     full_output=True
                 )
                 for action_computed, action in zip(NE_computed,
