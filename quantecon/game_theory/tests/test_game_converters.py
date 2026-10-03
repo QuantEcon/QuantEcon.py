@@ -554,6 +554,13 @@ def test_from_nfg_string_backslash_newline_in_title():
                        _game_3x2().payoff_profile_array)
 
 
+def test_from_nfg_string_quote_after_two_backslashes_in_title():
+    # Only `\"` is an escape, so the quote after `\\` does not end the title
+    s = _NFG_PAYOFF.replace('"3x2 game"', r'"a\\"b"')
+    assert_array_equal(from_nfg_string(s).payoff_profile_array,
+                       _game_3x2().payoff_profile_array)
+
+
 def test_from_nfg_string_3p():
     # 2x2x2 game, profile-major: player 0 varies fastest
     payoffs = np.arange(24).reshape((2, 2, 2, 3), order='F')

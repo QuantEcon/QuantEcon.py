@@ -510,11 +510,10 @@ class GAMWriter(_Writer):
 
 # Gambit .nfg #
 
-# A token is a quoted string (with `\"` for a quote inside), a brace, or a
-# run of other characters; commas are separators. DOTALL lets a backslash
-# escape a newline as well.
-_NFG_TOKEN = re.compile(r'"((?:[^"\\]|\\.)*)"|([{}])|([^\s{}",]+)',
-                        re.DOTALL)
+# A token is a quoted string, a brace, or a run of other characters; commas
+# are separators. A quoted string ends at the first quote not preceded by a
+# backslash, `\"` being the only escape that the format defines.
+_NFG_TOKEN = re.compile(r'"((?:[^"\\]|\\+[^\\])*)"|([{}])|([^\s{}",]+)')
 
 
 def _read_from_tokens(tokens, pos):
