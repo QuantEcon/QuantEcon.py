@@ -269,7 +269,7 @@ class PolymatrixGame:
         """
         Creates a Polymatrix from a Normal Form Game.
 
-        .. deprecated:: 0.12.1
+        .. deprecated:: 0.13.0
 
             Use `from_normal_form_game` instead.
 
@@ -324,7 +324,7 @@ class PolymatrixGame:
         """
         Creates a Normal Form Game from the Polymatrix Game.
 
-        .. deprecated:: 0.12.1
+        .. deprecated:: 0.13.0
 
             Use `to_normal_form_game` instead.
 
