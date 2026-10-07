@@ -2,7 +2,17 @@
 Utilities for converting between representations of games.
 
 Currently supports reading and writing the GameTracer `.gam` text format
-[1]_.
+[1]_ and the Gambit `.nfg` text format [2]_ through the following
+functions:
+
+from_gam, from_gam_string, from_gam_url
+    Read a NormalFormGame from a .gam file, string, or URL.
+to_gam
+    Write a NormalFormGame to a .gam file, or return it as a string.
+from_nfg, from_nfg_string, from_nfg_url
+    Read a NormalFormGame from a .nfg file, string, or URL.
+to_nfg
+    Write a NormalFormGame to a .nfg file, or return it as a string.
 
 Examples
 --------
@@ -33,26 +43,51 @@ References
 ----------
 .. [1] Ben Blum, Daphne Koller, Christian Shelton, "Game Theory:
    GameTracer," http://dags.stanford.edu/Games/gametracer.html
+.. [2] The Gambit Project, "Game representation formats,"
+   https://gambitproject.readthedocs.io/en/latest/formats.html
 
 """
 import io
+import math
 import numbers
+import re
 from fractions import Fraction
 import numpy as np
 from .normal_form_game import Player, NormalFormGame
 
 
-class GAMPayoffVector:
+_LAYOUTS = ('player-major', 'profile-major')
+_LAYOUT_ERROR = "layout must be 'player-major' or 'profile-major' (got {!r})"
+
+
+class PayoffVector:
     """
-    Internal intermediate representation that stores payoffs in a single
-    flat 1-dim array.
+    Intermediate representation that stores the payoffs of an N-player
+    game in a single flat 1-dim array, in one of the two orders in which
+    game files list them:
 
-    Payoff values are ordered as in the GameTracer .gam format:
+    'player-major' (as in the GameTracer .gam format)
+        All the payoffs to player 0, then those to player 1, ..., then
+        those to player N-1. Within each block, action profiles are
+        ordered with player 0 varying fastest, then player 1, ...,
+        player N-1 (i.e., column-major order).
 
-    1. Player-major blocks: player 0, ..., player N-1.
-    2. Within each block, action profiles are ordered with player 0
-       varying fastest, then player 1, ..., player N-1 (i.e.,
-       Fortran/column-major order).
+    'profile-major' (as in the Gambit .nfg format)
+        The payoffs to players 0, ..., N-1 at the first action profile,
+        then those at the second action profile, and so on. Action
+        profiles are ordered with player 0 varying fastest, then player
+        1, ..., player N-1 (i.e., column-major order).
+
+    Parameters
+    ----------
+    nums_actions : array_like(int, ndim=1)
+        Numbers of actions, one for each player.
+
+    payoffs : array_like(ndim=1)
+        Payoffs, of length prod(nums_actions) * N, in the order `layout`.
+
+    layout : {'player-major', 'profile-major'}
+        Order in which `payoffs` lists the payoffs.
 
     Attributes
     ----------
@@ -63,10 +98,13 @@ class GAMPayoffVector:
         Tuple of the numbers of actions, one for each player.
 
     payoffs : ndarray(ndim=1)
-        Array storing payoffs in .gam order.
+        Array storing the payoffs in the order `layout`.
+
+    layout : str
+        Order in which `payoffs` lists the payoffs.
 
     """
-    def __init__(self, nums_actions, payoffs):
+    def __init__(self, nums_actions, payoffs, *, layout):
         nums_actions = tuple(nums_actions)
         if len(nums_actions) == 0:
             raise ValueError('nums_actions must be a non-empty iterable ' +
@@ -81,11 +119,15 @@ class GAMPayoffVector:
         self.nums_actions = tuple(int(n) for n in nums_actions)
         self.N = len(self.nums_actions)
 
+        if layout not in _LAYOUTS:
+            raise ValueError(_LAYOUT_ERROR.format(layout))
+        self.layout = layout
+
         payoffs = np.ascontiguousarray(payoffs)
         if payoffs.ndim != 1:
             raise ValueError('payoffs must be a 1-dim array_like')
 
-        expected = np.prod(self.nums_actions) * self.N
+        expected = math.prod(self.nums_actions) * self.N  # no overflow
         if payoffs.size != expected:
             raise ValueError(
                 f'payoffs length mismatch: expected {expected}, ' +
@@ -94,15 +136,29 @@ class GAMPayoffVector:
 
         self.payoffs = payoffs
 
+    def _player_block(self, i):
+        # The payoffs to player i as an array indexed by the action
+        # profile; a view of `payoffs`. This is the only place where the
+        # layout matters.
+        if self.layout == 'player-major':
+            shape = self.nums_actions + (self.N,)
+            return self.payoffs.reshape(shape, order='F')[..., i]
+        else:
+            shape = (self.N,) + self.nums_actions
+            return self.payoffs.reshape(shape, order='F')[i, ...]
+
     @classmethod
-    def from_nfg(cls, g, dtype=None):
+    def from_normal_form_game(cls, g, *, layout, dtype=None):
         """
-        Construct a GAMPayoffVector from a NormalFormGame `g`.
+        Construct a PayoffVector from a NormalFormGame `g`.
 
         Parameters
         ----------
         g : NormalFormGame
             NormalFormGame instance.
+
+        layout : {'player-major', 'profile-major'}
+            Order in which the payoffs are stored.
 
         dtype : data-type, optional(default=None)
             Data type of the payoff array. If None, default to the
@@ -110,8 +166,8 @@ class GAMPayoffVector:
 
         Returns
         -------
-        GAMPayoffVector
-            The GAMPayoffVector representation of `g`.
+        PayoffVector
+            The PayoffVector representation of `g`.
 
         Examples
         --------
@@ -123,28 +179,66 @@ class GAMPayoffVector:
         [[[ 0,  6],  [ 3,  9]],
          [[ 1,  7],  [ 4, 10]],
          [[ 2,  8],  [ 5, 11]]]
-        >>> p = GAMPayoffVector.from_nfg(g)
+        >>> p = PayoffVector.from_normal_form_game(g, layout='player-major')
         >>> p.payoffs
         array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
+        >>> p = PayoffVector.from_normal_form_game(g, layout='profile-major')
+        >>> p.payoffs
+        array([ 0,  6,  1,  7,  2,  8,  3,  9,  4, 10,  5, 11])
 
         """
         N = g.N
-        nums_actions = g.nums_actions
         if dtype is None:
             dtype = g.dtype
 
-        na = np.prod(nums_actions)
-        payoffs = np.empty(na*N, dtype=dtype)
+        payoffs = np.empty(math.prod(g.nums_actions) * N, dtype=dtype)
+        p = cls(g.nums_actions, payoffs, layout=layout)
 
         for i, player in enumerate(g.players):
-            payoffs[na*i:na*(i+1)].reshape(nums_actions, order='F')[:] = \
-                player.payoff_array.transpose(
-                    (*range(N-i, g.N), *range(N-i))
-                )
+            p._player_block(i)[...] = player.payoff_array.transpose(
+                (*range(N-i, N), *range(N-i))
+            )
 
-        return cls(nums_actions, payoffs)
+        return p
 
-    def to_nfg(self, dtype=None):
+    def to_layout(self, layout, dtype=None):
+        """
+        Return a new PayoffVector with the payoffs in the order `layout`.
+        The payoffs are copied.
+
+        Parameters
+        ----------
+        layout : {'player-major', 'profile-major'}
+            Order in which the payoffs are stored.
+
+        dtype : data-type, optional(default=None)
+            Data type of the payoff array. If None, default to the data
+            type of the `payoffs` attribute.
+
+        Returns
+        -------
+        PayoffVector
+            The PayoffVector with the payoffs in the order `layout`.
+
+        Examples
+        --------
+        >>> p = PayoffVector((3, 2), np.arange(12), layout='player-major')
+        >>> p.to_layout('profile-major').payoffs
+        array([ 0,  6,  1,  7,  2,  8,  3,  9,  4, 10,  5, 11])
+
+        """
+        if dtype is None:
+            dtype = self.payoffs.dtype
+
+        payoffs = np.empty(self.payoffs.size, dtype=dtype)
+        p = type(self)(self.nums_actions, payoffs, layout=layout)
+
+        for i in range(self.N):
+            p._player_block(i)[...] = self._player_block(i)
+
+        return p
+
+    def to_normal_form_game(self, dtype=None):
         """
         Construct a NormalFormGame from self.
 
@@ -163,26 +257,26 @@ class GAMPayoffVector:
         --------
         >>> nums_actions = (3, 2)
         >>> payoffs = np.arange(12)
-        >>> p = GAMPayoffVector(nums_actions, payoffs)
-        >>> g = p.to_nfg()
-        >>> print(g)
+        >>> p = PayoffVector(nums_actions, payoffs, layout='player-major')
+        >>> print(p.to_normal_form_game())
         2-player NormalFormGame with payoff profile array:
         [[[ 0,  6],  [ 3,  9]],
          [[ 1,  7],  [ 4, 10]],
          [[ 2,  8],  [ 5, 11]]]
+        >>> p = PayoffVector(nums_actions, payoffs, layout='profile-major')
+        >>> print(p.to_normal_form_game())
+        2-player NormalFormGame with payoff profile array:
+        [[[ 0,  1],  [ 6,  7]],
+         [[ 2,  3],  [ 8,  9]],
+         [[ 4,  5],  [10, 11]]]
 
         """
         N = self.N
-        nums_actions = self.nums_actions
-
-        na = np.prod(nums_actions)
-        payoffs2d = self.payoffs.reshape((na, N), order='F')
         players = tuple(
             Player(
-                np.asarray(
-                    payoffs2d[:, i].reshape(nums_actions, order='F').transpose(
-                        (*range(i, N), *range(i))
-                    ), dtype=dtype, order='C'
+                np.array(  # always a copy: no aliasing with `payoffs`
+                    self._player_block(i).transpose((*range(i, N), *range(i))),
+                    dtype=dtype, order='C'
                 )
             ) for i in range(N)
         )
@@ -220,25 +314,26 @@ def _str2num(s):
     return float(s)
 
 
-class GAMReader:
+class _Reader:
     """
-    Parser for the GameTracer .gam format.
+    Base class of the parsers. `from_file`, `from_url`, and `from_string`
+    read the text and pass it to `_parse`, defined by each format.
 
     """
     @classmethod
     def from_file(cls, file_path):
         """
-        Read from a .gam format file.
+        Read from a file in the format of this reader.
 
         Parameters
         ----------
         file_path : str
-            Path to the .gam file.
+            Path to the file.
 
         Returns
         -------
         NormalFormGame
-            The game described by the .gam file.
+            The game described by the file.
 
         """
         with open(file_path, 'r') as f:
@@ -253,12 +348,12 @@ class GAMReader:
         Parameters
         ----------
         url : str
-            String containing a URL of the .gam file.
+            String containing a URL of the file.
 
         Returns
         -------
         NormalFormGame
-            The game described by the .gam file.
+            The game described by the file.
 
         """
         import urllib.request
@@ -269,21 +364,92 @@ class GAMReader:
     @classmethod
     def from_string(cls, string):
         """
-        Read from a .gam format string.
+        Read from a string in the format of this reader.
 
         Parameters
         ----------
         string : str
-            String in .gam format.
+            String in the format.
 
         Returns
         -------
         NormalFormGame
-            The game described by the .gam string.
+            The game described by the string.
 
         """
         return cls._parse(string)
 
+
+class _Writer:
+    """
+    Base class of the serializers. `to_file` and `to_string` write the
+    text returned by `_dump`, defined by each format.
+
+    """
+    @classmethod
+    def to_file(cls, g, file_path):
+        """
+        Write `g` to a file in the format of this writer.
+
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to write.
+
+        file_path : str
+            Path to the file to write to.
+
+        """
+        with open(file_path, 'w') as f:
+            f.write(cls._dump(g) + '\n')
+
+    @classmethod
+    def to_string(cls, g):
+        """
+        Return the string representation of `g` in the format of this
+        writer.
+
+        Parameters
+        ----------
+        g : NormalFormGame
+            NormalFormGame instance to convert.
+
+        Returns
+        -------
+        str
+            The string representation of `g`.
+
+        """
+        return cls._dump(g)
+
+
+def _format_payoffs(payoffs):
+    """
+    Return the 1-dim array `payoffs` as a string of space-separated
+    numbers.
+
+    """
+    if payoffs.dtype == np.bool_:
+        # Written as 0 and 1, not True and False
+        payoffs = payoffs.astype(int)
+
+    if np.issubdtype(payoffs.dtype, np.floating):
+        # Shortest representation that round-trips, without exponent
+        def fmt(x):
+            return np.format_float_positional(x, trim='.')
+    else:
+        fmt = str
+
+    return ' '.join(map(fmt, payoffs))
+
+
+# GameTracer .gam #
+
+class GAMReader(_Reader):
+    """
+    Parser for the GameTracer .gam format.
+
+    """
     @staticmethod
     def _parse(string):
         tokens = string.split()
@@ -318,53 +484,18 @@ class GAMReader:
         # payoffs
         payoffs = np.array([_str2num(tok) for tok in tokens[pos:]])
 
-        p = GAMPayoffVector(nums_actions, payoffs)
-        return p.to_nfg()
+        p = PayoffVector(nums_actions, payoffs, layout='player-major')
+        return p.to_normal_form_game()
 
 
-class GAMWriter:
+class GAMWriter(_Writer):
     """
     Serializer for the GameTracer .gam format.
 
     """
-    @classmethod
-    def to_file(cls, g, file_path):
-        """
-        Write `g` to a file in GameTracer .gam format.
-
-        Parameters
-        ----------
-        g : NormalFormGame
-            NormalFormGame instance to write.
-
-        file_path : str
-            Path to the file to write to.
-
-        """
-        with open(file_path, 'w') as f:
-            f.write(cls._dump(g) + '\n')
-
-    @classmethod
-    def to_string(cls, g):
-        """
-        Return the GameTracer .gam string representation of `g`.
-
-        Parameters
-        ----------
-        g : NormalFormGame
-            NormalFormGame instance to convert.
-
-        Returns
-        -------
-        str
-            The .gam format string representation of `g`.
-
-        """
-        return cls._dump(g)
-
     @staticmethod
     def _dump(g):
-        p = GAMPayoffVector.from_nfg(g)
+        p = PayoffVector.from_normal_form_game(g, layout='player-major')
 
         buf = io.StringIO()
 
@@ -372,22 +503,105 @@ class GAMWriter:
         buf.write('\n')
         buf.write(' '.join(map(str, p.nums_actions)))
         buf.write('\n\n')
+        buf.write(_format_payoffs(p.payoffs))
 
-        payoffs = p.payoffs
-        if payoffs.dtype == np.bool_:
-            # Written as 0 and 1, not True and False
-            payoffs = payoffs.astype(int)
+        return buf.getvalue()
 
-        if np.issubdtype(payoffs.dtype, np.floating):
-            # Shortest representation that round-trips, without exponent
-            def fmt(x):
-                return np.format_float_positional(x, trim='.')
+
+# Gambit .nfg #
+
+# A token is a quoted string, a brace, or a run of other characters; commas
+# are separators. A quoted string ends at the first quote not preceded by a
+# backslash, `\"` being the only escape that the format defines.
+_NFG_TOKEN = re.compile(r'"((?:[^"\\]|\\+[^\\])*)"|([{}])|([^\s{}",]+)')
+
+
+def _read_from_tokens(tokens, pos):
+    """
+    Return the item starting at `tokens[pos]` and the position after it: a
+    nested list for a braced group, the token itself otherwise.
+
+    Parses the braces only and leaves the meaning to the caller, in the
+    manner of a Lisp reader, which parses only the parentheses. Adapted from
+    Norvig's `read_from_tokens`, https://norvig.com/lispy.html.
+
+    """
+    if tokens[pos] == '{':
+        items, pos = [], pos + 1
+        while tokens[pos] != '}':
+            item, pos = _read_from_tokens(tokens, pos)
+            items.append(item)
+        return items, pos + 1
+    return tokens[pos], pos + 1
+
+
+class NFGReader(_Reader):
+    """
+    Parser for the Gambit .nfg format, in both the payoff version and the
+    outcome version. The title, the names of the players and of the
+    actions, the comment, and the names of the outcomes are ignored.
+
+    """
+    @staticmethod
+    def _parse(string):
+        # Braces around the whole file, so that it reads as one list
+        tokens = ['{']
+        tokens.extend(m.group(0) for m in _NFG_TOKEN.finditer(string))
+        tokens.append('}')
+        if len(tokens) < 3 or tokens[1] != 'NFG':
+            raise ValueError('not in the .nfg format')
+        items, _ = _read_from_tokens(tokens, 0)
+
+        # Prologue: NFG, version, R or D, title, players, actions (the
+        # numbers of actions, or the lists of their names), and an
+        # optional comment
+        _, _, _, _, _, actions, *body = items
+        if isinstance(body[0], str) and body[0].startswith('"'):
+            body = body[1:]
+        nums_actions = tuple(
+            len(a) if isinstance(a, list) else int(a) for a in actions
+        )
+
+        if isinstance(body[0], list):
+            # Outcome version: a list of outcomes, each a name and N
+            # payoffs, then the index of the outcome at each action
+            # profile, 0 meaning zero payoffs
+            outcomes, indices = body[0], body[1:]
+            N = len(nums_actions)
+            rows = [[_str2num(x) for x in o[1:]] for o in outcomes]
+            table = np.array(rows) if rows else np.empty((0, N), dtype=int)
+            # Row 0: the null outcome, in the dtype of the other rows
+            table = np.vstack((np.zeros((1, N), dtype=table.dtype), table))
+            payoffs = table[[int(i) for i in indices]].ravel()
         else:
-            fmt = str
+            # Payoff version: the payoffs at each action profile
+            payoffs = np.array([_str2num(tok) for tok in body])
 
-        buf.write(' '.join(map(fmt, payoffs)))
+        p = PayoffVector(nums_actions, payoffs, layout='profile-major')
+        return p.to_normal_form_game()
 
-        return buf.getvalue().rstrip()
+
+class NFGWriter(_Writer):
+    """
+    Serializer for the Gambit .nfg format, in the payoff version. The
+    title is empty and the players are named "1", ..., "N".
+
+    """
+    @staticmethod
+    def _dump(g):
+        p = PayoffVector.from_normal_form_game(g, layout='profile-major')
+
+        buf = io.StringIO()
+
+        buf.write('NFG 1 R ""')
+        buf.write(' { ')
+        buf.write(' '.join(f'"{i}"' for i in range(1, p.N + 1)))
+        buf.write(' } { ')
+        buf.write(' '.join(map(str, p.nums_actions)))
+        buf.write(' }\n\n')
+        buf.write(_format_payoffs(p.payoffs))
+
+        return buf.getvalue()
 
 
 def from_gam(filename: str) -> NormalFormGame:
@@ -500,3 +714,123 @@ def to_gam(g, file_path=None):
     if file_path is None:
         return GAMWriter.to_string(g)
     return GAMWriter.to_file(g, file_path)
+
+
+def from_nfg(filename: str) -> NormalFormGame:
+    """
+    Read a Gambit .nfg file and return a NormalFormGame.
+
+    Parameters
+    ----------
+    filename : str
+        Path to .nfg file.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .nfg file.
+
+    Examples
+    --------
+    Save a .nfg format string in a temporary file:
+
+    >>> import tempfile
+    >>> fname = tempfile.mkstemp()[1]
+    >>> with open(fname, mode='w') as f:
+    ...       _ = f.write(\"\"\"\\
+    ... NFG 1 R "" { "1" "2" } { 3 2 }
+    ...
+    ... 3 2 0 6 2 1 1 3 4 0 5 4\"\"\")
+
+    Read the file:
+
+    >>> g = from_nfg(fname)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[3, 2],  [1, 3]],
+     [[0, 6],  [4, 0]],
+     [[2, 1],  [5, 4]]]
+
+    """
+    return NFGReader.from_file(filename)
+
+
+def from_nfg_string(string):
+    """
+    Read a .nfg format string and return a NormalFormGame.
+
+    Parameters
+    ----------
+    string : str
+        String in .nfg format.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .nfg string.
+
+    Examples
+    --------
+    >>> string = \"\"\"\\
+    ... NFG 1 R "" { "1" "2" } { 3 2 }
+    ...
+    ... 3 2 0 6 2 1 1 3 4 0 5 4\"\"\"
+    >>> g = from_nfg_string(string)
+    >>> print(g)
+    2-player NormalFormGame with payoff profile array:
+    [[[3, 2],  [1, 3]],
+     [[0, 6],  [4, 0]],
+     [[2, 1],  [5, 4]]]
+
+    """
+    return NFGReader.from_string(string)
+
+
+def from_nfg_url(url):
+    """
+    Read a Gambit .nfg file from a URL and return a NormalFormGame.
+
+    Parameters
+    ----------
+    url : str
+        String containing a URL of the .nfg file.
+
+    Returns
+    -------
+    NormalFormGame
+        The game described by the .nfg file.
+
+    """
+    return NFGReader.from_url(url)
+
+
+def to_nfg(g, file_path=None):
+    """
+    Write a NormalFormGame to a file in .nfg format.
+
+    Parameters
+    ----------
+    g : NormalFormGame
+
+    file_path : str, optional(default=None)
+        Path to the file to write to. If None, the result is returned as
+        a string.
+
+    Returns
+    -------
+    None or str
+
+    Examples
+    --------
+    >>> g = NormalFormGame([[(3, 2), (1, 3)],
+    ...                     [(0, 6), (4, 0)],
+    ...                     [(2, 1), (5, 4)]])
+    >>> print(to_nfg(g))
+    NFG 1 R "" { "1" "2" } { 3 2 }
+    <BLANKLINE>
+    3 2 0 6 2 1 1 3 4 0 5 4
+
+    """
+    if file_path is None:
+        return NFGWriter.to_string(g)
+    return NFGWriter.to_file(g, file_path)
