@@ -11,7 +11,7 @@ when downloaded as a support File
 
 "https://github.com/QuantEcon/QuantEcon.notebooks/raw/master/dependencies/mpi/something.py" --> ./something.py
 
-.. deprecated:: 0.12.0
+.. deprecated:: 0.13.0
     ``fetch_nb_dependencies`` is deprecated and will be removed in v1.0, along
     with this module. It has no remaining callers in the QuantEcon lecture
     series, and ``requests`` is no longer a mandatory dependency of
@@ -36,7 +36,7 @@ def fetch_nb_dependencies(files, repo=REPO, raw=RAW, branch=BRANCH, folder=FOLDE
     """
     Retrieve raw files from QuantEcon.notebooks or other Github repo
 
-    .. deprecated:: 0.12.0
+    .. deprecated:: 0.13.0
         Deprecated and will be removed in v1.0. Fetch data by stable URL from
         `QuantEcon/data-lectures <https://github.com/QuantEcon/data-lectures>`_
         instead.
