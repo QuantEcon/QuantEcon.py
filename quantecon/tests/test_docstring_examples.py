@@ -29,10 +29,7 @@ import pytest
 import quantecon
 
 
-# `fetch_nb_dependencies` fetches over the network, so its example cannot
-# run offline. The module is deprecated and is removed in v1.0 (gh-880),
-# which retires this entry with it.
-SKIP_MODULES = {'quantecon.util.notebooks'}
+SKIP_MODULES = set()
 
 
 def _collect_doctests():
