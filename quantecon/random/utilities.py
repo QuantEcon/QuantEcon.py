@@ -287,7 +287,7 @@ def draw(cdf, size=None, rng=None):
     """
     if rng is None:
         rng = np.random
-    if isinstance(size, int):
+    if isinstance(size, (int, np.integer)):
         rs = rng.random(size)
         out = np.searchsorted(cdf, rs, side='right')
         return out
