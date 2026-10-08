@@ -196,12 +196,7 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
         self.P = KMR_Markov_matrix_sequential(self.N, self.p, self.epsilon)
         self.mc = MarkovChain(self.P)
         self.stationary = self.mc.stationary_distributions
-        stat_shape = self.stationary.shape
-
-        if len(stat_shape) == 1:
-            self.n_stat_dists = 1
-        else:
-            self.n_stat_dists = stat_shape[0]
+        self.n_stat_dists = self.stationary.shape[0]
 
     def test_markov_matrix(self):
         "Check that each row of matrix sums to 1"
@@ -224,13 +219,8 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
         mc = self.mc
         stationary_distributions = self.stationary
 
-        if self.n_stat_dists == 1:
-            assert_allclose(stationary_distributions @ mc.P,
-                            stationary_distributions, atol=self.TOL)
-        else:
-            for i in range(self.n_stat_dists):
-                curr_v = stationary_distributions[i, :]
-                assert_allclose(curr_v @ mc.P, curr_v, atol=self.TOL)
+        assert_allclose(stationary_distributions @ mc.P,
+                        stationary_distributions, atol=self.TOL)
 
 
 def test_simulate_shape():
