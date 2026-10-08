@@ -8,4 +8,5 @@ The contribution guide is maintained in the project documentation:
 - [Source file in this repository](docs/source/contributing.rst)
 
 The guide covers where to start, how to set up a development environment,
-and expectations for tests and documentation.
+expectations for tests and documentation, and the NumPy-style commit-message
+prefix convention (including the mapping to QEP-2 Type labels).
