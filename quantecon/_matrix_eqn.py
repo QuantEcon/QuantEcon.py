@@ -287,9 +287,6 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
     else:
         fail_msg = "Convergence failed after {} iterations."
 
-    # == Prepare array for iteration == #
-    sum1, sum2 = np.empty((n, n)), np.empty((n, n))
-
     # == Main loop == #
     iteration = 0
     while error > tolerance:
@@ -300,17 +297,13 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
         else:
             error = 0
             for i in range(m):
-                # Initialize arrays
-                sum1[:, :] = 0.
-                sum2[:, :] = 0.
-                for j in range(m):
-                    sum1 += beta * Π[i, j] * As[i].T @ Ps[j] @ As[i]
-                    sum2 += Π[i, j] * \
-                            (beta * As[i].T @ Ps[j] @ Bs[i] + Ns[i].T) @ \
-                            solve(Qs[i] + beta * Bs[i].T @ Ps[j] @ Bs[i],
-                                  beta * Bs[i].T @ Ps[j] @ As[i] + Ns[i])
-
-                Ps1[i][:, :] = Rs[i] + sum1 - sum2
+                # Expectation over next states goes inside the inverse
+                P_bar = np.tensordot(Π[i], Ps, axes=1)
+                Ps1[i][:, :] = (
+                    Rs[i] + beta * As[i].T @ P_bar @ As[i]
+                    - (beta * As[i].T @ P_bar @ Bs[i] + Ns[i].T)
+                    @ solve(Qs[i] + beta * Bs[i].T @ P_bar @ Bs[i],
+                            beta * Bs[i].T @ P_bar @ As[i] + Ns[i]))
                 error += np.max(np.abs(Ps1[i] - Ps[i]))
 
             Ps[:, :, :] = Ps1[:, :, :]
