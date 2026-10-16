@@ -131,8 +131,9 @@ class ARMA:
 
             ma_{poly} = (1, \theta_1, \theta_2,..., \theta_q)
 
-        In addition, ar_poly must be at least as long as ma_poly.
-        This can be achieved by padding it out with zeros when required.
+        In addition, ar_poly and ma_poly must have the same length,
+        otherwise scipy.signal delays the output by the difference in
+        length. This is achieved by padding the shorter one with zeros.
 
         """
         # === set up ma_poly === #
@@ -146,10 +147,13 @@ class ARMA:
             ar_poly = -np.asarray(self._phi)
         self.ar_poly = np.insert(ar_poly, 0, 1)  # The array (1, -phi)
 
-        # === pad ar_poly with zeros if required === #
+        # === pad the shorter polynomial with zeros === #
         if len(self.ar_poly) < len(self.ma_poly):
             temp = np.zeros(len(self.ma_poly) - len(self.ar_poly))
             self.ar_poly = np.hstack((self.ar_poly, temp))
+        elif len(self.ma_poly) < len(self.ar_poly):
+            temp = np.zeros(len(self.ar_poly) - len(self.ma_poly))
+            self.ma_poly = np.hstack((self.ma_poly, temp))
 
     def impulse_response(self, impulse_length=30):
         """
