@@ -217,6 +217,10 @@ def solve_discrete_riccati(A, B, Q, R, N=None, tolerance=1e-10, max_iter=500,
             H1 = H0 + (A0.T @ solve(I + (H0 @ G0), (H0 @ A0)))
 
             error = np.max(np.abs(H1 - H0))
+            # An overflowed iterate gives a NaN error, which would end the
+            # loop as if it had converged.
+            if not np.isfinite(error):
+                raise ValueError(fail_msg.format(i))
             A0 = A1
             G0 = G1
             H0 = H1
@@ -312,6 +316,11 @@ def solve_discrete_riccati_system(Π, As, Bs, Cs, Qs, Rs, Ns, beta,
 
                 Ps1[i][:, :] = Rs[i] + sum1 - sum2
                 error += np.max(np.abs(Ps1[i] - Ps[i]))
+
+            # An overflowed iterate gives a NaN error, which would end the
+            # loop as if it had converged.
+            if not np.isfinite(error):
+                raise ValueError(fail_msg.format(iteration))
 
             Ps[:, :, :] = Ps1[:, :, :]
             iteration += 1
