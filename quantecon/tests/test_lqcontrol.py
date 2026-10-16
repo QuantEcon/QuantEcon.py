@@ -95,6 +95,35 @@ class TestLQControl:
             assert_allclose(val_func_lq, val_func_answer, atol=1e-3)
 
 
+def _lq_markov_policy_cost(lq, Fs):
+    """
+    Return the matrices V(s) such that, when it is finite, the expected
+    discounted cost of following u = -F(s) x from (x, s) in `lq` is
+    x' V(s) x plus a term that does not depend on x. They solve the stacked
+    linear system
+
+        V(i) = R_F(i) + beta A_F(i)' [sum_j Π[i, j] V(j)] A_F(i)
+
+    where A_F(i) = A(i) - B(i) F(i) and
+    R_F(i) = R(i) + F(i)' Q(i) F(i) - F(i)' N(i) - N(i)' F(i).
+
+    """
+    m, n = lq.m, lq.n
+    M = np.identity(m * n**2)
+    b = np.empty(m * n**2)
+    for i in range(m):
+        A_F = lq.As[i] - lq.Bs[i] @ Fs[i]
+        rows = slice(i * n**2, (i+1) * n**2)
+        for j in range(m):
+            # vec(A_F' V A_F) = kron(A_F', A_F') vec(V)
+            M[rows, j * n**2:(j+1) * n**2] -= \
+                lq.beta * lq.Π[i, j] * np.kron(A_F.T, A_F.T)
+        R_F = lq.Rs[i] + Fs[i].T @ lq.Qs[i] @ Fs[i] - \
+            Fs[i].T @ lq.Ns[i] - lq.Ns[i].T @ Fs[i]
+        b[rows] = R_F.ravel()
+    return np.linalg.solve(M, b).reshape(m, n, n)
+
+
 class TestLQMarkov:
 
     def setup_method(self):
@@ -261,6 +290,42 @@ class TestLQMarkov:
             diff = policy_cost(Fs + delta) - Ps
             for D in diff:
                 assert np.linalg.eigvalsh(D).min() > -1e-10
+
+    def test_stationary_values_are_policy_costs(self):
+        # x' P(s) x must be the x-dependent part of the discounted cost of
+        # following u = -F(s) x from (x, s). This fails if the expectation
+        # over next period's Markov state is taken outside the inverse in
+        # the Riccati recursion (#982).
+        Π = np.array([[0.5, 0.5],
+                      [0.3, 0.7]])
+        As = [[[1., .1], [0., .9]], [[.9, .3], [.2, 1.]]]
+        Bs = [[[1.], [0.]], [[.2], [1.]]]
+        Rs = [np.eye(2), 2 * np.eye(2)]
+        lq_markov_mat2 = LQMarkov(Π, [.1, 5.], Rs, As, Bs, beta=.95)
+
+        for lq in (self.lq_markov_scalar, self.lq_markov_mat1,
+                   lq_markov_mat2):
+            Ps, ds, Fs = lq.stationary_values()
+
+            assert_allclose(Ps, _lq_markov_policy_cost(lq, Fs), rtol=1e-6)
+
+    def test_identical_regimes_match_lq(self):
+        # With one regime, or identical regimes, LQMarkov solves a standard
+        # LQ problem. A is unstable, so this also fails if the Riccati
+        # iteration lets rounding asymmetry in Ps grow.
+        A = np.array([[1.5, .3], [.1, 1.5]])
+        B = np.array([[1.], [1.]])
+        P, F, d = LQ(1., np.eye(2), A, B, beta=.99).stationary_values()
+
+        for Π in ([[1.]], [[.9, .1], [.2, .8]]):
+            m = len(Π)
+            lq = LQMarkov(Π, [1.] * m, [np.eye(2)] * m, [A] * m, [B] * m,
+                          beta=.99)
+            Ps, ds, Fs = lq.stationary_values()
+
+            for i in range(m):
+                assert_allclose(Ps[i], P, rtol=1e-8)
+                assert_allclose(Fs[i], F, rtol=1e-8)
 
     def test_beta_one_without_shocks_one_state(self):
         lq = LQMarkov([[1.]], [1.], [1.], [.5], [0.], beta=1)
