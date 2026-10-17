@@ -233,6 +233,24 @@ class TestLQMarkov:
         assert_allclose(w_seq, expected_w_seq, atol=1e-6)
         assert_allclose(state, expected_state, atol=1e-6)
 
+    def test_compute_sequence_switching_regimes(self):
+        # Regimes alternate every period, and A and B differ across them
+        # (regression test for #985).
+        beta, T = 0.9, 600
+        lq = LQMarkov([[0., 1.], [1., 0.]], [1., 1.], [1., 1.],
+                      [1.2, 0.5], [1., 0.3], beta=beta)
+        Ps, ds, Fs = lq.stationary_values()
+        x, u, w, state = lq.compute_sequence(1., ts_length=T,
+                                             random_state=0)
+        x, u, s = x[0], u[0], state[:T]
+        A, B = lq.As[:, 0, 0], lq.Bs[:, 0, 0]
+
+        # x_{t+1} = A(s_t) x_t + B(s_t) u_t
+        assert_allclose(x[1:], A[s] * x[:T] + B[s] * u)
+        # Realised discounted cost equals x0' P(s0) x0
+        cost = np.sum(beta**np.arange(T) * (x[:T]**2 + u**2))
+        assert_allclose(cost, Ps[state[0], 0, 0])
+
     def test_stationary_mat(self):
         lq_markov_mat = self.lq_markov_mat1
 
