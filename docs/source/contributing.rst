@@ -80,6 +80,48 @@ The rendered pages are written to ``docs/build/html``. Once you open a pull requ
 documentation is also built automatically by `Read the Docs <https://readthedocs.org>`_ and linked from
 the pull request checks.
 
+Commit messages
+---------------
+
+Commit and pull-request titles use a NumPy-style prefix so the git history and the issue
+tracker share a vocabulary. Start the first line with one canonical prefix from the list
+below, a colon, a space, and a short summary::
+
+    FIX: markov: reject invalid states in simulate
+
+Use the same prefix on the pull request title.
+
+Where a prefix corresponds to a `QEP-2 Type label
+<https://github.com/QuantEcon/qeps/blob/main/qeps/qep-0002-standard-github-labels.md>`_,
+the mapping is given so a commit prefix and its issue's Type tell the same story.
+
+*   ``ENH:`` New feature or user-visible improvement. QEP-2 Type: ``enhancement``.
+*   ``FIX:`` Bug fix. QEP-2 Type: ``bug``.
+*   ``DOC:`` Documentation and contributor-facing meta. QEP-2 Type: ``documentation``.
+*   ``MAINT:`` Routine housekeeping (style, formatting, env and dependency upkeep).
+    QEP-2 Type: ``maintenance``.
+*   ``INFR:`` Substantial CI, build, packaging, or repo-tooling work. QEP-2 Type:
+    ``infrastructure``.
+*   ``CI:`` GitHub Actions workflows and CI configuration. QEP-2 Type: ``infrastructure``.
+*   ``RFC:`` Behaviour-preserving restructuring of library source. QEP-2 Type: ``refactor``.
+*   ``TST:`` Addition or modification of tests. No QEP-2 Type (test work is labelled
+    ``infrastructure`` or ``maintenance``).
+*   ``RLS:`` Release process (version bump and tag preparation). No QEP-2 Type.
+*   ``PERF:`` Performance improvement that does not change behaviour. No QEP-2 Type.
+
+Deprecated synonyms have the same meaning as a canonical prefix. Do not use them on new
+commits or pull requests:
+
+*   ``BUG:`` — use ``FIX:``
+*   ``DOCS:`` — use ``DOC:``
+*   ``TEST:`` — use ``TST:``
+*   ``IMP:`` — use ``MAINT:``, ``INFR:``, or ``ENH:`` as defined above
+*   ``RELEASE:`` — use ``RLS:``
+
+A milestone may introduce a campaign-specific prefix (for example ``WASM:`` during the
+JupyterLite/Emscripten work). Use a campaign prefix only while that campaign is active,
+and do not treat it as a synonym of the canonical set.
+
 Multi-phase projects and releases
 ---------------------------------
 
