@@ -31,8 +31,8 @@ authors:
 - family-names: Zhang
   given-names: Hengcheng
 doi: 10.5281/zenodo.10345102
-version: 0.13.0
-date-released: 2026-10-08
+version: 0.13.1
+date-released: 2026-10-17
 message: If you use this software, please cite our article in the
   Journal of Open Source Software.
 preferred-citation:
