@@ -48,11 +48,6 @@ _pivot_limit_msg = \
 _BUFF_SIZE = 2**8
 
 
-def _is_approx_fp(T, v, error_tol, *args, **kwargs):
-    error = np.max(np.abs(T(v, *args, **kwargs) - v))
-    return error <= error_tol
-
-
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
                         print_skip=5, method='iteration', *args, **kwargs):
     r"""
@@ -122,11 +117,13 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
         raise ValueError('invalid method')
 
     if method == 'imitation_game':
-        is_approx_fp = \
-            lambda v: _is_approx_fp(T, v, error_tol, *args, **kwargs)
+        def oracle(x):
+            y = T(x, *args, **kwargs)
+            return y, np.max(np.abs(y - x))
+
         v_star, converged, iterate = \
-             _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip,
-                                     is_approx_fp, *args, **kwargs)
+            _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
+                                    print_skip)
         return v_star
 
     # method == 'iteration'
@@ -166,18 +163,26 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
     return v
 
 
-def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
-                            *args, **kwargs):
+def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
+                            print_skip):
     """
     Implement the imitation game algorithm by McLennan and Tourky (2006)
-    for computing an approximate fixed point of `T`.
+    for computing an approximate fixed point of a map `T`, given through
+    `oracle`.
 
     Parameters
     ----------
-    is_approx_fp : callable
-        A callable with signature `is_approx_fp(v)` which determines
-        whether `v` is an approximate fixed point with a bool return
-        value (i.e., True or False)
+    oracle : callable
+        A callable with signature `oracle(x)` returning the pair `(y,
+        error)`, where `y = T(x)` and `error` is the scalar measure of
+        the distance of `x` from being a fixed point against which
+        `error_tol` is compared (e.g., `np.max(np.abs(y - x))`). It is
+        called once per iteration, so that quantities shared by `y` and
+        `error` need to be computed only once.
+
+    error_tol : scalar(float)
+        Error tolerance: the iteration stops at the first `x` with
+        `error <= error_tol`.
 
     For the other parameters, see Parameters in compute_fixed_point.
 
@@ -198,13 +203,12 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         _print_after_skip(print_skip, it=None)
 
     x_new = v
-    y_new = T(x_new, *args, **kwargs)
+    y_new, error = oracle(x_new)
     iterate = 1
-    converged = is_approx_fp(x_new)
+    converged = error <= error_tol
 
     if converged or iterate >= max_iter:
         if verbose == 2:
-            error = np.max(np.abs(y_new - x_new))
             etime = time.time() - start_time
             print_skip = 1
             _print_after_skip(print_skip, iterate, error, etime)
@@ -216,7 +220,6 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         return x_new, converged, iterate
 
     if verbose == 2:
-        error = np.max(np.abs(y_new - x_new))
         etime = time.time() - start_time
         _print_after_skip(print_skip, iterate, error, etime)
 
@@ -243,15 +246,14 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
     status = 0
 
     while True:
-        y_new = T(x_new, *args, **kwargs)
+        y_new, error = oracle(x_new)
         iterate += 1
-        converged = is_approx_fp(x_new)
+        converged = error <= error_tol
 
         if converged or iterate >= max_iter:
             break
 
         if verbose == 2:
-            error = np.max(np.abs(y_new - x_new))
             etime = time.time() - start_time
             _print_after_skip(print_skip, iterate, error, etime)
 
@@ -299,7 +301,6 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
             x_new = (rho @ Y_2d[:m]).reshape(shape_Y[1:])
 
     if verbose == 2:
-        error = np.max(np.abs(y_new - x_new))
         etime = time.time() - start_time
         print_skip = 1
         _print_after_skip(print_skip, iterate, error, etime)

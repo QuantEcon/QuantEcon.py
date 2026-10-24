@@ -3,9 +3,12 @@ Tests for mclennan_tourky.py
 """
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises, assert_
-from quantecon.game_theory import Player, NormalFormGame, mclennan_tourky
+from quantecon.game_theory import (
+    Player, NormalFormGame, mclennan_tourky, random_game
+)
 from quantecon.game_theory.mclennan_tourky import (
-    _best_response_selection, _flatten_action_profile, _is_epsilon_nash
+    _best_response_selection, _flatten_action_profile, _is_epsilon_nash,
+    _best_response_oracle
 )
 
 
@@ -146,3 +149,29 @@ def test_best_response_selection_no_indptr():
     expected_output = np.array([0., 1., 0., 0., 1.])
 
     assert_array_equal(test_obj, expected_output)
+
+
+def test_best_response_oracle():
+    # The oracle agrees with `_best_response_selection` and, through its
+    # error, with `_is_epsilon_nash`, for 2- and 3-player games
+    rng = np.random.RandomState(0)
+    epsilon = 1e-2
+    for nums_actions in [(3, 4), (2, 3, 2)]:
+        g = random_game(nums_actions, random_state=rng)
+        N = len(nums_actions)
+        indptr = np.empty(N+1, dtype=int)
+        indptr[0] = 0
+        indptr[1:] = np.cumsum(nums_actions)
+        for _ in range(20):
+            x = np.concatenate([rng.dirichlet(np.ones(n))
+                                for n in nums_actions])
+            y, error = _best_response_oracle(x, g, indptr)
+            assert_array_equal(y, _best_response_selection(x, g, indptr))
+            assert_(error >= 0)
+            assert_((error <= epsilon) ==
+                    _is_epsilon_nash(x, g, epsilon, indptr))
+        # At the pure best response profile of a pure Nash equilibrium
+        # the error is zero
+        NE = _best_response_selection(y, g, indptr)
+        if np.array_equal(NE, y):
+            assert_(_best_response_oracle(y, g, indptr)[1] == 0)

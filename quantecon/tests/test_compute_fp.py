@@ -16,7 +16,9 @@ from numpy.testing import (
 )
 from quantecon import compute_fixed_point
 import quantecon._compute_fp
-from quantecon._compute_fp import _initialize_tableau_ig, _update_distances
+from quantecon._compute_fp import (
+    _compute_fixed_point_ig, _initialize_tableau_ig, _update_distances
+)
 
 
 class TestFPLogisticEquation():
@@ -211,3 +213,21 @@ def test_imitation_game_buffer_growth(monkeypatch):
     monkeypatch.setattr(quantecon._compute_fp, '_BUFF_SIZE', 3)
     x_small = compute_fixed_point(T, 0.3, **kwargs)
     assert_array_equal(x_small, x_ref)
+
+
+def test_imitation_game_one_oracle_call_per_iteration():
+    # The map is evaluated exactly once per iteration, by the oracle,
+    # which also supplies the error used in the convergence test
+    calls = []
+
+    def oracle(x):
+        calls.append(x)
+        y = 0.5 * x
+        return y, abs(y - x)
+
+    x, converged, iterate = _compute_fixed_point_ig(
+        oracle, 1., error_tol=0.5**10, max_iter=50, verbose=0, print_skip=1
+    )
+    assert_(converged)
+    assert_(len(calls) == iterate)
+    assert_(abs(0.5 * x - x) <= 0.5**10)
