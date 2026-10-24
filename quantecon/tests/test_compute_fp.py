@@ -142,11 +142,12 @@ def test_raises_value_error_nonpositive_max_iter():
     assert_raises(ValueError, compute_fixed_point, f, init, max_iter=max_iter)
 
 
-def test_imitation_game_numerical_breakdown():
-    # Values of order 1e7: the Lemke-Howson pivoting on the imitation
-    # game breaks down numerically (the tableaux hold no equilibrium);
-    # the routine must stop and report non-convergence, with a specific
-    # warning, instead of forming the next iterate from the tableaux
+def test_imitation_game_large_scale():
+    # Values of order 1e7: before the payoffs were scaled, the pivoting
+    # on the imitation game broke down numerically (squared distances of
+    # order 1e14 next to the identity block of the tableau). The map,
+    # a nearest-recorded-point lookup, has no fixed point, so the
+    # routine must run to max_iter and report non-convergence only
     X = np.array([-43904436.689917795, -58130594.69589446,
                   -51017515.692906134])
     Y = np.array([-58130594.69589446, 73372551.04835357,
@@ -154,7 +155,7 @@ def test_imitation_game_numerical_breakdown():
     max_iter = 10
     evaluations = []
 
-    def T(x):  # Map reproducing the sequence: nearest recorded point
+    def T(x):
         evaluations.append(x)
         return Y[np.argmin(np.abs(X - x))]
 
@@ -163,10 +164,40 @@ def test_imitation_game_numerical_breakdown():
         x = compute_fixed_point(T, X[0], error_tol=1e-3, max_iter=max_iter,
                                 verbose=1, method='imitation_game')
     messages = [str(wi.message) for wi in w]
-    assert_(any('numerical breakdown' in msg for msg in messages))
-    assert_(not any('max_iter' in msg for msg in messages))
-    assert_(len(evaluations) < max_iter)  # Stopped at the breakdown
+    assert_(not any('breakdown' in msg for msg in messages))
+    assert_(any('max_iter' in msg for msg in messages))
+    assert_(len(evaluations) == max_iter)
     assert_(np.isfinite(x))
+
+
+def test_imitation_game_driver_failure_warnings(monkeypatch):
+    # A nonzero status of the pivoting driver stops the iteration with a
+    # warning naming the cause, and the last iterate is returned
+    T = lambda x: 4 * x * (1 - x)  # Chaotic: pivoting always needed
+    for status, keyword in [(3, 'numerical breakdown'),
+                            (2, 'numerical breakdown'),
+                            (1, 'pivot limit')]:
+        evaluations = []
+
+        def _failing_tbl(*args, **kwargs):
+            return status, 0
+
+        def T_counting(x):
+            evaluations.append(x)
+            return T(x)
+
+        monkeypatch.setattr(quantecon._compute_fp, '_lcp_lemke_tbl',
+                            _failing_tbl)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            x = compute_fixed_point(T_counting, 0.3, error_tol=0,
+                                    max_iter=10, verbose=1,
+                                    method='imitation_game')
+        messages = [str(wi.message) for wi in w]
+        assert_(any(keyword in msg for msg in messages), messages)
+        assert_(not any('max_iter' in msg for msg in messages))
+        assert_(len(evaluations) == 2)  # Stopped at the first pivoting
+        assert_(x == T(0.3))
 
 
 def test_initialize_tableau_ig_layout():
@@ -184,12 +215,14 @@ def test_initialize_tableau_ig_layout():
 
     tableau = np.empty((m, 2*m+1))
     basis = np.empty(m, dtype=int)
-    _initialize_tableau_ig(D, tableau, basis)
-
-    assert_array_equal(tableau[:, :m], np.eye(m))
-    assert_allclose(tableau[:, m:2*m], D.max(axis=0) - D + 1)
-    assert_array_equal(tableau[:, 2*m], np.ones(m))
-    assert_array_equal(basis, np.arange(m))
+    for scale in [1., D.max()]:
+        _initialize_tableau_ig(D, scale, tableau, basis)
+        assert_array_equal(tableau[:, :m], np.eye(m))
+        assert_allclose(tableau[:, m:2*m], (D.max(axis=0) - D) / scale + 1)
+        assert_array_equal(tableau[:, 2*m], np.ones(m))
+        assert_array_equal(basis, np.arange(m))
+    # With the maximum as the scale, the payoff entries lie in [1, 2]
+    assert_((tableau[:, m:2*m] >= 1).all() and (tableau[:, m:2*m] <= 2).all())
 
 
 def test_update_distances_scalar_points():

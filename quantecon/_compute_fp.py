@@ -233,9 +233,10 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
     x_new = Y[0]
 
     # Squared distances D[i, j] = ||X[i] - Y[j]||^2, extended by one row
-    # and one column per new point
+    # and one column per new point, and their running maximum, by which
+    # the payoffs of the imitation game are scaled
     D = np.empty((buff_size, buff_size))
-    _update_distances(X, Y, 0, D)
+    d_max = _update_distances(X, Y, 0, D)
 
     tableau = np.empty((buff_size, buff_size*2+1))
     basis = np.empty(buff_size, dtype=int)
@@ -278,9 +279,10 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
             z = np.empty(buff_size)
 
         m = iterate
-        _update_distances(X, Y, m-1, D)
+        d_max = max(d_max, _update_distances(X, Y, m-1, D))
+        scale = d_max if d_max > 0 else 1.
         tableau_curr, basis_curr = tableau[:m, :2*m+1], basis[:m]
-        _initialize_tableau_ig(D[:m, :m], tableau_curr, basis_curr)
+        _initialize_tableau_ig(D[:m, :m], scale, tableau_curr, basis_curr)
         # Lemke path from the pure strategy of the newest point (index
         # m-1): its variable enters, and the path ends when either
         # variable of its complementary pair leaves
@@ -338,20 +340,25 @@ def _update_distances(X, Y, k, D):
 
     Returns
     -------
-    D : ndarray(float, ndim=2)
-        View to `D`.
+    d_max : scalar(float)
+        Maximum of the new entries.
 
     """
+    d_max = 0.
     for j in range(k+1):
         D[k, j] = _square_sum(X[k] - Y[j])
+        if D[k, j] > d_max:
+            d_max = D[k, j]
     for i in range(k):
         D[i, k] = _square_sum(X[i] - Y[k])
+        if D[i, k] > d_max:
+            d_max = D[i, k]
 
-    return D
+    return d_max
 
 
 @jit(nopython=True, cache=True)
-def _initialize_tableau_ig(D, tableau, basis):
+def _initialize_tableau_ig(D, scale, tableau, basis):
     """
     Given the squared distances `D` between the points of the sequences
     `X` and `Y`, initialize the tableau and basis arrays in place for
@@ -361,8 +368,12 @@ def _initialize_tableau_ig(D, tableau, basis):
 
     The game has m pure strategies, one per point. Row i of the tableau
     corresponds to the mover's pure strategy i, whose payoff against the
-    imitator's pure strategy j is `-D[i, j]`; the payoffs are shifted
-    column by column so that the minimum of each column is 1.
+    imitator's pure strategy j is `-D[i, j]`. The payoffs are divided by
+    `scale` and shifted column by column so that the minimum of each
+    column is 1; with `scale` the maximum of `D`, the entries lie in
+    [1, 2] whatever the magnitude of the distances, which keeps the
+    pivoting tolerances meaningful. Neither transformation changes the
+    mover's best responses, hence the Lemke path.
 
     * Columns 0, ..., m-1 are those of the slack variables, forming the
       identity matrix: the slack of row i is the mover's payoff loss
@@ -383,6 +394,9 @@ def _initialize_tableau_ig(D, tableau, basis):
         Array of shape (m, m) of squared distances, `D[i, j] = ||X[i] -
         Y[j]||^2`.
 
+    scale : scalar(float)
+        Positive number by which the payoffs are divided.
+
     tableau : ndarray(float, ndim=2)
         Array to be used to store the tableau, of shape (m, 2m+1).
         Modified in place.
@@ -402,6 +416,7 @@ def _initialize_tableau_ig(D, tableau, basis):
     """
     m = D.shape[0]
     min_ = np.zeros(m)
+    inv_scale = 1 / scale
 
     for i in range(m):
         # Slack variables
@@ -412,7 +427,7 @@ def _initialize_tableau_ig(D, tableau, basis):
                 tableau[i, j] = 0
         # Payoff variables
         for j in range(m):
-            tableau[i, m+j] = -D[i, j]
+            tableau[i, m+j] = -D[i, j] * inv_scale
             if tableau[i, m+j] < min_[j]:
                 min_[j] = tableau[i, m+j]
         # Right hand side
