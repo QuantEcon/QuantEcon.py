@@ -258,16 +258,12 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
             etime = time.time() - start_time
             _print_after_skip(print_skip, iterate, error, etime)
 
-        try:
-            X[iterate-1] = x_new
-            Y[iterate-1] = y_new
-        except IndexError:
+        if iterate > buff_size:  # Grow the buffers
             buff_size = min(max_iter, buff_size*2)
             shape = (buff_size,) + X.shape[1:]
             X_tmp, Y_tmp = X, Y
             X, Y = np.empty(shape), np.empty(shape)
             X[:X_tmp.shape[0]], Y[:Y_tmp.shape[0]] = X_tmp, Y_tmp
-            X[iterate-1], Y[iterate-1] = x_new, y_new
 
             D_tmp = D
             D = np.empty((buff_size, buff_size))
@@ -277,6 +273,8 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
             basis = np.empty(buff_size, dtype=int)
             argmins = np.empty(buff_size, dtype=int)
             z = np.empty(buff_size)
+
+        X[iterate-1], Y[iterate-1] = x_new, y_new
 
         m = iterate
         d_max = max(d_max, _update_distances(X, Y, m-1, D))
