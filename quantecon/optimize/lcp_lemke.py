@@ -168,33 +168,12 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     # Array to store row indices in lex_min_ratio_test
     argmins = np.empty(n, dtype=np.int_)
 
-    while num_iter < max_iter:
-        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
-            tableau, pivcol, 0, argmins,
-            piv_options.tol_piv, piv_options.tol_ratio_diff
-        )
-
-        if not pivrow_found:  # Ray termination
-            success = False
-            status = 2
-            break
-        if not resolved:  # Numerical breakdown: lexicographic tie not
-            success = False  # broken, impossible in exact arithmetic
-            status = 3
-            break
-
-        _pivoting(tableau, pivcol, pivrow)
-        basis[pivrow], leaving_var = pivcol, basis[pivrow]
-        num_iter += 1
-
-        if leaving_var == art_var:  # Solution found
-            success = True
-            status = 0
-            break
-        elif leaving_var < n:
-            pivcol = leaving_var + n
-        else:
-            pivcol = leaving_var - n
+    status, num_iter_tbl = _lcp_lemke_tbl(
+        tableau, basis, pivcol, art_var, max_iter - num_iter, argmins,
+        piv_options.tol_piv, piv_options.tol_ratio_diff
+    )
+    num_iter += num_iter_tbl
+    success = (status == 0)
 
     _get_solution(tableau, basis, z)
 
@@ -205,6 +184,102 @@ if lcp_lemke.__doc__ is not None:  # None under python -OO
     lcp_lemke.__doc__ = lcp_lemke.__doc__.format(
         FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
     )
+
+
+@jit(nopython=True, cache=True)
+def _lcp_lemke_tbl(tableau, basis, pivcol, art_var, max_iter, argmins,
+                   tol_piv, tol_ratio_diff):
+    """
+    Main body of Lemke's algorithm: perform the complementary pivoting
+    steps on an initialized tableau, modifying `tableau` and `basis` in
+    place, until the artificial variable leaves the basis.
+
+    The tableau has n rows, one per complementary pair, and its last
+    column holds the values of the basic variables. Columns 0, ..., n-1
+    are those of the slack variables w, which form the identity matrix
+    initially (the lexicographic ratio test reads the basis inverse from
+    them), columns n, ..., 2n-1 are those of the variables z, so that the
+    complementary pair of variable k is k + n or k - n, and the artificial
+    variable `art_var` occupies a further column. The path is "almost
+    complementary": at every step exactly one of w_i and z_i is basic for
+    every pair i but the one whose variable has just left, whose
+    complement is the next to enter. The path ends when `art_var` leaves
+    the basis, at which point all pairs are complementary.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        ndarray of shape (n, 2*n+2) containing the initialized tableau,
+        in which the entering variable `pivcol` is nonbasic. Modified in
+        place.
+
+    basis : ndarray(int, ndim=1)
+        ndarray of shape (n,) containing the basic variables. Modified in
+        place.
+
+    pivcol : scalar(int)
+        Index of the variable to enter the basis first.
+
+    art_var : scalar(int)
+        Index of the artificial variable, whose leaving the basis ends
+        the pivoting with success.
+
+    max_iter : scalar(int)
+        Maximum number of pivoting steps to perform.
+
+    argmins : ndarray(int, ndim=1)
+        Workspace ndarray of shape (n,) for the lexicographic ratio
+        test. Modified in place.
+
+    tol_piv : scalar(float)
+        Pivot tolerance below which a number is considered to be
+        nonpositive.
+
+    tol_ratio_diff : scalar(float)
+        Tolerance used in the lexicographic pivoting.
+
+    Returns
+    -------
+    status : scalar(int)
+        Exit status: 0 if `art_var` has left the basis (solution found),
+        1 if `max_iter` steps have been performed, 2 if the pivot column
+        has no positive entry (ray termination), 3 if the lexicographic
+        tie breaking failed to single out a row (numerical breakdown).
+
+    num_iter : scalar(int)
+        Number of pivoting steps performed.
+
+    """
+    n = tableau.shape[0]
+
+    status = 1
+    num_iter = 0
+
+    while num_iter < max_iter:
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
+            tableau, pivcol, 0, argmins, tol_piv, tol_ratio_diff
+        )
+
+        if not pivrow_found:  # Ray termination
+            status = 2
+            break
+        if not resolved:  # Numerical breakdown: lexicographic tie not
+            status = 3  # broken, impossible in exact arithmetic
+            break
+
+        _pivoting(tableau, pivcol, pivrow)
+        basis[pivrow], leaving_var = pivcol, basis[pivrow]
+        num_iter += 1
+
+        if leaving_var == art_var:  # Solution found
+            status = 0
+            break
+        elif leaving_var < n:
+            pivcol = leaving_var + n
+        else:
+            pivcol = leaving_var - n
+
+    return status, num_iter
 
 
 @jit(nopython=True, cache=True)
