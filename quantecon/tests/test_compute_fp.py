@@ -17,7 +17,11 @@ from numpy.testing import (
 from quantecon import compute_fixed_point
 import quantecon._compute_fp
 from quantecon._compute_fp import (
-    _compute_fixed_point_ig, _initialize_tableau_ig, _update_distances
+    _compute_fixed_point_ig, _initialize_tableau_ig, _update_distances,
+    _newest_is_equilibrium
+)
+from quantecon.optimize.pivoting import (
+    _lex_min_ratio_test, TOL_PIV, TOL_RATIO_DIFF
 )
 
 
@@ -264,3 +268,74 @@ def test_imitation_game_one_oracle_call_per_iteration():
     assert_(converged)
     assert_(len(calls) == iterate)
     assert_(abs(0.5 * x - x) <= 0.5**10)
+
+
+def test_newest_is_equilibrium_matches_ratio_test():
+    # The fast path decides the first ratio test of the Lemke path from
+    # the newest point exactly as the pivoting would, including exact
+    # ties (decided toward the largest row index) and near ties within
+    # the tolerance
+    rng = np.random.RandomState(0)
+    m = 6
+    tableau = np.empty((m, 2*m+1))
+    basis = np.empty(m, dtype=int)
+    argmins = np.empty(m, dtype=int)
+    work = np.empty(m)
+    num_fast = 0
+    for trial in range(400):
+        if trial % 2 == 0:  # Continuous distances
+            D = rng.uniform(0, 10, size=(m, m)) ** 2
+        else:  # Discrete distances: many exact ties
+            D = rng.randint(0, 3, size=(m, m)).astype(float)
+        if trial % 4 == 1:  # Near ties with the newest point
+            D[rng.randint(m-1), m-1] = D[m-1, m-1] * (1 + 1e-16)
+        if trial % 8 == 3:  # Large scale
+            D *= 1e14
+        scale = D.max() if D.max() > 0 else 1.
+        _initialize_tableau_ig(D, scale, tableau, basis)
+        found, row, resolved = _lex_min_ratio_test(
+            tableau, 2*m-1, 0, argmins, TOL_PIV, TOL_RATIO_DIFF
+        )
+        assert_(found and resolved)
+        fast = _newest_is_equilibrium(D[:, m-1], scale, work,
+                                      TOL_PIV, TOL_RATIO_DIFF)
+        assert_(fast == (row == m-1), (trial, fast, row))
+        num_fast += fast
+    assert_(0 < num_fast < 400)  # Both outcomes exercised
+
+
+def test_imitation_game_fast_path_identical(monkeypatch):
+    # With the fast path disabled, the pivoting takes the same single
+    # step and produces the same iterates to the last bit
+    maps = [(lambda x: 0.5 * x, 1., 0.5**20),
+            (lambda x: 4 * 0.3 * x * (1 - x), 0.4, 1e-10),
+            (lambda x: 4 * x * (1 - x), 0.3, 0.)]  # Chaotic, max_iter
+    results = []
+    for disabled in [False, True]:
+        if disabled:
+            monkeypatch.setattr(quantecon._compute_fp,
+                                '_newest_is_equilibrium',
+                                lambda *args: False)
+        results.append([
+            compute_fixed_point(T, x0, error_tol=tol, max_iter=60,
+                                verbose=0, method='imitation_game')
+            for T, x0, tol in maps
+        ])
+    for x_fast, x_piv in zip(*results):
+        assert_array_equal(x_fast, x_piv)
+
+
+def test_imitation_game_contraction_never_pivots(monkeypatch):
+    # On a contraction with factor 1/2 the newest point is always the
+    # equilibrium (McLennan and Tourky, Proposition 4.3): the tableau is
+    # never formed and the method reduces to iteration
+    def _no_pivoting(*args, **kwargs):
+        raise AssertionError('pivoting should not be needed')
+
+    monkeypatch.setattr(quantecon._compute_fp, '_lcp_lemke_tbl',
+                        _no_pivoting)
+    T = lambda x: 0.5 * x + 1
+    x = compute_fixed_point(T, np.array([5., -3.]), error_tol=1e-10,
+                            max_iter=100, verbose=0,
+                            method='imitation_game')
+    assert_allclose(x, [2., 2.], atol=1e-9)

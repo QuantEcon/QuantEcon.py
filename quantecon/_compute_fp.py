@@ -281,6 +281,15 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
         m = iterate
         d_max = max(d_max, _update_distances(X, Y, m-1, D))
         scale = d_max if d_max > 0 else 1.
+
+        if _newest_is_equilibrium(D[:m, m-1], scale, z[:m],
+                                  TOL_PIV, TOL_RATIO_DIFF):
+            # Fast path: the Lemke path from the newest point ends after
+            # its first pivot, with rho = delta_{m-1}, so that the next
+            # iterate is the image of the newest point
+            x_new = Y[m-1].copy()
+            continue
+
         tableau_curr, basis_curr = tableau[:m, :2*m+1], basis[:m]
         _initialize_tableau_ig(D[:m, :m], scale, tableau_curr, basis_curr)
         # Lemke path from the pure strategy of the newest point (index
@@ -355,6 +364,79 @@ def _update_distances(X, Y, k, D):
             d_max = D[i, k]
 
     return d_max
+
+
+@jit(nopython=True, cache=True)
+def _newest_is_equilibrium(d, scale, work, tol_piv, tol_ratio_diff):
+    """
+    Determine whether the pure strategy of the newest point, the last
+    of m points, is an equilibrium of the imitation game, by deciding
+    the first ratio test of the Lemke path from it without forming the
+    tableau: with `d` the column of the squared distances from the m
+    points to the image of the newest point, the test enters that
+    point's payoff column and selects the row of the nearest point,
+    ties going to the largest index. The payoffs are computed from `d`
+    by the same operations as in `_initialize_tableau_ig`, and the test
+    as in `_lex_min_ratio_test` with a right-hand side of ones, so that
+    the decision coincides with that of the pivoting.
+
+    Parameters
+    ----------
+    d : ndarray(float, ndim=1)
+        Array of shape (m,), the last column of the squared distances.
+
+    scale : scalar(float)
+        Positive number by which the payoffs are divided.
+
+    work : ndarray(float, ndim=1)
+        Workspace array of shape (m,). Modified in place.
+
+    tol_piv : scalar(float)
+        Pivot tolerance below which a number is considered to be
+        nonpositive.
+
+    tol_ratio_diff : scalar(float)
+        Tolerance to determine a tie between ratio values.
+
+    Returns
+    -------
+    bool
+        True if the first ratio test would select the row of the newest
+        point, in which case the pivoting would end there with the pure
+        strategy of the newest point as the equilibrium.
+
+    """
+    m = d.shape[0]
+    inv_scale = 1 / scale
+
+    # Payoff column, as in `_initialize_tableau_ig`
+    min_ = 0.
+    for i in range(m):
+        work[i] = -d[i] * inv_scale
+        if work[i] < min_:
+            min_ = work[i]
+    for i in range(m):
+        work[i] -= min_
+        work[i] += 1
+
+    # Minimum ratio test with right-hand side 1, as in
+    # `_min_ratio_test_no_tie_breaking`
+    ratio_min = np.inf
+    for i in range(m):
+        denom = work[i]
+        if denom <= tol_piv:
+            continue
+        ratio = 1. / denom
+        if ratio < ratio_min:
+            ratio_min = ratio
+
+    # The lexicographic tie breaking selects the largest row index among
+    # the rows within `tol_ratio_diff` of the minimum ratio, so the
+    # newest point's row is selected if and only if it is one of them
+    denom = work[m-1]
+    if denom <= tol_piv:
+        return False
+    return 1. / denom <= ratio_min + tol_ratio_diff
 
 
 @jit(nopython=True, cache=True)
