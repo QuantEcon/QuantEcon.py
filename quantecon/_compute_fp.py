@@ -43,6 +43,10 @@ _breakdown_msg = \
 _pivot_limit_msg = \
     'pivot limit reached in the imitation game in compute_fixed_point'
 
+# Initial length of the buffers for the computed sequences of x and y in
+# the imitation game method; doubled, up to max_iter, when exceeded
+_BUFF_SIZE = 2**8
+
 
 def _is_approx_fp(T, v, error_tol, *args, **kwargs):
     error = np.max(np.abs(T(v, *args, **kwargs) - v))
@@ -218,13 +222,17 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
 
     # Length of the arrays to store the computed sequences of x and y.
     # If exceeded, reset to min(max_iter, buff_size*2).
-    buff_size = 2**8
-    buff_size = min(max_iter, buff_size)
+    buff_size = min(max_iter, _BUFF_SIZE)
 
     shape = (buff_size,) + np.asarray(x_new).shape
     X, Y = np.empty(shape), np.empty(shape)
     X[0], Y[0] = x_new, y_new
     x_new = Y[0]
+
+    # Squared distances D[i, j] = ||X[i] - Y[j]||^2, extended by one row
+    # and one column per new point
+    D = np.empty((buff_size, buff_size))
+    _update_distances(X, Y, 0, D)
 
     tableau = np.empty((buff_size, buff_size*2+1))
     basis = np.empty(buff_size, dtype=int)
@@ -258,14 +266,19 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
             X[:X_tmp.shape[0]], Y[:Y_tmp.shape[0]] = X_tmp, Y_tmp
             X[iterate-1], Y[iterate-1] = x_new, y_new
 
+            D_tmp = D
+            D = np.empty((buff_size, buff_size))
+            D[:iterate-1, :iterate-1] = D_tmp[:iterate-1, :iterate-1]
+
             tableau = np.empty((buff_size, buff_size*2+1))
             basis = np.empty(buff_size, dtype=int)
             argmins = np.empty(buff_size, dtype=int)
             z = np.empty(buff_size)
 
         m = iterate
+        _update_distances(X, Y, m-1, D)
         tableau_curr, basis_curr = tableau[:m, :2*m+1], basis[:m]
-        _initialize_tableau_ig(X[:m], Y[:m], tableau_curr, basis_curr)
+        _initialize_tableau_ig(D[:m, :m], tableau_curr, basis_curr)
         # Lemke path from the pure strategy of the newest point (index
         # m-1): its variable enters, and the path ends when either
         # variable of its complementary pair leaves
@@ -303,17 +316,52 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
 
 
 @jit(nopython=True)
-def _initialize_tableau_ig(X, Y, tableau, basis):
+def _update_distances(X, Y, k, D):
     """
-    Given sequences `X` and `Y` of ndarrays, initialize the tableau and
-    basis arrays in place for the Lemke path on the imitator's polytope
-    of the "geometric" imitation game as defined in McLennan and Tourky
-    (2006), to be passed to `_lcp_lemke_tbl`.
+    Given sequences `X` and `Y` of ndarrays, store in place the squared
+    distances between the point `k` and the points `0, ..., k`, in row
+    and column `k` of `D`: `D[k, j] = ||X[k] - Y[j]||^2` for `j <= k`
+    and `D[i, k] = ||X[i] - Y[k]||^2` for `i < k`.
+
+    Parameters
+    ----------
+    X, Y : ndarray(float)
+        Arrays of the same shape (m, n), with m > k.
+
+    k : scalar(int)
+        Index of the new point.
+
+    D : ndarray(float, ndim=2)
+        Array of shape (m, m) holding the squared distances in
+        `D[:k, :k]`. Modified in place.
+
+    Returns
+    -------
+    D : ndarray(float, ndim=2)
+        View to `D`.
+
+    """
+    for j in range(k+1):
+        D[k, j] = _square_sum(X[k] - Y[j])
+    for i in range(k):
+        D[i, k] = _square_sum(X[i] - Y[k])
+
+    return D
+
+
+@jit(nopython=True, cache=True)
+def _initialize_tableau_ig(D, tableau, basis):
+    """
+    Given the squared distances `D` between the points of the sequences
+    `X` and `Y`, initialize the tableau and basis arrays in place for
+    the Lemke path on the imitator's polytope of the "geometric"
+    imitation game as defined in McLennan and Tourky (2006), to be
+    passed to `_lcp_lemke_tbl`.
 
     The game has m pure strategies, one per point. Row i of the tableau
     corresponds to the mover's pure strategy i, whose payoff against the
-    imitator's pure strategy j is -||X[i] - Y[j]||^2; the payoffs are
-    shifted column by column so that the minimum of each column is 1.
+    imitator's pure strategy j is `-D[i, j]`; the payoffs are shifted
+    column by column so that the minimum of each column is 1.
 
     * Columns 0, ..., m-1 are those of the slack variables, forming the
       identity matrix: the slack of row i is the mover's payoff loss
@@ -330,8 +378,9 @@ def _initialize_tableau_ig(X, Y, tableau, basis):
 
     Parameters
     ----------
-    X, Y : ndarray(float)
-        Arrays of the same shape (m, n).
+    D : ndarray(float, ndim=2)
+        Array of shape (m, m) of squared distances, `D[i, j] = ||X[i] -
+        Y[j]||^2`.
 
     tableau : ndarray(float, ndim=2)
         Array to be used to store the tableau, of shape (m, 2m+1).
@@ -350,7 +399,7 @@ def _initialize_tableau_ig(X, Y, tableau, basis):
         View to `basis`.
 
     """
-    m = X.shape[0]
+    m = D.shape[0]
     min_ = np.zeros(m)
 
     for i in range(m):
@@ -362,8 +411,7 @@ def _initialize_tableau_ig(X, Y, tableau, basis):
                 tableau[i, j] = 0
         # Payoff variables
         for j in range(m):
-            d = X[i] - Y[j]
-            tableau[i, m+j] = _square_sum(d) * (-1)
+            tableau[i, m+j] = -D[i, j]
             if tableau[i, m+j] < min_[j]:
                 min_[j] = tableau[i, m+j]
         # Right hand side

@@ -15,7 +15,8 @@ from numpy.testing import (
     assert_, assert_allclose, assert_array_equal, assert_raises
 )
 from quantecon import compute_fixed_point
-from quantecon._compute_fp import _initialize_tableau_ig
+import quantecon._compute_fp
+from quantecon._compute_fp import _initialize_tableau_ig, _update_distances
 
 
 class TestFPLogisticEquation():
@@ -173,12 +174,40 @@ def test_initialize_tableau_ig_layout():
     rng = np.random.RandomState(0)
     m, n = 4, 3
     X, Y = rng.standard_normal((m, n)), rng.standard_normal((m, n))
+    D = np.empty((m, m))
+    for k in range(m):  # One point at a time, as in the iteration
+        _update_distances(X, Y, k, D)
+    assert_allclose(D, ((X[:, np.newaxis, :] - Y[np.newaxis, :, :])**2)
+                    .sum(axis=-1))
+
     tableau = np.empty((m, 2*m+1))
     basis = np.empty(m, dtype=int)
-    _initialize_tableau_ig(X, Y, tableau, basis)
+    _initialize_tableau_ig(D, tableau, basis)
 
-    D = ((X[:, np.newaxis, :] - Y[np.newaxis, :, :])**2).sum(axis=-1)
     assert_array_equal(tableau[:, :m], np.eye(m))
     assert_allclose(tableau[:, m:2*m], D.max(axis=0) - D + 1)
     assert_array_equal(tableau[:, 2*m], np.ones(m))
     assert_array_equal(basis, np.arange(m))
+
+
+def test_update_distances_scalar_points():
+    X = np.array([0., 1., 3.])
+    Y = np.array([1., 1., 0.])
+    D = np.empty((3, 3))
+    for k in range(3):
+        _update_distances(X, Y, k, D)
+    assert_array_equal(D, (X[:, np.newaxis] - Y[np.newaxis, :])**2)
+
+
+def test_imitation_game_buffer_growth(monkeypatch):
+    # The buffers for the points, the distances and the tableau grow by
+    # doubling; the iterates must not depend on the initial buffer size.
+    # The chaotic logistic map never converges, so the iteration runs to
+    # max_iter and goes through several doublings from a tiny buffer
+    T = lambda x: 4 * x * (1 - x)
+    kwargs = dict(error_tol=0, max_iter=60, verbose=0,
+                  method='imitation_game')
+    x_ref = compute_fixed_point(T, 0.3, **kwargs)
+    monkeypatch.setattr(quantecon._compute_fp, '_BUFF_SIZE', 3)
+    x_small = compute_fixed_point(T, 0.3, **kwargs)
+    assert_array_equal(x_small, x_ref)
