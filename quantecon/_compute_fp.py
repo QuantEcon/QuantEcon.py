@@ -8,7 +8,8 @@ import warnings
 import numpy as np
 from numba import jit, types
 from numba.extending import overload
-from .game_theory.lemke_howson import _lemke_howson_tbl, _get_mixed_actions
+from .optimize.lcp_lemke import _lcp_lemke_tbl
+from .optimize.pivoting import TOL_PIV, TOL_RATIO_DIFF
 
 
 def _print_after_skip(skip, it=None, dist=None, etime=None):
@@ -39,6 +40,8 @@ _non_convergence_msg = \
     'max_iter attained before convergence in compute_fixed_point'
 _breakdown_msg = \
     'numerical breakdown in the imitation game in compute_fixed_point'
+_pivot_limit_msg = \
+    'pivot limit reached in the imitation game in compute_fixed_point'
 
 
 def _is_approx_fp(T, v, error_tol, *args, **kwargs):
@@ -62,8 +65,9 @@ def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
     The method `'imitation_game'` uses the "imitation game algorithm"
     developed by McLennan and Tourky [1]_, which internally constructs
     a sequence of two-player games called imitation games and utilizes
-    their Nash equilibria, computed by the Lemke-Howson algorithm
-    routine. It finds an approximate fixed point of `T`, a point
+    their Nash equilibria, computed by the Lemke paths algorithm (the
+    Lemke-Howson algorithm on the imitator's polytope). It finds an
+    approximate fixed point of `T`, a point
     :math:`v^*` such that :math:`\lVert T(v) - v\rVert \leq
     \mathrm{error\_tol}`, provided `T` is a function that satisfies the
     assumptions of Brouwer's fixed point theorem, i.e., a continuous
@@ -222,10 +226,13 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
     X[0], Y[0] = x_new, y_new
     x_new = Y[0]
 
-    tableaux = tuple(np.empty((buff_size, buff_size*2+1)) for i in range(2))
-    bases = tuple(np.empty(buff_size, dtype=int) for i in range(2))
-    max_piv = 10**6  # Max number of pivoting steps in _lemke_howson_tbl
-    breakdown = False
+    tableau = np.empty((buff_size, buff_size*2+1))
+    basis = np.empty(buff_size, dtype=int)
+    argmins = np.empty(buff_size, dtype=int)
+    z = np.empty(buff_size)
+    stop_vars = np.empty(2, dtype=int)
+    max_piv = 10**6  # Max number of pivoting steps in _lcp_lemke_tbl
+    status = 0
 
     while True:
         y_new = T(x_new, *args, **kwargs)
@@ -251,20 +258,25 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
             X[:X_tmp.shape[0]], Y[:Y_tmp.shape[0]] = X_tmp, Y_tmp
             X[iterate-1], Y[iterate-1] = x_new, y_new
 
-            tableaux = tuple(np.empty((buff_size, buff_size*2+1))
-                             for i in range(2))
-            bases = tuple(np.empty(buff_size, dtype=int) for i in range(2))
+            tableau = np.empty((buff_size, buff_size*2+1))
+            basis = np.empty(buff_size, dtype=int)
+            argmins = np.empty(buff_size, dtype=int)
+            z = np.empty(buff_size)
 
         m = iterate
-        tableaux_curr = tuple(tableau[:m, :2*m+1] for tableau in tableaux)
-        bases_curr = tuple(basis[:m] for basis in bases)
-        _initialize_tableaux_ig(X[:m], Y[:m], tableaux_curr, bases_curr)
-        _, _, breakdown = _lemke_howson_tbl(
-            tableaux_curr, bases_curr, init_pivot=m-1, max_iter=max_piv
+        tableau_curr, basis_curr = tableau[:m, :2*m+1], basis[:m]
+        _initialize_tableau_ig(X[:m], Y[:m], tableau_curr, basis_curr)
+        # Lemke path from the pure strategy of the newest point (index
+        # m-1): its variable enters, and the path ends when either
+        # variable of its complementary pair leaves
+        stop_vars[0], stop_vars[1] = m-1, 2*m-1
+        status, _ = _lcp_lemke_tbl(
+            tableau_curr, basis_curr, 2*m-1, stop_vars, max_piv, argmins,
+            TOL_PIV, TOL_RATIO_DIFF
         )
-        if breakdown:  # The tableaux do not hold an equilibrium
+        if status != 0:  # The tableau does not hold an equilibrium
             break
-        _, rho = _get_mixed_actions(tableaux_curr, bases_curr)
+        rho = _get_mixed_action(tableau_curr, basis_curr, z[:m])
 
         if Y.ndim <= 2:
             x_new = rho @ Y[:m]
@@ -279,8 +291,9 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
         print_skip = 1
         _print_after_skip(print_skip, iterate, error, etime)
     if verbose >= 1:
-        if breakdown:
-            warnings.warn(_breakdown_msg, RuntimeWarning)
+        if status != 0:
+            msg = _breakdown_msg if status in (2, 3) else _pivot_limit_msg
+            warnings.warn(msg, RuntimeWarning)
         elif not converged:
             warnings.warn(_non_convergence_msg, RuntimeWarning)
         elif verbose == 2:
@@ -290,74 +303,121 @@ def _compute_fixed_point_ig(T, v, max_iter, verbose, print_skip, is_approx_fp,
 
 
 @jit(nopython=True)
-def _initialize_tableaux_ig(X, Y, tableaux, bases):
+def _initialize_tableau_ig(X, Y, tableau, basis):
     """
     Given sequences `X` and `Y` of ndarrays, initialize the tableau and
-    basis arrays in place for the "geometric" imitation game as defined
-    in McLennan and Tourky (2006), to be passed to `_lemke_howson_tbl`.
+    basis arrays in place for the Lemke path on the imitator's polytope
+    of the "geometric" imitation game as defined in McLennan and Tourky
+    (2006), to be passed to `_lcp_lemke_tbl`.
+
+    The game has m pure strategies, one per point. Row i of the tableau
+    corresponds to the mover's pure strategy i, whose payoff against the
+    imitator's pure strategy j is -||X[i] - Y[j]||^2; the payoffs are
+    shifted column by column so that the minimum of each column is 1.
+
+    * Columns 0, ..., m-1 are those of the slack variables, forming the
+      identity matrix: the slack of row i is the mover's payoff loss
+      from strategy i, zero if and only if i is a best response.
+
+    * Columns m, ..., 2m-1 are those of the imitator's pure strategies,
+      holding the shifted payoffs.
+
+    * Column 2m contains the values of the basic variables, initially
+      1.
+
+    * `basis` contains the basic variables, initially the slacks 0, ...,
+      m-1.
 
     Parameters
     ----------
     X, Y : ndarray(float)
         Arrays of the same shape (m, n).
 
-    tableaux : tuple(ndarray(float, ndim=2))
-        Tuple of two arrays to be used to store the tableaux, of shape
-        (2m, 2m). Modified in place.
+    tableau : ndarray(float, ndim=2)
+        Array to be used to store the tableau, of shape (m, 2m+1).
+        Modified in place.
 
-    bases : tuple(ndarray(int, ndim=1))
-        Tuple of two arrays to be used to store the bases, of shape
-        (m,). Modified in place.
+    basis : ndarray(int, ndim=1)
+        Array to be used to store the basis, of shape (m,). Modified in
+        place.
 
     Returns
     -------
-    tableaux : tuple(ndarray(float, ndim=2))
-        View to `tableaux`.
+    tableau : ndarray(float, ndim=2)
+        View to `tableau`.
 
-    bases : tuple(ndarray(int, ndim=1))
-        View to `bases`.
+    basis : ndarray(int, ndim=1)
+        View to `basis`.
 
     """
     m = X.shape[0]
     min_ = np.zeros(m)
 
-    # Mover
-    for i in range(m):
-        for j in range(2*m):
-            if j == i or j == i + m:
-                tableaux[0][i, j] = 1
-            else:
-                tableaux[0][i, j] = 0
-        # Right hand side
-        tableaux[0][i, 2*m] = 1
-
-    # Imitator
     for i in range(m):
         # Slack variables
         for j in range(m):
             if j == i:
-                tableaux[1][i, j] = 1
+                tableau[i, j] = 1
             else:
-                tableaux[1][i, j] = 0
+                tableau[i, j] = 0
         # Payoff variables
         for j in range(m):
             d = X[i] - Y[j]
-            tableaux[1][i, m+j] = _square_sum(d) * (-1)
-            if tableaux[1][i, m+j] < min_[j]:
-                min_[j] = tableaux[1][i, m+j]
+            tableau[i, m+j] = _square_sum(d) * (-1)
+            if tableau[i, m+j] < min_[j]:
+                min_[j] = tableau[i, m+j]
         # Right hand side
-        tableaux[1][i, 2*m] = 1
+        tableau[i, 2*m] = 1
     # Shift the payoff values
     for i in range(m):
         for j in range(m):
-            tableaux[1][i, m+j] -= min_[j]
-            tableaux[1][i, m+j] += 1
+            tableau[i, m+j] -= min_[j]
+            tableau[i, m+j] += 1
 
-    for pl, start in enumerate([m, 0]):
-        for i in range(m):
-            bases[pl][i] = start + i
+    for i in range(m):
+        basis[i] = i
 
-    return tableaux, bases
+    return tableau, basis
+
+
+@jit(nopython=True, cache=True)
+def _get_mixed_action(tableau, basis, out):
+    """
+    From `tableau` and `basis` of the imitation game, extract the
+    imitator's basic variables and store the corresponding normalized
+    mixed action in `out`, in place.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        Array of shape (m, 2m+1) containing the terminal tableau.
+
+    basis : ndarray(int, ndim=1)
+        Array of shape (m,) containing the terminal basis.
+
+    out : ndarray(float, ndim=1)
+        Array of shape (m,) to store the mixed action. Modified in
+        place.
+
+    Returns
+    -------
+    out : ndarray(float, ndim=1)
+        View to `out`.
+
+    """
+    m = basis.shape[0]
+
+    out[:] = 0
+    sum_ = 0.
+    for i in range(m):
+        k = basis[i]
+        if m <= k < 2*m:
+            out[k-m] = tableau[i, -1]
+            sum_ += tableau[i, -1]
+    if sum_ != 0:
+        out /= sum_
+
+    return out
 
 
 def _square_sum(a):  # pragma: no cover

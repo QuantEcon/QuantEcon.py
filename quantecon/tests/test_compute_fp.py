@@ -11,8 +11,11 @@ TODO: add multivariate case
 """
 import warnings
 import numpy as np
-from numpy.testing import assert_, assert_raises
+from numpy.testing import (
+    assert_, assert_allclose, assert_array_equal, assert_raises
+)
 from quantecon import compute_fixed_point
+from quantecon._compute_fp import _initialize_tableau_ig
 
 
 class TestFPLogisticEquation():
@@ -161,3 +164,21 @@ def test_imitation_game_numerical_breakdown():
     assert_(not any('max_iter' in msg for msg in messages))
     assert_(len(evaluations) < max_iter)  # Stopped at the breakdown
     assert_(np.isfinite(x))
+
+
+def test_initialize_tableau_ig_layout():
+    # [I | shifted payoffs | 1] with the slacks basic: the mover's payoff
+    # from point i against point j is -||X[i] - Y[j]||^2, shifted column
+    # by column so that each column has minimum 1
+    rng = np.random.RandomState(0)
+    m, n = 4, 3
+    X, Y = rng.standard_normal((m, n)), rng.standard_normal((m, n))
+    tableau = np.empty((m, 2*m+1))
+    basis = np.empty(m, dtype=int)
+    _initialize_tableau_ig(X, Y, tableau, basis)
+
+    D = ((X[:, np.newaxis, :] - Y[np.newaxis, :, :])**2).sum(axis=-1)
+    assert_array_equal(tableau[:, :m], np.eye(m))
+    assert_allclose(tableau[:, m:2*m], D.max(axis=0) - D + 1)
+    assert_array_equal(tableau[:, 2*m], np.ones(m))
+    assert_array_equal(basis, np.arange(m))
