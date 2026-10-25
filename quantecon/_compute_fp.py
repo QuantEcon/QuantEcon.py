@@ -325,7 +325,7 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
     return x_new, converged, iterate
 
 
-@jit(nopython=True)
+@jit(nopython=True, cache=True)
 def _update_distances(X, Y, k, D):
     """
     Given sequences `X` and `Y` of ndarrays, store in place the squared
