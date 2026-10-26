@@ -174,6 +174,28 @@ def test_imitation_game_large_scale():
     assert_(np.isfinite(x))
 
 
+def test_imitation_game_tiny_scale():
+    # Squared distances below the smallest normal float: the scale of the
+    # payoffs is clamped so that its reciprocal does not overflow (which
+    # produced NaN payoffs and a spurious numerical breakdown), and the
+    # contraction converges as at any other scale
+    evaluations = []
+
+    def T(x):
+        evaluations.append(x)
+        return 0.5 * x
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        x = compute_fixed_point(T, 1e-155, error_tol=1e-160, max_iter=100,
+                                verbose=1, method='imitation_game')
+    assert_(len(w) == 0, [str(wi.message) for wi in w])
+    assert_(abs(T(x) - x) <= 1e-160)
+    # Same path as plain iteration: 17 steps from 1e-155 to a point with
+    # residual 1e-155 * 2**-17 <= 1e-160, one evaluation of T per step
+    assert_(len(evaluations) - 1 == 17)
+
+
 def test_imitation_game_driver_failure_warnings(monkeypatch):
     # A nonzero status of the pivoting driver stops the iteration with a
     # warning naming the cause, and the last iterate is returned
@@ -227,6 +249,17 @@ def test_initialize_tableau_ig_layout():
         assert_array_equal(basis, np.arange(m))
     # With the maximum as the scale, the payoff entries lie in [1, 2]
     assert_((tableau[:, m:2*m] >= 1).all() and (tableau[:, m:2*m] <= 2).all())
+
+    # Subnormal distances: with the scale clamped at the smallest normal
+    # float, as in the iteration, the entries are finite and in [1, 2]
+    D_sub = D * 1e-310
+    assert_(D_sub.max() < np.finfo(np.float64).tiny)
+    scale = max(D_sub.max(), np.finfo(np.float64).tiny)
+    _initialize_tableau_ig(D_sub, scale, tableau, basis)
+    payoffs = tableau[:, m:2*m]
+    assert_(np.isfinite(payoffs).all())
+    assert_((payoffs >= 1).all() and (payoffs <= 2).all())
+    assert_allclose(payoffs, (D_sub.max(axis=0) - D_sub) / scale + 1)
 
 
 def test_update_distances_scalar_points():

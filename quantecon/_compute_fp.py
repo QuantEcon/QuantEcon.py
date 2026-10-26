@@ -234,9 +234,12 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
 
     # Squared distances D[i, j] = ||X[i] - Y[j]||^2, extended by one row
     # and one column per new point, and their running maximum, by which
-    # the payoffs of the imitation game are scaled
+    # the payoffs of the imitation game are scaled; the scale is bounded
+    # below by the smallest positive normal float, below which its
+    # reciprocal overflows
     D = np.empty((buff_size, buff_size))
     d_max = _update_distances(X, Y, 0, D)
+    scale_min = np.finfo(np.float64).tiny
 
     tableau = np.empty((buff_size, buff_size*2+1))
     basis = np.empty(buff_size, dtype=int)
@@ -278,7 +281,7 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
 
         m = iterate
         d_max = max(d_max, _update_distances(X, Y, m-1, D))
-        scale = d_max if d_max > 0 else 1.
+        scale = max(d_max, scale_min)
 
         if _newest_is_equilibrium(D[:m, m-1], scale, z[:m],
                                   TOL_PIV, TOL_RATIO_DIFF):
