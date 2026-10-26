@@ -1,0 +1,175 @@
+# Disclosure ask: the neutral comment QEP-5's Adoption section names as the
+# third visibility channel for the Code of AI Use.
+#
+# One comment, posted once, on each external pull request whose description
+# and commit messages carry no disclosure, asking the author for the
+# `Assisted-by:` line and a one-line attestation. It posts nothing else: no
+# label, no status check, no hold. A maintainer reads the reply.
+#
+# Pilot on QuantEcon.py under QuantEcon/QuantEcon.py#965; build issue
+# QuantEcon/project-qep5#8; the policy is
+# https://github.com/QuantEcon/qeps/blob/main/qeps/qep-0005-code-of-ai-use.md
+#
+# The pilot runs this file inline so wording and filter changes are one small
+# pull request here. Once the pilot month is in, the shared copy moves to
+# QuantEcon/actions, the home for the organisation's Action-based automation,
+# and this file becomes a caller pinned to an exact release tag.
+#
+# Security model. The job runs on `pull_request_target`, so it holds the base
+# repository's token. It therefore never checks out or executes anything from
+# the pull request, reads the title and body only as data inside the script
+# (never through `${{ }}` interpolation into the script text), holds the one
+# permission it needs, and pins its single action by commit.
+
+name: disclosure-ask
+
+on:
+  pull_request_target:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: "Number of an existing pull request to evaluate (for a sandbox test, a backfill, or a re-run after a wording change)"
+        required: true
+        type: string
+      dry_run:
+        description: "Log the decision and the comment that would be posted, without posting it"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: disclosure-ask-${{ github.event.pull_request.number || github.event.inputs.pull_request }}
+  cancel-in-progress: false
+
+jobs:
+  ask:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask for the Assisted-by line if it is missing
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            // Bump the version in the marker when the wording changes, so the
+            // pilot's counts (QuantEcon/project-qep5#6) can be split by text.
+            const MARKER = '<!-- qep5-disclosure-ask v1 -->';
+            const CODE_URL = 'https://github.com/QuantEcon/qeps/blob/main/qeps/qep-0005-code-of-ai-use.md';
+
+            // QEP-2's label for organisation-operated automation. QEP-5 exempts
+            // such automation only when it is registered and labelled, so the
+            // skip is on the label, not on any login. The label must be applied
+            // when the pull request is created: `opened` fires before a later
+            // label call.
+            const AUTOMATED_LABEL = 'automated';
+
+            // A `Co-Authored-By:` trailer that a tool emitted on its own counts
+            // as disclosure under norm 2; a human co-author's does not. The only
+            // way to tell them apart is this list. It will drift: add a tool
+            // here when a pull request shows a trailer it misses.
+            const TOOL_COAUTHOR = /co-authored-by:.*(noreply@anthropic\.com|copilot@users\.noreply\.github\.com|\b(claude|copilot|codex|gemini|cursor|devin|aider)\b)/i;
+
+            // A disclosure is `Assisted-by:` at the start of a line with a
+            // non-empty value. The org pull-request template carries the key
+            // with an empty value for the author to fill, so an empty value is
+            // "missing", not "disclosed". HTML comments are stripped first so
+            // the template's explanatory comment never matches.
+            const ASSISTED_BY = /^[ \t]*assisted-by:[ \t]*\S/im;
+            const stripComments = (text) => (text || '').replace(/<!--[\s\S]*?-->/g, '');
+            const discloses = (text) => ASSISTED_BY.test(stripComments(text));
+
+            const { owner, repo } = context.repo;
+            const inputs = context.payload.inputs || {};
+            const dryRun = String(inputs.dry_run) === 'true';
+
+            // Resolve the pull request: from the event, or by number on dispatch.
+            let pr = context.payload.pull_request;
+            if (!pr) {
+              const number = Number(inputs.pull_request);
+              if (!Number.isInteger(number) || number <= 0) {
+                core.setFailed('workflow_dispatch needs a positive pull request number');
+                return;
+              }
+              pr = (await github.rest.pulls.get({ owner, repo, pull_number: number })).data;
+            }
+            const number = pr.number;
+            const login = pr.user.login;
+            const skip = (why) => core.info(`#${number}: no ask (${why})`);
+
+            // 1. Bot accounts have no human to ask.
+            if (pr.user.type === 'Bot' || login.endsWith('[bot]')) {
+              return skip(`author ${login} is a bot`);
+            }
+
+            // 2. Registered organisation automation carries the label.
+            if ((pr.labels || []).some((l) => l.name === AUTOMATED_LABEL)) {
+              return skip(`labelled ${AUTOMATED_LABEL}`);
+            }
+
+            // 3. The ask is for external pull requests. Members and owners are
+            //    inside by association; anyone with write access is inside by
+            //    permission. The permission lookup also catches members whose
+            //    membership is private, which the association field may not
+            //    report, and settles outside collaborators by what they hold.
+            if (['OWNER', 'MEMBER'].includes(pr.author_association)) {
+              return skip(`author association ${pr.author_association}`);
+            }
+            try {
+              const level = (await github.rest.repos.getCollaboratorPermissionLevel({
+                owner, repo, username: login,
+              })).data;
+              const role = level.role_name || level.permission;
+              if (['admin', 'maintain', 'write'].includes(role)) {
+                return skip(`author holds ${role}`);
+              }
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              // 404: no relationship with the repository, so external.
+            }
+
+            // 4. Already disclosed, in the description or in a commit message.
+            if (discloses(pr.body)) {
+              return skip('description carries Assisted-by');
+            }
+            const commits = await github.paginate(github.rest.pulls.listCommits, {
+              owner, repo, pull_number: number, per_page: 100,
+            });
+            for (const c of commits) {
+              const message = c.commit.message || '';
+              if (discloses(message)) return skip(`commit ${c.sha.slice(0, 7)} carries Assisted-by`);
+              if (TOOL_COAUTHOR.test(message)) return skip(`commit ${c.sha.slice(0, 7)} carries a tool co-author trailer`);
+            }
+
+            // 5. Once per pull request, whatever reopens or re-runs it.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: number, per_page: 100,
+            });
+            if (comments.some((c) => (c.body || '').includes(MARKER))) {
+              return skip('already asked');
+            }
+
+            const first = ['FIRST_TIME_CONTRIBUTOR', 'FIRST_TIMER'].includes(pr.author_association);
+            const greeting = first
+              ? `Thanks for the pull request, @${login}, and welcome to ${repo}!`
+              : `Thanks for the pull request, @${login}!`;
+
+            const body = [
+              MARKER,
+              greeting,
+              '',
+              `QuantEcon welcomes AI-assisted contributions under its [Code of AI Use](${CODE_URL}). Every pull request carries one \`Assisted-by:\` line, and this one does not yet, so two quick things, please:`,
+              '',
+              '1. Add one line to the description above: `Assisted-by: <tool> (<model>)` if AI tools meaningfully contributed (for example `Assisted-by: Claude Code (Claude Fable 5.1)`), or `Assisted-by: none` if they did not.',
+              '2. Reply here to confirm that a human chose the task, read the result, and will answer review on it.',
+              '',
+              'This comment is posted on every external pull request that arrives without the line, so it is not a flag on yours. Nothing is blocked; a maintainer reads the reply.',
+            ].join('\n');
+
+            if (dryRun) {
+              core.info(`#${number}: would ask (dry run). Comment:\n${body}`);
+              return;
+            }
+            await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
+            core.info(`#${number}: asked`);
