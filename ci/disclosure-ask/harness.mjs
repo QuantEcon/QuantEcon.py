@@ -29,9 +29,10 @@ for (const l of lines.slice(start + 1)) {
 }
 const script = body.join('\n');
 
-function fake({ pr, commits = [], comments = [], permission = null, permissionStatus = 200 }) {
+function fake({ pr, commits = [], comments = [], permission = null, permissionStatus = 200, labelFails = false }) {
   const log = [];
   const posted = [];
+  const labelled = [];
   const github = {
     rest: {
       pulls: {
@@ -41,6 +42,10 @@ function fake({ pr, commits = [], comments = [], permission = null, permissionSt
       issues: {
         listComments: 'listComments',
         createComment: async ({ body }) => { posted.push(body); return {}; },
+        addLabels: async ({ labels }) => {
+          if (labelFails) throw new Error('Resource not accessible by integration');
+          labelled.push(...labels); return {};
+        },
       },
       repos: {
         getCollaboratorPermissionLevel: async () => {
@@ -53,9 +58,10 @@ function fake({ pr, commits = [], comments = [], permission = null, permissionSt
   };
   const core = {
     info: (m) => log.push(m),
+    warning: (m) => log.push('WARNING: ' + m),
     setFailed: (m) => log.push('FAILED: ' + m),
   };
-  return { github, core, log, posted };
+  return { github, core, log, posted, labelled };
 }
 
 const base = {
@@ -92,7 +98,10 @@ const cases = [
   ['already asked (marker on page 2)', { pr: base, comments: [...Array(31).fill({ body: 'chatter' }), { body: '<!-- qep5-disclosure-ask v1 -->\nold ask' }], ...external }, { asks: false, why: 'already asked' }],
   ['dispatch with number', { pr: null, dispatch: '42', fetched: base, ...external }, { asks: true }],
   ['dispatch with bad number', { pr: null, dispatch: 'x' }, { asks: false, why: 'FAILED' }],
-  ['dispatch dry run: logs, does not post', { pr: null, dispatch: '42', dryRun: 'true', fetched: base, ...external }, { asks: false, why: 'would ask' }],
+  ['dispatch dry run: logs, does not post', { pr: null, dispatch: '42', dryRun: 'true', fetched: base, ...external }, { asks: false, why: 'would ask', labels: 0 }],
+  ['ask adds the author-response label', { pr: base, ...external }, { asks: true, why: 'labelled author-response', labels: 1 }],
+  ['label failure keeps the ask and warns', { pr: base, labelFails: true, ...external }, { asks: true, why: 'WARNING', labels: 0 }],
+  ['skip adds no label', { pr: { ...base, author_association: 'MEMBER' } }, { asks: false, labels: 0 }],
 ];
 
 let failures = 0;
@@ -116,6 +125,8 @@ for (const [name, setup, expect] of cases) {
     if (asked && expect.noWelcome && f.posted[0].includes('and welcome to')) problems.push('unexpected welcome');
     if (asked && !expect.noWelcome && !f.posted[0].includes('and welcome to')) problems.push('missing welcome');
     if (asked && !f.posted[0].startsWith('<!-- qep5-disclosure-ask v1 -->')) problems.push('marker not first');
+    if (expect.labels !== undefined && f.labelled.length !== expect.labels) problems.push(`labels=${f.labelled.length}, expected ${expect.labels}`);
+    if (asked && expect.labels === undefined && f.labelled.join() !== 'author-response') problems.push('ask without the label');
   }
   console.log((problems.length ? 'FAIL ' : 'ok   ') + name + (problems.length ? '\n     ' + problems.join('\n     ') : ''));
   failures += problems.length ? 1 : 0;
