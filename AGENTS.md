@@ -32,3 +32,32 @@ agents too — this file only adds the essentials and repo-specific conventions.
   durable record.
 - Release notes live on [GitHub releases](https://github.com/QuantEcon/QuantEcon.py/releases);
   `CHANGELOG.md` only points there. Do not add per-PR changelog entries.
+
+## Code of AI Use
+
+<!-- qep-5 v0 begin -->
+> [!IMPORTANT]
+> **QuantEcon's Code of AI Use**
+> ([QEP-5](https://github.com/QuantEcon/qeps/blob/main/qeps/qep-0005-code-of-ai-use.md)).
+> AI-assisted contributions are welcome. In exchange:
+>
+> 1. **A human is in the loop.** Choose the task, read the result before asking
+>    anyone else to, submit it under your own account, and answer review on it
+>    yourself.
+> 2. **Disclose.** Put one line in the pull-request description or a commit
+>    message: `Assisted-by: <tool> (<model>)` where AI tools meaningfully
+>    contributed to the code, tests, or text, or `Assisted-by: none` where they
+>    did not.
+> 3. **Own it.** Be able to explain the change and answer review on it: read
+>    every line, or read the tests that would fail if it were wrong.
+> 4. **Verify before you claim.** Say tests pass, coverage rose, or benchmarks
+>    improved only if you ran them to completion.
+> 5. **Don't crawl, duplicate, or farm.** No automation that crawls our issue
+>    tracker; check for an existing pull request before starting; never
+>    mass-submit; and do not use AI tools on issues labelled `good first issue`.
+> 6. **Put it right.** If a maintainer points at a lapse, amend the pull
+>    request, or carry the point into your next one.
+>
+> This covers anything you ask a maintainer to read: pull requests, issues,
+> review comments, and proposals.
+<!-- qep-5 end -->
