@@ -3,8 +3,12 @@
 #
 # One comment, posted once, on each external pull request whose description
 # and commit messages carry no disclosure, asking the author for the
-# `Assisted-by:` line and a one-line attestation. It posts nothing else: no
-# label, no status check, no hold. A maintainer reads the reply.
+# `Assisted-by:` line and a one-line attestation. It also applies the
+# `author-response` label, the repository's existing signal that a thread
+# waits on its author, which a maintainer removes by hand as today. No
+# status check, no hold. A maintainer reads the reply. (The label is a
+# departure from the comment-only constraint recorded on the build issue;
+# the lead ruled it on 2026-10-27.)
 #
 # Pilot on QuantEcon.py under QuantEcon/QuantEcon.py#965; build issue
 # QuantEcon/project-qep5#8; the policy is
@@ -64,6 +68,11 @@ jobs:
             // when the pull request is created: `opened` fires before a later
             // label call.
             const AUTOMATED_LABEL = 'automated';
+
+            // Applied after the ask so the thread shows it waits on the author.
+            // The comment is the deliverable: a label failure is logged, not
+            // fatal, so a missing label or permission never loses the ask.
+            const ASK_LABEL = 'author-response';
 
             // A `Co-Authored-By:` trailer that a tool emitted on its own counts
             // as disclosure under norm 2; a human co-author's does not. The only
@@ -168,8 +177,14 @@ jobs:
             ].join('\n');
 
             if (dryRun) {
-              core.info(`#${number}: would ask (dry run). Comment:\n${body}`);
+              core.info(`#${number}: would ask and label ${ASK_LABEL} (dry run). Comment:\n${body}`);
               return;
             }
             await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
             core.info(`#${number}: asked`);
+            try {
+              await github.rest.issues.addLabels({ owner, repo, issue_number: number, labels: [ASK_LABEL] });
+              core.info(`#${number}: labelled ${ASK_LABEL}`);
+            } catch (error) {
+              core.warning(`#${number}: asked, but could not add label ${ASK_LABEL}: ${error.message}`);
+            }
