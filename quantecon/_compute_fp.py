@@ -9,7 +9,7 @@ import numpy as np
 from numba import jit, types
 from numba.extending import overload
 from .optimize.lcp_lemke import _lcp_lemke_tbl
-from .optimize.pivoting import TOL_PIV, TOL_RATIO_DIFF
+from .optimize.pivoting import TOL_RATIO_DIFF
 
 
 def _print_after_skip(skip, it=None, dist=None, etime=None):
@@ -46,6 +46,28 @@ _pivot_limit_msg = \
 # Initial length of the buffers for the computed sequences of x and y in
 # the imitation game method; doubled, up to max_iter, when exceeded
 _BUFF_SIZE = 2**8
+
+# Pivot tolerance for the Lemke paths on the imitation games, whose
+# payoffs are the squared distances divided by their maximum d_max and
+# shifted into [1, 2], which makes the tableau invariant to a uniform
+# change of coordinate units. Once the iterates have clustered, the
+# path needs pivots far below the tolerance TOL_PIV = 1e-10 shared by
+# the solvers that work on the user's own data: with the default oracle
+# (error = sup-norm distance), the pivot that separates two clustered
+# points is of order (error / sqrt(d_max))**2, e.g. 1e-11 in the sine
+# map of test_imitation_game_far_start, but the pivots along a path
+# depend on the basis, and the oracle of mclennan_tourky measures a
+# regret, not a distance. Unlike the simplex method, Lemke's algorithm
+# cannot replace a rejected pivot by a safer one: the path either ends
+# with a spurious ray or follows a wrong row and ends at a point that
+# does not advance the iteration (the sine map stalled this way). The
+# value, about a hundred machine epsilons, is an empirical choice: on a
+# sweep of maps, coordinate scales and tolerances, it recovered every
+# case that 1e-10 lost at tolerances down to 1e-6 times the coordinate
+# scale, and lower values gained nothing. The outer loop checks the
+# actual error, so a rejected pivot costs a reported failure, not a
+# wrong answer
+_TOL_PIV = 1e-14
 
 
 def compute_fixed_point(T, v, error_tol=1e-3, max_iter=50, verbose=2,
@@ -234,9 +256,9 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
 
     # Squared distances D[i, j] = ||X[i] - Y[j]||^2, extended by one row
     # and one column per new point, and their running maximum, by which
-    # the payoffs of the imitation game are scaled; the scale is bounded
-    # below by the smallest positive normal float, below which its
-    # reciprocal overflows
+    # the payoffs of the imitation game are scaled to [1, 2] (see
+    # _TOL_PIV); the scale is bounded below by the smallest positive
+    # normal float, below which its reciprocal overflows
     D = np.empty((buff_size, buff_size))
     d_max = _update_distances(X, Y, 0, D)
     scale_min = np.finfo(np.float64).tiny
@@ -284,7 +306,7 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
         scale = max(d_max, scale_min)
 
         if _newest_is_equilibrium(D[:m, m-1], scale, z[:m],
-                                  TOL_PIV, TOL_RATIO_DIFF):
+                                  _TOL_PIV, TOL_RATIO_DIFF):
             # Fast path: the Lemke path from the newest point ends after
             # its first pivot, with rho = delta_{m-1}, so that the next
             # iterate is the image of the newest point
@@ -299,7 +321,7 @@ def _compute_fixed_point_ig(oracle, v, error_tol, max_iter, verbose,
         stop_vars[0], stop_vars[1] = m-1, 2*m-1
         status, _ = _lcp_lemke_tbl(
             tableau_curr, basis_curr, 2*m-1, stop_vars, max_piv, argmins,
-            TOL_PIV, TOL_RATIO_DIFF
+            _TOL_PIV, TOL_RATIO_DIFF
         )
         if status != 0:  # The tableau does not hold an equilibrium
             break
@@ -454,9 +476,10 @@ def _initialize_tableau_ig(D, scale, tableau, basis):
     imitator's pure strategy j is `-D[i, j]`. The payoffs are divided by
     `scale` and shifted column by column so that the minimum of each
     column is 1; with `scale` the maximum of `D`, the entries lie in
-    [1, 2] whatever the magnitude of the distances, which keeps the
-    pivoting tolerances meaningful. Neither transformation changes the
-    mover's best responses, hence the Lemke path.
+    [1, 2] whatever the magnitude of the distances, so that the pivoting
+    tolerances (see `_TOL_PIV`) are relative to the distances. Neither
+    transformation changes the mover's best responses, hence the Lemke
+    path.
 
     * Columns 0, ..., m-1 are those of the slack variables, forming the
       identity matrix: the slack of row i is the mover's payoff loss

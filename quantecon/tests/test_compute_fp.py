@@ -18,11 +18,9 @@ from quantecon import compute_fixed_point
 import quantecon._compute_fp
 from quantecon._compute_fp import (
     _compute_fixed_point_ig, _initialize_tableau_ig, _update_distances,
-    _newest_is_equilibrium
+    _newest_is_equilibrium, _TOL_PIV
 )
-from quantecon.optimize.pivoting import (
-    _lex_min_ratio_test, TOL_PIV, TOL_RATIO_DIFF
-)
+from quantecon.optimize.pivoting import _lex_min_ratio_test, TOL_RATIO_DIFF
 
 
 class TestFPLogisticEquation():
@@ -196,6 +194,57 @@ def test_imitation_game_tiny_scale():
     assert_(len(evaluations) - 1 == 17)
 
 
+def test_imitation_game_far_start():
+    # Iterates far apart before they cluster: the payoffs are the squared
+    # distances divided by their maximum, so the pivots that the Lemke
+    # path needs near the fixed point are of order (error / largest
+    # distance)**2, here about 1e-11, and were excluded by the shared
+    # pivot tolerance 1e-10, which stalled the iteration at a residual of
+    # 3e-3 (the iterate repeated itself) although the map is a continuous
+    # self-map of [-1000, 1000] with fixed point 0
+    evaluations = []
+
+    def T(x):
+        evaluations.append(x)
+        return -1000 * np.sin(1.1 * x / 1000)
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        x = compute_fixed_point(T, 300., error_tol=1e-3, max_iter=100,
+                                verbose=1, method='imitation_game')
+    assert_(len(w) == 0, [str(wi.message) for wi in w])
+    assert_(abs(T(x) - x) <= 1e-3)
+    assert_(len(evaluations) - 1 <= 20)  # 11 iterations
+
+
+def test_imitation_game_tight_tolerance():
+    # Absolute tolerance 1e-6 from a start at distance of order 1e2 from
+    # the fixed point, on a map that is not a contraction in the sup norm:
+    # the recorded points sit at every intermediate scale, and the path
+    # needs pivots between 1e-14 and the shared pivot tolerance 1e-10,
+    # with which the iteration stalled at every coordinate scale
+    theta = 0.7
+    R = 0.95 * np.array([[np.cos(theta), -np.sin(theta)],
+                         [np.sin(theta), np.cos(theta)]])
+    c = np.array([1., -2.])
+    x_star = np.linalg.solve(np.eye(2) - R, c)
+    evaluations = []
+
+    def T(x):
+        evaluations.append(x)
+        return R @ x + c
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter('always')
+        x = compute_fixed_point(T, np.array([100., 100.]), error_tol=1e-6,
+                                max_iter=300, verbose=1,
+                                method='imitation_game')
+    assert_(len(w) == 0, [str(wi.message) for wi in w])
+    assert_(np.max(np.abs(T(x) - x)) <= 1e-6)
+    assert_allclose(x, x_star, atol=1e-5)
+    assert_(len(evaluations) - 1 <= 150)  # 111 iterations
+
+
 def test_imitation_game_driver_failure_warnings(monkeypatch):
     # A nonzero status of the pivoting driver stops the iteration with a
     # warning naming the cause, and the last iterate is returned
@@ -327,11 +376,11 @@ def test_newest_is_equilibrium_matches_ratio_test():
         scale = D.max() if D.max() > 0 else 1.
         _initialize_tableau_ig(D, scale, tableau, basis)
         found, row, resolved = _lex_min_ratio_test(
-            tableau, 2*m-1, 0, argmins, TOL_PIV, TOL_RATIO_DIFF
+            tableau, 2*m-1, 0, argmins, _TOL_PIV, TOL_RATIO_DIFF
         )
         assert_(found and resolved)
         fast = _newest_is_equilibrium(D[:, m-1], scale, work,
-                                      TOL_PIV, TOL_RATIO_DIFF)
+                                      _TOL_PIV, TOL_RATIO_DIFF)
         assert_(fast == (row == m-1), (trial, fast, row))
         num_fast += fast
     assert_(0 < num_fast < 400)  # Both outcomes exercised
