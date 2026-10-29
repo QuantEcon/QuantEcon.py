@@ -42,7 +42,8 @@ from ._filter import hamilton_filter
 from ._lqnash import nnash
 from ._ivp import IVP
 from ._lss import LinearStateSpace
-from ._matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati
+from ._matrix_eqn import solve_discrete_lyapunov, solve_discrete_riccati, \
+    solve_discrete_riccati_system
 from ._quadsums import var_quadratic_sum, m_quadratic_sum
 #->Propose Delete From Top Level
 #Promote to keep current examples working
