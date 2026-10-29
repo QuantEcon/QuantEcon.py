@@ -168,33 +168,14 @@ def lcp_lemke(M, q, d=None, max_iter=10**6, piv_options=PivOptions(),
     # Array to store row indices in lex_min_ratio_test
     argmins = np.empty(n, dtype=np.int_)
 
-    while num_iter < max_iter:
-        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
-            tableau, pivcol, 0, argmins,
-            piv_options.tol_piv, piv_options.tol_ratio_diff
-        )
-
-        if not pivrow_found:  # Ray termination
-            success = False
-            status = 2
-            break
-        if not resolved:  # Numerical breakdown: lexicographic tie not
-            success = False  # broken, impossible in exact arithmetic
-            status = 3
-            break
-
-        _pivoting(tableau, pivcol, pivrow)
-        basis[pivrow], leaving_var = pivcol, basis[pivrow]
-        num_iter += 1
-
-        if leaving_var == art_var:  # Solution found
-            success = True
-            status = 0
-            break
-        elif leaving_var < n:
-            pivcol = leaving_var + n
-        else:
-            pivcol = leaving_var - n
+    stop_vars = np.empty(1, dtype=np.int_)
+    stop_vars[0] = art_var
+    status, num_iter_tbl = _lcp_lemke_tbl(
+        tableau, basis, pivcol, stop_vars, max_iter - num_iter, argmins,
+        piv_options.tol_piv, piv_options.tol_ratio_diff
+    )
+    num_iter += num_iter_tbl
+    success = (status == 0)
 
     _get_solution(tableau, basis, z)
 
@@ -205,6 +186,122 @@ if lcp_lemke.__doc__ is not None:  # None under python -OO
     lcp_lemke.__doc__ = lcp_lemke.__doc__.format(
         FEA_TOL=FEA_TOL, TOL_PIV=TOL_PIV, TOL_RATIO_DIFF=TOL_RATIO_DIFF
     )
+
+
+@jit(nopython=True, cache=True)
+def _lcp_lemke_tbl(tableau, basis, pivcol, stop_vars, max_iter, argmins,
+                   tol_piv, tol_ratio_diff):
+    """
+    Perform the complementary pivoting steps on an initialized tableau,
+    modifying `tableau` and `basis` in place, until a variable in
+    `stop_vars` leaves the basis.
+
+    The tableau has n rows, one per complementary pair, and its last
+    column holds the values of the basic variables. Columns 0, ..., n-1
+    are those of the slack variables w, which form the identity matrix
+    initially (the lexicographic ratio test reads the basis inverse from
+    them), and columns n, ..., 2n-1 are those of the variables z, so that
+    the complementary pair of variable k is k + n or k - n; further
+    columns, if any, hold additional variables. Starting with `pivcol`
+    entering, the path followed is "almost complementary": after each
+    step, the complement of the variable that has just left enters next,
+    unless the leaving variable is in `stop_vars`, in which case the
+    pivoting ends with success.
+
+    Two uses, which differ only in the initial tableau and `stop_vars`:
+
+    * Lemke's algorithm (Scheme I), as in `lcp_lemke`: the tableau has
+      an extra column for the artificial variable z0 (index 2n), whose
+      covering vector makes the initial basis feasible; z0 enters first
+      (by a ratio test performed by the caller), and `stop_vars` is
+      `[2n]`: the path ends when z0 leaves, where all n pairs are
+      complementary.
+
+    * Lemke paths (Scheme II, or the Lemke-Howson algorithm on a single
+      polytope): the tableau has no artificial column, its initial basis
+      (all w) is feasible and complementary, and `pivcol` is `n + s` for
+      a chosen index s, so that the pair s holds both of its variables
+      while another pair holds none; `stop_vars` is `[s, n + s]`: the
+      path ends when either variable of the pair s leaves, where the
+      basis is complementary again and differs from the initial one.
+
+    Parameters
+    ----------
+    tableau : ndarray(float, ndim=2)
+        ndarray of shape (n, ncols), with ncols >= 2*n+1, containing the
+        initialized tableau, in which the entering variable `pivcol` is
+        nonbasic. Modified in place.
+
+    basis : ndarray(int, ndim=1)
+        ndarray of shape (n,) containing the basic variables. Modified in
+        place.
+
+    pivcol : scalar(int)
+        Index of the variable to enter the basis first.
+
+    stop_vars : ndarray(int, ndim=1)
+        Indices of the variables whose leaving the basis ends the
+        pivoting with success.
+
+    max_iter : scalar(int)
+        Maximum number of pivoting steps to perform.
+
+    argmins : ndarray(int, ndim=1)
+        Workspace ndarray of shape (n,) for the lexicographic ratio
+        test. Modified in place.
+
+    tol_piv : scalar(float)
+        Pivot tolerance below which a number is considered to be
+        nonpositive.
+
+    tol_ratio_diff : scalar(float)
+        Tolerance used in the lexicographic pivoting.
+
+    Returns
+    -------
+    status : scalar(int)
+        Exit status: 0 if a variable in `stop_vars` has left the basis,
+        1 if `max_iter` steps have been performed, 2 if the pivot column
+        has no positive entry (ray termination), 3 if the lexicographic
+        tie breaking failed to single out a row (numerical breakdown).
+
+    num_iter : scalar(int)
+        Number of pivoting steps performed.
+
+    """
+    n = tableau.shape[0]
+
+    status = 1
+    num_iter = 0
+
+    while num_iter < max_iter:
+        pivrow_found, pivrow, resolved = _lex_min_ratio_test(
+            tableau, pivcol, 0, argmins, tol_piv, tol_ratio_diff
+        )
+
+        if not pivrow_found:  # Ray termination
+            status = 2
+            break
+        if not resolved:  # Numerical breakdown: lexicographic tie not
+            status = 3  # broken, impossible in exact arithmetic
+            break
+
+        _pivoting(tableau, pivcol, pivrow)
+        basis[pivrow], leaving_var = pivcol, basis[pivrow]
+        num_iter += 1
+
+        for k in range(stop_vars.shape[0]):
+            if leaving_var == stop_vars[k]:  # Solution found
+                status = 0
+                break
+        if status == 0:
+            break
+        elif leaving_var < n:
+            pivcol = leaving_var + n
+        else:
+            pivcol = leaving_var - n
+
+    return status, num_iter
 
 
 @jit(nopython=True, cache=True)

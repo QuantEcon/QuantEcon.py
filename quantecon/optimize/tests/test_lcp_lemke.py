@@ -7,7 +7,9 @@ from numpy.testing import (
     assert_, assert_allclose, assert_equal, assert_raises
 )
 
-from quantecon.optimize import lcp_lemke
+from quantecon.optimize import lcp_lemke, PivOptions
+from quantecon.optimize.lcp_lemke import _lcp_lemke_tbl
+from quantecon.game_theory import NormalFormGame, Player, lemke_howson
 
 
 def _assert_ray_termination(res):
@@ -177,3 +179,102 @@ def test_lcp_lemke_initial_ratio_test_anchored():
     res = lcp_lemke(M, q, basis=basis, max_iter=1)
     assert_equal(res.status, 1)
     assert_equal(basis[1], 2*n)  # Artificial variable
+
+
+def _symmetric_game_tableau(A, buf=None):
+    # Scheme II tableau [I | A | 1] for the symmetric game (A, A.T) with
+    # positive payoff matrix A, optionally as a view into `buf`
+    n = A.shape[0]
+    tableau = np.empty((n, 2*n+1)) if buf is None else buf[:n, :2*n+1]
+    tableau[:, :n] = np.eye(n)
+    tableau[:, n:2*n] = A
+    tableau[:, 2*n] = 1
+    basis = np.arange(n)
+    return tableau, basis
+
+
+def _lemke_path(A, s, max_iter=10**6, buf=None):
+    # Lemke path of the symmetric game (A, A.T) from the pure strategy s
+    n = A.shape[0]
+    tableau, basis = _symmetric_game_tableau(A, buf)
+    argmins = np.empty(n, dtype=int)
+    stop_vars = np.array([s, n+s])
+    piv_options = PivOptions()
+    status, num_iter = _lcp_lemke_tbl(
+        tableau, basis, n+s, stop_vars, max_iter, argmins,
+        piv_options.tol_piv, piv_options.tol_ratio_diff
+    )
+    y = np.zeros(n)
+    for i in range(n):
+        if n <= basis[i] < 2*n:
+            y[basis[i]-n] = tableau[i, -1]
+    return status, num_iter, y
+
+
+def _assert_symmetric_nash(A, rho, atol=1e-12):
+    payoffs = A @ rho
+    assert_((rho >= -atol).all())
+    assert_allclose(rho.sum(), 1)
+    # Every action in the support is a best response to rho
+    assert_(np.all(payoffs[rho > atol] >= payoffs.max() - atol))
+
+
+class TestLCPLemkeTblSchemeII:
+    def test_rock_paper_scissors(self):
+        # Unique symmetric equilibrium (1/3, 1/3, 1/3); no pure strategy
+        # is an equilibrium, so the path needs more than one step
+        A = np.array([[2, 1, 3],
+                      [3, 2, 1],
+                      [1, 3, 2]], dtype=float)
+        n = A.shape[0]
+        for s in range(n):
+            status, num_iter, y = _lemke_path(A, s)
+            assert_equal(status, 0)
+            assert_(num_iter > 1)
+            assert_allclose(y / y.sum(), np.ones(n) / n)
+
+            # Iteration limit
+            status, num_iter, _ = _lemke_path(A, s, max_iter=1)
+            assert_equal(status, 1)
+            assert_equal(num_iter, 1)
+
+    def test_pure_equilibrium_one_step(self):
+        # Action 0 is a strict symmetric equilibrium: the path from it
+        # ends after a single pivot (slack 0 leaves)
+        A = np.array([[3, 1],
+                      [1, 2]], dtype=float)
+        status, num_iter, y = _lemke_path(A, 0)
+        assert_equal(status, 0)
+        assert_equal(num_iter, 1)
+        assert_allclose(y / y.sum(), [1, 0])
+
+    def test_random_games_vs_lemke_howson(self):
+        # The Lemke path from s coincides with the Lemke-Howson path of
+        # the imitation game (A, I) with initial pivot s, projected onto
+        # the imitator's strategy
+        n = 6
+        rng = np.random.RandomState(1234)
+        for trial in range(5):
+            A = rng.uniform(1, 2, size=(n, n))
+            g = NormalFormGame((Player(A), Player(np.eye(n))))
+            for s in range(n):
+                status, _, y = _lemke_path(A, s)
+                assert_equal(status, 0)
+                rho = y / y.sum()
+                _assert_symmetric_nash(A, rho)
+                NE = lemke_howson(g, init_pivot=s)
+                assert_allclose(rho, NE[1], atol=1e-12)
+
+    def test_view_of_larger_buffer(self):
+        # The driver works on a non-contiguous view, as used by callers
+        # that keep a growing tableau in a preallocated buffer
+        n = 5
+        rng = np.random.RandomState(0)
+        A = rng.uniform(1, 2, size=(n, n))
+        buf = np.empty((n+3, 2*n+4))
+        for s in range(n):
+            status, num_iter, y = _lemke_path(A, s)
+            status_v, num_iter_v, y_v = _lemke_path(A, s, buf=buf)
+            assert_equal(status_v, status)
+            assert_equal(num_iter_v, num_iter)
+            assert_allclose(y_v, y)

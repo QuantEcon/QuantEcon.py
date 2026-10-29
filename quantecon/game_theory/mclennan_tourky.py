@@ -131,12 +131,10 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
     indptr[1:] = np.cumsum(g.nums_actions)
     x_init = _flatten_action_profile(init, indptr)
 
-    is_approx_fp = lambda x: _is_epsilon_nash(x, g, epsilon, indptr)
+    oracle = lambda x: _best_response_oracle(x, g, indptr)
     x_star, converged, num_iter = \
-        _compute_fixed_point_ig(_best_response_selection, x_init, max_iter,
-                                verbose=0, print_skip=1,
-                                is_approx_fp=is_approx_fp,
-                                g=g, indptr=indptr)
+        _compute_fixed_point_ig(oracle, x_init, epsilon, max_iter,
+                                verbose=0, print_skip=1)
     NE = _get_action_profile(x_star, indptr)
 
     if not full_output:
@@ -150,6 +148,68 @@ def mclennan_tourky(g, init=None, epsilon=1e-3, max_iter=200,
                      epsilon=epsilon)
 
     return NE, res
+
+
+def _best_response_oracle(x, g, indptr):
+    """
+    Oracle for `_compute_fixed_point_ig`: return the best response
+    selection `_best_response_selection(x, g, indptr)` together with the
+    largest payoff gain any player can obtain by deviating from `x`,
+    which is at most `epsilon` if and only if `x` is an `epsilon`-Nash
+    equilibrium of `g`. The payoff vectors are computed once and used
+    for both.
+
+    Parameters
+    ----------
+    x : array_like(float, ndim=1)
+        Array of flattened mixed action profile of length equal to n_0 +
+        ... + n_N-1, where `x[indptr[i]:indptr[i+1]]` contains player
+        i's mixed action.
+
+    g : NormalFormGame
+
+    indptr : array_like(int, ndim=1)
+        Array of index pointers of length N+1, where `indptr[0] = 0` and
+        `indptr[i+1] = indptr[i] + n_i`.
+
+    Returns
+    -------
+    out : ndarray(float, ndim=1)
+        Array of flattened mixed action profile of the pure best
+        responses, as returned by `_best_response_selection`.
+
+    error : scalar(float)
+        Maximum over the players i of `max(payoff_vector_i) - x_i @
+        payoff_vector_i`.
+
+    """
+    N = g.N
+    out = np.zeros(indptr[-1])
+    error = 0.
+
+    for i in range(N):
+        player = g.players[i]
+        if N == 2:
+            opponents_actions = x[indptr[1-i]:indptr[1-i+1]]
+        else:
+            opponents_actions = tuple(
+                x[indptr[(i+j)%N]:indptr[(i+j)%N+1]] for j in range(1, N)
+            )
+        payoff_vector = player.payoff_vector(opponents_actions)
+        payoff_max = payoff_vector.max()
+
+        # Best response with the smallest index, as in
+        # `Player.best_response` with `tie_breaking='smallest'`
+        best_responses = \
+            np.where(payoff_vector >= payoff_max - player.tol)[0]
+        out[indptr[i]+best_responses[0]] = 1
+
+        own_action = x[indptr[i]:indptr[i+1]]
+        gain = payoff_max - own_action @ payoff_vector
+        if gain > error:
+            error = gain
+
+    return out, error
 
 
 def _best_response_selection(x, g, indptr=None):
