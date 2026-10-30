@@ -4,21 +4,16 @@ Browser smoke suite for QuantEcon.py on the JupyterLite xeus-python kernel.
 One representative function per Numba feature class used in the library.
 Run natively with pytest to validate the suite itself; the WASM CI job
 (issue #933) will consume the same file once it is wired to ship it into
-the JupyterLite site.  Until then the Emscripten-only branches below
-(IS_EMSCRIPTEN, xfail) are inert but document the expected behaviour.
+the JupyterLite site.
 
 Findings from a WASM run should be recorded in issue #928 as a results
 table: function name -> works / fails / notes.
 """
-import sys
 import time
 import warnings
 
 import numpy as np
-import pytest
 from numba import njit
-
-IS_EMSCRIPTEN = sys.platform == "emscripten"
 
 # ---------------------------------------------------------------------------
 # Jitted helpers required by optimize tests (must be at module scope)
@@ -198,21 +193,26 @@ def test_support_enumeration():
 
 
 # ---------------------------------------------------------------------------
-# 11. gini_coefficient — @njit(parallel=True) + prange; expected to fail
-#     at first call on Emscripten because the ParallelAccelerator pass is
-#     not supported (issue #926).
+# 11. gini_coefficient — plain @njit with np.sort, O(n log n) (#926, #937).
+#     No parallel=True any more, so it is expected to pass on Emscripten.
+#     The timing bound catches the old O(n^2) loop coming back.
 # ---------------------------------------------------------------------------
 
-@pytest.mark.xfail(
-    IS_EMSCRIPTEN,
-    reason="@njit(parallel=True) not supported on Emscripten (#926)",
-    strict=True,
-)
 def test_gini_coefficient():
     import quantecon as qe
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    # pairwise definition: sum|y_i - y_j| / (2 n sum(y)) = 40 / 150
+    assert np.isclose(qe.gini_coefficient(y), 4 / 15)
+
+    # The call above compiled the function; time a warm call on a large
+    # sample.  Uniform(0, 1) has Gini coefficient 1/3.  At this size the old
+    # O(n^2) loop would need far longer than the bound, the sorted form not.
+    y = np.random.default_rng(0).random(400_000)
+    t0 = time.perf_counter()
     g = qe.gini_coefficient(y)
-    assert 0.0 < g < 1.0
+    elapsed = time.perf_counter() - t0
+    assert abs(g - 1 / 3) < 0.01
+    assert elapsed < 5, f"gini_coefficient took {elapsed:.1f} s"
 
 
 # ---------------------------------------------------------------------------
