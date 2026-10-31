@@ -16,7 +16,7 @@ class LocalInteraction:
         The payoff matrix of the symmetric two-player game played in each
         interaction.
 
-    adj_matrix : array_like(float, ndim=2)
+    adj_matrix : array_like or sparse array or matrix (float, ndim=2)
         The adjacency matrix of the network. Non constant weights and asymmetry
         in interactions are allowed.
 
@@ -25,8 +25,10 @@ class LocalInteraction:
     players : list(Player)
         The list consisting of all players with the given payoff matrix.
 
-    adj_matrix : scipy.sparse.csr.csr_matrix(float, ndim=2)
-        See Parameters.
+    adj_matrix : scipy.sparse.csr_array or scipy.sparse.csr_matrix
+        The adjacency matrix of the network, of shape (N, N). Stored as
+        `csr_array` if the input `adj_matrix` is an instance of
+        `scipy.sparse.sparray`; otherwise, as `csr_matrix`.
 
     N : scalar(int)
         The number of players.
@@ -36,7 +38,10 @@ class LocalInteraction:
 
     """
     def __init__(self, payoff_matrix, adj_matrix):
-        self.adj_matrix = sparse.csr_matrix(adj_matrix)
+        if isinstance(adj_matrix, sparse.sparray):
+            self.adj_matrix = sparse.csr_array(adj_matrix)
+        else:
+            self.adj_matrix = sparse.csr_matrix(adj_matrix)
         M, N = self.adj_matrix.shape
         if N != M:
             raise ValueError('adjacency matrix must be square')
@@ -51,7 +56,8 @@ class LocalInteraction:
         self.tie_breaking = 'smallest'
 
     def _play(self, actions, player_ind, tie_breaking, tol, random_state):
-        actions_matrix = sparse.csr_matrix(
+        # Same family (sparse array or matrix) as adj_matrix
+        actions_matrix = type(self.adj_matrix)(
             (np.ones(self.N, dtype=int), actions, np.arange(self.N+1)),
             shape=(self.N, self.num_actions))
 

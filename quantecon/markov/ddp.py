@@ -159,14 +159,14 @@ class DiscreteDP:
        the probability that the state in the next period is `s_next` when
        the current state is `s_indices[i]` and the action chosen is
        `a_indices[i]`. With this formulation, `Q` may be represented by
-       a scipy.sparse matrix.
+       a scipy sparse array or matrix.
 
     Parameters
     ----------
     R : array_like(float, ndim=2 or 1)
         Reward array.
 
-    Q : array_like(float, ndim=3 or 2) or scipy.sparse matrix
+    Q : array_like or sparse array or matrix (float, ndim=3 or 2)
         Transition probability array.
 
     beta : scalar(float)
@@ -197,7 +197,17 @@ class DiscreteDP:
 
     Attributes
     ----------
-    R, Q, beta : see Parameters.
+    R : ndarray(float)
+        Reward array, of shape (n, m) or (L,).
+
+    Q : ndarray, scipy.sparse.csr_array, or scipy.sparse.csr_matrix
+        Transition probability array, of shape (n, m, n) or (L, n).
+        Stored as `csr_array` or `csr_matrix` if the input `Q` is an
+        instance of `scipy.sparse.sparray` or `scipy.sparse.spmatrix`,
+        respectively; otherwise, as `ndarray`.
+
+    beta : scalar(float)
+        Discount factor.
 
     num_states : scalar(int)
         Number of states.
@@ -453,6 +463,8 @@ class DiscreteDP:
             import scipy.sparse.linalg
             self._lineq_solve = scipy.sparse.linalg.spsolve
             self._I = sp.identity(self.num_states, format='csr')
+            if isinstance(self.Q, sp.sparray):  # Same family as Q
+                self._I = sp.csr_array(self._I)
         else:
             self._lineq_solve = np.linalg.solve
             self._I = np.identity(self.num_states)
