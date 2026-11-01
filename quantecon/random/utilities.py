@@ -36,7 +36,8 @@ def probvec(m, k, random_state=None, parallel=True):
     parallel : bool(default=True)
         Whether to use multi-core CPU (parallel=True) or single-threaded
         CPU (parallel=False). (Internally the code is executed through
-        Numba.guvectorize.)
+        Numba.guvectorize.) In the browser (JupyterLite/Emscripten),
+        Numba is single-threaded and parallel=True runs serially.
 
     Returns
     -------
