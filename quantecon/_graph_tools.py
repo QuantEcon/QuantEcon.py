@@ -29,7 +29,7 @@ class DiGraph:
 
     Parameters
     ----------
-    adj_matrix : array_like(ndim=2)
+    adj_matrix : array_like or sparse array or matrix (ndim=2)
         Adjacency matrix representing a directed graph. Must be of shape
         n x n.
 
@@ -43,8 +43,14 @@ class DiGraph:
 
     Attributes
     ----------
-    csgraph : scipy.sparse.csr_matrix
-        Compressed sparse representation of the digraph.
+    csgraph : scipy.sparse.csr_array or scipy.sparse.csr_matrix
+        Compressed sparse representation of the digraph, of shape (n, n)
+        and dtype bool if `weighted` is False (the dtype of `adj_matrix`
+        otherwise). Stored as `csr_array` if `adj_matrix` is an instance
+        of `scipy.sparse.sparray`; otherwise, as `csr_matrix`.
+
+    n : int
+        Number of nodes.
 
     is_strongly_connected : bool
         Indicate whether the digraph is strongly connected.
@@ -105,7 +111,10 @@ class DiGraph:
             dtype = None
         else:
             dtype = bool
-        self.csgraph = sparse.csr_matrix(adj_matrix, dtype=dtype)
+        if isinstance(adj_matrix, sparse.sparray):
+            self.csgraph = sparse.csr_array(adj_matrix, dtype=dtype)
+        else:
+            self.csgraph = sparse.csr_matrix(adj_matrix, dtype=dtype)
 
         m, n = self.csgraph.shape
         if n != m:

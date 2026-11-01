@@ -5,8 +5,15 @@ Tests for graph_tools.py
 
 import numpy as np
 from numpy.testing import assert_array_equal, assert_raises, assert_
+import pytest
+from scipy import sparse
 
 from quantecon import DiGraph, random_tournament_graph
+
+
+# Both scipy sparse families: the old "matrix" family and the new
+# "array" family
+sparse_families = [sparse.csr_matrix, sparse.csr_array]
 
 
 def list_of_array_equal(s, t):
@@ -120,6 +127,16 @@ class Graphs:
         }
         self.strongly_connected_graph_dicts.append(graph_dict)
 
+        # Sparse-input versions of all of the above, in both families
+        for graph_dicts in [self.strongly_connected_graph_dicts,
+                            self.not_strongly_connected_graph_dicts]:
+            dense_graph_dicts = list(graph_dicts)  # Copy before appending
+            for graph_dict in dense_graph_dicts:
+                for sparse_type in sparse_families:
+                    graph_dict_sparse = graph_dict.copy()
+                    graph_dict_sparse['A'] = sparse_type(graph_dict['A'])
+                    graph_dicts.append(graph_dict_sparse)
+
         self.graph_dicts = \
             self.strongly_connected_graph_dicts + \
             self.not_strongly_connected_graph_dicts
@@ -199,28 +216,62 @@ class TestDiGraph:
                 assert_(not graph_dict['g'].is_strongly_connected)
 
 
-def test_subgraph():
-    adj_matrix = [[0, 1, 0], [0, 0, 1], [1, 0, 0]]
+@pytest.mark.parametrize('input_type', [np.asarray] + sparse_families)
+def test_subgraph(input_type):
+    adj_matrix = input_type([[0, 1, 0], [0, 0, 1], [1, 0, 0]])
     g = DiGraph(adj_matrix)
     nodes = [1, 2]
 
     subgraph_adj_matrix = [[False, True], [False, False]]
-    assert_array_equal(
-        g.subgraph(nodes).csgraph.toarray(),
-        subgraph_adj_matrix
-    )
+    subgraph_csgraph = g.subgraph(nodes).csgraph
+    assert_array_equal(subgraph_csgraph.toarray(), subgraph_adj_matrix)
+    assert_(subgraph_csgraph.dtype == bool)
+    assert_(type(subgraph_csgraph) is type(g.csgraph))
 
 
-def test_subgraph_weighted():
-    adj_matrix = np.arange(3**2).reshape(3, 3)
+@pytest.mark.parametrize('input_type', [np.asarray] + sparse_families)
+def test_subgraph_weighted(input_type):
+    adj_matrix = input_type(np.arange(3**2).reshape(3, 3))
     g = DiGraph(adj_matrix, weighted=True)
     nodes = [0, 1]
 
     subgraph_adj_matrix = [[0, 1], [3, 4]]
-    assert_array_equal(
-        g.subgraph(nodes).csgraph.toarray(),
-        subgraph_adj_matrix
-    )
+    subgraph_csgraph = g.subgraph(nodes).csgraph
+    assert_array_equal(subgraph_csgraph.toarray(), subgraph_adj_matrix)
+    assert_(subgraph_csgraph.dtype == g.csgraph.dtype)
+    assert_(type(subgraph_csgraph) is type(g.csgraph))
+
+
+def test_csgraph_dense_input():
+    # Dense input gives a csr_matrix (old family)
+    adj_matrix = np.array([[0, 0.5], [2, 0]])
+    for weighted, dtype in [(False, bool), (True, adj_matrix.dtype)]:
+        g = DiGraph(adj_matrix, weighted=weighted)
+        assert_(type(g.csgraph) is sparse.csr_matrix)
+        assert_(g.csgraph.dtype == dtype)
+
+
+@pytest.mark.parametrize('sparse_type', sparse_families)
+def test_csgraph_sparse_input_family_preserved(sparse_type):
+    adj_matrix = sparse_type(np.array([[0, 0.5], [2, 0]]))
+    for weighted, dtype in [(False, bool), (True, adj_matrix.dtype)]:
+        g = DiGraph(adj_matrix, weighted=weighted)
+        assert_(type(g.csgraph) is sparse_type)
+        assert_(g.csgraph.dtype == dtype)
+        expected = adj_matrix.toarray()
+        if not weighted:
+            expected = expected != 0
+        assert_array_equal(g.csgraph.toarray(), expected)
+
+
+@pytest.mark.parametrize('sparse_type', sparse_families)
+def test_csgraph_sparse_input_non_csr(sparse_type):
+    # Non-CSR sparse input is converted to CSR in the same family
+    adj_matrix = sparse_type(np.array([[0, 1], [1, 0]])).tocoo()
+    g = DiGraph(adj_matrix)
+    assert_(g.csgraph.format == 'csr')
+    assert_(sparse.isspmatrix(g.csgraph) == sparse.isspmatrix(adj_matrix))
+    assert_array_equal(g.csgraph.toarray(), [[False, True], [True, False]])
 
 
 def test_node_labels_connected_components():
@@ -283,9 +334,10 @@ def test_node_labels_subgraph():
     )
 
 
-def test_raises_value_error_non_sym():
+@pytest.mark.parametrize('input_type', [np.asarray] + sparse_families)
+def test_raises_value_error_non_sym(input_type):
     """Test with non symmetric input"""
-    assert_raises(ValueError, DiGraph, np.array([[0.4, 0.6]]))
+    assert_raises(ValueError, DiGraph, input_type(np.array([[0.4, 0.6]])))
 
 
 def test_raises_non_homogeneous_node_labels():
@@ -308,6 +360,13 @@ class TestRandomTournamentGraph:
     def test_off_diagonal(self):
         # Test for each pair of distinct nodes to have exactly one edge
         assert_((self.adj_matrix ^ self.adj_matrix.T)[~self.eye_bool].all())
+
+
+def test_random_tournament_graph_csgraph_type():
+    # Output type unchanged: csr_matrix (old family)
+    g = random_tournament_graph(5)
+    assert_(type(g.csgraph) is sparse.csr_matrix)
+    assert_(g.csgraph.dtype == bool)
 
 
 def test_random_tournament_graph_seed():

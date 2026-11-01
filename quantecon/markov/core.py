@@ -99,7 +99,7 @@ class MarkovChain:
 
     Parameters
     ----------
-    P : array_like or scipy sparse matrix (float, ndim=2)
+    P : array_like or sparse array or matrix (float, ndim=2)
         The transition matrix.  Must be of shape n x n.
 
     state_values : array_like(default=None)
@@ -109,8 +109,11 @@ class MarkovChain:
 
     Attributes
     ----------
-    P : ndarray or scipy.sparse.csr_matrix (float, ndim=2)
-        See Parameters
+    P : ndarray, scipy.sparse.csr_array, or scipy.sparse.csr_matrix
+        The transition matrix, of shape (n, n). Stored as `csr_array` or
+        `csr_matrix` if the input `P` is an instance of
+        `scipy.sparse.sparray` or `scipy.sparse.spmatrix`, respectively;
+        otherwise, as `ndarray`.
 
     n : int
         Number of states.
@@ -119,8 +122,7 @@ class MarkovChain:
         Array of state values if set, None otherwise.
 
     is_sparse : bool
-        Whether the transition matrix `P` is stored in sparse
-        (scipy.sparse.csr_matrix) form.
+        Whether the transition matrix `P` is stored in sparse form.
 
     digraph : DiGraph
         Directed graph representation of the Markov chain with nodes as 
@@ -174,13 +176,17 @@ class MarkovChain:
 
     Notes
     -----
-    In computing stationary distributions, if the input matrix is a
-    sparse matrix, internally it is converted to a dense matrix.
+    In computing stationary distributions, if the input matrix is
+    a sparse array or sparse matrix, internally it is converted to a
+    dense matrix.
 
     """
 
     def __init__(self, P, state_values=None):
-        if sparse.issparse(P):  # Sparse matrix
+        if isinstance(P, sparse.sparray):  # Sparse array
+            self.P = sparse.csr_array(P)
+            self.is_sparse = True
+        elif sparse.issparse(P):  # Sparse matrix
             self.P = sparse.csr_matrix(P)
             self.is_sparse = True
         else:  # Dense matrix
@@ -199,14 +205,13 @@ class MarkovChain:
         if not self.is_sparse:
             data_nonnegative = (self.P >= 0)  # ndarray
         else:
-            data_nonnegative = (self.P.data >= 0)  # csr_matrx
+            data_nonnegative = (self.P.data >= 0)  # sparse
         if not np.all(data_nonnegative):
             raise ValueError('P must be nonnegative')
 
         # Double check that the rows of P sum to one
-        row_sums = self.P.sum(axis=1)
-        if self.is_sparse:  # row_sums is np.matrix (ndim=2)
-            row_sums = row_sums.getA1()
+        # (csr_matrix.sum returns an np.matrix of shape (n, 1))
+        row_sums = np.asarray(self.P.sum(axis=1)).ravel()
         if not np.allclose(row_sums, np.ones(self.n)):
             raise ValueError('The rows of P must sum to 1')
 
@@ -708,7 +713,7 @@ def mc_compute_stationary(P):
 
     Parameters
     ----------
-    P : array_like or scipy sparse matrix (float, ndim=2)
+    P : array_like or sparse array or matrix (float, ndim=2)
         A Markov transition matrix, of shape n x n.
 
     Returns

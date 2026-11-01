@@ -5,20 +5,29 @@ Tests for localint.py
 
 """
 import numpy as np
-from numpy.testing import assert_array_equal, assert_equal
+from numpy.testing import assert_array_equal, assert_equal, assert_
+import pytest
+from scipy import sparse
 
 from quantecon.game_theory import LocalInteraction
+
+
+# Both scipy sparse families: the old "matrix" family and the new
+# "array" family
+sparse_families = [sparse.csr_matrix, sparse.csr_array]
 
 
 class TestLocalInteraction:
     '''Test the methods of LocalInteraction'''
 
-    def setup_method(self):
-        '''Setup a LocalInteraction instance'''
+    @pytest.fixture(autouse=True, params=[np.asarray] + sparse_families,
+                    ids=['dense', 'csr_matrix', 'csr_array'])
+    def setup(self, request):
+        '''Setup a LocalInteraction instance with dense or sparse input'''
         payoff_matrix = np.asarray([[4, 0], [2, 3]])
-        adj_matrix = np.asarray([[0, 1, 3],
-                                 [2, 0, 1],
-                                 [3, 2, 0]])
+        adj_matrix = request.param([[0, 1, 3],
+                                    [2, 0, 1],
+                                    [3, 2, 0]])
         self.li = LocalInteraction(payoff_matrix, adj_matrix)
 
     def test_play(self):
@@ -55,3 +64,23 @@ class TestLocalInteraction:
                                                actions=init_actions,
                                                player_ind_seq=player_ind_seq),
                            x)
+
+
+def test_adj_matrix_dense_input():
+    # Dense input gives a csr_matrix (old family)
+    payoff_matrix = [[4, 0], [2, 3]]
+    adj_matrix = np.array([[0, 1, 3], [2, 0, 1], [3, 2, 0]])
+    li = LocalInteraction(payoff_matrix, adj_matrix)
+    assert_(type(li.adj_matrix) is sparse.csr_matrix)
+    assert_array_equal(li.adj_matrix.toarray(), adj_matrix)
+
+
+def test_adj_matrix_sparse_input_family_preserved():
+    payoff_matrix = [[4, 0], [2, 3]]
+    adj_matrix = np.array([[0, 1, 3], [2, 0, 1], [3, 2, 0]])
+    for sparse_type in sparse_families:
+        # CSR input, and non-CSR input converted to CSR in the same family
+        for A in [sparse_type(adj_matrix), sparse_type(adj_matrix).tocoo()]:
+            li = LocalInteraction(payoff_matrix, A)
+            assert_(type(li.adj_matrix) is sparse_type)
+            assert_array_equal(li.adj_matrix.toarray(), adj_matrix)

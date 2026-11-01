@@ -20,6 +20,11 @@ from quantecon.markov import (
 )
 
 
+# Both scipy sparse families: the old "matrix" family and the new
+# "array" family
+sparse_families = [sparse.csr_matrix, sparse.csr_array]
+
+
 def list_of_array_equal(s, t):
     """
     Compare two lists of ndarrays
@@ -89,15 +94,6 @@ def test_markovchain_pmatrices():
          'is_aperiodic': True,
          'cyclic_classes': [np.arange(2)],
          },
-        {'P': sparse.csr_matrix([[0.4, 0.6], [0.2, 0.8]]),
-         'stationary_dists': np.array([[0.25, 0.75]]),
-         'comm_classes': [np.arange(2)],
-         'rec_classes': [np.arange(2)],
-         'is_irreducible': True,
-         'period': 1,
-         'is_aperiodic': True,
-         'cyclic_classes': [np.arange(2)],
-         },
         {'P': np.array([[0, 1], [1, 0]]),
          'stationary_dists': np.array([[0.5, 0.5]]),
          'comm_classes': [np.arange(2)],
@@ -132,16 +128,13 @@ def test_markovchain_pmatrices():
          'is_irreducible': False,
          'period': 6,
          'is_aperiodic': False,
-         },
-        {'P': sparse.csr_matrix(Q),
-         'stationary_dists': Q_stationary_dists,
-         'comm_classes': [np.array([0, 1]), np.array([2]), np.array([3, 4, 5])],
-         'rec_classes': [np.array([0, 1]), np.array([3, 4, 5])],
-         'is_irreducible': False,
-         'period': 6,
-         'is_aperiodic': False,
          }
     ]
+
+    # Sparse-input versions of all of the above, in both families
+    testset += [dict(test_dict, P=sparse_type(test_dict['P']))
+                for test_dict in list(testset)
+                for sparse_type in sparse_families]
 
     # Loop Through TestSet #
     for test_dict in testset:
@@ -235,7 +228,8 @@ class Test_markovchain_stationary_distributions_KMRMarkovMatrix2():
 
 def test_simulate_shape():
     P = [[0.4, 0.6], [0.2, 0.8]]
-    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+    mcs = [MarkovChain(P)] + [MarkovChain(sparse_type(P))
+                            for sparse_type in sparse_families]
 
     for mc in mcs:
         (ts_length, init, num_reps) = (10, None, None)
@@ -289,7 +283,8 @@ def test_simulate_dense_vs_sparse():
     P = np.zeros((n, n))
     for i in range(n):
         P[i, (i-1) % n], P[i, i], P[i, (i+1) % n] = b, a, b
-    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+    mcs = [MarkovChain(P)] + [MarkovChain(sparse_type(P))
+                            for sparse_type in sparse_families]
 
     ts_length = 10
     inits = (None, 0, [0, 1])
@@ -375,7 +370,8 @@ def test_simulate_deficient_row_sums():
     https://github.com/QuantEcon/QuantEcon.py/issues/591
     """
     P = np.array([[0.5, 0.5 - 1e-5], [0.5, 0.5 - 1e-5]])
-    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+    mcs = [MarkovChain(P)] + [MarkovChain(sparse_type(P))
+                            for sparse_type in sparse_families]
 
     ts_length = 1_000_000
     for mc in mcs:
@@ -410,23 +406,25 @@ def test_simulate_clamp_maps_to_last_state():
     X = mc.simulate_indices(2, init=0, random_state=seed)
     assert_equal(X[1], 1)
 
-    # Sparse, row 0 deficient with support {0, 1}: overflow -> state 1,
-    # the last state of positive probability (pre-fix, indices[2] was
-    # read, i.e. the first index of row 1, giving the in-range but
-    # wrong state 2)
-    mc = MarkovChain(sparse.csr_matrix(P))
-    X = mc.simulate_indices(2, init=0, random_state=seed)
-    assert_equal(X[1], 1)
+    for sparse_type in sparse_families:
+        # Sparse, row 0 deficient with support {0, 1}: overflow ->
+        # state 1, the last state of positive probability (pre-fix,
+        # indices[2] was read, i.e. the first index of row 1, giving
+        # the in-range but wrong state 2)
+        mc = MarkovChain(sparse_type(P))
+        X = mc.simulate_indices(2, init=0, random_state=seed)
+        assert_equal(X[1], 1)
 
-    # Sparse, row 0 deficient with an explicitly stored zero at the
-    # end: overflow -> state 1, not the stored zero-probability state 2
-    data = np.array([0.5, 0.5 - 1e-5, 0., 1., 1.])
-    indices = np.array([0, 1, 2, 2, 0])
-    indptr = np.array([0, 3, 4, 5])
-    P_csr = sparse.csr_matrix((data, indices, indptr), shape=(3, 3))
-    mc = MarkovChain(P_csr)
-    X = mc.simulate_indices(2, init=0, random_state=seed)
-    assert_equal(X[1], 1)
+        # Sparse, row 0 deficient with an explicitly stored zero at the
+        # end: overflow -> state 1, not the stored zero-probability
+        # state 2
+        data = np.array([0.5, 0.5 - 1e-5, 0., 1., 1.])
+        indices = np.array([0, 1, 2, 2, 0])
+        indptr = np.array([0, 3, 4, 5])
+        P_csr = sparse_type((data, indices, indptr), shape=(3, 3))
+        mc = MarkovChain(P_csr)
+        X = mc.simulate_indices(2, init=0, random_state=seed)
+        assert_equal(X[1], 1)
 
 
 def test_simulate_indices_negative_init():
@@ -435,7 +433,8 @@ def test_simulate_indices_negative_init():
     P = np.zeros((n, n))
     for i in range(n):
         P[i, (i+1) % n] = 1.
-    mcs = [MarkovChain(P), MarkovChain(sparse.csr_matrix(P))]
+    mcs = [MarkovChain(P)] + [MarkovChain(sparse_type(P))
+                            for sparse_type in sparse_families]
 
     ts_length = 10
     for mc in mcs:
@@ -454,6 +453,24 @@ def test_str():
     P = [[0.4, 0.6], [0.2, 0.8]]
     mc = MarkovChain(P)
     assert_equal(str(mc), mc.__repr__())
+
+
+def test_P_dense_input():
+    P = [[0.4, 0.6], [0.2, 0.8]]
+    mc = MarkovChain(P)
+    assert_(type(mc.P) is np.ndarray)
+    assert_(not mc.is_sparse)
+
+
+def test_P_sparse_input_family_preserved():
+    P = np.array([[0.4, 0.6], [0.2, 0.8]])
+    for sparse_type in sparse_families:
+        # CSR input, and non-CSR input converted to CSR in the same family
+        for P_sparse in [sparse_type(P), sparse_type(P).tocoo()]:
+            mc = MarkovChain(P_sparse)
+            assert_(type(mc.P) is sparse_type)
+            assert_(mc.is_sparse)
+            assert_array_equal(mc.P.toarray(), P)
 
 
 def test_mc_sample_path_deficient_init_distribution():
@@ -477,7 +494,7 @@ def test_mc_sample_path_invalid_init_distribution():
 
 def test_mc_sample_path():
     P = [[0.4, 0.6], [0.2, 0.8]]
-    Ps = [P, sparse.csr_matrix(P)]
+    Ps = [P] + [sparse_type(P) for sparse_type in sparse_families]
 
     init = 0
     sample_size = 10
@@ -662,21 +679,24 @@ def test_raises_value_error_non_sym():
     """Test with non symmetric input"""
     P = np.array([[0.4, 0.6]])
     assert_raises(ValueError, MarkovChain, P)
-    assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
+    for sparse_type in sparse_families:
+        assert_raises(ValueError, MarkovChain, sparse_type(P))
 
 
 def test_raises_value_error_non_nonnegative():
     """Test with non nonnegative input"""
     P = np.array([[0.4, 0.6], [-0.2, 1.2]])
     assert_raises(ValueError, MarkovChain, P)
-    assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
+    for sparse_type in sparse_families:
+        assert_raises(ValueError, MarkovChain, sparse_type(P))
 
 
 def test_raises_value_error_non_sum_one():
     """Test with input such that some of the rows does not sum to one"""
     P = np.array([[0.4, 0.6], [0.2, 0.9]])
     assert_raises(ValueError, MarkovChain, P)
-    assert_raises(ValueError, MarkovChain, sparse.csr_matrix(P))
+    for sparse_type in sparse_families:
+        assert_raises(ValueError, MarkovChain, sparse_type(P))
 
 
 def test_raises_value_error_simulate_init_out_of_range():

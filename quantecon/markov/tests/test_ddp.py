@@ -12,6 +12,11 @@ from numpy.testing import (assert_array_equal, assert_allclose, assert_raises,
 from quantecon.markov import DiscreteDP, backward_induction
 
 
+# Both scipy sparse families: the old "matrix" family and the new
+# "array" family
+sparse_families = [sparse.csr_matrix, sparse.csr_array]
+
+
 class TestDiscreteDP:
     def setup_method(self):
         # From Puterman 2005, Section 3.1
@@ -35,11 +40,14 @@ class TestDiscreteDP:
         Q_sa[0, :] = Q[0, 0, :]
         Q_sa[1, :] = Q[0, 1, :]
         Q_sa[2, :] = Q[1, 0, :]
-        ddp_sa_sparse = DiscreteDP(R_sa, Q_sa, beta, s_indices, a_indices)
+        ddps_sa_sparse = [
+            DiscreteDP(R_sa, sparse_type(Q_sa), beta, s_indices, a_indices)
+            for sparse_type in sparse_families
+        ]
         ddp_sa_dense = \
             DiscreteDP(R_sa, Q_sa.toarray(), beta, s_indices, a_indices)
 
-        self.ddps = [ddp0, ddp_sa_sparse, ddp_sa_dense]
+        self.ddps = [ddp0, *ddps_sa_sparse, ddp_sa_dense]
 
         for ddp in self.ddps:
             ddp.max_iter = 200
@@ -167,23 +175,24 @@ def test_ddp_sorting():
     a_indptr = [0, 2, 3]
     R = [0, 1, 2]
     Q = [(1, 0), (1/2, 1/2), (0, 1)]
-    Q_sparse = sparse.csr_matrix(Q)
 
     # Shuffled
     s_indices_shuffled = [0, 1, 0]
     a_indices_shuffled = [0, 0, 1]
     R_shuffled = [0, 2, 1]
     Q_shuffled = [(1, 0), (0, 1), (1/2, 1/2)]
-    Q_shuffled_sparse = sparse.csr_matrix(Q_shuffled)
 
-    ddp0 = DiscreteDP(R, Q, beta, s_indices, a_indices)
-    ddp_sparse = DiscreteDP(R, Q_sparse, beta, s_indices, a_indices)
-    ddp_shuffled = DiscreteDP(R_shuffled, Q_shuffled, beta,
-                              s_indices_shuffled, a_indices_shuffled)
-    ddp_shuffled_sparse = DiscreteDP(R_shuffled, Q_shuffled_sparse, beta,
-                                     s_indices_shuffled, a_indices_shuffled)
+    ddps = []
+    for convert in [np.asarray, *sparse_families]:
+        ddps.append(
+            DiscreteDP(R, convert(Q), beta, s_indices, a_indices)
+        )
+        ddps.append(
+            DiscreteDP(R_shuffled, convert(Q_shuffled), beta,
+                       s_indices_shuffled, a_indices_shuffled)
+        )
 
-    for ddp in [ddp0, ddp_sparse, ddp_shuffled, ddp_shuffled_sparse]:
+    for ddp in ddps:
         assert_array_equal(ddp.s_indices, s_indices)
         assert_array_equal(ddp.a_indices, a_indices)
         assert_array_equal(ddp.a_indptr, a_indptr)
@@ -242,7 +251,6 @@ def test_ddp_negative_inf_error():
     a_indices = [0, 1, 0, 1, 0, 1]
     R_sa = R.reshape(n*m)
     Q_sa_dense = Q.reshape(n*m, n)
-    Q_sa_sparse = sparse.csr_matrix(Q_sa_dense)
 
     beta = 0.95
 
@@ -250,9 +258,11 @@ def test_ddp_negative_inf_error():
     assert_raises(
         ValueError, DiscreteDP, R_sa, Q_sa_dense, beta, s_indices, a_indices
     )
-    assert_raises(
-        ValueError, DiscreteDP, R_sa, Q_sa_sparse, beta, s_indices, a_indices
-    )
+    for sparse_type in sparse_families:
+        assert_raises(
+            ValueError, DiscreteDP, R_sa, sparse_type(Q_sa_dense), beta,
+            s_indices, a_indices
+        )
 
 
 def test_ddp_no_feasible_action_error():
@@ -289,13 +299,14 @@ def test_ddp_duplicate_sa_pair_error():
     a_indices = [0, 0, 0, 1]
     R = [1., 2., 3., 4.]
     Q = [(0.5, 0.5), (1., 0.), (0.25, 0.75), (0.6, 0.4)]
-    Q_sparse = sparse.csr_matrix(Q)
     beta = 0.95
 
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
-    assert_raises(
-        ValueError, DiscreteDP, R, Q_sparse, beta, s_indices, a_indices
-    )
+    for sparse_type in sparse_families:
+        assert_raises(
+            ValueError, DiscreteDP, R, sparse_type(Q), beta, s_indices,
+            a_indices
+        )
 
 
 def test_ddp_out_of_range_indices_error():
@@ -303,15 +314,16 @@ def test_ddp_out_of_range_indices_error():
     # the pair would previously be silently reattributed to state 1
     R = [1.0, 2.0]
     Q = [(1.0, 0.0), (0.0, 1.0)]
-    Q_sparse = sparse.csr_matrix(Q)
     beta = 0.95
 
     # Sorted indices
     s_indices, a_indices = [0, 2], [0, 0]
     assert_raises(ValueError, DiscreteDP, R, Q, beta, s_indices, a_indices)
-    assert_raises(
-        ValueError, DiscreteDP, R, Q_sparse, beta, s_indices, a_indices
-    )
+    for sparse_type in sparse_families:
+        assert_raises(
+            ValueError, DiscreteDP, R, sparse_type(Q), beta, s_indices,
+            a_indices
+        )
 
     # Unsorted indices
     s_indices, a_indices = [2, 0], [0, 0]
@@ -409,7 +421,11 @@ def test_ddp_picklable():
     beta = 0.95
 
     ddp0 = DiscreteDP(R, Q, beta)
-    ddps = [ddp0, ddp0.to_sa_pair_form(), ddp0.to_sa_pair_form(sparse=False)]
+    ddp_sa = ddp0.to_sa_pair_form()
+    ddps = [ddp0, ddp_sa, ddp0.to_sa_pair_form(sparse=False)]
+    ddps += [DiscreteDP(ddp_sa.R, sparse_type(ddp_sa.Q), beta,
+                        ddp_sa.s_indices, ddp_sa.a_indices)
+             for sparse_type in sparse_families]
 
     for ddp in ddps:
         ddp2 = pickle.loads(pickle.dumps(ddp))
@@ -417,6 +433,56 @@ def test_ddp_picklable():
         res2 = ddp2.solve(method='pi')
         assert_allclose(res2.v, res.v)
         assert_array_equal(res2.sigma, res.sigma)
+
+
+def test_ddp_sparse_input_family_preserved():
+    # From Puterman 2005, Section 3.1, in state-action pair form
+    beta = 0.95
+    s_indices = [0, 0, 1]
+    a_indices = [0, 1, 0]
+    R = [5, 10, -1]
+    Q = np.array([[0.5, 0.5], [0, 1], [0, 1]])
+    sigma = [1, 0]
+
+    ddp_dense = DiscreteDP(R, Q, beta, s_indices, a_indices)
+    v_sigma = ddp_dense.evaluate_policy(sigma)
+    res = ddp_dense.solve(method='pi')
+
+    for sparse_type in sparse_families:
+        # CSR input, and non-CSR input converted to CSR in the same family
+        for Q_sparse in [sparse_type(Q), sparse_type(Q).tocoo()]:
+            ddp = DiscreteDP(R, Q_sparse, beta, s_indices, a_indices)
+            assert_(ddp._sparse)
+            assert_(type(ddp.Q) is sparse_type)
+            assert_(type(ddp._I) is sparse_type)
+            assert_array_equal(ddp.Q.toarray(), Q)
+
+            # Same results as the dense formulation
+            assert_allclose(ddp.evaluate_policy(sigma), v_sigma)
+            res_sparse = ddp.solve(method='pi')
+            assert_allclose(res_sparse.v, res.v)
+            assert_array_equal(res_sparse.sigma, res.sigma)
+            assert_array_equal(ddp.to_product_form().Q,
+                               ddp_dense.to_product_form().Q)
+
+            # The controlled Markov chain follows the family of Q
+            mc = ddp.controlled_mc(sigma)
+            assert_(type(mc.P) is sparse_type)
+            assert_array_equal(mc.P.toarray(),
+                               ddp_dense.controlled_mc(sigma).P)
+
+
+def test_ddp_to_sa_pair_form_output_type():
+    # Output type unchanged: csr_matrix (old family)
+    n, m = 2, 2
+    R = [[5, 10], [-1, -np.inf]]
+    Q = np.empty((n, m, n))
+    Q[0, 0, :] = 0.5, 0.5
+    Q[0, 1, :] = 0, 1
+    Q[1, :, :] = 0, 1
+    ddp_sa = DiscreteDP(R, Q, 0.95).to_sa_pair_form()
+    assert_(type(ddp_sa.Q) is sparse.csr_matrix)
+    assert_(type(ddp_sa._I) is sparse.csr_matrix)
 
 
 def test_ddp_beta_1_not_implemented_error():
