@@ -46,7 +46,7 @@ class LQ:
     Here :math:`x` is n x 1, :math:`u` is k x 1, :math:`w` is j x 1 and the
     matrices are conformable for these dimensions.  The sequence :math:`{w_t}`
     is assumed to be white noise, with zero mean and
-    :math:`\mathbb{E} [ w_t' w_t ] = I`, the j x j identity.
+    :math:`\mathbb{E}[ w_t w_t' ] = I`, the j x j identity.
 
     If :math:`C` is not supplied as a parameter, the model is assumed to be
     deterministic (and :math:`C` is set to a zero matrix of appropriate
@@ -364,7 +364,7 @@ class LQMarkov:
     Here :math:`x` is n x 1, :math:`u` is k x 1, :math:`w` is j x 1 and the
     matrices are conformable for these dimensions.  The sequence :math:`{w_t}`
     is assumed to be white noise, with zero mean and
-    :math:`\mathbb{E} [ w_t' w_t ] = I`, the j x j identity.
+    :math:`\mathbb{E}[ w_t w_t' ] = I`, the j x j identity.
 
     If :math:`C` is not supplied as a parameter, the model is assumed to be
     deterministic (and :math:`C` is set to a zero matrix of appropriate
