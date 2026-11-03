@@ -63,3 +63,23 @@ def test_solve_discrete_riccati_system_beta_ge_one_failure_message():
             assert expected in message
 
         assert "max_iter" not in message
+
+
+def test_solve_discrete_riccati_system_overflow_raises():
+    # x' = 2x, B = 0: P grows 4x per iteration and overflows before max_iter
+    one, zero = np.ones((1, 1, 1)), np.zeros((1, 1, 1))
+    with np.errstate(over='ignore', invalid='ignore'):
+        with assert_raises(ValueError) as excinfo:
+            qme.solve_discrete_riccati_system(
+                np.ones((1, 1)), 2 * one, zero, zero, one, one, zero,
+                beta=1.0
+            )
+    assert "stabilized without discounting" in str(excinfo.exception)
+
+
+def test_solve_discrete_riccati_overflow_raises():
+    # Same unstabilizable system for the doubling solver
+    with np.errstate(over='ignore', invalid='ignore'):
+        with assert_raises(ValueError) as excinfo:
+            qme.solve_discrete_riccati(2., 0., 1., 1.)
+    assert "Convergence failed" in str(excinfo.exception)
