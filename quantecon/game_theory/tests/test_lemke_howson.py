@@ -134,21 +134,37 @@ def test_lemke_howson_invalid_init_pivot_float():
 
 
 @pytest.mark.parametrize('scale', [1e15, 1e16])
-def test_lemke_howson_large_payoffs_report_breakdown(scale):
-    # With payoffs of this size, the ratios in the lexico-minimum ratio
-    # test all tie within the (absolute) `tol_ratio_diff`, and the tie
-    # breaking fails. The routine must then report non-convergence
-    # rather than return a wrong "equilibrium" with `converged=True`.
+def test_lemke_howson_large_payoffs_converge(scale):
+    # gh-951: with the payoff blocks normalized in `_initialize_tableaux`,
+    # the absolute pivoting tolerances act relative to the payoff scale,
+    # so the routine converges to a valid equilibrium instead of
+    # reporting a breakdown.
     A = scale * np.array([[3., 1.],
                           [1., 3.]])
     B = scale * np.array([[1., 3.],
                           [3., 1.]])
     g = NormalFormGame((Player(A), Player(B)))
     NE, res = lemke_howson(g, full_output=True)
-    assert_(not res.converged)
-    # Without capping, no other initial pivot is tried on breakdown
-    assert_(res.init == 0)
-    assert_(res.num_iter == 0)
+    assert_(res.converged)
+    assert_(g.is_nash(NE))
+
+
+@pytest.mark.parametrize('scale', [1e-12, 1e-10, 1e12, 1e15])
+def test_lemke_howson_payoff_scale_invariance(scale):
+    # gh-951: Nash equilibria are invariant to per-player positive affine
+    # transformations of the payoffs. With the payoff blocks normalized
+    # in `_initialize_tableaux`, the routine must converge to an
+    # equilibrium that is valid for the unit-scale game at any scale.
+    # Uniform payoffs are used as in the issue: all values are positive,
+    # so only the rescaling (not the positivity shift) is exercised.
+    rng = np.random.default_rng(0)
+    for _ in range(10):
+        base = rng.random(size=(4, 4, 2))
+        g_unit = NormalFormGame(base)
+        NE, res = lemke_howson(NormalFormGame(base * scale),
+                              full_output=True)
+        assert_(res.converged)
+        assert_(g_unit.is_nash(tuple(NE)))
 
 
 def test_lemke_howson_tbl_breakdown():
