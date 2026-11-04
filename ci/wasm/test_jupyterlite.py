@@ -166,20 +166,21 @@ def test_support_enumeration(console: Page):
     )
 
 
-def test_gini_fails_on_emscripten(console: Page):
+def test_gini_coefficient(console: Page):
     """
-    gini_coefficient must raise on Emscripten: @njit(parallel=True) + prange
-    is not supported by the WASM Numba build (#926).
+    gini_coefficient runs on Emscripten: since #937 it is plain @njit with
+    np.sort and no parallel=True (#926).  Checks the value, then times a warm
+    call on a large sample to catch the old O(n^2) loop coming back.
     """
     code = (
-        "import quantecon as qe, numpy as np\n"
-        "try:\n"
-        "    qe.gini_coefficient(np.array([1.,2.,3.]))\n"
-        "    print('QE_GINI_NO_ERROR')\n"
-        "except Exception:\n"
-        "    print('QE_GINI_EXPECTED_ERROR')"
+        "import time, quantecon as qe, numpy as np\n"
+        "g = qe.gini_coefficient(np.array([1.,2.,3.,4.,5.]))\n"
+        "y = np.random.default_rng(0).random(400_000)\n"
+        "t0 = time.perf_counter()\n"
+        "g2 = qe.gini_coefficient(y)\n"
+        "dt = time.perf_counter() - t0\n"
+        "ok = abs(g-4/15) < 1e-9 and abs(g2-1/3) < 0.01 and dt < 5\n"
+        "print('QE_GINI_OK' if ok else 'QE_GINI_FAIL', g, g2, f'{dt:.3f}s')"
     )
     out = _run(console, code)
-    assert "QE_GINI_EXPECTED_ERROR" in out, (
-        f"gini_coefficient should fail on Emscripten but did not: {out!r}"
-    )
+    assert "QE_GINI_OK" in out, f"gini_coefficient failed: {out!r}"
