@@ -11,3 +11,9 @@ updates:
       prefix: ⬆️
     schedule:
       interval: weekly
+  - package-ecosystem: pip
+    directory: /
+    commit-message:
+      prefix: ⬆️
+    schedule:
+      interval: weekly
