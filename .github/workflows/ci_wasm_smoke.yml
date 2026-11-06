@@ -1,5 +1,8 @@
 name: WASM smoke suite
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -9,27 +12,30 @@ on:
       - main
 
 jobs:
-  # ------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # Native Python gate: ensures the smoke suite itself is correct and
-  # all tests pass against this repo's source.  The Emscripten /
+  # all tests pass against this repo's source. The Emscripten /
   # JupyterLite job that consumes the same suite lands with issue #933.
-  # ------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   native:
     name: Smoke suite (native)
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: write
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
     - name: Cache conda
-      uses: actions/cache@v6
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       env:
         CACHE_NUMBER: 0
       with:
         path: ~/conda_pkgs_dir
         key: ${{ runner.os }}-3.13-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
 
-    - uses: conda-incubator/setup-miniconda@v4
+    - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
       with:
         auto-update-conda: true
         miniforge-version: latest
