@@ -167,7 +167,7 @@ jobs:
 
     name: Publish to PyPi
     needs: [tests]
-    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')) || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: PyPI
     permissions:
