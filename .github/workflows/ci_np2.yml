@@ -1,5 +1,8 @@
 name: conda-build (numba rc/latest)
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]
@@ -13,8 +16,8 @@ jobs:
       max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v7
-    - uses: conda-incubator/setup-miniconda@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+    - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
       with:
         auto-update-conda: true
         miniforge-version: latest
