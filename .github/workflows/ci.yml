@@ -1,5 +1,8 @@
 name: conda-build
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -16,10 +19,12 @@ on:
         required: true
         type: string
 
-
 jobs:
   tests:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      actions: write
     strategy:
       # one failing job shouldn't cancel the rest of the matrix
       fail-fast: false
@@ -28,18 +33,18 @@ jobs:
         # quoted as strings (bare 3.10 would parse as float 3.1)
         python-version: ["3.12", "3.13", "3.14"]
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
         fetch-depth: 0
     - name: Cache conda
-      uses: actions/cache@v6
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       env:
         CACHE_NUMBER: 0
       with:
         path: ~/conda_pkgs_dir
         key:
           ${{ runner.os }}-${{ matrix.python-version }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
-    - uses: conda-incubator/setup-miniconda@v4
+    - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
       with:
         auto-update-conda: true
         miniforge-version: latest
@@ -65,19 +70,23 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+      statuses: write
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
         fetch-depth: 0
     - name: Cache conda
-      uses: actions/cache@v6
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       env:
         CACHE_NUMBER: 0
       with:
         path: ~/conda_pkgs_dir
         key:
           ${{ runner.os }}-3.13-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
-    - uses: conda-incubator/setup-miniconda@v4
+    - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
       with:
         auto-update-conda: true
         miniforge-version: latest
@@ -100,7 +109,7 @@ jobs:
         coverage run -m pytest quantecon
         coverage lcov
     - name: Coveralls
-      uses: coverallsapp/github-action@v2
+      uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
       # continue-on-error so an upload hiccup can't fail CI
       continue-on-error: true
       with:
@@ -113,10 +122,13 @@ jobs:
 
     name: Build docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - name: Set up Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         # mirrors the Read the Docs build (see .readthedocs.yaml)
         python-version: "3.14"
@@ -146,7 +158,7 @@ jobs:
       working-directory: docs
       run: sphinx-build -b html source build/html
     - name: Upload built docs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       with:
         name: docs-html
         path: docs/build/html
@@ -155,29 +167,32 @@ jobs:
 
     name: Publish to PyPi
     needs: [tests]
-    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')) || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    environment: PyPI
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v7
-        with:
-          # On manual dispatch, check out the input as a fully qualified tag ref: a branch
-          # name or SHA cannot resolve, and a missing tag fails here before anything is built.
-          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.ref) || github.ref }}
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.x"
-      - name: Install flit
-        run: |
-          # Keep flit and flit_core in the same major series: flit 3.x only requires
-          # flit_core>=3.12 with no upper bound, and flit_core 4 (August 2026) dropped
-          # the gen_setup_py argument flit 3.x still passes, so an unpinned flit_core
-          # breaks `flit publish` with a TypeError.
-          pip install "flit~=3.12" "flit_core~=3.12"
-      - name: Build and publish
-        run: |
-          flit publish
-        env:
-          FLIT_USERNAME: __token__
-          FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+    - name: Checkout source
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        # On manual dispatch, check out the input as a fully qualified tag ref: a branch
+        # name or SHA cannot resolve, and a missing tag fails here before anything is built.
+        ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.ref) || github.ref }}
+    - name: Set up Python
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+      with:
+        python-version: "3.x"
+    - name: Install flit
+      run: |
+        # Keep flit and flit_core in the same major series: flit 3.x only requires
+        # flit_core>=3.12 with no upper bound, and flit_core 4 (August 2026) dropped
+        # the gen_setup.py argument flit 3.x still passes, so an unpinned flit_core
+        # breaks `flit build` with a TypeError.
+        pip install "flit~=3.12" "flit_core~=3.12"
+    - name: Build distribution
+      run: |
+        flit build
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
