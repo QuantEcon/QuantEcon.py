@@ -12,11 +12,11 @@ on:
       - main
 
 jobs:
-  # ---------------------------------------------------------------------------
+  # ------------------------------------------------------------------
   # Native Python gate: ensures the smoke suite itself is correct and
-  # all tests pass against this repo's source. The Emscripten /
+  # all tests pass against this repo's source.  The Emscripten /
   # JupyterLite job that consumes the same suite lands with issue #933.
-  # ---------------------------------------------------------------------------
+  # ------------------------------------------------------------------
   native:
     name: Smoke suite (native)
     runs-on: ubuntu-latest
