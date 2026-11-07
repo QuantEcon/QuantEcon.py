@@ -161,6 +161,11 @@ def test_other_dtypes():
 def test_small_chains():
     assert_array_equal(arnoldi_solve(np.ones((1, 1))), [1.])
     assert_array_equal(arnoldi_solve([[1.]], [3.]), [1.])
+    assert_array_equal(arnoldi_solve(sparse.csr_array(np.ones((1, 1)))), [1.])
+    # a single state is still checked for stochasticity
+    assert_raises(ValueError, arnoldi_solve, [[0.9]])
+    assert_raises(ValueError, arnoldi_solve,
+                  as_linear_operator(np.full((1, 1), 0.9)))
     P = np.array([[0.3, 0.7], [0.6, 0.4]])
     ref = gth_solve(P)
     for kind in input_kinds:

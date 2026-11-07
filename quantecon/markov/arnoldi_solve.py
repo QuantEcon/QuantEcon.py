@@ -57,8 +57,8 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     Raises
     ------
     ValueError
-        If the eigenvalue found is not 1 up to the accuracy of the
-        solver, which means that the matrix is not stochastic.
+        If the eigenvalue found is not 1 within `sqrt(max(tol, eps))`,
+        which means that the matrix is not stochastic.
 
     scipy.sparse.linalg.ArpackNoConvergence
         If the iteration does not converge within `max_iter` restarts.
@@ -113,6 +113,9 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     slack = np.sqrt(max(tol, np.finfo(dtype).eps))
 
     if n == 1:
+        # the operator is the scalar eigenvalue itself
+        lam = np.asarray(op @ x0, dtype=dtype).ravel()[0]
+        _check_eigenvalue(lam, slack)
         return np.ones(1, dtype=dtype)
     if n == 2:
         # ARPACK needs k < n - 1; the 2 x 2 case is solved in closed form
@@ -120,12 +123,7 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
 
     vals, vecs = eigs(op, k=1, which='LR', v0=x0, tol=tol, maxiter=max_iter,
                       ncv=ncv)
-    lam = vals[0]
-    if abs(lam - 1) > slack:
-        raise ValueError(
-            f'the largest eigenvalue {lam} is not 1: the matrix is not '
-            'stochastic (rows must sum to 1)'
-        )
+    _check_eigenvalue(vals[0], slack)
 
     # the eigenvector is complex (with zero imaginary part at a real
     # eigenvalue) and has arbitrary sign and scale; normalizing by the
@@ -134,6 +132,14 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     # solvers
     x = vecs[:, 0].real
     return x / x.sum()
+
+
+def _check_eigenvalue(lam, slack):
+    if abs(lam - 1) > slack:
+        raise ValueError(
+            f'the largest eigenvalue {lam} is not 1: the matrix is not '
+            'stochastic (rows must sum to 1)'
+        )
 
 
 def _working_dtype(dtype):
