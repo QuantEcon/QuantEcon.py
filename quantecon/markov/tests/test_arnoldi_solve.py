@@ -187,6 +187,12 @@ def test_float32():
     assert_allclose(x, gth_solve(P.astype(np.float64)), atol=1e-4)
     # float32 P with float64 x0: P decides
     assert arnoldi_solve(P, np.full(20, 1/20)).dtype == np.float32
+    # float32 in the non-native byte order is float32 too: the eigenvalue
+    # is 1 only to single precision
+    Q = np.array([[0.75, 0.25, 0], [0.125, 0.625, 0.25], [0, 0.125, 0.875]],
+                 dtype=np.float32)
+    assert_allclose(arnoldi_solve(Q.astype(Q.dtype.newbyteorder())),
+                    [1/7, 2/7, 4/7], atol=1e-6)
 
 
 def test_other_dtypes():

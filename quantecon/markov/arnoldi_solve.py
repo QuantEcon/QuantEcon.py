@@ -119,11 +119,9 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
         # ARPACK needs k < n - 1; the 2 x 2 case is solved in closed form
         return _solve_2x2(op, x0, slack, dtype)
 
-    if not np.can_cast(P.dtype, dtype):
-        # ARPACK takes float32 and float64, and upcasts the dtypes that
-        # cast safely to float64 (integers, float16) in its products; it
-        # rejects the others (longdouble where that is wider than
-        # float64), whose products are converted here
+    if P.dtype.char not in 'fd':
+        # ARPACK takes float32 and float64 only: the products of a matrix
+        # of another dtype are converted here
         Pt = op
         op = LinearOperator(
             (n, n), dtype=dtype,
@@ -161,7 +159,7 @@ def _working_dtype(dtype):
     Working precision: ARPACK supports float32 and float64 only.
 
     """
-    return np.float32 if dtype == np.float32 else np.float64
+    return np.float32 if dtype.char == 'f' else np.float64
 
 
 def _solve_2x2(op, x0, slack, dtype):
