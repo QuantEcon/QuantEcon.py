@@ -86,9 +86,7 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
 
     """
     if not (isinstance(P, LinearOperator) or issparse(P)):
-        # P.T is a view; ARPACK upcasts integer and other dtypes to
-        # float64 in its products, without copying P
-        P = np.asarray(P)
+        P = np.asarray(P)  # P.T is a view: P is never copied
     if len(P.shape) != 2 or P.shape[0] != P.shape[1]:
         raise ValueError('matrix must be square')
     op, n = P.T, P.shape[0]
@@ -126,6 +124,17 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     if n == 2:
         # ARPACK needs k < n - 1; the 2 x 2 case is solved in closed form
         return _solve_2x2(op, x0, slack, dtype)
+
+    if not np.can_cast(P.dtype, dtype):
+        # ARPACK takes float32 and float64, and upcasts the dtypes that
+        # cast safely to float64 (integers, float16) in its products; it
+        # rejects the others (longdouble where that is wider than
+        # float64), whose products are converted here
+        Pt = op
+        op = LinearOperator(
+            (n, n), dtype=dtype,
+            matvec=lambda x: np.asarray(Pt @ x, dtype=dtype)
+        )
 
     vals, vecs = eigs(op, k=1, which='LR', v0=x0, tol=tol, maxiter=max_iter,
                       ncv=ncv)
