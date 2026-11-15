@@ -8,7 +8,7 @@ from scipy import sparse
 from scipy.sparse.linalg import LinearOperator, ArpackNoConvergence
 import pytest
 
-from quantecon.markov import arnoldi_solve, gth_solve, MarkovChain
+from quantecon.markov import arnoldi_solve, gth_solve
 
 
 def random_stochastic_matrix(rng, n):
@@ -203,17 +203,13 @@ def test_other_dtypes():
         assert_allclose(y, ref, atol=1e-10)
     assert_allclose(arnoldi_solve(P, np.array([1, 0, 0], dtype=np.longdouble)),
                     ref, atol=1e-10)
-    # float16 entries whose rows sum to 1 only in float16 (accepted by
-    # MarkovChain): the eigenvalue check allows the precision of P, and
-    # the result is the stationary distribution of the normalized chain
-    P16 = np.array([[0.3, 0.7], [0.3, 0.7]], dtype=np.float16)
-    MarkovChain(P16)
-    v = P16[0].astype(np.float64)
-    assert_allclose(arnoldi_solve(P16), v / v.sum(), atol=1e-10)
-    # a 3-state version goes through ARPACK rather than the closed form
-    P16 = np.array([[0.3, 0.7, 0], [0, 0.3, 0.7], [0.7, 0, 0.3]],
-                   dtype=np.float16)
-    assert_allclose(arnoldi_solve(P16), np.full(3, 1/3), atol=1e-10)
+    # float16 entries whose rows sum to 1 only in float16: the matrix is
+    # used as given, and it is not stochastic in float64 (2 states in
+    # closed form, 3 states through ARPACK)
+    for rows in ([[0.3, 0.7], [0.3, 0.7]],
+                 [[0.3, 0.7, 0], [0, 0.3, 0.7], [0.7, 0, 0.3]]):
+        assert_raises(ValueError, arnoldi_solve,
+                      np.array(rows, dtype=np.float16))
 
 
 def test_small_chains():
@@ -249,7 +245,9 @@ def test_errors():
     assert_raises(ValueError, arnoldi_solve, P, np.r_[-1., np.ones(9)])
     assert_raises(ValueError, arnoldi_solve, P, np.r_[np.nan, np.ones(9)])
     assert_raises(ValueError, arnoldi_solve, P, np.r_[np.inf, np.ones(9)])
-    # non-square, non-2d
+    # empty, non-square, non-2d
+    assert_raises(ValueError, arnoldi_solve, np.ones((0, 0)))
+    assert_raises(ValueError, arnoldi_solve, sparse.csr_array((0, 0)))
     assert_raises(ValueError, arnoldi_solve, np.ones((2, 3)) / 3)
     assert_raises(ValueError, arnoldi_solve, np.array([0.4, 0.6]))
     assert_raises(ValueError, arnoldi_solve, sparse.csr_array(np.ones((2, 3))))

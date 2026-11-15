@@ -58,10 +58,7 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     ------
     ValueError
         If the eigenvalue found is not 1 within `sqrt(max(tol, eps))`,
-        where `eps` is the machine epsilon of the working dtype, or that
-        of the dtype of `P` if it is a floating-point dtype of lower
-        precision (such as `float16`), which means that the matrix is
-        not stochastic.
+        which means that the matrix is not stochastic.
 
     scipy.sparse.linalg.ArpackNoConvergence
         If the iteration does not converge within `max_iter` restarts.
@@ -90,6 +87,8 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     if len(P.shape) != 2 or P.shape[0] != P.shape[1]:
         raise ValueError('matrix must be square')
     op, n = P.T, P.shape[0]
+    if n == 0:
+        raise ValueError('matrix must be nonempty')
     dtype = _working_dtype(P.dtype)
 
     if x0 is None:
@@ -98,8 +97,6 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
         x0 = np.array(x0, dtype=dtype)  # copy: normalized in place below
         if x0.shape != (n,):
             raise ValueError(f'x0 must have shape ({n},); got {x0.shape}')
-    if n == 0:
-        raise ValueError('matrix must be nonempty')
     if not np.all(x0 >= 0):
         raise ValueError('x0 must be nonnegative')
     s = x0.sum()
@@ -110,11 +107,8 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     if tol is None:
         tol = 0  # SciPy's default: machine precision
     # slack for the check that the eigenvalue found is 1: the error of a
-    # converged eigenvalue is of the order of tol (relative to 1), and the
-    # eigenvalue lies between the smallest and the largest row sum, which
-    # are 1 within the precision of the stored probabilities (as accepted
-    # by MarkovChain)
-    slack = np.sqrt(max(tol, np.finfo(dtype).eps, _dtype_eps(P.dtype)))
+    # converged eigenvalue is of the order of tol (relative to 1)
+    slack = np.sqrt(max(tol, np.finfo(dtype).eps))
 
     if n == 1:
         # the operator is the scalar eigenvalue itself
@@ -168,17 +162,6 @@ def _working_dtype(dtype):
 
     """
     return np.float32 if dtype == np.float32 else np.float64
-
-
-def _dtype_eps(dtype):
-    """
-    Precision of the stored transition probabilities, to which their
-    rows sum to 1: the machine epsilon of a floating-point dtype, 0 for
-    exact dtypes.
-
-    """
-    dtype = np.dtype(dtype)
-    return np.finfo(dtype).eps if np.issubdtype(dtype, np.floating) else 0
 
 
 def _solve_2x2(op, x0, slack, dtype):
