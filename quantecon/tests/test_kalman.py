@@ -37,6 +37,23 @@ def _two_noisy_signals_kalman(rho=0.8, sigma_v=0.5, sigma_e=0.6):
     return Kalman(LinearStateSpace(A, C, G, H))
 
 
+def _general_kalman():
+    """
+    Stable model with n = 3 states, m = 1 shock, k = 2 observables and
+    l = 4 measurement shocks. The four dimensions are pairwise different
+    (asserted below) and A, G, H are non-symmetric, so a transposed block,
+    or a block built from the wrong dimension (n where l is meant, say),
+    changes the shape or the values of the result.
+    """
+    A = np.array([[0.8, 0.2, 0.0], [0.1, 0.5, 0.3], [0.0, 0.2, 0.6]])
+    C = np.array([[1.0], [0.3], [0.5]])
+    G = np.array([[1.0, 0.5, 0.0], [0.0, 1.0, 0.7]])
+    H = np.array([[0.7, 0.1, 0.0, 0.3], [0.0, 0.5, 0.2, 0.1]])
+    ss = LinearStateSpace(A, C, G, H)
+    assert len({ss.n, ss.m, ss.k, ss.l}) == 4
+    return Kalman(ss)
+
+
 def _lecture_two_signal_posterior_variance(rho, sigma_v, sigma_e):
     """
     Solve lecture eq. (37.26) for p.
@@ -236,3 +253,165 @@ class TestKalmanStationaryCoefficientsTwoNoisySignals:
                 expected = _expected_stationary_coefficients(
                     A, G, self.K_ref, k, j, 'var')
                 _assert_coeff_lists_equal(actual, expected)
+
+
+class TestKalmanInfinityAndInnovationTwoNoisySignals:
+    """
+    The properties Sigma_infinity / K_infinity and
+    stationary_innovation_covar, checked against the closed form of the
+    two-noisy-signals model (see _two_noisy_signals_kalman).
+    """
+
+    rho, sigma_v, sigma_e = 0.8, 0.5, 0.6
+
+    def setup_method(self):
+        self.kf = _two_noisy_signals_kalman(
+            self.rho, self.sigma_v, self.sigma_e)
+        # p solves the Riccati equation in closed form (lecture eq. 37.26),
+        # so p = Sigma_infinity
+        self.p = _lecture_two_signal_posterior_variance(
+            self.rho, self.sigma_v, self.sigma_e)
+
+    def test_Sigma_infinity_computed_on_first_access(self):
+        kf = self.kf
+
+        # No call to stationary_values() beforehand: the property solves
+        # the Riccati equation itself
+        assert_allclose(kf.Sigma_infinity, [[self.p]], rtol=1e-10)
+
+    def test_K_infinity_computed_on_first_access(self):
+        kf = self.kf
+        K_ref = _lecture_two_signal_kalman_gain(
+            self.rho, self.sigma_v, self.sigma_e)
+
+        assert_allclose(kf.K_infinity, K_ref, rtol=1e-10, atol=1e-10)
+
+    @pytest.mark.parametrize("method", RICCATI_METHODS)
+    def test_stationary_innovation_covar(self, method):
+        kf = self.kf
+        kf.stationary_values(method=method)
+        # G = [1, 1]' and R = sigma_e^2 I, so G Sigma G' + R is
+        # p [[1, 1], [1, 1]] + sigma_e^2 I
+        expected = self.p * np.ones((2, 2)) + self.sigma_e ** 2 * np.eye(2)
+
+        actual = kf.stationary_innovation_covar()
+
+        assert actual.shape == (2, 2)
+        assert_allclose(actual, expected, rtol=1e-10, atol=1e-10)
+
+
+class TestKalmanGeneralModel:
+    """
+    Tests on a model whose four dimensions all differ (see
+    _general_kalman). The steady-state filter is checked through
+    fixed-point identities, since the Riccati solution has no closed form
+    here.
+    """
+
+    def setup_method(self):
+        self.kf = _general_kalman()
+
+    def test_default_prior(self):
+        # Documented defaults: x_hat = 0 (n x 1) and Sigma = I (n x n)
+        kf = self.kf
+        n = kf.ss.n
+
+        assert_allclose(kf.x_hat, np.zeros((n, 1)))
+        assert_allclose(kf.Sigma, np.identity(n))
+
+    def test_update_matches_filter_recursion(self):
+        kf = self.kf
+        A, C, G, H = kf.ss.A, kf.ss.C, kf.ss.G, kf.ss.H
+        x_hat = np.array([[1.0], [-0.5], [0.25]])
+        Sigma = np.array([[1.0, 0.2, 0.0], [0.2, 0.8, 0.1], [0.0, 0.1, 0.6]])
+        y = np.array([[0.4], [-0.3]])
+        # Flat inputs are reshaped to columns
+        kf.set_state(x_hat.ravel(), Sigma)
+
+        kf.update(y.ravel())
+
+        # One step of the recursion, with F = G Sigma G' + R and the gain
+        # K = A Sigma G' F^{-1}: the new prior mean is
+        # A x_hat + K (y - G x_hat) and the new prior covariance is
+        # A Sigma A' - K F K' + C C'
+        F = G @ Sigma @ G.T + H @ H.T
+        K = A @ Sigma @ G.T @ np.linalg.inv(F)
+        assert_allclose(kf.x_hat, A @ x_hat + K @ (y - G @ x_hat),
+                        rtol=1e-10, atol=1e-12)
+        assert_allclose(kf.Sigma, A @ Sigma @ A.T - K @ F @ K.T + C @ C.T,
+                        rtol=1e-10, atol=1e-12)
+
+    @pytest.mark.parametrize("coeff_type", ['ma', 'var'])
+    def test_stationary_coefficients(self, coeff_type):
+        kf = self.kf
+        A, G, k = kf.ss.A, kf.ss.G, kf.ss.k
+
+        actual = kf.stationary_coefficients(3, coeff_type=coeff_type)
+        expected = _expected_stationary_coefficients(
+            A, G, kf.K_infinity, k, 3, coeff_type)
+
+        _assert_coeff_lists_equal(actual, expected)
+
+    @pytest.mark.parametrize("method", RICCATI_METHODS)
+    def test_stationary_innovation_covar_fixed_point(self, method):
+        kf = self.kf
+        A, C, G = kf.ss.A, kf.ss.C, kf.ss.G
+        Sigma, K = kf.stationary_values(method=method)
+
+        F = kf.stationary_innovation_covar()
+
+        assert F.shape == (kf.ss.k, kf.ss.k)
+        # The gain is K = A Sigma G' F^{-1}, i.e. K F = A Sigma G' ...
+        assert_allclose(K @ F, A @ Sigma @ G.T, rtol=1e-8, atol=1e-8)
+        # ... and the Riccati equation in innovations form is
+        # Sigma = A Sigma A' - K F K' + C C'
+        assert_allclose(Sigma, A @ Sigma @ A.T - K @ F @ K.T + C @ C.T,
+                        rtol=1e-8, atol=1e-8)
+
+    def test_whitener_lss_matrices(self):
+        kf = self.kf
+        A, C, G, H = kf.ss.A, kf.ss.C, kf.ss.G, kf.ss.H
+        n, m, ell = kf.ss.n, kf.ss.m, kf.ss.l
+        K = kf.K_infinity
+
+        whitened = kf.whitener_lss()
+
+        # Block matrices as given in the docstring of whitener_lss
+        Atil = np.block([
+            [A, np.zeros((n, n)), np.zeros((n, ell))],
+            [K @ G, A - K @ G, K @ H],
+            [np.zeros((ell, n)), np.zeros((ell, n)), np.zeros((ell, ell))],
+        ])
+        Ctil = np.block([
+            [C, np.zeros((n, ell))],
+            [np.zeros((n, m)), np.zeros((n, ell))],
+            [np.zeros((ell, m)), np.eye(ell)],
+        ])
+        Gtil = np.hstack([G, -G, H])
+        assert isinstance(whitened, LinearStateSpace)
+        assert whitened.n == 2 * n + ell
+        assert whitened.m == m + ell
+        assert whitened.k == kf.ss.k
+        assert_allclose(whitened.A, Atil, rtol=1e-10, atol=1e-12)
+        assert_allclose(whitened.C, Ctil, rtol=1e-10, atol=1e-12)
+        assert_allclose(whitened.G, Gtil, rtol=1e-10, atol=1e-12)
+
+    @pytest.mark.parametrize("method", RICCATI_METHODS)
+    def test_whitener_lss_output_is_white_innovation(self, method):
+        kf = self.kf
+        kf.stationary_values(method=method)
+        F = kf.stationary_innovation_covar()
+
+        whitened = kf.whitener_lss()
+        A_til, G_til = whitened.A, whitened.G
+        _, mu_a, Sigma_x, Sigma_a, _ = whitened.stationary_distributions()
+
+        # The output is the innovation y_t - G x_hat_t: mean zero, with
+        # the steady-state innovation covariance G Sigma G' + R ...
+        assert_allclose(mu_a, 0., atol=1e-10)
+        assert_allclose(Sigma_a, F, rtol=1e-8, atol=1e-8)
+        # ... and serially uncorrelated: Cov(a_{t+j}, a_t) = G A^j Sigma_x G'
+        for j in (1, 2, 3):
+            autocov = G_til @ np.linalg.matrix_power(A_til, j) \
+                @ Sigma_x @ G_til.T
+            assert_allclose(autocov, 0., atol=1e-8)
