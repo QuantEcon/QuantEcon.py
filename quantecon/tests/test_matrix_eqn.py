@@ -4,7 +4,9 @@ Tests for quantecon.util
 """
 import numpy as np
 from numpy.testing import assert_allclose, assert_raises
+import quantecon as qe
 from quantecon import _matrix_eqn as qme
+from quantecon import matrix_eqn as deprecated_matrix_eqn
 
 
 def test_solve_discrete_lyapunov_zero():
@@ -63,3 +65,10 @@ def test_solve_discrete_riccati_system_beta_ge_one_failure_message():
             assert expected in message
 
         assert "max_iter" not in message
+
+
+def test_deprecated_matrix_eqn_names_are_exported_by_quantecon():
+    # The `quantecon.matrix_eqn` shim tells users to import each of its names
+    # from the `quantecon` namespace, so that advice has to work.
+    for name in deprecated_matrix_eqn.__all__:
+        assert getattr(qe, name) is getattr(qme, name)
