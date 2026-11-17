@@ -616,20 +616,15 @@ class LQMarkov:
         x_path = np.empty((self.n, T+1))
         u_path = np.empty((self.k, T))
         w_path = random_state.standard_normal((self.j, T+1))
-        Cw_path = np.empty((self.n, T+1))
-        for i in range(T+1):
-            Cw_path[:, i] = Cs[state[i]] @ w_path[:, i]
 
         # == Use policy sequence to generate states and controls == #
+        # The step from x_t to x_{t+1} uses the regime s_t, the same one
+        # that sets u_t = -F(s_t) x_t
         x_path[:, 0] = x0.flatten()
-        u_path[:, 0] = - (Fs[state[0]] @ x0).flatten()
-        for t in range(1, T):
-            Ax = As[state[t]] @ x_path[:, t-1]
-            Bu = Bs[state[t]] @ u_path[:, t-1]
-            x_path[:, t] = Ax + Bu + Cw_path[:, t]
-            u_path[:, t] = - (Fs[state[t]] @ x_path[:, t])
-        Ax = As[state[T]] @ x_path[:, T-1]
-        Bu = Bs[state[T]] @ u_path[:, T-1]
-        x_path[:, T] = Ax + Bu + Cw_path[:, T]
+        for t in range(T):
+            s = state[t]
+            u_path[:, t] = - (Fs[s] @ x_path[:, t])
+            x_path[:, t+1] = (As[s] @ x_path[:, t] + Bs[s] @ u_path[:, t]
+                              + Cs[s] @ w_path[:, t+1])
 
         return x_path, u_path, w_path, state
