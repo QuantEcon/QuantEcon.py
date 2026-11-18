@@ -221,7 +221,7 @@ class TestMaximization():
 
     def test_rotated_hyper_ellipsoid(self):
         d = 5
-        x0 = np.random.normal(size=d)
+        x0 = np.random.default_rng(42).normal(size=d)
         bounds = np.array([[-65.536, 65.536]] * d)
 
         sol = np.zeros(d)
