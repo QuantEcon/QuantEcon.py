@@ -247,6 +247,12 @@ def _initialize_tableaux(payoff_matrices, tableaux, bases):
     `abs(payoff_matrices[i].min()) + 1` (to ensure for the tableau not
     to have a negative entry or a column identically zero).
 
+    The shifted payoffs of each player are additionally divided by their
+    maximum, so that the payoff block of each tableau lies in a fixed
+    range and the absolute tolerances of the pivoting routine act as
+    tolerances relative to the payoff scale. Nash equilibria are
+    invariant to such per-player positive affine transformations.
+
     Suppose that the players 0 and 1 have m and n actions, respectively.
 
     * `tableaux[0]` has n rows and m+n+1 columns, where columns 0, ...,
@@ -294,12 +300,17 @@ def _initialize_tableaux(payoff_matrices, tableaux, bases):
     >>> bases = (np.empty(n, dtype=int), np.empty(m, dtype=int))
     >>> tableaux, bases = _initialize_tableaux((A, B), tableaux, bases)
     >>> tableaux[0]
-    array([[3., 2., 3., 1., 0., 1.],
-           [2., 6., 1., 0., 1., 1.]])
+    array([[0.5       , 0.33333333, 0.5       , 1.        , 0.        ,
+            1.        ],
+           [0.33333333, 1.        , 0.16666667, 0.        , 1.        ,
+            1.        ]])
     >>> tableaux[1]
-    array([[1., 0., 0., 4., 4., 1.],
-           [0., 1., 0., 3., 6., 1.],
-           [0., 0., 1., 1., 7., 1.]])
+    array([[1.        , 0.        , 0.        , 0.57142857, 0.57142857,
+            1.        ],
+           [0.        , 1.        , 0.        , 0.42857143, 0.85714286,
+            1.        ],
+           [0.        , 0.        , 1.        , 0.14285714, 1.        ,
+            1.        ]])
     >>> bases
     (array([3, 4]), array([0, 1, 2]))
 
@@ -307,17 +318,20 @@ def _initialize_tableaux(payoff_matrices, tableaux, bases):
     nums_actions = payoff_matrices[0].shape
 
     consts = np.zeros(2)  # To be added to payoffs if min <= 0
+    scales = np.ones(2)  # To divide the shifted payoffs by their maximum
     for pl in range(2):
         min_ = payoff_matrices[pl].min()
         if min_ <= 0:
             consts[pl] = min_ * (-1) + 1
+        scales[pl] = (payoff_matrices[pl] + consts[pl]).max()
 
     for pl, (py_start, sl_start) in enumerate(zip((0, nums_actions[0]),
                                                   (nums_actions[0], 0))):
         for i in range(nums_actions[1-pl]):
             for j in range(nums_actions[pl]):
                 tableaux[pl][i, py_start+j] = \
-                    payoff_matrices[1-pl][i, j] + consts[1-pl]
+                    (payoff_matrices[1-pl][i, j] + consts[1-pl]) / \
+                    scales[1-pl]
             for j in range(nums_actions[1-pl]):
                 if j == i:
                     tableaux[pl][i, sl_start+j] = 1
@@ -381,12 +395,12 @@ def _lemke_howson_tbl(tableaux, bases, init_pivot, max_iter):
     >>> _lemke_howson_tbl(tableaux, bases, 1, 10)
     (True, 4, False)
     >>> tableaux[0]
-    array([[ 0.875 ,  0.    ,  1.    ,  0.375 , -0.125 ,  0.25  ],
-           [ 0.1875,  1.    ,  0.    , -0.0625,  0.1875,  0.125 ]])
+    array([[ 0.875 ,  0.    ,  1.    ,  2.25  , -0.75  ,  1.5   ],
+           [ 0.1875,  1.    ,  0.    , -0.375 ,  1.125 ,  0.75  ]])
     >>> tableaux[1]
     array([[ 1.    , -1.6   ,  0.8   ,  0.    ,  0.    ,  0.2   ],
-           [ 0.    ,  0.4667, -0.4   ,  1.    ,  0.    ,  0.0667],
-           [ 0.    , -0.0667,  0.2   ,  0.    ,  1.    ,  0.1333]])
+           [ 0.    ,  3.2667, -2.8   ,  1.    ,  0.    ,  0.4667],
+           [ 0.    , -0.4667,  1.4   ,  0.    ,  1.    ,  0.9333]])
     >>> bases
     (array([2, 1]), array([0, 3, 4]))
 
