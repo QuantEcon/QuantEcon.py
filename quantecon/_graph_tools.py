@@ -2,6 +2,8 @@
 Tools for dealing with a directed graph.
 
 """
+from functools import wraps
+
 import numpy as np
 from scipy import sparse
 from scipy.sparse import csgraph
@@ -13,6 +15,28 @@ from .util import check_random_state
 
 # Decorator for *_components properties
 def annotate_nodes(func):
+    """
+    Decorator that replaces node indices with node labels.
+
+    Wrap a method of `DiGraph` that returns a list of arrays of node
+    indices so that, if the instance has `node_labels` set, each array
+    of indices is replaced with the corresponding array of labels. If
+    `node_labels` is None, the indices are returned unchanged.
+
+    Parameters
+    ----------
+    func : callable
+        Method taking a `DiGraph` instance as its only argument and
+        returning a list of ndarray(int) of node indices.
+
+    Returns
+    -------
+    callable
+        The wrapped method, which returns a list of ndarray of node
+        labels (or of node indices if `node_labels` is None).
+
+    """
+    @wraps(func)
     def new_func(self):
         list_of_components = func(self)
         if self.node_labels is not None:
@@ -139,6 +163,13 @@ class DiGraph:
 
     @property
     def node_labels(self):
+        """
+        ndarray or None: Labels of the nodes, an array of length n, or
+        None if no labels are set. When set, the value must be an
+        array_like of length n with data homogeneous in type; otherwise
+        a ValueError is raised.
+
+        """
         return self._node_labels
 
     @node_labels.setter
@@ -174,18 +205,34 @@ class DiGraph:
 
     @property
     def num_strongly_connected_components(self):
+        """
+        int: Number of strongly connected components of the digraph.
+
+        """
         if self._num_scc is None:
             self._find_scc()
         return self._num_scc
 
     @property
     def scc_proj(self):
+        """
+        ndarray(int, ndim=1): Array of length n whose i-th entry is the
+        label (an integer from 0 to
+        ``num_strongly_connected_components - 1``) of the strongly
+        connected component that node i belongs to.
+
+        """
         if self._scc_proj is None:
             self._find_scc()
         return self._scc_proj
 
     @property
     def is_strongly_connected(self):
+        """
+        bool: Whether the digraph is strongly connected, i.e., whether
+        every node is reachable from every other node.
+
+        """
         return (self.num_strongly_connected_components == 1)
 
     def _condensation_lil(self):
@@ -223,16 +270,47 @@ class DiGraph:
 
     @property
     def sink_scc_labels(self):
+        """
+        ndarray(int, ndim=1): Labels (as used in `scc_proj`) of the sink
+        strongly connected components, i.e., the strongly connected
+        components with no edge leading out to another component.
+
+        """
         if self._sink_scc_labels is None:
             self._find_sink_scc()
         return self._sink_scc_labels
 
     @property
     def num_sink_strongly_connected_components(self):
+        """
+        int: Number of sink strongly connected components of the
+        digraph.
+
+        """
         return len(self.sink_scc_labels)
 
     @property
     def strongly_connected_components_indices(self):
+        """
+        list(ndarray(int)): List of arrays of node indices, one array
+        for each strongly connected component, ordered by component
+        label as in `scc_proj`.
+
+        Examples
+        --------
+        Nodes 0 and 1 form a cycle, node 2 points into it and to node 3,
+        and node 3 has a self loop:
+
+        >>> import quantecon as qe
+        >>> adj_matrix = [[0, 1, 0, 0],
+        ...               [1, 0, 0, 0],
+        ...               [0, 1, 0, 1],
+        ...               [0, 0, 0, 1]]
+        >>> g = qe.DiGraph(adj_matrix)
+        >>> g.strongly_connected_components_indices
+        [array([0, 1]), array([3]), array([2])]
+
+        """
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
@@ -242,10 +320,49 @@ class DiGraph:
     @property
     @annotate_nodes
     def strongly_connected_components(self):
+        """
+        list(ndarray): List of arrays, one for each strongly connected
+        component, containing the labels of its nodes if `node_labels`
+        is not None, or their indices otherwise.
+
+        Examples
+        --------
+        >>> import quantecon as qe
+        >>> adj_matrix = [[0, 1, 0, 0],
+        ...               [1, 0, 0, 0],
+        ...               [0, 1, 0, 1],
+        ...               [0, 0, 0, 1]]
+        >>> g = qe.DiGraph(adj_matrix, node_labels=['a', 'b', 'c', 'd'])
+        >>> for component in g.strongly_connected_components:
+        ...     print(component)
+        ['a' 'b']
+        ['d']
+        ['c']
+
+        """
         return self.strongly_connected_components_indices
 
     @property
     def sink_strongly_connected_components_indices(self):
+        """
+        list(ndarray(int)): List of arrays of node indices, one array
+        for each sink strongly connected component.
+
+        Examples
+        --------
+        In this digraph, no edge leaves the component {0, 1} or the
+        component {3}, while node 2 has edges into both:
+
+        >>> import quantecon as qe
+        >>> adj_matrix = [[0, 1, 0, 0],
+        ...               [1, 0, 0, 0],
+        ...               [0, 1, 0, 1],
+        ...               [0, 0, 0, 1]]
+        >>> g = qe.DiGraph(adj_matrix)
+        >>> g.sink_strongly_connected_components_indices
+        [array([0, 1]), array([3])]
+
+        """
         if self.is_strongly_connected:
             return [np.arange(self.n)]
         else:
@@ -255,6 +372,12 @@ class DiGraph:
     @property
     @annotate_nodes
     def sink_strongly_connected_components(self):
+        """
+        list(ndarray): List of arrays, one for each sink strongly
+        connected component, containing the labels of its nodes if
+        `node_labels` is not None, or their indices otherwise.
+
+        """
         return self.sink_strongly_connected_components_indices
 
     def _compute_period(self):
@@ -319,16 +442,80 @@ class DiGraph:
 
     @property
     def period(self):
+        """
+        int: Period of the digraph, the greatest common divisor of the
+        lengths of its cycles. Defined only for a strongly connected
+        digraph; for a single node, with or without a self loop, the
+        period is set to 1.
+
+        Raises
+        ------
+        NotImplementedError
+            If the digraph is not strongly connected.
+
+        Examples
+        --------
+        A directed cycle on four nodes has period 4:
+
+        >>> import quantecon as qe
+        >>> adj_matrix = [[0, 1, 0, 0],
+        ...               [0, 0, 1, 0],
+        ...               [0, 0, 0, 1],
+        ...               [1, 0, 0, 0]]
+        >>> g = qe.DiGraph(adj_matrix)
+        >>> g.period
+        4
+
+        """
         if self._period is None:
             self._compute_period()
         return self._period
 
     @property
     def is_aperiodic(self):
+        """
+        bool: Whether the digraph is aperiodic, i.e., whether its
+        period is 1. Defined only for a strongly connected digraph.
+
+        Raises
+        ------
+        NotImplementedError
+            If the digraph is not strongly connected.
+
+        """
         return (self.period == 1)
 
     @property
     def cyclic_components_indices(self):
+        """
+        list(ndarray(int)): List of arrays of node indices, one array
+        for each cyclic component. If the period is d > 1, the nodes
+        split into d cyclic components such that every edge leads from
+        one component to the next (cyclically); if the digraph is
+        aperiodic, the single cyclic component contains all the nodes.
+        Defined only for a strongly connected digraph.
+
+        Raises
+        ------
+        NotImplementedError
+            If the digraph is not strongly connected.
+
+        Examples
+        --------
+        Node 0 has edges to nodes 1 and 2, which both lead back to
+        node 0, so the period is 2:
+
+        >>> import quantecon as qe
+        >>> adj_matrix = [[0, 1, 1],
+        ...               [1, 0, 0],
+        ...               [1, 0, 0]]
+        >>> g = qe.DiGraph(adj_matrix)
+        >>> g.period
+        2
+        >>> g.cyclic_components_indices
+        [array([0]), array([1, 2])]
+
+        """
         if self.is_aperiodic:
             return [np.arange(self.n)]
         else:
@@ -338,6 +525,18 @@ class DiGraph:
     @property
     @annotate_nodes
     def cyclic_components(self,):
+        """
+        list(ndarray): List of arrays, one for each cyclic component,
+        containing the labels of its nodes if `node_labels` is not
+        None, or their indices otherwise. Defined only for a strongly
+        connected digraph.
+
+        Raises
+        ------
+        NotImplementedError
+            If the digraph is not strongly connected.
+
+        """
         return self.cyclic_components_indices
 
     def subgraph(self, nodes):
