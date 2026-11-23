@@ -57,8 +57,11 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     Raises
     ------
     ValueError
-        If the eigenvalue found is not 1 within `sqrt(max(tol, eps))`,
-        which means that the matrix is not stochastic.
+        If an explicit matrix is not finite, real, nonnegative, and
+        row-stochastic, or if the eigenvalue is nonfinite or outside
+        `sqrt(max(tol, eps))` of 1. A `LinearOperator` is assumed to
+        represent a stochastic matrix; the eigenvalue check is not a
+        validation of its entries or row sums.
 
     scipy.sparse.linalg.ArpackNoConvergence
         If the iteration does not converge within `max_iter` restarts.
@@ -70,7 +73,12 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     elimination without subtractions; it requires a dense matrix.
     `arnoldi_solve` wraps a general-purpose iterative solver that acts on
     the matrix, or the operator, as given, so it is suited to chains too
-    large to densify.
+    large to densify. Explicit row sums are accumulated in at least
+    double precision and checked within the larger of `sqrt(eps64)`
+    and eight epsilons of ARPACK's working dtype, independently of
+    the eigensolver tolerance. Validation never densifies sparse
+    input. Noncanonical or uncommon sparse formats may need sparse
+    scratch space; the solver still uses the original matrix/operator.
 
     Examples
     --------
@@ -90,6 +98,8 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     if n == 0:
         raise ValueError('matrix must be nonempty')
     dtype = _working_dtype(P.dtype)
+    if not isinstance(P, LinearOperator):
+        _check_explicit_stochastic(P, dtype)
 
     if x0 is None:
         x0 = np.full(n, 1 / n, dtype=dtype)
@@ -146,8 +156,39 @@ def arnoldi_solve(P, x0=None, tol=None, max_iter=None, ncv=None):
     return x / x.sum()
 
 
+def _check_explicit_stochastic(P, dtype):
+    if not np.issubdtype(P.dtype, np.number) and P.dtype.kind != 'b':
+        raise ValueError('the transition matrix must be real numeric')
+    if P.dtype.kind == 'c':
+        raise ValueError('the transition matrix must be real numeric')
+    if issparse(P):
+        entries = P if P.format in ('csr', 'csc', 'coo') else P.tocoo()
+        if not np.isfinite(entries.data).all():
+            raise ValueError('the transition matrix must be finite')
+        if (entries.data < 0).any():
+            # A signed stored term is not necessarily a negative matrix
+            # entry when repeated coordinates have not been coalesced.
+            if not entries.has_canonical_format:
+                entries = entries.tocoo(copy=True)
+                entries = entries.astype(np.result_type(entries.dtype, np.float64),
+                                         copy=False)
+                entries.sum_duplicates()
+            if (entries.data < 0).any():
+                raise ValueError('the transition matrix must be nonnegative')
+        rows = P @ np.ones(P.shape[1], dtype=np.float64)
+    else:
+        if not np.isfinite(P).all():
+            raise ValueError('the transition matrix must be finite')
+        if (P < 0).any():
+            raise ValueError('the transition matrix must be nonnegative')
+        rows = P.sum(axis=1, dtype=np.result_type(P.dtype, np.float64))
+    slack = max(np.sqrt(np.finfo(np.float64).eps), 8 * np.finfo(dtype).eps)
+    if not np.all(np.abs(rows - 1) <= slack):
+        raise ValueError('the matrix is not stochastic (rows must sum to 1)')
+
+
 def _check_eigenvalue(lam, slack):
-    if abs(lam - 1) > slack:
+    if not np.isfinite(lam) or abs(lam - 1) > slack:
         raise ValueError(
             f'the largest eigenvalue {lam} is not 1: the matrix is not '
             'stochastic (rows must sum to 1)'
@@ -170,6 +211,8 @@ def _solve_2x2(op, x0, slack, dtype):
 
     """
     Pt = np.asarray(op @ np.eye(2, dtype=dtype), dtype=dtype)
+    if not np.isfinite(Pt).all() or (Pt < 0).any():
+        raise ValueError('the transition matrix must be finite and nonnegative')
     if np.abs(Pt.sum(axis=0) - 1).max() > slack:
         raise ValueError('the matrix is not stochastic (rows must sum to 1)')
     a, b = Pt[1, 0], Pt[0, 1]  # P[0, 1] and P[1, 0]

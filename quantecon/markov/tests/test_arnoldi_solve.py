@@ -276,3 +276,85 @@ def test_x0_not_modified():
     x0 = np.array([3., 0., 0.])
     arnoldi_solve(P, x0)
     assert_array_equal(x0, [3., 0., 0.])
+
+
+@pytest.mark.parametrize("as_matrix", [np.asarray, sparse.csr_matrix,
+                                       sparse.csc_array, sparse.coo_array])
+@pytest.mark.parametrize("data", [
+    [[1., 0., 0.], [0., 0.9, 0.], [0., 0., 0.8]],
+    [[1., 0., 0.], [0.6, 0.5, 0.], [0., 0., 0.8]],
+    [[1.25, -0.25], [0.5, 0.5]],
+    [[1., 0., 0.], [-0.25, 0.5, 0.75], [0., 0., 1.]],
+    [[np.nan]], [[np.inf]], [[1 + 1j]],
+])
+def test_explicit_invalid_transition_entries(as_matrix, data):
+    with pytest.raises(ValueError):
+        arnoldi_solve(as_matrix(data), tol=1e-2)
+
+
+@pytest.mark.parametrize("as_matrix", [sparse.coo_array, sparse.csr_array,
+                                       sparse.csc_matrix])
+def test_sparse_duplicate_terms_are_coalesced_for_entry_sign(as_matrix):
+    terms = [1.25, -0.75, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5]
+    row_or_col = [0, 0, 1, 2, 0, 1, 2, 0, 1, 2]
+    P = sparse.coo_array((terms, (np.repeat([0, 1, 2], [4, 3, 3]), row_or_col)),
+                         shape=(3, 3))
+    if as_matrix is not sparse.coo_array:
+        # SciPy's COO-to-compressed constructor coalesces, so construct
+        # a compressed duplicate explicitly rather than testing that path.
+        P = as_matrix((terms, row_or_col, [0, 4, 7, 10]), shape=(3, 3))
+    values = P.data.copy()
+    x = arnoldi_solve(P)
+    assert_allclose(x, np.full(3, 1 / 3), atol=1e-12)
+    assert_array_equal(P.data, values)
+
+
+def test_sparse_large_validation_never_densifies(monkeypatch):
+    n = 20000
+    P = sparse.csr_array(([0.5] * n + [0.5] * n,
+                         (np.tile(np.arange(n), 2),
+                          np.r_[np.arange(n), (np.arange(n) + 1) % n])),
+                         shape=(n, n))
+    def forbid(*args, **kwargs):
+        pytest.fail("sparse transition matrix was densified")
+    monkeypatch.setattr(sparse.csr_array, 'toarray', forbid)
+    monkeypatch.setattr(sparse.csc_array, 'toarray', forbid)
+    # An independent block construction makes non-uniform eigenvalues
+    # far from 1 for an inexpensive analytic uniform stationary test.
+    P = (P + P.T) / 2
+    rng = np.random.default_rng(999)
+    permutation = rng.permutation(n)
+    Q = sparse.csr_array((np.ones(n), (np.arange(n), permutation)), shape=(n, n))
+    P = (P + (Q + Q.T) / 2) / 2
+    assert_allclose(arnoldi_solve(P), np.full(n, 1/n), atol=2e-12)
+
+
+def test_sparse_duplicate_net_negative_is_rejected():
+    P = sparse.coo_array(([-0.5, 0.25, 1.25, 1., 1.],
+                         ([0, 0, 0, 1, 2], [0, 0, 1, 1, 2])), shape=(3, 3))
+    with pytest.raises(ValueError, match="nonnegative"):
+        arnoldi_solve(P)
+
+
+def test_sparse_duplicate_integer_row_sum_does_not_wrap():
+    P = sparse.coo_array((np.array([127, 127, 3, 1, 1], dtype=np.int8),
+                         ([0, 0, 0, 1, 2], [0, 0, 0, 1, 2])), shape=(3, 3))
+    with pytest.raises(ValueError, match="rows must sum"):
+        arnoldi_solve(P)
+
+
+def test_large_matrix_free_does_not_require_forward_matvec():
+    n = 20
+    P = np.full((n, n), 1.0 / n)
+    def forbidden(_):
+        pytest.fail("matrix-free input was probed in the forward direction")
+    op = LinearOperator((n, n), matvec=forbidden,
+                        rmatvec=lambda z: P.T @ z, dtype=np.float64)
+    assert_allclose(arnoldi_solve(op), np.full(n, 1.0 / n), atol=1e-14)
+
+
+@pytest.mark.parametrize("P", [np.full((1, 1), np.nan),
+                               np.array([[1.25, -0.25], [0.5, 0.5]])])
+def test_tiny_matrix_free_handles_values_already_computed(P):
+    with pytest.raises(ValueError):
+        arnoldi_solve(as_linear_operator(P))
