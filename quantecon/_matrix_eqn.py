@@ -41,13 +41,10 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
     Parameters
     ----------
     A : array_like(float, ndim=2)
-        An n x n matrix as described above.  We assume in order for
-        convergence that the eigenvalues of A have moduli bounded by
-        unity
+        An n x n matrix as described above. The doubling method assumes
+        that the eigenvalues of A lie strictly inside the unit disk.
     B : array_like(float, ndim=2)
-        An n x n matrix as described above.  We assume in order for
-        convergence that the eigenvalues of A have moduli bounded by
-        unity
+        An n x n matrix giving the right-hand side of the equation.
     max_it : scalar(int), optional(default=50)
         The maximum number of iterations
     method : string, optional(default="doubling")
@@ -66,24 +63,35 @@ def solve_discrete_lyapunov(A, B, max_it=50, method="doubling"):
         A, B = list(map(np.atleast_2d, [A, B]))
         alpha0 = A
         gamma0 = B
-
-        diff = 5
+        zero_rhs = not B.any()
         n_its = 1
 
-        while diff > 1e-15:
-
-            alpha1 = alpha0 @ alpha0
-            gamma1 = gamma0 + (alpha0 @ gamma0 @ alpha0.conjugate().T)
-
-            diff = np.max(np.abs(gamma1 - gamma0))
-            alpha0 = alpha1
-            gamma0 = gamma1
-
+        while True:
+            left = alpha0 @ gamma0
+            gamma1 = gamma0 + (left @ alpha0.conjugate().T)
             n_its += 1
 
             if n_its > max_it:
-                msg = "Exceeded maximum iterations {}, check input matrics"
+                msg = "Exceeded maximum iterations {}, check input matrices"
                 raise ValueError(msg.format(n_its))
+
+            if not np.isfinite(gamma1).all():
+                raise ValueError("Non-finite values in Lyapunov doubling; check input matrices")
+
+            # Preserve exact invariant right-hand sides, including a zero
+            # RHS or a nonexpansive transition that annihilates the sum.
+            if zero_rhs or (not left.any() and np.abs(alpha0).sum(axis=1).max() <= 1):
+                break
+
+            alpha0 = alpha0 @ alpha0
+
+            # The unaccounted tail is T(gamma1) + T**2(gamma1) + ...,
+            # where T(G) = alpha0 @ G @ alpha0*. In the entrywise max norm
+            # ||T|| <= ||alpha0||_inf**2. This bound gives a relative tail
+            # below 1e-15, without assuming monotone increments.
+            if np.abs(alpha0).sum(axis=1).max() <= 3e-8:
+                break
+            gamma0 = gamma1
 
     elif method == "bartels-stewart":
         gamma1 = sp_solve_discrete_lyapunov(A, B)
