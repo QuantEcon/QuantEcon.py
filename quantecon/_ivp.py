@@ -18,6 +18,31 @@ import numpy as np
 from scipy import integrate, interpolate
 
 
+class _TrajectoryRows:
+    """Collect rows in bounded batches without copying earlier batches."""
+
+    _chunk_rows = 256
+
+    def __init__(self, initial):
+        self._rows = [initial]
+        self._chunks = []
+
+    def append(self, row):
+        self._rows.append(row)
+        if len(self._rows) == self._chunk_rows:
+            self._chunks.append(np.vstack(self._rows))
+            self._rows = []
+
+    def as_array(self):
+        if not self._chunks and len(self._rows) == 1:
+            # Preserve the initial-only result, which has no second axis.
+            return self._rows[0]
+        chunks = self._chunks
+        if self._rows:
+            chunks = [*chunks, np.vstack(self._rows)]
+        return chunks[0] if len(chunks) == 1 else np.concatenate(chunks)
+
+
 class IVP(integrate.ode):
 
     r"""
@@ -48,13 +73,13 @@ class IVP(integrate.ode):
     def _integrate_fixed_trajectory(self, h, T, step, relax):
         """Generates a solution trajectory of fixed length."""
         # initialize the solution using initial condition
-        solution = np.hstack((self.t, self.y))
+        solution = _TrajectoryRows(np.hstack((self.t, self.y)))
 
         while self.successful():
 
             self.integrate(self.t + h, step, relax)
             current_step = np.hstack((self.t, self.y))
-            solution = np.vstack((solution, current_step))
+            solution.append(current_step)
 
             if (h > 0) and (self.t >= T):
                 break
@@ -63,25 +88,25 @@ class IVP(integrate.ode):
             else:
                 continue
 
-        return solution
+        return solution.as_array()
 
     def _integrate_variable_trajectory(self, h, g, tol, step, relax):
         """Generates a solution trajectory of variable length."""
         # initialize the solution using initial condition
-        solution = np.hstack((self.t, self.y))
+        solution = _TrajectoryRows(np.hstack((self.t, self.y)))
 
         while self.successful():
 
             self.integrate(self.t + h, step, relax)
             current_step = np.hstack((self.t, self.y))
-            solution = np.vstack((solution, current_step))
+            solution.append(current_step)
 
             if g(self.t, self.y, *self.f_params) < tol:
                 break
             else:
                 continue
 
-        return solution
+        return solution.as_array()
 
     def _initialize_integrator(self, t0, y0, integrator, **kwargs):
         """Initializes the integrator prior to integration."""
